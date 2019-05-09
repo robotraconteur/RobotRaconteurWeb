@@ -1,0 +1,228 @@
+service com.robotraconteur.testing.TestService3
+
+stdver 0.9.0
+#option version 0.9.0
+
+import com.robotraconteur.testing.TestService1
+using  com.robotraconteur.testing.TestService1.testroot
+using  com.robotraconteur.testing.TestService1.teststruct1
+using  com.robotraconteur.testing.TestService1.teststruct2
+using  com.robotraconteur.testing.TestService1.testexception1
+using  com.robotraconteur.testing.TestService1.sub2
+using  com.robotraconteur.testing.TestService1.sub3
+
+enum testenum1
+	value1 = 0,	value2,	value3,	anothervalue = -1,
+	anothervalue2 = -2,
+	anothervalue3 = -3,
+	hexval1 = 0x10,
+	hexval2,
+	neghexval1 = 0x80000005,
+	neghexval2,
+	more_values
+end
+
+constant string strconst "This is a\n \"string constant\" \\\/\b\f \r\u00FF tabme\ttabme\n smile! \ud83d\udE01"
+constant int32 int32const 3856384
+constant int32[] int32const_array {182476, 56483, -2947}
+constant double[] doubleconst_array {1.5847, 3.14, -548e3, 3452.67e2, 485e-21}
+constant struct structconst {field1: strconst, field2: int32const_array}
+constant struct structconst2 {field3: structconst, field4: int32const}    
+
+namedarray vector3
+    field double x
+	field double y
+	field double z
+end namedarray
+
+namedarray quaternion
+    field double q0
+	field double q1
+	field double q2
+	field double q3
+end
+
+namedarray transform
+    field quaternion rotation
+    field vector3 translation	
+end
+
+namedarray pixel
+	field uint8 r
+	field uint8 b
+	field uint8 g
+end
+
+namedarray pixel2
+	field uint8 c
+	field pixel d
+	field pixel e
+	field pixel[7] f
+	field pixel g
+end
+
+pod testpod1
+	field double d1
+	field double[6] d2
+	field double[6-] d3
+	field double[3,3] d4
+	field testpod2 s1
+	field testpod2[8] s2
+	field testpod2[9-] s3
+	field testpod2[2,4] s4
+	field transform t1
+	field transform[4] t2
+	field transform[15-] t3
+	field transform[2,4] t4
+end
+
+pod testpod2
+	field int8 i1
+	field int8[15] i2
+	field int8[17-] i3
+end
+
+struct teststruct3
+	field testpod1 s1
+	field testpod1[] s2
+	field testpod1[11] s3
+	field testpod1[16-] s4
+	field testpod1[3,3] s5
+	field testpod1[*] s6
+	field testpod1{list} s7
+	field testpod1[]{list} s8
+	field testpod1[*]{list} s9
+	field varvalue s10
+	field varvalue s11
+	field varvalue s12
+	field varvalue s13
+	field varvalue s14
+	field varvalue s15
+	field transform t1
+	field transform[4] t2
+	field transform[2,4] t3
+	field varvalue t4
+	field varvalue t5
+	field transform{list} t6
+	field transform[4]{list} t7
+	field transform[2,4]{list} t8
+	field varvalue t9
+	field varvalue t10
+	field varvalue t11
+	
+end
+
+object testroot3
+    property int32 readme [readonly]
+	property int32 writeme [writeonly]
+	
+	pipe int32 unreliable1 [unreliable,readonly]
+	option pipe unreliable2 unreliable
+	pipe int32 unreliable2
+
+    wire int32 peekwire [readonly]
+    wire int32 \
+	pokewire [writeonly]
+	property int32 unknown_modifier [unknown, unknown2(), unknown_3(23, 45.8e-5, hello, "world")]
+	
+	memory double[] readmem [readonly]
+	
+	objref obj4 o4
+	
+	property testenum1 testenum1_prop
+	
+	property testpod1 testpod1_prop
+	function void testpod1_func1(testpod1 s)
+	function testpod1 testpod1_func2()
+	
+	property teststruct3 teststruct3_prop
+	
+	memory testpod2[] pod_m1
+	memory testpod2[*] pod_m2
+	
+	function double{generator} gen_func1() 
+	function uint8[]{generator} gen_func2(string name) 
+	function void gen_func3(string name, uint8[]{generator} in) 
+	function uint8[]{generator} gen_func4(uint8[]{generator} in) 
+	function teststruct2{generator} gen_func5(teststruct2{generator} in)
+	
+	#extra tests for fixed length arrays
+	property double[6]{list} d1
+	property double[6-]{list} d2
+	property double[6]{int32} d3
+	property double[6-]{int32} d4
+	property double[3,3]{list} d5
+	property double[3,3]{int32} d6
+	
+	#Test pipe and wire verification
+	pipe int32[3] p1
+	pipe int32[3-] p2
+	pipe int32[2,2] p3
+	wire int32[6] w1
+	wire int32[6-] w2
+	wire int32[3,2] w3
+	
+	#namedarray test
+	property vector3 testnamedarray1
+	property transform testnamedarray2
+	property transform[10-] testnamedarray3
+	property transform[*] testnamedarray4
+	property transform[3,2] testnamedarray5
+	
+	memory transform[] namedarray_m1
+	memory transform[*] namedarray_m2
+	
+	#new primitive types test
+	property cdouble c1
+	property cdouble[] c2
+	property cdouble[*] c3
+	property cdouble{list} c4
+	property cdouble[]{list} c5
+	property cdouble[*]{list} c6
+	property csingle c7
+	property csingle[] c8
+	property csingle[*] c9
+	property csingle{list} c10
+	property csingle[]{list} c11
+	property csingle[*]{list} c12
+	
+	property bool b1
+	property bool[] b2
+	property bool[*] b3
+	property bool{list} b4
+	property bool[]{list} b5
+	property bool[*]{list} b6
+			
+	memory cdouble[] c_m1
+	memory cdouble[*] c_m2
+	memory cdouble[] c_m3
+	memory cdouble[*] c_m4
+	memory bool[] c_m5
+	memory bool[*] c_m6
+	
+end
+
+object obj1
+    property double[] d1
+end
+
+object obj2
+    implements obj1
+    property double[] d1
+end
+
+object obj3
+    implements obj1
+    implements obj2
+	property double[] d1
+end
+
+object obj4
+    implements sub2
+	property string s_ind
+	property int32 i_ind
+
+	property string data
+	objref sub3{string} o3_1
+end
+

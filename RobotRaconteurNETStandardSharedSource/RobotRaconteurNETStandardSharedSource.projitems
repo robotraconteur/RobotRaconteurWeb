@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>9648c599-747e-4bea-8af3-d24a07df8e22</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>RobotRaconteurNETStandardSharedSource</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncMutex.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CallbackMember.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Endpoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Error.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IOUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MemoryMember.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultiDimArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NodeID.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PeriodicTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PipeMember.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RobotRaconteur.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RobotRaconteurServiceIndex.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RobotRaconteurServiceIndex_stubskel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Security.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceDefinition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceStructure.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Transport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WireMember.cs" />
+  </ItemGroup>
+</Project>

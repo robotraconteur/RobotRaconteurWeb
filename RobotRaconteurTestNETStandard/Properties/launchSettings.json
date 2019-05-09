@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RobotRaconteurTestNETStandard": {
+      "commandName": "Project",
+      "commandLineArgs": "loopback"
+    }
+  }
+}

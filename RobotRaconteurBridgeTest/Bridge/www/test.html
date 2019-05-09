@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Bridge RobotRaconteurBridgeTest</title>
+    <script src="../../Scripts/jquery-3.4.1.js"></script>    
+    <script src="../output/bridge.js"></script>
+    <script src="../output/RobotRaconteurBridge.js"></script>
+    <script src="../output/RobotRaconteurBridgeTest.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#log").append("Starting...<br/>");
+            var c = new RobotRaconteurTest.ServiceTestClient();
+            c.RunFullTest("rr+tcp://localhost:2354/?service=RobotRaconteurTestService", "rr+tcp://localhost:2354/?service=RobotRaconteurTestService_auth").continueWith(function (res) {
+                try {
+                    res.getResult()
+                    $("#log").append("Done!");
+
+                }
+                catch (e) {
+                    $("#log").append("Error!");
+                }
+
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <!--
+        Right-Click on this file
+        and select "View in Browser"
+    -->
+    <div id="log">
+
+    </div>
+
+</body>
+</html>
