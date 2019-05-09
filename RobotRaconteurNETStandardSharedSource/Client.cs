@@ -83,7 +83,7 @@ namespace RobotRaconteur
         public Task<object> FindObjRef(string n, string i, CancellationToken cancel)
         {
             if (RRContext == null) throw new ServiceException("Reference has been released");
-            return RRContext.FindObjRef(RRServicePath + "." + n + "[" + RRUriExtensions.EscapeDataString(i.ToString()).Replace(".", "%2e") + "]", null, cancel);
+            return RRContext.FindObjRef(RRServicePath + "." + n + "[" + Uri.EscapeDataString(i.ToString()).Replace(".", "%2e") + "]", null, cancel);
         }
 
         public Task<object> FindObjRefTyped(string n, string objecttype, CancellationToken cancel)
@@ -95,7 +95,7 @@ namespace RobotRaconteur
         public Task<object> FindObjRefTyped(string n, string i, string objecttype, CancellationToken cancel)
         {
             if (RRContext == null) throw new ServiceException("Reference has been released");
-            return RRContext.FindObjRef(RRServicePath + "." + n + "[" + RRUriExtensions.EscapeDataString(i.ToString()).Replace(".", "%2e") + "]", objecttype, cancel);
+            return RRContext.FindObjRef(RRServicePath + "." + n + "[" + Uri.EscapeDataString(i.ToString()).Replace(".", "%2e") + "]", objecttype, cancel);
         }
 
         protected internal async Task SendPipeMessage(MessageEntry m, CancellationToken cancel)

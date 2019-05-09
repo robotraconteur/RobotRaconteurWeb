@@ -20,7 +20,6 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteur.Extensions;
 
 namespace RobotRaconteur
 {
@@ -52,18 +51,18 @@ namespace RobotRaconteur
 
         public override Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken))
         {            
-                return Task.FromResult((ulong)RRArrayExtensions.LongLength(memory));            
+                return Task.FromResult((ulong)memory.LongLength);            
         }
 
         public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
         {
-            RRArrayExtensions.Copy(memory, (long)memorypos, buffer, (long)bufferpos, (long)count);
+            Array.Copy(memory, (long)memorypos, buffer, (long)bufferpos, (long)count);
             return Task.FromResult(0);
         }
 
         public virtual Task Write(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
-            RRArrayExtensions.Copy(buffer, (long)bufferpos, memory, (long)memorypos, (long)count);
+            Array.Copy(buffer, (long)bufferpos, memory, (long)memorypos, (long)count);
             return Task.FromResult(0);
         }
     }
@@ -519,20 +518,20 @@ namespace RobotRaconteur
 
         protected override ulong GetBufferLength(object buffer)
         {
-            return (ulong)RRArrayExtensions.LongLength((T[])buffer);
+            return (ulong)((T[])buffer).LongLength;
         }
 
         protected override object PackWriteRequest(object buffer, ulong bufferpos, ulong count)
         {
             var buffer1 = (T[])buffer;
-            if (bufferpos == 0 && RRArrayExtensions.LongLength(buffer1) == (long)count)
+            if (bufferpos == 0 && buffer1.LongLength == (long)count)
             {
                 return buffer1;
             }
-            else if ((RRArrayExtensions.LongLength(buffer1) - (long)(bufferpos)) >= (long)(count))
+            else if ((buffer1.LongLength - (long)(bufferpos)) >= (long)(count))
             {
                 var data = new T[count];
-                RRArrayExtensions.Copy(buffer1, (long)bufferpos, data, 0, (long)count);                
+                Array.Copy(buffer1, (long)bufferpos, data, 0, (long)count);                
                 return data;
             }
             else
@@ -545,7 +544,7 @@ namespace RobotRaconteur
         {
             var data = (T[])res;
             var buffer1 = (T[])buffer;
-            RRArrayExtensions.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
+            Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
     }
 
@@ -710,7 +709,7 @@ namespace RobotRaconteur
                         var current_buf_pos = new ulong[bufferpos.Length];
                         var current_mem_pos = new ulong[bufferpos.Length];
 
-                        for (long j = 0; j < RRArrayExtensions.LongLength(current_buf_pos); j++)
+                        for (long j = 0; j < current_buf_pos.LongLength; j++)
                         {
                             current_buf_pos[j] = current_pos[j] + bufferpos[j];
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
@@ -725,7 +724,7 @@ namespace RobotRaconteur
                         var current_buf_pos = new ulong[bufferpos.Length];
                         var current_mem_pos = new ulong[bufferpos.Length];
 
-                        for (long j = 0; j < RRArrayExtensions.LongLength(current_buf_pos); j++)
+                        for (long j = 0; j < current_buf_pos.LongLength; j++)
                         {
                             current_buf_pos[j] = current_pos[j] + bufferpos[j];
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
@@ -816,7 +815,7 @@ namespace RobotRaconteur
                         var current_buf_pos = new ulong[bufferpos.Length];
                         var current_mem_pos = new ulong[bufferpos.Length];
 
-                        for (long j = 0; j < RRArrayExtensions.LongLength(current_buf_pos); j++)
+                        for (long j = 0; j < current_buf_pos.LongLength; j++)
                         {
                             current_buf_pos[j] = current_pos[j] + bufferpos[j];
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
@@ -831,7 +830,7 @@ namespace RobotRaconteur
                         var current_buf_pos = new ulong[bufferpos.Length];
                         var current_mem_pos = new ulong[bufferpos.Length];
 
-                        for (long j = 0; j < RRArrayExtensions.LongLength(current_buf_pos); j++)
+                        for (long j = 0; j < current_buf_pos.LongLength; j++)
                         {
                             current_buf_pos[j] = current_pos[j] + bufferpos[j];
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
@@ -863,7 +862,7 @@ namespace RobotRaconteur
                                         current_pos[j]++;
                                     }
                                 }
-                                if (current_pos[RRArrayExtensions.LongLength(count) - 1] >= count[RRArrayExtensions.LongLength(count) - 1])
+                                if (current_pos[count.LongLength - 1] >= count[count.LongLength - 1])
                                     done = true;
                             }
                         }
@@ -929,7 +928,7 @@ namespace RobotRaconteur
             var buffer1 = (MultiDimArray)(buffer);
 
             bool equ = true;
-            for (long i = 0; i < RRArrayExtensions.LongLength(count); i++)
+            for (long i = 0; i < count.LongLength; i++)
             {
                 if (bufferpos[i] != 0 || buffer1.Dims[i] != count[i])
                 {
@@ -1024,14 +1023,14 @@ namespace RobotRaconteur
 
         protected override ulong GetBufferLength(object buffer)
         {
-            return (ulong)RRArrayExtensions.LongLength((T[])buffer);
+            return (ulong)((T[])buffer).LongLength;
         }
 
         protected override object PackWriteRequest(object buffer, ulong bufferpos, ulong count)
         {
             var buffer1 = (T[])buffer;            
             var o = new T[count];
-            RRArrayExtensions.Copy(buffer1, (long)bufferpos, o, 0, (long)count);
+            Array.Copy(buffer1, (long)bufferpos, o, 0, (long)count);
             return stub.rr_node.PackPodArray(o, stub.RRContext);           
         }
 
@@ -1039,7 +1038,7 @@ namespace RobotRaconteur
         {            
             var data = stub.rr_node.UnpackPodArray<T>((MessageElementPodArray)res, stub.RRContext);
             var buffer1 = (T[])buffer;
-            RRArrayExtensions.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
+            Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
     }
 
@@ -1134,7 +1133,7 @@ namespace RobotRaconteur
             var buffer1 = (PodMultiDimArray)(buffer);
 
             bool equ = true;
-            for (long i = 0; i < RRArrayExtensions.LongLength(count); i++)
+            for (long i = 0; i < count.LongLength; i++)
             {
                 if (bufferpos[i] != 0 || buffer1.Dims[i] != count[i])
                 {
@@ -1276,14 +1275,14 @@ namespace RobotRaconteur
 
         protected override ulong GetBufferLength(object buffer)
         {
-            return (ulong)RRArrayExtensions.LongLength((T[])buffer);
+            return (ulong)((T[])buffer).LongLength;
         }
 
         protected override object PackWriteRequest(object buffer, ulong bufferpos, ulong count)
         {
             var buffer1 = (T[])buffer;
             var o = new T[count];
-            RRArrayExtensions.Copy(buffer1, (long)bufferpos, o, 0, (long)count);
+            Array.Copy(buffer1, (long)bufferpos, o, 0, (long)count);
             return stub.rr_node.PackNamedArray(o, stub.RRContext);
         }
 
@@ -1291,7 +1290,7 @@ namespace RobotRaconteur
         {
             var data = stub.rr_node.UnpackNamedArray<T>((MessageElementNamedArray)res, stub.RRContext);
             var buffer1 = (T[])buffer;
-            RRArrayExtensions.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
+            Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
     }
 
@@ -1386,7 +1385,7 @@ namespace RobotRaconteur
             var buffer1 = (NamedMultiDimArray)(buffer);
 
             bool equ = true;
-            for (long i = 0; i < RRArrayExtensions.LongLength(count); i++)
+            for (long i = 0; i < count.LongLength; i++)
             {
                 if (bufferpos[i] != 0 || buffer1.Dims[i] != count[i])
                 {

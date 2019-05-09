@@ -79,7 +79,7 @@ namespace RobotRaconteur
             }
             else
             {
-                string ind= RRUriExtensions.UnescapeDataString( s1[1].Replace("]",""));
+                string ind=Uri.UnescapeDataString( s1[1].Replace("]",""));
                 return GetSubObj(s1[0], ind);
             }
         }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #pragma warning disable
-using RobotRaconteur.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -534,7 +533,7 @@ namespace RobotRaconteur
 
         public static DataTypes TypeIDFromType(Type stype)
         {
-            switch (RRTypeExtensions.GetTypeCode(stype))
+            switch (Type.GetTypeCode(stype))
             {                
                 case TypeCode.Double:
                     return DataTypes.double_t;

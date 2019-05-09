@@ -18,7 +18,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteur.Extensions;
 
 namespace RobotRaconteur
 {
@@ -28,7 +27,7 @@ namespace RobotRaconteur
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await RRTaskExtensions.Delay((int)period.TotalMilliseconds, cancellationToken);
+                await Task.Delay(period, cancellationToken);
                 if (cancellationToken.IsCancellationRequested) break;
                 action();
             }

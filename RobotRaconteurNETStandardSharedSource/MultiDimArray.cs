@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using RobotRaconteur.Extensions;
 using System;
 using System.Collections.Generic;
 
@@ -179,7 +178,7 @@ namespace RobotRaconteur
 
             while (iter.Next(out indexa, out indexb, out len))
             {
-                RRArrayExtensions.Copy(mema.Array_, (long)indexa, memb.Array_, (long)indexb, (long)len);
+                Array.Copy(mema.Array_, (long)indexa, memb.Array_, (long)indexb, (long)len);
             }
 
         }
@@ -199,7 +198,7 @@ namespace RobotRaconteur
 
             while (iter.Next(out indexa, out indexb, out len))
             {
-                RRArrayExtensions.Copy(memb.Array_, (long)indexb, mema.Array_, (long)indexa, (long)len);
+                Array.Copy(memb.Array_, (long)indexb, mema.Array_, (long)indexa, (long)len);
 
             }
         }
@@ -236,7 +235,7 @@ namespace RobotRaconteur
 
             while (iter.Next(out indexa, out indexb, out len))
             {
-                RRArrayExtensions.Copy(mema.pod_array, (long)indexa, memb.pod_array, (long)indexb, (long)len);
+                Array.Copy(mema.pod_array, (long)indexa, memb.pod_array, (long)indexb, (long)len);
             }
 
         }
@@ -254,7 +253,7 @@ namespace RobotRaconteur
 
             while (iter.Next(out indexa, out indexb, out len))
             {
-                RRArrayExtensions.Copy(memb.pod_array, (long)indexb, mema.pod_array, (long)indexa, (long)len);
+                Array.Copy(memb.pod_array, (long)indexb, mema.pod_array, (long)indexa, (long)len);
             }
         }
 
@@ -290,7 +289,7 @@ namespace RobotRaconteur
 
             while (iter.Next(out indexa, out indexb, out len))
             {
-                RRArrayExtensions.Copy(mema.namedarray_array, (long)indexa, memb.namedarray_array, (long)indexb, (long)len);
+                Array.Copy(mema.namedarray_array, (long)indexa, memb.namedarray_array, (long)indexb, (long)len);
             }
 
         }
@@ -308,7 +307,7 @@ namespace RobotRaconteur
 
             while (iter.Next(out indexa, out indexb, out len))
             {
-                RRArrayExtensions.Copy(memb.namedarray_array, (long)indexb, mema.namedarray_array, (long)indexa, (long)len);
+                Array.Copy(memb.namedarray_array, (long)indexb, mema.namedarray_array, (long)indexa, (long)len);
             }
         }
 

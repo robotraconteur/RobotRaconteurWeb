@@ -18,7 +18,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Text.RegularExpressions;
-using RobotRaconteur.Extensions;
 
 namespace RobotRaconteur
 {
@@ -266,7 +265,7 @@ namespace RobotRaconteur
                 var q3 = e.Split(new char[] { '=' });
                 if (q3.Length != 2) throw new ConnectionException("Invalid Connection URL");
                 if (q3[0].Length == 0 || q3[1].Length == 0) throw new ConnectionException("Invalid Connection URL");
-                query_params.Add(q3[0], RRUriExtensions.UnescapeDataString(q3[1]));
+                query_params.Add(q3[0], Uri.UnescapeDataString(q3[1]));
             }
 
             if (!query_params.ContainsKey("service"))

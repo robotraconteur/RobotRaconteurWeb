@@ -798,7 +798,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         {
             while (m_Connected)
             {
-                await RRTaskExtensions.Delay(500, cancellationToken.Token);
+                await Task.Delay(500, cancellationToken.Token);
 
 
                 if ((DateTime.UtcNow - tlastsend).TotalMilliseconds > m_HeartbeatPeriod)
