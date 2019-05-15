@@ -199,12 +199,12 @@ namespace RobotRaconteur
         NotImplementedError,
         MemberBusy,
         ValueNotSet,
-        AuthenticationError = 150,
-        ObjectLockedError,
-        PermissionDenied,
         AbortOperation,
         OperationAborted,
-        StopIteration
+        StopIteration,
+        AuthenticationError = 150,
+        ObjectLockedError,
+        PermissionDenied      
     }
 
     public struct CDouble
