@@ -262,9 +262,8 @@ namespace RobotRaconteur
                 //socket = new TcpClient(u.Host, u.Port);
                 websocket = null;
 
-                ClientWebSocket socket1 = new ClientWebSocket();
-                var socket2 = socket1 as dynamic;
-                socket2.options.addSubProtocol("robotraconteur.robotraconteur.com");
+                ClientWebSocket socket1 = new ClientWebSocket();                
+                socket1.Options.AddSubProtocol("robotraconteur.robotraconteur.com");
                 await socket1.ConnectAsync(u2, cancel).AwaitWithTimeout(parenttransport.DefaultConnectTimeout);
 
                 websocket = socket1;
@@ -289,9 +288,9 @@ namespace RobotRaconteur
     class WebSocketStreamWrapper : Stream
     {
 
-        ClientWebSocket websock;
+        WebSocket websock;
 
-        public WebSocketStreamWrapper(ClientWebSocket websocket)
+        public WebSocketStreamWrapper(WebSocket websocket)
         {
             websock = websocket;
         }
@@ -340,7 +339,7 @@ namespace RobotRaconteur
 
         public override int EndRead(IAsyncResult asyncResult)
         {
-            return ((Extensions.Extensions.AsyncResultWrapper)asyncResult).Result;
+            return ((Task<int>)asyncResult).Result;
         }
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
@@ -350,7 +349,7 @@ namespace RobotRaconteur
 
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            int noop = ((Extensions.Extensions.AsyncResultWrapper)asyncResult).Result;
+            int noop = ((Task<int>)asyncResult).Result;
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -373,19 +372,19 @@ namespace RobotRaconteur
             websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, false, default(CancellationToken)).GetAwaiter().GetResult();
         }
 
-        public async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken=default(CancellationToken))
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             var r = await websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken).ConfigureAwait(false);
             if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
             return r.Count;
         }
 
-        public async Task<int> WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken=default(CancellationToken))
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (count <= 4096)
             {
-                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken);
-                return count;
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+                return;
             }
 
             int pos = 0;
@@ -397,11 +396,11 @@ namespace RobotRaconteur
                     c = count - pos;
                 }
 
-                await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, c), WebSocketMessageType.Binary, true, cancellationToken);
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, c), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
 
                 pos += c;
             }
-            return count;
+
         }
 
         public override void Close()
