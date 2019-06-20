@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RobotRaconteurBridgeTest
 {
-    [RobotRaconteur.RobotRaconteurServiceObjectInterface("blah")]
+    [RobotRaconteurWeb.RobotRaconteurServiceObjectInterface("blah")]
     public class Class1
     {
     }

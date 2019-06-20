@@ -334,17 +334,26 @@ namespace RobotRaconteurWeb
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return ReadAsync(buffer, offset, count).AsApm(callback, state);
+            return websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count),default(CancellationToken)).AsApm(callback,state);            
         }
 
         public override int EndRead(IAsyncResult asyncResult)
         {
-            return ((Task<int>)asyncResult).Result;
+            var r = ((Task<WebSocketReceiveResult>)asyncResult).Result;
+            if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
+            return r.Count;
+        }
+
+        private async Task<int> DoBeginWrite(byte[] buffer, int offset, int count)
+        {
+            if (count > 4096) count = 4096;
+            await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true);
+            return count;
         }
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return WriteAsync(buffer, offset, count).AsApm(callback, state);
+            return DoBeginWrite(buffer, offset, count).AsApm(callback, state);
         }
 
         public override void EndWrite(IAsyncResult asyncResult)
@@ -354,7 +363,7 @@ namespace RobotRaconteurWeb
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), default(CancellationToken)).Result.Count;
+            throw new InvalidOperationException("Invalid for browser");
         }
 
         public override long Seek(long offset, SeekOrigin origin)
@@ -369,40 +378,9 @@ namespace RobotRaconteurWeb
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, false, default(CancellationToken)).GetAwaiter().GetResult();
+            throw new InvalidOperationException("Invalid for browser");
         }
-
-        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            var r = await websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken);
-            if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
-            return r.Count;
-        }
-
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            if (count <= 4096)
-            {
-                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken);
-                return;
-            }
-
-            int pos = 0;
-            while (pos < count)
-            {
-                int c = 4096;
-                if (pos + 4096 > count)
-                {
-                    c = count - pos;
-                }
-
-                await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, c), WebSocketMessageType.Binary, true, cancellationToken);
-
-                pos += c;
-            }
-
-        }
-
+        
         public override void Close()
         {
             websock.CloseAsync(WebSocketCloseStatus.NormalClosure, "", default(CancellationToken)).IgnoreResult();

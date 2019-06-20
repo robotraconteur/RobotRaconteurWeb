@@ -4338,7 +4338,7 @@ namespace RobotRaconteurWeb
                 for (int j = 0; j < interfaces.Count; j++)
                 {
                     if (i != j)
-                        if (interfaces[j].GetInterface(interfaces[i].ToString()) != null) parent = false;
+                        if (interfaces[j].GetInterfaces().Count(x => x == interfaces[i]) != 0) parent = false;
                 }
 
                 if (parent)
@@ -4356,7 +4356,7 @@ namespace RobotRaconteurWeb
         public static string FindObjectRRType(object obj)
         {
             var i = FindParentInterface(obj.GetType());
-            return ((RobotRaconteurServiceObjectInterface)Attribute.GetCustomAttribute(i, typeof(RobotRaconteurServiceObjectInterface))).RRType;
+            return ((RobotRaconteurServiceObjectInterface)i.GetCustomAttributes(typeof(RobotRaconteurServiceObjectInterface), false)[0]).RRType;
         }
 
         public static string FindStructRRType(Type s)
@@ -4366,26 +4366,26 @@ namespace RobotRaconteurWeb
                 s = s.GetElementType();
             }
 
-            var t1 = ((RobotRaconteurServiceStruct)Attribute.GetCustomAttribute(s, typeof(RobotRaconteurServiceStruct)));
-            if (t1 != null)
+            var t1 = s.GetCustomAttributes(typeof(RobotRaconteurServiceStruct), true);
+            if (t1.Length > 0)
             {
-                return t1.RRType;
+                return ((RobotRaconteurServiceStruct)t1[0]).RRType;
             }
 
-            var t2 = ((RobotRaconteurNamedArrayElementTypeAndCount)Attribute.GetCustomAttribute(s, typeof(RobotRaconteurNamedArrayElementTypeAndCount)));
-            if (t2 != null)
+            var t2 = s.GetCustomAttributes(typeof(RobotRaconteurNamedArrayElementTypeAndCount), true);
+            if (t2.Length > 0)
             {
-                return t2.RRType;
+                return ((RobotRaconteurNamedArrayElementTypeAndCount)t2[0]).RRType;
             }
 
-            var t3 = ((RobotRaconteurServicePod)Attribute.GetCustomAttribute(s, typeof(RobotRaconteurServicePod)));
-            if (t3 != null)
+            var t3 = s.GetCustomAttributes(typeof(RobotRaconteurServicePod), true);
+            if (t3.Length > 0)
             {
-                return t3.RRType;
+                return ((RobotRaconteurServicePod)t3[0]).RRType;
             }
 
             throw new ArgumentException("Invalid Robot Raconteur structure");
         }
-
     }
 }
+

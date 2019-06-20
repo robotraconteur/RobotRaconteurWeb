@@ -359,7 +359,7 @@ namespace RobotRaconteurWeb
             {
                 Type t2 = t;
                 if (t.IsArray) t2 = t.GetElementType();
-                if (Attribute.GetCustomAttribute(t2, typeof(RobotRaconteurNamedArrayElementTypeAndCount), false) != null)
+                if (t2.GetCustomAttributes(typeof(RobotRaconteurNamedArrayElementTypeAndCount), false).Length > 0)
                 {
                     return MessageElementUtil.NewMessageElement(name, PackNamedArray(data, context));
                 }
@@ -649,7 +649,7 @@ namespace RobotRaconteurWeb
             {
                 Type t2 = t;
                 if (t.IsArray) t2 = t.GetElementType();
-                if (Attribute.GetCustomAttribute(t2, typeof(RobotRaconteurNamedArrayElementTypeAndCount), false) != null)
+                if (t2.GetCustomAttributes(typeof(RobotRaconteurNamedArrayElementTypeAndCount), false).Length > 0)
                 {
                     return PackNamedArray(data, context);
                 }
@@ -1520,7 +1520,7 @@ namespace RobotRaconteurWeb
                     s.Name = c.ServiceName;
                     s.RootObjectType = c.RootObjectType;
                     s.ConnectionURL = new Dictionary<int, string>();
-                    s.ConnectionURL.Add(1,Transport.CurrentThreadTransportConnectionURL + "?" + ("nodeid=" + node.NodeID.ToString().Trim(new char[] {'{','}'}) + "&service=" + Uri.EscapeDataString(s.Name)));
+                    s.ConnectionURL.Add(1,Transport.CurrentThreadTransportConnectionURL + "?" + ("nodeid=" + node.NodeID.ToString().Trim(new char[] {'{','}'}) + "&service=" + RRUriExtensions.EscapeDataString(s.Name)));
                     s.RootObjectImplements = new Dictionary<int, string>();
                     
                     List<string> implements=c.ServiceDef.ServiceDef().Objects[ServiceDefinitionUtil.SplitQualifiedName(c.RootObjectType).Item2].Implements;
