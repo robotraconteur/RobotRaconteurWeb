@@ -307,9 +307,14 @@ namespace RobotRaconteurWeb
                 return MessageElementUtil.NewMessageElement(name, null);
             }
 
-            if (t.IsPrimitive || (is_array && t.GetElementType().IsPrimitive))
+            if (t.IsPrimitive)
             {
-                return MessageElementUtil.NewMessageElement(name, data);
+                return MessageElementUtil.NewMessageElement(name, new T[] { data });
+            }
+
+            if  (is_array && t.GetElementType().IsPrimitive)
+            {
+                return MessageElementUtil.NewMessageElement(name, data );
             }
 
             if (t == typeof(string))

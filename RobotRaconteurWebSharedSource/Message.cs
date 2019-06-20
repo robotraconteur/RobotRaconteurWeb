@@ -343,29 +343,29 @@ namespace RobotRaconteurWeb
                     return DataTypes.string_t;
                 case "System.Boolean":                
                     return DataTypes.bool_t;
-                case "RobotRaconteur.CDouble":
+                case "RobotRaconteurWeb.CDouble":
                     return DataTypes.cdouble_t;
-                case "RobotRaconteur.CSingle":
+                case "RobotRaconteurWeb.CSingle":
                     return DataTypes.csingle_t;
-                case "RobotRaconteur.MessageElementStructure":
+                case "RobotRaconteurWeb.MessageElementStructure":
                     return DataTypes.structure_t;
-                case "RobotRaconteur.MessageElementMap<int>":
+                case "RobotRaconteurWeb.MessageElementMap<int>":
                     return DataTypes.vector_t;
-                case "RobotRaconteur.MessageElementMap<string>":
+                case "RobotRaconteurWeb.MessageElementMap<string>":
                     return DataTypes.dictionary_t;
-                case "RobotRaconteur.MessageElementMultiDimArray":
+                case "RobotRaconteurWeb.MessageElementMultiDimArray":
                     return DataTypes.multidimarray_t;
-                case "RobotRaconteur.MessageElementList":
+                case "RobotRaconteurWeb.MessageElementList":
                     return DataTypes.list_t;
-                case "RobotRaconteur.MessageElementPod":
+                case "RobotRaconteurWeb.MessageElementPod":
                     return DataTypes.pod_t;
-                case "RobotRaconteur.MessageElementPodArray":
+                case "RobotRaconteurWeb.MessageElementPodArray":
                     return DataTypes.pod_array_t;
-                case "RobotRaconteur.MessageElementPodMultiDimArray":
+                case "RobotRaconteurWeb.MessageElementPodMultiDimArray":
                     return DataTypes.pod_multidimarray_t;
-                case "RobotRaconteur.MessageElementNamedArray":
+                case "RobotRaconteurWeb.MessageElementNamedArray":
                     return DataTypes.namedarray_array_t;
-                case "RobotRaconteur.MessageElementNamedMultiDimArray":
+                case "RobotRaconteurWeb.MessageElementNamedMultiDimArray":
                     return DataTypes.namedarray_multidimarray_t;
                 case "System.Object":
                     return DataTypes.varvalue_t;
@@ -407,17 +407,17 @@ namespace RobotRaconteurWeb
 
                 case "System.Boolean":
 
-                case "RobotRaconteur.CDouble":
+                case "RobotRaconteurWeb.CDouble":
 
-                case "RobotRaconteur.CSingle":
+                case "RobotRaconteurWeb.CSingle":
 
-                case "RobotRaconteur.MessageElementStructure":
+                case "RobotRaconteurWeb.MessageElementStructure":
                     
-                case "RobotRaconteur.MessageElementIndexedSet<int>":
+                case "RobotRaconteurWeb.MessageElementIndexedSet<int>":
                     
-                case "RobotRaconteur.MessageElementIndexedSet<string>":
+                case "RobotRaconteurWeb.MessageElementIndexedSet<string>":
                     
-                case "RobotRaconteur.MessageElementMultiDimArray":
+                case "RobotRaconteurWeb.MessageElementMultiDimArray":
                     
                 case "System.Object":
                     return true;
@@ -520,9 +520,9 @@ namespace RobotRaconteurWeb
                     return new long[] { ((long)inv) };
                 case "System.UInt64":
                     return new ulong[] { ((ulong)inv) };
-                case "RobotRaconteur.CDouble":
+                case "RobotRaconteurWeb.CDouble":
                     return new CDouble[] { ((CDouble)inv) };
-                case "RobotRaconteur.CSingle":
+                case "RobotRaconteurWeb.CSingle":
                     return new CSingle[] { ((CSingle)inv) };
                 case "System.Boolean":
                     return new bool[] { ((bool)inv) };
@@ -559,19 +559,19 @@ namespace RobotRaconteurWeb
                     return DataTypes.string_t;
                 case TypeCode.Boolean:
                     return DataTypes.bool_t;
-                /*case "RobotRaconteur.CDouble":
+                /*case "RobotRaconteurWeb.CDouble":
                     return DataTypes.cdouble_t;
-                case "RobotRaconteur.CSingle":
+                case "RobotRaconteurWeb.CSingle":
                     return DataTypes.csingle_t;
-                case "RobotRaconteur.MessageElementStructure":
+                case "RobotRaconteurWeb.MessageElementStructure":
                     return DataTypes.structure_t;
-                case "RobotRaconteur.MessageElementMap<int>":
+                case "RobotRaconteurWeb.MessageElementMap<int>":
                     return DataTypes.vector_t;
-                case "RobotRaconteur.MessageElementMap<string>":
+                case "RobotRaconteurWeb.MessageElementMap<string>":
                     return DataTypes.dictionary_t;
-                case "RobotRaconteur.MessageElementMultiDimArray":
+                case "RobotRaconteurWeb.MessageElementMultiDimArray":
                     return DataTypes.multidimarray_t;
-                case "RobotRaconteur.MessageElementList":
+                case "RobotRaconteurWeb.MessageElementList":
                     return DataTypes.list_t;*/
                 case TypeCode.Object:
                     {
@@ -1261,56 +1261,56 @@ namespace RobotRaconteurWeb
             else if (dat is MessageElementStructure) {
                 DataCount = (uint)((MessageElementStructure)dat).Elements.Count;
                 ElementTypeName = ((MessageElementStructure)dat).Type;
-                datatype = "RobotRaconteur.MessageElementStructure";
+                datatype = "RobotRaconteurWeb.MessageElementStructure";
             }
             else if (dat is MessageElementMap<int>)
             {
                 DataCount = (uint)((MessageElementMap<int>)dat).Elements.Count;
-                datatype = "RobotRaconteur.MessageElementMap<int>";
+                datatype = "RobotRaconteurWeb.MessageElementMap<int>";
             }
             else if (dat is MessageElementMap<string>)
             {
                 DataCount = (uint)((MessageElementMap<string>)dat).Elements.Count;
-                datatype = "RobotRaconteur.MessageElementMap<string>";
+                datatype = "RobotRaconteurWeb.MessageElementMap<string>";
             }
             else if (dat is MessageElementList)
             {
                 DataCount = (uint)((MessageElementList)dat).Elements.Count;
-                datatype = "RobotRaconteur.MessageElementList";
+                datatype = "RobotRaconteurWeb.MessageElementList";
             }
             else if (dat is MessageElementMultiDimArray)
             {
                 DataCount = (uint)((MessageElementMultiDimArray)dat).Elements.Count;
-                datatype = "RobotRaconteur.MessageElementMultiDimArray";
+                datatype = "RobotRaconteurWeb.MessageElementMultiDimArray";
             }
             else if (dat is MessageElementPod)
             {
                 DataCount = (uint)((MessageElementPod)dat).Elements.Count;
-                datatype = "RobotRaconteur.MessageElementPod";
+                datatype = "RobotRaconteurWeb.MessageElementPod";
             }
             else if (dat is MessageElementPodArray)
             {
                 DataCount = (uint)((MessageElementPodArray)dat).Elements.Count;
                 ElementTypeName = ((MessageElementPodArray)dat).Type;
-                datatype = "RobotRaconteur.MessageElementPodArray";
+                datatype = "RobotRaconteurWeb.MessageElementPodArray";
             }
             else if (dat is MessageElementPodMultiDimArray)
             {
                 DataCount = (uint)((MessageElementPodMultiDimArray)dat).Elements.Count;
                 ElementTypeName = ((MessageElementPodMultiDimArray)dat).Type;
-                datatype = "RobotRaconteur.MessageElementPodMultiDimArray";
+                datatype = "RobotRaconteurWeb.MessageElementPodMultiDimArray";
             }
             else if (dat is MessageElementNamedArray)
             {
                 DataCount = (uint)((MessageElementNamedArray)dat).Elements.Count;
                 ElementTypeName = ((MessageElementNamedArray)dat).Type;
-                datatype = "RobotRaconteur.MessageElementNamedArray";
+                datatype = "RobotRaconteurWeb.MessageElementNamedArray";
             }
             else if (dat is MessageElementNamedMultiDimArray)
             {
                 DataCount = (uint)((MessageElementNamedMultiDimArray)dat).Elements.Count;
                 ElementTypeName = ((MessageElementNamedMultiDimArray)dat).Type;
-                datatype = "RobotRaconteur.MessageElementNamedMultiDimArray";
+                datatype = "RobotRaconteurWeb.MessageElementNamedMultiDimArray";
             }
             else if (dat is string) 
             {

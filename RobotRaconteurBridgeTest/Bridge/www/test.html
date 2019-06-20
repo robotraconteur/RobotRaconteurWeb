@@ -4,14 +4,17 @@
 <head>
     <meta charset="utf-8" />
     <title>Bridge RobotRaconteurBridgeTest</title>
-    <script src="../../Scripts/jquery-3.4.1.js"></script>    
+    <script src="../../Scripts/jquery-3.4.1.js"></script>
     <script src="../output/bridge.js"></script>
     <script src="../output/RobotRaconteurBridge.js"></script>
+    <script src="../output/RobotRaconteurBridge.meta.js"></script>
     <script src="../output/RobotRaconteurBridgeTest.js"></script>
+    <script src="../output/RobotRaconteurBridgeTest.meta.js"></script>
 
     <script>
         $(document).ready(function () {
             $("#log").append("Starting...<br/>");
+            RobotRaconteurBridgeTest.RegisterServiceTypes.DoRegisterServiceTypes();
             var c = new RobotRaconteurTest.ServiceTestClient();
             c.RunFullTest("rr+tcp://localhost:2354/?service=RobotRaconteurTestService", "rr+tcp://localhost:2354/?service=RobotRaconteurTestService_auth").continueWith(function (res) {
                 try {

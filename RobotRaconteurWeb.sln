@@ -22,6 +22,7 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{06048487-1017-44a9-9c2a-49e45eb070a9}*SharedItemsImports = 13
+		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{58d9802b-f3a9-4abb-a35c-0bd5b3cab9e7}*SharedItemsImports = 4
 		RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems*{88a2b69f-af86-4dda-a0a3-9a3c45d27bed}*SharedItemsImports = 4
 		RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems*{9648c599-747e-4bea-8af3-d24a07df8e22}*SharedItemsImports = 13
 	EndGlobalSection

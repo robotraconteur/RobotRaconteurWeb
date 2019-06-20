@@ -262,8 +262,9 @@ namespace RobotRaconteurWeb
                 //socket = new TcpClient(u.Host, u.Port);
                 websocket = null;
 
-                ClientWebSocket socket1 = new ClientWebSocket();                
-                socket1.Options.AddSubProtocol("robotraconteur.robotraconteur.com");
+                ClientWebSocket socket1 = new ClientWebSocket();
+                dynamic socket2 = socket1;
+                socket2.options.addSubProtocol("robotraconteur.robotraconteur.com");
                 await socket1.ConnectAsync(u2, cancel).AwaitWithTimeout(parenttransport.DefaultConnectTimeout);
 
                 websocket = socket1;
@@ -332,22 +333,49 @@ namespace RobotRaconteurWeb
             }
         }
 
+        private async Task<int> DoBeginRead(byte[] buffer, int offset, int count)
+        {
+            var buffer2 = new byte[count];
+            var r = await websock.ReceiveAsync(new ArraySegment<byte>(buffer2, 0, count), default(CancellationToken));
+            if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
+            Array.Copy(buffer2, 0, buffer, offset, r.Count);
+            return r.Count;
+        }
+
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count),default(CancellationToken)).AsApm(callback,state);            
+            return DoBeginRead(buffer, offset, count).AsApm(callback,state);
         }
 
         public override int EndRead(IAsyncResult asyncResult)
         {
-            var r = ((Task<WebSocketReceiveResult>)asyncResult).Result;
-            if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
-            return r.Count;
+            dynamic asyncResult1 = asyncResult;
+            return (int)asyncResult1.getResult();
         }
 
         private async Task<int> DoBeginWrite(byte[] buffer, int offset, int count)
         {
-            if (count > 4096) count = 4096;
-            await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true);
+            if (count <= 65536)
+            {
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true);
+            }
+            else
+            {
+                int pos = 0;
+                while (pos < count)
+                {
+                    if ((count - pos) <= 65536)
+                    {
+                        await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, count - pos), WebSocketMessageType.Binary, true);
+                        pos = count;
+                    }
+                    else
+                    {
+                        await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, 65536), WebSocketMessageType.Binary, true);
+                        pos += 65536;
+                    }
+                }
+            }
             return count;
         }
 
