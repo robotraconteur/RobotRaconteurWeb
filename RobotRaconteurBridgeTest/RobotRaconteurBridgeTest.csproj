@@ -67,7 +67,6 @@
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
   </ItemGroup>
-  <Import Project="..\RobotRaconteurTestNETStandardSharedSource\RobotRaconteurTestNETStandardSharedSource.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Bridge.Min.17.7.0\build\Bridge.Min.targets" Condition="Exists('..\packages\Bridge.Min.17.7.0\build\Bridge.Min.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Data\Robot_Raconteur_Node_Root_CA.cer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Robot_Raconteur_Node_Root_CA.cer" />
+  </ItemGroup>
+
+  <Import Project="..\RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems" Label="Shared" />
+
+  
+</Project>

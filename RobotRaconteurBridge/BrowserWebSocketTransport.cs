@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net.WebSockets;
-using RobotRaconteur.Extensions;
+using RobotRaconteurWeb.Extensions;
 using System.IO;
 
-namespace RobotRaconteur
+namespace RobotRaconteurWeb
 {
     public sealed class BrowserWebSocketTransport : Transport
     {
@@ -288,9 +288,9 @@ namespace RobotRaconteur
     class WebSocketStreamWrapper : Stream
     {
 
-        WebSocket websock;
+        ClientWebSocket websock;
 
-        public WebSocketStreamWrapper(WebSocket websocket)
+        public WebSocketStreamWrapper(ClientWebSocket websocket)
         {
             websock = websocket;
         }
@@ -374,7 +374,7 @@ namespace RobotRaconteur
 
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            var r = await websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken).ConfigureAwait(false);
+            var r = await websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken);
             if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
             return r.Count;
         }
@@ -383,7 +383,7 @@ namespace RobotRaconteur
         {
             if (count <= 4096)
             {
-                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken);
                 return;
             }
 
@@ -396,7 +396,7 @@ namespace RobotRaconteur
                     c = count - pos;
                 }
 
-                await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, c), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, c), WebSocketMessageType.Binary, true, cancellationToken);
 
                 pos += c;
             }
