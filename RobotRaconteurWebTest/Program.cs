@@ -79,8 +79,8 @@ namespace RobotRaconteurTest
             }
             else if (command == "server")
             {
-                int port = 0;
-                                
+                int port = int.Parse(args[1]);
+                      
                 //NodeID id = new NodeID(args[2]);
                 string name = args[2];
 
