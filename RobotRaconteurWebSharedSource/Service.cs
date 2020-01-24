@@ -164,6 +164,11 @@ namespace RobotRaconteurWeb
             }
         }
 
+        public virtual bool IsRequestNoLock(MessageEntry m)
+        {
+            return false;
+        }
+
         public bool IsMonitorLocked
         {
             get
@@ -571,35 +576,35 @@ namespace RobotRaconteurWeb
                     if (m.EntryType == MessageEntryType.PropertyGetReq)
                     {
                         ServiceSkel skel=await GetObjectSkel(m.ServicePath);
-                        check_lock(skel);
+                        check_lock(skel, m);
                         ret = await skel.CallGetProperty(m);
                     }
 
                     if (m.EntryType == MessageEntryType.PropertySetReq)
                     {
                         ServiceSkel skel = await GetObjectSkel(m.ServicePath);
-                        check_lock(skel);
+                        check_lock(skel, m);
                         ret = await skel.CallSetProperty(m);
                     }
 
                     if (m.EntryType == MessageEntryType.FunctionCallReq)
                     {
                         ServiceSkel skel = await GetObjectSkel(m.ServicePath);
-                        check_lock(skel);
+                        check_lock(skel, m);
                         ret = await skel.CallFunction(m);
                     }
 
                     if (m.EntryType == MessageEntryType.PipeConnectReq || m.EntryType==MessageEntryType.PipeDisconnectReq)
                     {
                         ServiceSkel skel = await GetObjectSkel(m.ServicePath);
-                        check_lock(skel);
+                        check_lock(skel, m);
                         ret = await skel.CallPipeFunction(m,c);
                     }
 
                     if (m.EntryType == MessageEntryType.WireConnectReq || m.EntryType == MessageEntryType.WireDisconnectReq || m.EntryType == MessageEntryType.WirePeekInValueReq || m.EntryType == MessageEntryType.WirePeekOutValueReq || m.EntryType == MessageEntryType.WirePokeOutValueReq)
                     {
                         ServiceSkel skel = await GetObjectSkel(m.ServicePath);
-                        check_lock(skel);
+                        check_lock(skel, m);
                         ret = await skel.CallWireFunction(m, c);
                     }
 
@@ -608,7 +613,7 @@ namespace RobotRaconteurWeb
                     if (m.EntryType == MessageEntryType.MemoryWrite || m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)
                     {
                         ServiceSkel skel = await GetObjectSkel(m.ServicePath);
-                        check_lock(skel);
+                        check_lock(skel, m);
                         ret=await skel.CallMemoryFunction(m, c);
                     }
 
@@ -632,7 +637,7 @@ namespace RobotRaconteurWeb
                 else if (m.EntryType == MessageEntryType.GeneratorNextReq)
                 {
                     var skel = await GetObjectSkel(m.ServicePath);
-                    check_lock(skel);
+                    check_lock(skel, m);
                     ret = await skel.CallGeneratorNext(m, c);
                     noreturn = true;
                 }
@@ -1067,11 +1072,15 @@ namespace RobotRaconteurWeb
 
         }
 
-        protected void check_lock(ServiceSkel skel)
+        protected void check_lock(ServiceSkel skel, MessageEntry m)
         {
             check_monitor_lock(skel);
             if (skel.IsLocked)
             {
+                if (skel.IsRequestNoLock(m))
+                {
+                    return;
+                }
                 if (skel.objectlock.Username == ServerEndpoint.CurrentAuthenticatedUser.Username && skel.objectlock.Endpoint == 0)
                     return;
                 if (skel.objectlock.Username == ServerEndpoint.CurrentAuthenticatedUser.Username && skel.objectlock.Endpoint == ServerEndpoint.CurrentEndpoint.LocalEndpoint)

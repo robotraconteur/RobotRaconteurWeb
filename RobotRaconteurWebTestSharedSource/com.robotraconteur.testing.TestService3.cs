@@ -303,9 +303,11 @@ public interface testroot3
     Task<Generator3<byte[]>> gen_func3(string name,CancellationToken rr_cancel=default(CancellationToken));
     Task<Generator1<byte[],byte[]>> gen_func4(CancellationToken rr_cancel=default(CancellationToken));
     Task<Generator1<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2>> gen_func5(CancellationToken rr_cancel=default(CancellationToken));
+    Task test_exception_params1(CancellationToken rr_cancel=default(CancellationToken));
+    Task test_exception_params2(CancellationToken rr_cancel=default(CancellationToken));
     Task<obj4> get_o4(CancellationToken rr_cancel=default(CancellationToken));
+    Task<obj5> get_nolock_test(CancellationToken rr_cancel=default(CancellationToken));
     Pipe<int> unreliable1{ get; set; }
-    Pipe<int> unreliable2{ get; set; }
     Pipe<int[]> p1{ get; set; }
     Pipe<int[]> p2{ get; set; }
     Pipe<MultiDimArray> p3{ get; set; }
@@ -360,13 +362,40 @@ public interface obj4 : com.robotraconteur.testing.TestService1.sub2
     Task<com.robotraconteur.testing.TestService1.sub3> get_o3_1(string ind, CancellationToken rr_cancel=default(CancellationToken));
 }
 
+[RobotRaconteurServiceObjectInterface("com.robotraconteur.testing.TestService3.obj5")]
+public interface obj5
+{
+    Task<double> get_p1(CancellationToken cancel=default(CancellationToken));
+    Task set_p1(double value, CancellationToken cancel=default(CancellationToken));
+    Task<double> get_p2(CancellationToken cancel=default(CancellationToken));
+    Task set_p2(double value, CancellationToken cancel=default(CancellationToken));
+    Task<double> get_p3(CancellationToken cancel=default(CancellationToken));
+    Task set_p3(double value, CancellationToken cancel=default(CancellationToken));
+    Task<int> f1(CancellationToken rr_cancel=default(CancellationToken));
+    Task<int> f2(CancellationToken rr_cancel=default(CancellationToken));
+    Pipe<int> q1{ get; set; }
+    Pipe<int> q2{ get; set; }
+    Wire<int> w1 { get; set; }
+    Wire<int> w2 { get; set; }
+    ArrayMemory<int> m1 { get; }
+    ArrayMemory<int> m2 { get; }
+    ArrayMemory<int> m3 { get; }
+}
+
 public static class com__robotraconteur__testing__TestService3Constants  {
     public const string strconst="This is a\n \"string constant\" \\/\b\f \r＀ tabme\ttabme\n smile! 㷘Ǟ";
     public const int int32const=3856384;
     public static readonly int[] int32const_array={182476, 56483, -2947};
+    public const int int32hexconst=0x082bc7;
+    public const int int32hexconst2=-0x7264c17;
+    public static readonly int[] int32hexconst_array={ 0x8274ec, -0x0001, +0xABCDEF, 0xabcdef, 0x012345, 0x6789 };
     public static readonly double[] doubleconst_array={1.5847, 3.14, -548e3, 3452.67e2, 485e-21};
     public static class structconst { public const string strconst="This is a\n \"string constant\" \\/\b\f \r＀ tabme\ttabme\n smile! 㷘Ǟ"; public static readonly int[] int32const_array={182476, 56483, -2947}; }
     public static class structconst2 { public static class structconst { public const string strconst="This is a\n \"string constant\" \\/\b\f \r＀ tabme\ttabme\n smile! 㷘Ǟ"; public static readonly int[] int32const_array={182476, 56483, -2947}; } public const int int32const=3856384; }
+    public static class testroot3
+    {
+    public const string unknown_modifier_hello="hello world!";
+    }
 }
     public enum testenum1
     {
@@ -393,4 +422,8 @@ public static class com__robotraconteur__testing__TestService3Constants  {
     more_values = -2147483641
 
     };
+public class test_exception4 : RobotRaconteurRemoteException
+{
+    public test_exception4(string message) : base("com.robotraconteur.testing.TestService3.test_exception4",message) {}
+};
 }

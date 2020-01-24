@@ -12,7 +12,7 @@ public class com__robotraconteur__testing__TestService3Factory : ServiceFactory
 {
     public override string DefString()
 {
-    const string s="service com.robotraconteur.testing.TestService3\n\nstdver 0.9.0\n#option version 0.9.0\n\nimport com.robotraconteur.testing.TestService1\nusing  com.robotraconteur.testing.TestService1.testroot\nusing  com.robotraconteur.testing.TestService1.teststruct1\nusing  com.robotraconteur.testing.TestService1.teststruct2\nusing  com.robotraconteur.testing.TestService1.testexception1\nusing  com.robotraconteur.testing.TestService1.sub2\nusing  com.robotraconteur.testing.TestService1.sub3\n\nenum testenum1\nvalue1 = 0,	value2,	value3,	anothervalue = -1,\nanothervalue2 = -2,\nanothervalue3 = -3,\nhexval1 = 0x10,\nhexval2,\nneghexval1 = 0x80000005,\nneghexval2,\nmore_values\nend\n\nconstant string strconst \"This is a\\n \\\"string constant\\\" \\\\\\/\\b\\f \\r\\u00FF tabme\\ttabme\\n smile! \\ud83d\\udE01\"\nconstant int32 int32const 3856384\nconstant int32[] int32const_array {182476, 56483, -2947}\nconstant double[] doubleconst_array {1.5847, 3.14, -548e3, 3452.67e2, 485e-21}\nconstant struct structconst {field1: strconst, field2: int32const_array}\nconstant struct structconst2 {field3: structconst, field4: int32const}\n\nnamedarray vector3\nfield double x\nfield double y\nfield double z\nend namedarray\n\nnamedarray quaternion\nfield double q0\nfield double q1\nfield double q2\nfield double q3\nend\n\nnamedarray transform\nfield quaternion rotation\nfield vector3 translation\nend\n\nnamedarray pixel\nfield uint8 r\nfield uint8 b\nfield uint8 g\nend\n\nnamedarray pixel2\nfield uint8 c\nfield pixel d\nfield pixel e\nfield pixel[7] f\nfield pixel g\nend\n\npod testpod1\nfield double d1\nfield double[6] d2\nfield double[6-] d3\nfield double[3,3] d4\nfield testpod2 s1\nfield testpod2[8] s2\nfield testpod2[9-] s3\nfield testpod2[2,4] s4\nfield transform t1\nfield transform[4] t2\nfield transform[15-] t3\nfield transform[2,4] t4\nend\n\npod testpod2\nfield int8 i1\nfield int8[15] i2\nfield int8[17-] i3\nend\n\nstruct teststruct3\nfield testpod1 s1\nfield testpod1[] s2\nfield testpod1[11] s3\nfield testpod1[16-] s4\nfield testpod1[3,3] s5\nfield testpod1[*] s6\nfield testpod1{list} s7\nfield testpod1[]{list} s8\nfield testpod1[*]{list} s9\nfield varvalue s10\nfield varvalue s11\nfield varvalue s12\nfield varvalue s13\nfield varvalue s14\nfield varvalue s15\nfield transform t1\nfield transform[4] t2\nfield transform[2,4] t3\nfield varvalue t4\nfield varvalue t5\nfield transform{list} t6\nfield transform[4]{list} t7\nfield transform[2,4]{list} t8\nfield varvalue t9\nfield varvalue t10\nfield varvalue t11\n\nend\n\nobject testroot3\nproperty int32 readme [readonly]\nproperty int32 writeme [writeonly]\n\npipe int32 unreliable1 [unreliable,readonly]\noption pipe unreliable2 unreliable\npipe int32 unreliable2\n\nwire int32 peekwire [readonly]\nwire int32 \\\npokewire [writeonly]\nproperty int32 unknown_modifier [unknown, unknown2(), unknown_3(23, 45.8e-5, hello, \"world\")]\n\nmemory double[] readmem [readonly]\n\nobjref obj4 o4\n\nproperty testenum1 testenum1_prop\n\nproperty testpod1 testpod1_prop\nfunction void testpod1_func1(testpod1 s)\nfunction testpod1 testpod1_func2()\n\nproperty teststruct3 teststruct3_prop\n\nmemory testpod2[] pod_m1\nmemory testpod2[*] pod_m2\n\nfunction double{generator} gen_func1()\nfunction uint8[]{generator} gen_func2(string name)\nfunction void gen_func3(string name, uint8[]{generator} in)\nfunction uint8[]{generator} gen_func4(uint8[]{generator} in)\nfunction teststruct2{generator} gen_func5(teststruct2{generator} in)\n\n#extra tests for fixed length arrays\nproperty double[6]{list} d1\nproperty double[6-]{list} d2\nproperty double[6]{int32} d3\nproperty double[6-]{int32} d4\nproperty double[3,3]{list} d5\nproperty double[3,3]{int32} d6\n\n#Test pipe and wire verification\npipe int32[3] p1\npipe int32[3-] p2\npipe int32[2,2] p3\nwire int32[6] w1\nwire int32[6-] w2\nwire int32[3,2] w3\n\n#namedarray test\nproperty vector3 testnamedarray1\nproperty transform testnamedarray2\nproperty transform[10-] testnamedarray3\nproperty transform[*] testnamedarray4\nproperty transform[3,2] testnamedarray5\n\nmemory transform[] namedarray_m1\nmemory transform[*] namedarray_m2\n\n#new primitive types test\nproperty cdouble c1\nproperty cdouble[] c2\nproperty cdouble[*] c3\nproperty cdouble{list} c4\nproperty cdouble[]{list} c5\nproperty cdouble[*]{list} c6\nproperty csingle c7\nproperty csingle[] c8\nproperty csingle[*] c9\nproperty csingle{list} c10\nproperty csingle[]{list} c11\nproperty csingle[*]{list} c12\n\nproperty bool b1\nproperty bool[] b2\nproperty bool[*] b3\nproperty bool{list} b4\nproperty bool[]{list} b5\nproperty bool[*]{list} b6\n\nmemory cdouble[] c_m1\nmemory cdouble[*] c_m2\nmemory cdouble[] c_m3\nmemory cdouble[*] c_m4\nmemory bool[] c_m5\nmemory bool[*] c_m6\n\nend\n\nobject obj1\nproperty double[] d1\nend\n\nobject obj2\nimplements obj1\nproperty double[] d1\nend\n\nobject obj3\nimplements obj1\nimplements obj2\nproperty double[] d1\nend\n\nobject obj4\nimplements sub2\nproperty string s_ind\nproperty int32 i_ind\n\nproperty string data\nobjref sub3{string} o3_1\nend\n\n\n";
+    const string s="service com.robotraconteur.testing.TestService3\n\nstdver 0.9.2\n#option version 0.9.0\n\nimport com.robotraconteur.testing.TestService1\nusing  com.robotraconteur.testing.TestService1.testroot\nusing  com.robotraconteur.testing.TestService1.teststruct1\nusing  com.robotraconteur.testing.TestService1.teststruct2\nusing  com.robotraconteur.testing.TestService1.testexception1\nusing  com.robotraconteur.testing.TestService1.sub2\nusing  com.robotraconteur.testing.TestService1.sub3\n\nenum testenum1\nvalue1 = 0,	value2,	value3,	anothervalue = -1,\nanothervalue2 = -2,\nanothervalue3 = -3,\nhexval1 = 0x10,\nhexval2,\nneghexval1 = -0x7ffffffb,\nneghexval2,\nmore_values\nend\n\nconstant string strconst \"This is a\\n \\\"string constant\\\" \\\\\\/\\b\\f \\r\\u00FF tabme\\ttabme\\n smile! \\ud83d\\udE01\"\nconstant int32 int32const 3856384\nconstant int32[] int32const_array {182476, 56483, -2947}\nconstant int32 int32hexconst 0x082bc7\nconstant int32 int32hexconst2 -0x7264c17\nconstant int32[] int32hexconst_array { 0x8274ec, -0x0001, +0xABCDEF, 0xabcdef, 0x012345, 0x6789 }\nconstant double[] doubleconst_array {1.5847, 3.14, -548e3, 3452.67e2, 485e-21}\nconstant struct structconst {field1: strconst, field2: int32const_array}\nconstant struct structconst2 {field3: structconst, field4: int32const}\n\nexception test_exception4\n\nnamedarray vector3\nfield double x\nfield double y\nfield double z\nend\n\nnamedarray quaternion\nfield double q0\nfield double q1\nfield double q2\nfield double q3\nend\n\nnamedarray transform\nfield quaternion rotation\nfield vector3 translation\nend\n\nnamedarray pixel\nfield uint8 r\nfield uint8 b\nfield uint8 g\nend\n\nnamedarray pixel2\nfield uint8 c\nfield pixel d\nfield pixel e\nfield pixel[7] f\nfield pixel g\nend\n\npod testpod1\nfield double d1\nfield double[6] d2\nfield double[6-] d3\nfield double[3,3] d4\nfield testpod2 s1\nfield testpod2[8] s2\nfield testpod2[9-] s3\nfield testpod2[2,4] s4\nfield transform t1\nfield transform[4] t2\nfield transform[15-] t3\nfield transform[2,4] t4\nend\n\npod testpod2\nfield int8 i1\nfield int8[15] i2\nfield int8[17-] i3\nend\n\nstruct teststruct3\nfield testpod1 s1\nfield testpod1[] s2\nfield testpod1[11] s3\nfield testpod1[16-] s4\nfield testpod1[3,3] s5\nfield testpod1[*] s6\nfield testpod1{list} s7\nfield testpod1[]{list} s8\nfield testpod1[*]{list} s9\nfield varvalue s10\nfield varvalue s11\nfield varvalue s12\nfield varvalue s13\nfield varvalue s14\nfield varvalue s15\nfield transform t1\nfield transform[4] t2\nfield transform[2,4] t3\nfield varvalue t4\nfield varvalue t5\nfield transform{list} t6\nfield transform[4]{list} t7\nfield transform[2,4]{list} t8\nfield varvalue t9\nfield varvalue t10\nfield varvalue t11\n\nend\n\nobject testroot3\n\nconstant string unknown_modifier_hello \"hello world!\"\n\nproperty int32 readme [readonly]\nproperty int32 writeme [writeonly]\n\npipe int32 unreliable1 [unreliable,readonly]\n\nwire int32 peekwire [readonly]\nwire int32 \\\npokewire [writeonly]\nproperty int32 unknown_modifier [unknown, unknown_3(23, 45.8e-5, unknown_modifier_hello)]\n\nmemory double[] readmem [readonly]\n\nobjref obj4 o4\n\nproperty testenum1 testenum1_prop\n\nproperty testpod1 testpod1_prop\nfunction void testpod1_func1(testpod1 s)\nfunction testpod1 testpod1_func2()\n\nproperty teststruct3 teststruct3_prop\n\nmemory testpod2[] pod_m1\nmemory testpod2[*] pod_m2\n\nfunction double{generator} gen_func1()\nfunction uint8[]{generator} gen_func2(string name)\nfunction void gen_func3(string name, uint8[]{generator} in)\nfunction uint8[]{generator} gen_func4(uint8[]{generator} in)\nfunction teststruct2{generator} gen_func5(teststruct2{generator} in)\n\n#extra tests for fixed length arrays\nproperty double[6]{list} d1\nproperty double[6-]{list} d2\nproperty double[6]{int32} d3\nproperty double[6-]{int32} d4\nproperty double[3,3]{list} d5\nproperty double[3,3]{int32} d6\n\n#Test pipe and wire verification\npipe int32[3] p1\npipe int32[3-] p2\npipe int32[2,2] p3\nwire int32[6] w1\nwire int32[6-] w2\nwire int32[3,2] w3\n\n#namedarray test\nproperty vector3 testnamedarray1\nproperty transform testnamedarray2\nproperty transform[10-] testnamedarray3\nproperty transform[*] testnamedarray4\nproperty transform[3,2] testnamedarray5\n\nmemory transform[] namedarray_m1\nmemory transform[*] namedarray_m2\n\n#new primitive types test\nproperty cdouble c1\nproperty cdouble[] c2\nproperty cdouble[*] c3\nproperty cdouble{list} c4\nproperty cdouble[]{list} c5\nproperty cdouble[*]{list} c6\nproperty csingle c7\nproperty csingle[] c8\nproperty csingle[*] c9\nproperty csingle{list} c10\nproperty csingle[]{list} c11\nproperty csingle[*]{list} c12\n\nproperty bool b1\nproperty bool[] b2\nproperty bool[*] b3\nproperty bool{list} b4\nproperty bool[]{list} b5\nproperty bool[*]{list} b6\n\nmemory cdouble[] c_m1\nmemory cdouble[*] c_m2\nmemory cdouble[] c_m3\nmemory cdouble[*] c_m4\nmemory bool[] c_m5\nmemory bool[*] c_m6\n\nobjref obj5 nolock_test\n\nfunction void test_exception_params1()\nfunction void test_exception_params2()\n\nend\n\nobject obj1\nproperty double[] d1\nend\n\nobject obj2\nimplements obj1\nproperty double[] d1\nend\n\nobject obj3\nimplements obj1\nimplements obj2\nproperty double[] d1\nend\n\nobject obj4\nimplements sub2\nproperty string s_ind\nproperty int32 i_ind\n\nproperty string data\nobjref sub3{string} o3_1\nend\n\nobject obj5\n\nproperty double p1\nproperty double p2 [nolock]\nproperty double p3 [nolockread]\n\nfunction int32 f1()\nfunction int32 f2() [nolock]\n\npipe int32 q1 [readonly]\npipe int32 q2 [readonly,nolock]\n\nwire int32 w1 [readonly]\nwire int32 w2 [readonly,nolock]\n\nmemory int32[] m1\nmemory int32[] m2 [nolock]\nmemory int32[] m3 [nolockread]\n\nend\n\n\n";
     return s;
     }
     public override string GetServiceName() {return "com.robotraconteur.testing.TestService3";}
@@ -77,6 +77,8 @@ public class com__robotraconteur__testing__TestService3Factory : ServiceFactory
     return new obj3_stub(path, context);
     case "obj4":
     return new obj4_stub(path, context);
+    case "obj5":
+    return new obj5_stub(path, context);
     default:
     break;
     }
@@ -100,6 +102,8 @@ public class com__robotraconteur__testing__TestService3Factory : ServiceFactory
     return new obj3_skel(path,(obj3)obj,context);
     case "obj4":
     return new obj4_skel(path,(obj4)obj,context);
+    case "obj5":
+    return new obj5_skel(path,(obj5)obj,context);
     default:
     break;
     }
@@ -115,6 +119,7 @@ public class com__robotraconteur__testing__TestService3Factory : ServiceFactory
     if (!rr_type.Contains(".")) return rr_exp;
     string rr_stype;
     if (CompareNamespace(rr_type, out rr_stype)) {
+    if (rr_stype=="test_exception4") return new test_exception4(rr_exp.Message);
     } else {
     return base.DownCastException(rr_exp); 
     }
@@ -381,7 +386,6 @@ public class pixel2_stub : NamedArrayStub<pixel2,byte> {
 
 public class testroot3_stub : ServiceStub , testroot3 {
     private Pipe<int> rr_unreliable1;
-    private Pipe<int> rr_unreliable2;
     private Pipe<int[]> rr_p1;
     private Pipe<int[]> rr_p2;
     private Pipe<MultiDimArray> rr_p3;
@@ -403,7 +407,6 @@ public class testroot3_stub : ServiceStub , testroot3 {
     private MultiDimArrayMemory<bool> rr_c_m6;
     public testroot3_stub(string path, ClientContext c) : base(path, c) {
     rr_unreliable1=new PipeClient<int>("unreliable1", this);
-    rr_unreliable2=new PipeClient<int>("unreliable2", this);
     rr_p1=new PipeClient<int[]>("p1", this);
     rr_p2=new PipeClient<int[]>("p2", this);
     rr_p3=new PipeClient<MultiDimArray>("p3", this);
@@ -846,6 +849,14 @@ public class testroot3_stub : ServiceStub , testroot3 {
         MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
     return new Generator1Client<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2>("gen_func5",this,rr_me.FindElement("index").CastData<int[]>()[0]);
     }
+    public async Task test_exception_params1(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"test_exception_params1");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+    }
+    public async Task test_exception_params2(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"test_exception_params2");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+    }
     protected override void DispatchEvent(MessageEntry rr_m) {
     switch (rr_m.MemberName) {
     default:
@@ -855,12 +866,11 @@ public class testroot3_stub : ServiceStub , testroot3 {
     public async Task<obj4> get_o4(CancellationToken cancel=default(CancellationToken)) {
     return (obj4)await FindObjRefTyped("o4","com.robotraconteur.testing.TestService3.obj4",cancel);
     }
+    public async Task<obj5> get_nolock_test(CancellationToken cancel=default(CancellationToken)) {
+    return (obj5)await FindObjRefTyped("nolock_test","com.robotraconteur.testing.TestService3.obj5",cancel);
+    }
     public Pipe<int> unreliable1 {
     get { return rr_unreliable1;  }
-    set { throw new InvalidOperationException();}
-    }
-    public Pipe<int> unreliable2 {
-    get { return rr_unreliable2;  }
     set { throw new InvalidOperationException();}
     }
     public Pipe<int[]> p1 {
@@ -933,9 +943,6 @@ public class testroot3_stub : ServiceStub , testroot3 {
     switch (m.MemberName) {
     case "unreliable1":
     this.rr_unreliable1.PipePacketReceived(m);
-    break;
-    case "unreliable2":
-    this.rr_unreliable2.PipePacketReceived(m);
     break;
     case "p1":
     this.rr_p1.PipePacketReceived(m);
@@ -1188,6 +1195,135 @@ public class obj4_stub : ServiceStub , obj4 {
     protected override void DispatchWireMessage(MessageEntry m)
     {
     switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+}
+public class obj5_stub : ServiceStub , obj5 {
+    private Pipe<int> rr_q1;
+    private Pipe<int> rr_q2;
+    private Wire<int> rr_w1;
+    private Wire<int> rr_w2;
+    private ArrayMemory<int> rr_m1;
+    private ArrayMemory<int> rr_m2;
+    private ArrayMemory<int> rr_m3;
+    public obj5_stub(string path, ClientContext c) : base(path, c) {
+    rr_q1=new PipeClient<int>("q1", this);
+    rr_q2=new PipeClient<int>("q2", this);
+    rr_w1=new WireClient<int>("w1", this);
+    rr_w2=new WireClient<int>("w2", this);
+    rr_m1=new ArrayMemoryClient<int>("m1",this, MemberDefinition_Direction.both);
+    rr_m2=new ArrayMemoryClient<int>("m2",this, MemberDefinition_Direction.both);
+    rr_m3=new ArrayMemoryClient<int>("m3",this, MemberDefinition_Direction.both);
+    }
+    public async Task<double> get_p1(CancellationToken cancel=default(CancellationToken)) {
+        MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "p1");
+        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageElement me=mr.FindElement("value");
+        return (MessageElementUtil.UnpackScalar<double>(me));
+        }
+    public async Task set_p1(double value, CancellationToken cancel=default(CancellationToken)) {
+        MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"p1");
+        MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
+        MessageEntry mr=await ProcessRequest(m, cancel);
+        }
+    public async Task<double> get_p2(CancellationToken cancel=default(CancellationToken)) {
+        MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "p2");
+        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageElement me=mr.FindElement("value");
+        return (MessageElementUtil.UnpackScalar<double>(me));
+        }
+    public async Task set_p2(double value, CancellationToken cancel=default(CancellationToken)) {
+        MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"p2");
+        MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
+        MessageEntry mr=await ProcessRequest(m, cancel);
+        }
+    public async Task<double> get_p3(CancellationToken cancel=default(CancellationToken)) {
+        MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "p3");
+        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageElement me=mr.FindElement("value");
+        return (MessageElementUtil.UnpackScalar<double>(me));
+        }
+    public async Task set_p3(double value, CancellationToken cancel=default(CancellationToken)) {
+        MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"p3");
+        MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
+        MessageEntry mr=await ProcessRequest(m, cancel);
+        }
+    public async Task<int> f1(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"f1");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+    return (MessageElementUtil.UnpackScalar<int>(rr_me.FindElement("return")));
+    }
+    public async Task<int> f2(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"f2");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+    return (MessageElementUtil.UnpackScalar<int>(rr_me.FindElement("return")));
+    }
+    protected override void DispatchEvent(MessageEntry rr_m) {
+    switch (rr_m.MemberName) {
+    default:
+    break;
+    }
+    }
+    public Pipe<int> q1 {
+    get { return rr_q1;  }
+    set { throw new InvalidOperationException();}
+    }
+    public Pipe<int> q2 {
+    get { return rr_q2;  }
+    set { throw new InvalidOperationException();}
+    }
+    public Wire<int> w1 {
+    get { return rr_w1;  }
+    set { throw new InvalidOperationException();}
+    }
+    public Wire<int> w2 {
+    get { return rr_w2;  }
+    set { throw new InvalidOperationException();}
+    }
+    public ArrayMemory<int> m1 { 
+    get { return rr_m1; }
+    }
+    public ArrayMemory<int> m2 { 
+    get { return rr_m2; }
+    }
+    public ArrayMemory<int> m3 { 
+    get { return rr_m3; }
+    }
+    protected override void DispatchPipeMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    case "q1":
+    this.rr_q1.PipePacketReceived(m);
+    break;
+    case "q2":
+    this.rr_q2.PipePacketReceived(m);
+    break;
+    default:
+    throw new Exception();
+    }
+    }
+    protected override async Task<MessageEntry> CallbackCall(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.CallbackCallRet, rr_ename);
+    rr_mr.ServicePath=rr_m.ServicePath;
+    rr_mr.RequestID=rr_m.RequestID;
+    switch (rr_ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    protected override void DispatchWireMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    case "w1":
+    this.rr_w1.WirePacketReceived(m);
+    break;
+    case "w2":
+    this.rr_w2.WirePacketReceived(m);
+    break;
     default:
     throw new Exception();
     }
@@ -1671,6 +1807,18 @@ public class testroot3_skel : ServiceSkel {
     }
     break;
     }
+    case "test_exception_params1":
+    {
+    await this.obj.test_exception_params1(default(CancellationToken));
+    rr_mr.AddElement("return",(int)0);
+    break;
+    }
+    case "test_exception_params2":
+    {
+    await this.obj.test_exception_params2(default(CancellationToken));
+    rr_mr.AddElement("return",(int)0);
+    break;
+    }
     default:
     throw new MemberNotFoundException("Member not found");
     }
@@ -1680,6 +1828,9 @@ public class testroot3_skel : ServiceSkel {
     switch (name) {
     case "o4": {
     return await obj.get_o4();
+    }
+    case "nolock_test": {
+    return await obj.get_nolock_test();
     }
     default:
     break;
@@ -1700,7 +1851,6 @@ public class testroot3_skel : ServiceSkel {
     throw new MemberNotFoundException("Member not found");
     }
     private PipeServer<int> rr_unreliable1;
-    private PipeServer<int> rr_unreliable2;
     private PipeServer<int[]> rr_p1;
     private PipeServer<int[]> rr_p2;
     private PipeServer<MultiDimArray> rr_p3;
@@ -1715,7 +1865,6 @@ public class testroot3_skel : ServiceSkel {
     this.rr_InitPipeServersRun=true;
     testroot3 castobj=(testroot3)o;
     this.rr_unreliable1=new PipeServer<int>("unreliable1",this);
-    this.rr_unreliable2=new PipeServer<int>("unreliable2",this);
     this.rr_p1=new PipeServer<int[]>("p1",this);
     this.rr_p2=new PipeServer<int[]>("p2",this);
     this.rr_p3=new PipeServer<MultiDimArray>("p3",this);
@@ -1725,7 +1874,6 @@ public class testroot3_skel : ServiceSkel {
     this.rr_w2=new WireServer<int[]>("w2",this);
     this.rr_w3=new WireServer<MultiDimArray>("w3",this);
     castobj.unreliable1=this.rr_unreliable1;
-    castobj.unreliable2=this.rr_unreliable2;
     castobj.p1=this.rr_p1;
     castobj.p2=this.rr_p2;
     castobj.p3=this.rr_p3;
@@ -1743,8 +1891,6 @@ public class testroot3_skel : ServiceSkel {
     switch (ename) {
     case "unreliable1":
     return await this.rr_unreliable1.PipeCommand(m,e);
-    case "unreliable2":
-    return await this.rr_unreliable2.PipeCommand(m,e);
     case "p1":
     return await this.rr_p1.PipeCommand(m,e);
     case "p2":
@@ -1777,9 +1923,6 @@ public class testroot3_skel : ServiceSkel {
     switch (m.MemberName) {
     case "unreliable1":
     this.rr_unreliable1.PipePacketReceived(m,e);
-    break;
-    case "unreliable2":
-    this.rr_unreliable2.PipePacketReceived(m,e);
     break;
     case "p1":
     this.rr_p1.PipePacketReceived(m,e);
@@ -1855,6 +1998,9 @@ public class testroot3_skel : ServiceSkel {
     default:
     throw new MemberNotFoundException("Member not found");
     }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
     }
 }
 public class obj1_skel : ServiceSkel {
@@ -1965,6 +2111,9 @@ public class obj1_skel : ServiceSkel {
     throw new MemberNotFoundException("Member not found");
     }
     }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
 }
 public class obj2_skel : ServiceSkel {
     protected obj2 obj;
@@ -2074,6 +2223,9 @@ public class obj2_skel : ServiceSkel {
     throw new MemberNotFoundException("Member not found");
     }
     }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
 }
 public class obj3_skel : ServiceSkel {
     protected obj3 obj;
@@ -2182,6 +2334,9 @@ public class obj3_skel : ServiceSkel {
     default:
     throw new MemberNotFoundException("Member not found");
     }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
     }
 }
 public class obj4_skel : ServiceSkel {
@@ -2316,6 +2471,203 @@ public class obj4_skel : ServiceSkel {
     default:
     throw new MemberNotFoundException("Member not found");
     }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
+}
+public class obj5_skel : ServiceSkel {
+    protected obj5 obj;
+    public obj5_skel(string p,obj5 o,ServerContext c) : base(p,o,c) { obj=(obj5)o; }
+    public override void ReleaseCastObject() { 
+    }
+    public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertyGetRes, ename);
+    switch (ename) {
+    case "p1":
+    {
+    double ret=await obj.get_p1();
+    mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
+    break;
+    }
+    case "p2":
+    {
+    double ret=await obj.get_p2();
+    mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
+    break;
+    }
+    case "p3":
+    {
+    double ret=await obj.get_p3();
+    mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
+    break;
+    }
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallSetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageElement me=m.FindElement("value");
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertySetRes, ename);
+    switch (ename) {
+    case "p1":
+    {
+    await obj.set_p1((MessageElementUtil.UnpackScalar<double>(me)));
+    break;
+    }
+    case "p2":
+    {
+    await obj.set_p2((MessageElementUtil.UnpackScalar<double>(me)));
+    break;
+    }
+    case "p3":
+    {
+    await obj.set_p3((MessageElementUtil.UnpackScalar<double>(me)));
+    break;
+    }
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallFunction(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.FunctionCallRes, rr_ename);
+    switch (rr_ename) {
+    case "f1":
+    {
+    int rr_ret=await this.obj.f1(default(CancellationToken));
+    rr_mr.AddElement(MessageElementUtil.PackScalar<int>("return",rr_ret));
+    break;
+    }
+    case "f2":
+    {
+    int rr_ret=await this.obj.f2(default(CancellationToken));
+    rr_mr.AddElement(MessageElementUtil.PackScalar<int>("return",rr_ret));
+    break;
+    }
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    public override async Task<object> GetSubObj(string name, string ind) {
+    switch (name) {
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("");
+    }
+    public override void RegisterEvents(object rrobj1) {
+    obj=(obj5)rrobj1;
+    }
+    public override void UnregisterEvents(object rrobj1) {
+    obj=(obj5)rrobj1;
+    }
+    public override object GetCallbackFunction(uint rr_endpoint, string rr_membername) {
+    switch (rr_membername) {
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("Member not found");
+    }
+    private PipeServer<int> rr_q1;
+    private PipeServer<int> rr_q2;
+    private WireServer<int> rr_w1;
+    private WireServer<int> rr_w2;
+    private bool rr_InitPipeServersRun=false;
+    public override void InitPipeServers(object o) {
+    if (this.rr_InitPipeServersRun) return;
+    this.rr_InitPipeServersRun=true;
+    obj5 castobj=(obj5)o;
+    this.rr_q1=new PipeServer<int>("q1",this);
+    this.rr_q2=new PipeServer<int>("q2",this);
+    this.rr_w1=new WireServer<int>("w1",this);
+    this.rr_w2=new WireServer<int>("w2",this);
+    castobj.q1=this.rr_q1;
+    castobj.q2=this.rr_q2;
+    castobj.w1=this.rr_w1;
+    castobj.w2=this.rr_w2;
+    }
+    public override void InitCallbackServers(object rrobj1) {
+    obj=(obj5)rrobj1;
+    }
+    public override async Task<MessageEntry> CallPipeFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    case "q1":
+    return await this.rr_q1.PipeCommand(m,e);
+    case "q2":
+    return await this.rr_q2.PipeCommand(m,e);
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallWireFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    case "w1":
+    return await this.rr_w1.WireCommand(m,e);
+    case "w2":
+    return await this.rr_w2.WireCommand(m,e);
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchPipeMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    case "q1":
+    this.rr_q1.PipePacketReceived(m,e);
+    break;
+    case "q2":
+    this.rr_q2.PipePacketReceived(m,e);
+    break;
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchWireMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    case "w1":
+    this.rr_w1.WirePacketReceived(m,e);
+    break;
+    case "w2":
+    this.rr_w2.WirePacketReceived(m,e);
+    break;
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallMemoryFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    case "m1":
+     return await (new ArrayMemoryServiceSkel<int>("m1",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m1);
+    break;
+    case "m2":
+     return await (new ArrayMemoryServiceSkel<int>("m2",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m2);
+    break;
+    case "m3":
+     return await (new ArrayMemoryServiceSkel<int>("m3",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m3);
+    break;
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    if (m.MemberName == "p2") return true;
+    if (m.MemberName == "p3" && m.EntryType == MessageEntryType.PropertyGetReq) return true;
+    if (m.MemberName == "f2") return true;
+    if (m.MemberName == "q2") return true;
+    if (m.MemberName == "w2") return true;
+    if (m.MemberName == "m2") return true;
+    if (m.MemberName == "m3" && (m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)) return true;
+    return false;
     }
 }
 public class testroot3_default_impl : testroot3{
@@ -2553,7 +2905,16 @@ public class testroot3_default_impl : testroot3{
     public virtual Task<Generator1<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2>> gen_func5(CancellationToken rr_cancel=default(CancellationToken)) {
     throw new NotImplementedException();
     }
+    public virtual Task test_exception_params1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task test_exception_params2(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
     public virtual Task<obj4> get_o4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<obj5> get_nolock_test(CancellationToken cancel=default(CancellationToken)) {
     throw new NotImplementedException();
     }
     public virtual Pipe<int> unreliable1 {
@@ -2562,10 +2923,6 @@ public class testroot3_default_impl : testroot3{
     if (rrvar_unreliable1!=null) throw new InvalidOperationException("Pipe already set");
     rrvar_unreliable1= new PipeBroadcaster<int>(value);
     }
-    }
-    public virtual Pipe<int> unreliable2 {
-    get { throw new NotImplementedException(); }
-    set { throw new InvalidOperationException();}
     }
     public virtual Pipe<int[]> p1 {
     get { throw new NotImplementedException(); }
@@ -2684,6 +3041,73 @@ public class obj4_default_impl : obj4{
     }
     public virtual Task<com.robotraconteur.testing.TestService1.sub3> get_o3_1(string ind, CancellationToken cancel=default(CancellationToken)) {
     throw new NotImplementedException();
+    }
+}
+public class obj5_default_impl : obj5{
+    protected PipeBroadcaster<int> rrvar_q1;
+    protected PipeBroadcaster<int> rrvar_q2;
+    protected WireBroadcaster<int> rrvar_w1;
+    protected WireBroadcaster<int> rrvar_w2;
+    public virtual Task<double> get_p1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_p1(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> get_p2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_p2(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> get_p3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_p3(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> f1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> f2(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Pipe<int> q1 {
+    get { return rrvar_q1.Pipe;  }
+    set {
+    if (rrvar_q1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_q1= new PipeBroadcaster<int>(value);
+    }
+    }
+    public virtual Pipe<int> q2 {
+    get { return rrvar_q2.Pipe;  }
+    set {
+    if (rrvar_q2!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_q2= new PipeBroadcaster<int>(value);
+    }
+    }
+    public virtual Wire<int> w1 {
+    get { return rrvar_w1.Wire;  }
+    set {
+    if (rrvar_w1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_w1= new WireBroadcaster<int>(value);
+    }
+    }
+    public virtual Wire<int> w2 {
+    get { return rrvar_w2.Wire;  }
+    set {
+    if (rrvar_w2!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_w2= new WireBroadcaster<int>(value);
+    }
+    }
+    public virtual ArrayMemory<int> m1 { 
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<int> m2 { 
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<int> m3 { 
+    get { throw new NotImplementedException(); }
     }
 }
 public static class RRExtensions

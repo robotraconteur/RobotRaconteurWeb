@@ -2215,6 +2215,30 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    }");
             w2.WriteLine("    }");
 
+            w2.WriteLine("    public override bool IsRequestNoLock(MessageEntry m) {");
+            
+            foreach (var m in MemberIter<MemberDefinition>(e))
+            {
+                if (m.NoLock == MemberDefinition_NoLock.all)
+                {
+                    w2.WriteLine("    if (m.MemberName == \"" + m.Name + "\") return true;");
+                }
+
+                if (m.NoLock == MemberDefinition_NoLock.read)
+                {
+                    if (m is PropertyDefinition)
+                    {
+                        w2.WriteLine("    if (m.MemberName == \"" + m.Name + "\" && m.EntryType == MessageEntryType.PropertyGetReq) return true;");
+                    }
+                    if (m is MemoryDefinition)
+                    {
+                        w2.WriteLine("    if (m.MemberName == \"" + m.Name + "\" && (m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)) return true;");
+                    }
+                }
+            }
+
+            w2.WriteLine("    return false;");
+            w2.WriteLine("    }");
 
             w2.WriteLine("}");
         }
@@ -2824,6 +2848,17 @@ namespace RobotRaconteurWeb
                 GenerateStubSkelFile(d, servicedef, f2);
             }
 
+        }
+
+        public static void GenerateOneFileHeader(TextWriter w2)
+        {
+
+        }
+
+        public static void GenerateOneFilePart(ServiceDefinition d, string servicedef, TextWriter w2)
+        {
+            GenerateInterfaceFile(d, w2);
+            GenerateStubSkelFile(d, servicedef, w2);
         }
 
     }

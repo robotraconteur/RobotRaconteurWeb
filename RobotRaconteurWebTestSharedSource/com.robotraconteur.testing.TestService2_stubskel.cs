@@ -422,6 +422,9 @@ public class baseobj_skel : ServiceSkel {
     throw new MemberNotFoundException("Member not found");
     }
     }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
 }
 public class subobj_skel : ServiceSkel {
     protected subobj obj;
@@ -526,6 +529,9 @@ public class subobj_skel : ServiceSkel {
     default:
     throw new MemberNotFoundException("Member not found");
     }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
     }
 }
 public class baseobj_default_impl : baseobj{

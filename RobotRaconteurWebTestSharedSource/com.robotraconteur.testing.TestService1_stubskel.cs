@@ -2196,6 +2196,9 @@ public class testroot_skel : ServiceSkel {
     throw new MemberNotFoundException("Member not found");
     }
     }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
 }
 public class sub1_skel : ServiceSkel {
     protected sub1 obj;
@@ -2347,6 +2350,9 @@ public class sub1_skel : ServiceSkel {
     throw new MemberNotFoundException("Member not found");
     }
     }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
 }
 public class sub2_skel : ServiceSkel {
     protected sub2 obj;
@@ -2480,6 +2486,9 @@ public class sub2_skel : ServiceSkel {
     default:
     throw new MemberNotFoundException("Member not found");
     }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
     }
 }
 public class sub3_skel : ServiceSkel {
@@ -2618,6 +2627,9 @@ public class sub3_skel : ServiceSkel {
     default:
     throw new MemberNotFoundException("Member not found");
     }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
     }
 }
 public class testroot_default_impl : testroot{

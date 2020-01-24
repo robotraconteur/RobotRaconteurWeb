@@ -69,8 +69,7 @@ namespace RobotRaconteurTest
 
 
         public override Pipe<int> unreliable1 { get; set; }
-        public override Pipe<int> unreliable2 { get; set; }
-
+        
         public override ArrayMemory<double> readmem { get; }
 
         public override Task<testenum1> get_testenum1_prop(CancellationToken cancel = default(CancellationToken))

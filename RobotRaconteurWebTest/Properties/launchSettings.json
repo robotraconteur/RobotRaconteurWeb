@@ -2,7 +2,8 @@
   "profiles": {
     "Start App": {
       "commandName": "Project",
-      "commandLineArgs": "loopback2"
+      "commandLineArgs": "loopback",
+      "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\RobotRaconteurWebTestSharedSource"
     }
   }
 }
