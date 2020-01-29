@@ -3153,7 +3153,7 @@ namespace RobotRaconteurWeb
             : base(CreateString(e,info))
         {
             ShortMessage = e;
-            ParseInfo.LineNumber = null;       
+            ParseInfo = info;
         }
 
         private static string CreateString(string short_message, ServiceDefinitionParseInfo parse_info = default(ServiceDefinitionParseInfo))
@@ -3201,7 +3201,7 @@ namespace RobotRaconteurWeb
             : base(CreateString(e, info))
         {
             ShortMessage = e;
-            ParseInfo.LineNumber = null;
+            ParseInfo = info;
         }
 
         private static string CreateString(string short_message, ServiceDefinitionParseInfo parse_info = default(ServiceDefinitionParseInfo))

@@ -22,7 +22,7 @@ using RobotRaconteurWeb;
 using Mono.Options;
 using System.IO;
 
-namespace RobotRaconteurNETGen
+namespace RobotRaconteurWebGen
 {
     class Program
     {
@@ -52,11 +52,11 @@ namespace RobotRaconteurNETGen
             {
                 {"thunksource", "generate thunk source code", v=> thunksource = v!=null},
                 {"version", "print program version", v => show_version = v != null},
-                {"output-dir", "directory for output", v => output_dir = v },
+                {"output-dir=", "directory for output", v => output_dir = v },
                 {"lang=", "language to generate sources for for (only csharp currently supported)", v=> lang=v},
                 {"import=", "input file for use in imports", v=> sources.Add(new Source {filename = v, is_import = true }) },
-                {"I|include-path", "include path", v=> include_dirs.Add(v) },
-                {"outfile", "unified output file (csharp only)", v=> outfile = v },
+                {"I|include-path=", "include path", v=> include_dirs.Add(v) },
+                {"outfile=", "unified output file (csharp only)", v=> outfile = v },
                 {"h|help", "show this message and exit", v=> show_help = v!=null},
             };
 
@@ -117,7 +117,7 @@ namespace RobotRaconteurNETGen
 
                 foreach (var s in sources)
                 {
-                    if (!File.Exists(s.filename) && Path.IsPathFullyQualified(s.filename))
+                    if (!File.Exists(s.filename) && !Path.IsPathFullyQualified(s.filename))
                     {
                         foreach (var inc in include_dirs)
                         {
@@ -135,7 +135,7 @@ namespace RobotRaconteurNETGen
                 {
                     if (!File.Exists(s.filename))
                     {
-                        Console.WriteLine("RobotRaconteurWebGen: fatal error: input file not found {0}", s);                        
+                        Console.WriteLine("RobotRaconteurWebGen: fatal error: input file not found {0}", s.filename);                        
                         return 1002;
                     }
                 }
