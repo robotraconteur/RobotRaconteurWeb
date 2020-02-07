@@ -139,32 +139,10 @@ namespace RobotRaconteurWeb
         private void StartWaitForConnections()
         {
               List<IPEndPoint> listener_endpoints=new List<IPEndPoint>();
-            
-            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
-            foreach (NetworkInterface adapter in adapters)
-            {
-                if (adapter.OperationalStatus == OperationalStatus.Up || adapter.OperationalStatus== OperationalStatus.Unknown)
-                {
-                    IPInterfaceProperties properties = adapter.GetIPProperties();
-                    foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
-                    {
-                       listener_endpoints.Add(new IPEndPoint(uniCast.Address,m_Port));
+
+            listener_endpoints.Add(new IPEndPoint(IPAddress.Any, m_Port));
+            listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Any, m_Port));
                         
-                    }
-                }
-
-            }
-
-            if (!listener_endpoints.Any(x => (x.Address.Equals(IPAddress.Loopback))))
-            {
-                listener_endpoints.Add(new IPEndPoint(IPAddress.Loopback, m_Port));
-            }
-
-            if (!listener_endpoints.Any(x => x.Address.Equals( IPAddress.IPv6Loopback)))
-            {
-                listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Loopback, m_Port));
-            }
-
             int count = 0;
 
             foreach (IPEndPoint e in listener_endpoints)
@@ -174,8 +152,19 @@ namespace RobotRaconteurWeb
                 {
                     TcpListener listen = new TcpListener(e);
 
-
-                    listen.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+                    try
+                    {
+                        listen.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+                    }
+                    catch (Exception) { }
+                    if (e.AddressFamily == AddressFamily.InterNetworkV6)
+                    {
+                        try
+                        {
+                            listen.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, true);
+                        }
+                        catch (Exception) { }
+                    }
                     listen.Start();
                     listeners.Add(listen);
 
@@ -183,9 +172,9 @@ namespace RobotRaconteurWeb
                     //Console.WriteLine("Success");
                     count++;
                 }
-                catch (Exception)
+                catch (Exception ee)
                 {
-                    //Console.WriteLine(ee.ToString());
+                    Console.WriteLine(ee.ToString());
                 }
                
             }
