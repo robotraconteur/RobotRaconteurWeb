@@ -2,7 +2,7 @@
   "profiles": {
     "Start App": {
       "commandName": "Project",
-      "commandLineArgs": "loopback",
+      "commandLineArgs": "client \"rr+local:///?nodename=testprog&service=RobotRaconteurTestService\" \"rr+tcp://localhost:22222/?nodename=testprog&service=RobotRaconteurTestService_auth\"",
       "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\RobotRaconteurWebTestSharedSource"
     }
   }

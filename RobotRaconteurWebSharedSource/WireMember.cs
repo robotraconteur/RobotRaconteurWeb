@@ -64,6 +64,8 @@ namespace RobotRaconteurWeb
             protected bool outval_valid=false;
             protected TimeSpec lasttime_send;
 
+            protected bool send_closed = false;
+
             public virtual T OutValue
             {
                 get
@@ -73,23 +75,34 @@ namespace RobotRaconteurWeb
                 }
                 set
                 {
-                    lock (sendlock)
-                    {
-                        TimeSpec time = TimeSpec.Now;
-                        if (time == last_sendtime)
-                        {
-                            time.nanoseconds += 1;
-                        }
-
-
-                        parent.SendWirePacket(value, time, endpoint);
-                        last_sendtime = time;
-                        outval = value;
-                        outval_valid = true;
-                        lasttime_send = TimeSpec.Now;
-                    }
+                    SendOutValue(value).IgnoreResult();
                 }
 
+            }
+
+            public Task SendOutValue(T value)
+            {
+                lock (sendlock)
+                {
+                    if (send_closed)
+                    {
+                        throw new InvalidOperationException("Wire has been closed");
+                    }
+
+                    TimeSpec time = TimeSpec.Now;
+                    if (time == last_sendtime)
+                    {
+                        time.nanoseconds += 1;
+                    }
+
+
+                    Task t = parent.SendWirePacket(value, time, endpoint);
+                    last_sendtime = time;
+                    outval = value;
+                    outval_valid = true;
+                    lasttime_send = TimeSpec.Now;
+                    return t;
+                }
             }
 
             public virtual TimeSpec LastValueReceivedTime
@@ -113,6 +126,11 @@ namespace RobotRaconteurWeb
 
             public virtual Task Close()
             {
+                lock(sendlock)
+                {
+                    send_closed = true;
+                }
+
                 return parent.Close(this);
             }
 
@@ -255,7 +273,7 @@ namespace RobotRaconteurWeb
             return elems;
         }
 
-        public abstract void SendWirePacket(T packet, TimeSpec time, Endpoint e = null);
+        public abstract Task SendWirePacket(T packet, TimeSpec time, Endpoint e = null);
 
         public abstract void WirePacketReceived(MessageEntry m, Endpoint e = null);
 
@@ -374,12 +392,12 @@ namespace RobotRaconteurWeb
 
 
 
-        public override void SendWirePacket(T packet, TimeSpec time, Endpoint e = null)
+        public override Task SendWirePacket(T packet, TimeSpec time, Endpoint e = null)
         {
             List<MessageElement> el = PackPacket(packet, time);
             MessageEntry m = new MessageEntry(MessageEntryType.WirePacket, MemberName);
             m.elements = el;
-            stub.SendWireMessage(m, default(CancellationToken)).IgnoreResult();
+            return stub.SendWireMessage(m, default(CancellationToken));
         }
 
         protected virtual void ClientContextListener(ClientContext context, ClientServiceListenerEventType event_, object param)
@@ -561,14 +579,14 @@ namespace RobotRaconteurWeb
             catch { }
         }
 
-        public override void SendWirePacket(T packet, TimeSpec time, Endpoint e = null)
+        public override Task SendWirePacket(T packet, TimeSpec time, Endpoint e = null)
         {
             if (!connections.ContainsKey(e.LocalEndpoint)) throw new Exception("Wire has been disconnected");
             List<MessageElement> el = PackPacket(packet, time);
             MessageEntry m = new MessageEntry(MessageEntryType.WirePacket, MemberName);
             m.elements = el;
 
-            skel.SendWireMessage(m, e, default(CancellationToken)).IgnoreResult();
+            return skel.SendWireMessage(m, e, default(CancellationToken));
         }
 
         public override void Shutdown()
@@ -662,6 +680,7 @@ namespace RobotRaconteurWeb
         }
 
         protected T current_out_value = default(T);
+        protected bool out_value_valid = false;
 
         public T OutValue
         {
@@ -670,6 +689,7 @@ namespace RobotRaconteurWeb
                 lock (connected_wires_lock)
                 {
                     current_out_value = value;
+                    out_value_valid = true;
                     List<connected_connection> ceps = new List<connected_connection>();
                     foreach (connected_connection c in connected_wires)
                     {
@@ -686,10 +706,25 @@ namespace RobotRaconteurWeb
                                 connected_wires.Remove(ee);
                                 continue;
                             }
-                            c.OutValue = value;
+                            c.SendOutValue(value).ContinueWith(delegate(Task t)
+                            {
+                                if (t.IsFaulted)
+                                {
+                                    lock (connected_wires_lock)
+                                    {
+                                        ee.connection = null;
+                                    }
+                                }
+                            }
+#if !ROBOTRACONTEUR_BRIDGE
+                            , TaskContinuationOptions.OnlyOnFaulted
+#endif
+                            );
 
                         }
-                        catch (Exception exp) { }
+                        catch (Exception exp) {
+                            ee.connection = null;
+                        }
                     }
                 }
             }
@@ -699,6 +734,10 @@ namespace RobotRaconteurWeb
         {
             lock (connected_wires_lock)
             {
+                if (!out_value_valid)
+                {
+                    throw new ValueNotSetException("Value not set");
+                }
                 return current_out_value;
             }
         }

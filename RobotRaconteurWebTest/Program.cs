@@ -60,8 +60,10 @@ namespace RobotRaconteurTest
                 }
 
                 var t = new TcpTransport();
+                var t2 = new LocalTransport();
 
                 RobotRaconteurNode.s.RegisterTransport(t);
+                RobotRaconteurNode.s.RegisterTransport(t2);
 
 
                 RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
@@ -85,14 +87,13 @@ namespace RobotRaconteurTest
                 string name = args[2];
 
 
-
-                //RobotRaconteurNode.s.NodeID = id;
-                //RobotRaconteurNode.s.NodeName = name;
-
+                var t2 = new LocalTransport();
+                t2.StartServerAsNodeName(name);
 
 
                 var t = new TcpTransport();
-                
+                RobotRaconteurNode.s.RegisterTransport(t2);
+
                 t.StartServer(port);
                 
                 RobotRaconteurNode.s.RegisterTransport(t);

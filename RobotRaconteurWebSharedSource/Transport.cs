@@ -185,7 +185,7 @@ namespace RobotRaconteurWeb
     {
         public static ParseConnectionUrlResult ParseConnectionUrl(string url)
         {
-            var rr1 = new Regex("^([^:\\s]+)://((?:\\[[A-Fa-f0-9\\:]+(?:\\%\\w*)?\\])|(?:[^\\[\\]\\:/\\?\\s]+))(?::([^:/\\?\\s]+))?(?:/([^\\?\\s]*))?\\??([^\\s]*)$");
+            var rr1 = new Regex("^([^:\\s]+)://(?:((?:\\[[A-Fa-f0-9\\:]+(?:\\%\\w*)?\\])|(?:[^\\[\\]\\:/\\?\\s]+))(?::([^:/\\?\\s]+))?|/)(?:/([^\\?\\s]*))?\\??([^\\s]*)$");
             var u1 = rr1.Match(url);
 
             if (!u1.Success)

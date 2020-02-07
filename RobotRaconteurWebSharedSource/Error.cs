@@ -227,20 +227,7 @@ namespace RobotRaconteurWeb
         {
         }
     }
-    public class OutOfRangeException : RobotRaconteurException
-    {
-        public OutOfRangeException(string message)
-            : base(MessageErrorType.OutOfRange, "RobotRaconteur.OutOfRange", message)
-        {
-        }
-    }
-    public class KeyNotFoundException : RobotRaconteurException
-    {
-        public KeyNotFoundException(string message)
-            : base(MessageErrorType.KeyNotFound, "RobotRaconteur.KeyNotFound", message)
-        {
-        }
-    }
+    
     public class RobotRaconteurRemoteException : RobotRaconteurException
     {
         public RobotRaconteurRemoteException(string error, string message)
@@ -364,6 +351,21 @@ namespace RobotRaconteurWeb
                 return;
             }
 
+            if (exception is ArgumentOutOfRangeException)
+            {
+                entry.Error = MessageErrorType.OutOfRange;
+                entry.AddElement("errorname", "RobotRaconteur.OutOfRange");
+                entry.AddElement("errorstring", exception.Message);
+                return;
+            }
+
+            if (exception is KeyNotFoundException)
+            {
+                entry.Error = MessageErrorType.KeyNotFound;
+                entry.AddElement("errorname", "RobotRaconteur.KeyNotFound");
+                entry.AddElement("errorstring", exception.Message);
+                return;
+            }
 
             if (exception is RobotRaconteurException)
             {
@@ -481,7 +483,7 @@ namespace RobotRaconteurWeb
                     return new ServiceDefinitionException(errorstring);
 
                 case MessageErrorType.OutOfRange:
-                    return new OutOfRangeException(errorstring);
+                    return new ArgumentOutOfRangeException(errorstring);
 
                 case MessageErrorType.KeyNotFound:
                     return new KeyNotFoundException(errorstring);

@@ -1413,7 +1413,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        private void NodeDetected(NodeDiscoveryInfo n)
+        internal void NodeDetected(NodeDiscoveryInfo n)
         {            
             try
             {
@@ -2359,6 +2359,7 @@ namespace RobotRaconteurWeb
         public NodeID NodeID;
         public string NodeName = "";
         public List<NodeDiscoveryInfoURL> URLs = new List<NodeDiscoveryInfoURL>();
+        public string ServiceStateNonce;
     }
 
     public class NodeDiscoveryInfoURL

@@ -483,7 +483,7 @@ namespace RobotRaconteurWeb
             else
             {
                 if (GetBufferLength(buffer) - bufferpos < count)
-                    throw new OutOfRangeException("");
+                    throw new ArgumentOutOfRangeException("");
 
                 ulong blocks = count / max_elems;
                 ulong blockrem = count % max_elems;
@@ -536,7 +536,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                throw new OutOfRangeException("");
+                throw new ArgumentOutOfRangeException("");
             }
         }
 

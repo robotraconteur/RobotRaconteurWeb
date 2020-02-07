@@ -635,7 +635,7 @@ namespace RobotRaconteurWeb
 
         private IPNodeDiscovery node_discovery;
 
-        public void EnableNodeDiscoveryListening(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LINK_LOCAL)
+        public void EnableNodeDiscoveryListening(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LinkLocal)
         {
             if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
             node_discovery.StartListeningForNodes(flags);
@@ -648,7 +648,7 @@ namespace RobotRaconteurWeb
             node_discovery.StopListeningForNodes();
         }
 
-        public void EnableNodeAnnounce(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LINK_LOCAL)
+        public void EnableNodeAnnounce(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LinkLocal)
         {
             if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
             node_discovery.StartAnnouncingNode(flags);
@@ -1534,13 +1534,13 @@ namespace RobotRaconteurWeb
     }
 
 
-    [FlagsAttribute]
+    [Flags]
     public enum  IPNodeDiscoveryFlags
     {        
-        NODE_LOCAL=0x1,
-        LINK_LOCAL=0x2,
-        SITE_LOCAL=0x4,
-        IPV4_BROADCAST = 0x8
+        NodeLocal=0x1,
+        LinkLocal=0x2,
+        SiteLocal=0x4,
+        IPv4Broadcast = 0x8
 
     }
 
@@ -1591,17 +1591,17 @@ namespace RobotRaconteurWeb
         {
             var IPv6MulticastListenAddresses = new List<IPAddress>();
 
-            if (((uint)flags & ((uint)IPNodeDiscoveryFlags.NODE_LOCAL)) != 0)
+            if (flags.HasFlag(IPNodeDiscoveryFlags.NodeLocal))
             {
                 IPv6MulticastListenAddresses.Add(IPAddress.Parse("FF01::BA86"));
             }
 
-            if (((uint)flags & ((uint)IPNodeDiscoveryFlags.LINK_LOCAL)) != 0)
+            if (flags.HasFlag(IPNodeDiscoveryFlags.LinkLocal))
             {
                 IPv6MulticastListenAddresses.Add(IPAddress.Parse("FF02::BA86"));
             }
 
-            if (((uint)flags & ((uint)IPNodeDiscoveryFlags.SITE_LOCAL)) != 0)
+            if (flags.HasFlag(IPNodeDiscoveryFlags.SiteLocal))
             {
                 IPv6MulticastListenAddresses.Add(IPAddress.Parse("FF05::BA86"));
             }
@@ -1611,7 +1611,7 @@ namespace RobotRaconteurWeb
 
 
 
-        private bool GetUseIPv4(IPNodeDiscoveryFlags flags) => (((uint) flags & ((uint) IPNodeDiscoveryFlags.IPV4_BROADCAST)) != 0);
+        private bool GetUseIPv4(IPNodeDiscoveryFlags flags) => (flags.HasFlag(IPNodeDiscoveryFlags.IPv4Broadcast));
 
         private void InitUDPRecvSockets()
         {

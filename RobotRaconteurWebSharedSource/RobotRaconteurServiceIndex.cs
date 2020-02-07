@@ -33,6 +33,8 @@ end object";
     public override string GetServiceName() {return "RobotRaconteurServiceIndex";}
     public NodeInfo_stub NodeInfo_stubentry;
     public ServiceInfo_stub ServiceInfo_stubentry;
+
+    public RobotRaconteurServiceIndexFactory() : this(null) { }
     public RobotRaconteurServiceIndexFactory(RobotRaconteurNode node=null) : base(node) {
     NodeInfo_stubentry=new NodeInfo_stub(this);
     ServiceInfo_stubentry=new ServiceInfo_stub(this);

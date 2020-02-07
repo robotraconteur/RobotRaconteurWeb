@@ -1110,8 +1110,9 @@ namespace RobotRaconteurWeb
             {
                 w2.WriteLine("    public " + FixName(e.Value.Name) + "_stub " + FixName(e.Value.Name) + "_stubentry;");
             }
+            w2.WriteLine("    public " + FixName(d.Name).Replace(".", "__") + "Factory() : this(null,null) {}");
             w2.WriteLine("    public " + FixName(d.Name).Replace(".", "__") + "Factory(RobotRaconteurNode node = null, ClientContext context = null) : base(node,context)");
-            w2.WriteLine("{");
+            w2.WriteLine("    {");
             foreach (var e in d.Structures)
             {
                 w2.WriteLine("    " + FixName(e.Value.Name) + "_stubentry=new " + FixName(e.Value.Name) + "_stub(this,this.node,this.context);");
@@ -2663,17 +2664,17 @@ namespace RobotRaconteurWeb
                     var v = e.Value.Values[i];
                     if (!v.HexValue)
                     {
-                        w2.WriteLine("    " + FixName(v.Name) + " = " + v.Value);
+                        w2.Write("    " + FixName(v.Name) + " = " + v.Value);
                     }
                     else
                     {
                         if (v.Value >= 0)
                         {
-                            w2.WriteLine("    " + FixName(v.Name) + " = 0x" + v.Value.ToString("x"));
+                            w2.Write("    " + FixName(v.Name) + " = 0x" + v.Value.ToString("x"));
                         }
                         else
                         {
-                            w2.WriteLine("    " + FixName(v.Name) + " = " + v.Value);
+                            w2.Write("    " + FixName(v.Name) + " = " + v.Value);
                         }
                     }
                     if (i + 1 < e.Value.Values.Count)

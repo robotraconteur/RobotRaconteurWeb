@@ -814,6 +814,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
                 if ((tlastsend - tlastrec).TotalMilliseconds > ReceiveTimeout)
                 {
+                        var diff = (tlastsend - tlastrec).TotalMilliseconds;
                     Close();
                 }
                 else if ((DateTime.UtcNow - tlastrec_mes).TotalMilliseconds > node.TransportInactivityTimeout)

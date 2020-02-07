@@ -862,5 +862,21 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+
+        public int MaximumBacklog
+        {
+            get => maximum_backlog;
+            set
+            {
+                lock (endpoints)
+                {
+                    if (endpoints.Count > 0)
+                    {
+                        throw new InvalidOperationException("Cannot change MaximumBacklog while endpoints are connected");
+                    }
+                    maximum_backlog = value;
+                }
+            }
+        }
     }
 }

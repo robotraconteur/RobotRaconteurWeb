@@ -89,7 +89,7 @@ namespace RobotRaconteurWeb
             return bid;
         }
 
-        public override string ToString()
+        private string _ToStringD()
         {
             string[] hexvals = id.Select(x => String.Format("{0:x2}", x)).ToArray();
             string g1 = String.Join("", hexvals, 0, 4);
@@ -98,7 +98,27 @@ namespace RobotRaconteurWeb
             string g4 = String.Join("", hexvals, 8, 2);
             string g5 = String.Join("", hexvals, 10, 6);
 
-            return "{" + String.Join("-", new string[] { g1, g2, g3, g4, g5 }) + "}";
+            return String.Join("-", new string[] { g1, g2, g3, g4, g5 });
+        }
+
+        public override string ToString()
+        {
+            return "{" + _ToStringD() + "}";
+        }
+
+        public virtual string ToString(string format)
+        {
+            switch (format)
+            {
+                case "B":
+                    return "{" + _ToStringD() + "}";
+                case "D":
+                    return _ToStringD();
+                case "N":
+                    return _ToStringD().Replace("-", "");
+                default:
+                    throw new ArgumentException("Invalid NodeID format");
+            }
         }
 
         public static explicit operator byte[](NodeID i)
