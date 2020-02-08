@@ -1417,8 +1417,8 @@ namespace RobotRaconteurWeb
             //LocalEndpoint = e.LocalEndpoint;
 
             socket = s;
-            socket.ReceiveBufferSize = 10000;
-            socket.SendBufferSize = 10000;
+            //socket.ReceiveBufferSize = 10000;
+            //socket.SendBufferSize = 10000;
             //socket.Client.NoDelay = true;
 
             m_Connected = true;
