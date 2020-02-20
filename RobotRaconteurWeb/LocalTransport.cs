@@ -841,7 +841,14 @@ namespace RobotRaconteurWeb
             }
         }
 
-
+        private static int check_mkdir_res(int res)
+        {
+            if (Mono.Unix.Native.Syscall.GetLastError() == Mono.Unix.Native.Errno.EEXIST)
+            {
+                return 0;
+            }
+            return res;
+        }
         public static string GetUserRunPath()
         {
             try
@@ -865,8 +872,8 @@ namespace RobotRaconteurWeb
                     if (u == 0)
                     {
                         path = "/var/run/robotraconteur/root/";
-                        if (Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
-                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR) < 0)
+                        if (check_mkdir_res(Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
+                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR)) < 0)
                         {
                             throw new SystemResourceException("Could not create root run directory");
                         }
@@ -887,8 +894,8 @@ namespace RobotRaconteurWeb
                         }
 
                         path = Path.Combine(path, "robotraconteur");
-                        if (Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
-                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR) < 0)
+                        if (check_mkdir_res(Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
+                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR)) < 0)
                         {
                             throw new SystemResourceException("Could not create user run directory");
                         }
@@ -903,8 +910,8 @@ namespace RobotRaconteurWeb
                     if (u == 0)
                     {
                         path = "/var/run/robotraconteur/root/";
-                        if (Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
-                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR) < 0)
+                        if (check_mkdir_res(Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
+                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR)) < 0)
                         {
                             throw new SystemResourceException("Could not create root run directory");
                         }
@@ -919,8 +926,8 @@ namespace RobotRaconteurWeb
                         }
 
                         path = Path.Combine(path, "robotraconteur");
-                        if (Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
-                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR) < 0)
+                        if (check_mkdir_res(Mono.Unix.Native.Syscall.mkdir(path, Mono.Unix.Native.FilePermissions.S_IRUSR
+                            | Mono.Unix.Native.FilePermissions.S_IWUSR | Mono.Unix.Native.FilePermissions.S_IXUSR)) < 0)
                         {
                             throw new SystemResourceException("Could not create user run directory");
                         }
