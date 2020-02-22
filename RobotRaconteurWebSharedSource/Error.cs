@@ -206,13 +206,7 @@ namespace RobotRaconteurWeb
         {
         }
     }
-    public class IOException : RobotRaconteurException
-    {
-        public IOException(string message)
-            : base(MessageErrorType.IOError, "RobotRaconteur.IOError", message)
-        {
-        }
-    }
+    
     public class BufferLimitViolationException : RobotRaconteurException
     {
         public BufferLimitViolationException(string message)
@@ -367,6 +361,14 @@ namespace RobotRaconteurWeb
                 return;
             }
 
+            if (exception is System.IO.IOException)
+            {
+                entry.Error = MessageErrorType.IOError;
+                entry.AddElement("errorname", "RobotRaconteur.IOError");
+                entry.AddElement("errorstring", exception.Message);
+                return;
+            }
+
             if (exception is RobotRaconteurException)
             {
                 RobotRaconteurException r = (RobotRaconteurException)exception;
@@ -474,7 +476,7 @@ namespace RobotRaconteurWeb
                     return new ResourceNotFoundException(errorstring);
 
                 case MessageErrorType.IOError:
-                    return new IOException(errorstring);
+                    return new System.IO.IOException(errorstring);
 
                 case MessageErrorType.BufferLimitViolation:
                     return new BufferLimitViolationException(errorstring);
