@@ -87,6 +87,7 @@ namespace RobotRaconteurWeb
             parent_adapter = new AsyncStreamTransportParentImpl(this);
             AcceptWebSockets = true;
 
+            allowed_websocket_origins.Add("null"); //Why firefox??
             allowed_websocket_origins.Add("file://");
             allowed_websocket_origins.Add("chrome-extension://");
             allowed_websocket_origins.Add("http://robotraconteur.com");
@@ -374,10 +375,18 @@ namespace RobotRaconteurWeb
                         string origin1 = request["Origin"];
                         bool good_origin = false;
 
-                        var res = Regex.Match(origin1, "^([^:\\s]+://[^/]*).*$");
+                        var res = Regex.Match(origin1, "(?:^([^:\\s]+://[^/]*).*$)|(?:null)");
                         if (res.Success)
                         {
-                            var origin = res.Groups[1].Value;
+                            string origin;
+                            if (res.Groups[1].Success)
+                            {
+                                origin = res.Groups[1].Value;
+                            }
+                            else
+                            {
+                                origin = "null";
+                            }
 
                             lock (this)
                             {
