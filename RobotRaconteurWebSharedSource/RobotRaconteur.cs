@@ -631,6 +631,11 @@ namespace RobotRaconteurWeb
                 return data;
             }
 
+            if (t.IsEnum)
+            {
+                return new int[] { (int)(data) };
+            }
+
             if (t == typeof(MultiDimArray))
             {
                 return PackMultiDimArray((MultiDimArray)data);
