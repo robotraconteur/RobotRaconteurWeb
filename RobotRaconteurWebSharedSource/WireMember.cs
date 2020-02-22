@@ -828,6 +828,24 @@ namespace RobotRaconteurWeb
             }
         }
 
+        public bool TryGetInValue(out T val, out TimeSpec ts, out uint ep)
+        {
+            lock (this)
+            {
+                if (!in_value_valid)
+                {
+                    val = default;
+                    ts = default;
+                    ep = default;
+                    return false;
+                }
+                ts = in_value_ts;
+                ep = in_value_ep;
+                val = in_value;
+                return true;
+            }
+        }
+
         protected T ClientPeekInValue(uint c)
         {
             throw new WriteOnlyMemberException("Write only wire");
