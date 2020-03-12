@@ -415,7 +415,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
                         }
                     }
 
-                    if (mes.entries[0].EntryType != MessageEntryType.ConnectionTest && mes.entries[0].EntryType != MessageEntryType.ConnectionTestRet)
+                    //if (mes.entries[0].EntryType != MessageEntryType.ConnectionTest && mes.entries[0].EntryType != MessageEntryType.ConnectionTestRet)
                     {
                         tlastrec = DateTime.UtcNow;
                     }
