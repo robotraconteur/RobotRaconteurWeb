@@ -1920,11 +1920,11 @@ namespace RobotRaconteurWeb
                         w2.WriteLine("    " + t3.cs_type + t3.cs_arr_type + " " + FixName(p.Name) + "=" + str_unpack_message_element("MessageElementUtil.FindElement(rr_m,\"" + p.Name + "\")", p) + ";");
 
                     }
-
+                    w2.WriteLine("    var rr_ep = ServerEndpoint.CurrentEndpoint;");
                     w2.WriteLine("    " + t4.generator_csharp_type + " rr_ret=await this.obj." + FixName(m.Name) + "(" + params_ + ");");
                     w2.WriteLine("    lock(generators) {");
                     w2.WriteLine("    int rr_index = GetNewGeneratorIndex();");
-                    w2.WriteLine("    generators.Add(rr_index, new " + t4.generator_csharp_base_type + "Server<" + t4.generator_csharp_template_params + ">(rr_ret,\""  + m.Name + "\",rr_index, this, ServerEndpoint.CurrentEndpoint));");
+                    w2.WriteLine("    generators.Add(rr_index, new " + t4.generator_csharp_base_type + "Server<" + t4.generator_csharp_template_params + ">(rr_ret,\""  + m.Name + "\",rr_index, this, rr_ep));");
                     w2.WriteLine("    rr_mr.AddElement(\"index\",rr_index);");
                     w2.WriteLine("    }");
                     w2.WriteLine("    break;");
