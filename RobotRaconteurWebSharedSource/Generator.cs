@@ -102,18 +102,10 @@ namespace RobotRaconteurWeb
 
         public async Task<ReturnType> Next(ParamType param, CancellationToken cancel = default(CancellationToken))
         {
-            var m = new MessageElement("param", stub.RRContext.PackVarType(param));
+            var m = new MessageElement("param", stub.RRContext.PackAnyType<ParamType>(ref param));
             var m_ret = await NextBase(m, cancel);
-            var data = stub.RRContext.UnpackVarType(m_ret);
-            if (data is Array)
-            {
-                if (typeof(ReturnType).IsArray)
-                    return (ReturnType)data;
-                else
-                   return ((ReturnType[])data)[0];
-            }
-            else
-               return (ReturnType)data;
+            var data = stub.RRContext.UnpackAnyType<ReturnType>(m_ret);
+            return (ReturnType)data;
         }
     }
 
@@ -126,16 +118,8 @@ namespace RobotRaconteurWeb
         public async Task<ReturnType> Next(CancellationToken cancel = default(CancellationToken))
         {            
             var m_ret = await NextBase(null, cancel);
-            var data = stub.RRContext.UnpackVarType(m_ret);
-            if (data is Array)
-            {
-                if (typeof(ReturnType).IsArray)
-                    return (ReturnType)data;
-                else
-                    return ((ReturnType[])data)[0];
-            }
-            else
-                return (ReturnType)data;
+            var data = stub.RRContext.UnpackAnyType<ReturnType>(m_ret);
+            return (ReturnType)data;
         }
 
         public async Task<ReturnType[]> NextAll(CancellationToken cancel = default(CancellationToken))
@@ -158,7 +142,7 @@ namespace RobotRaconteurWeb
 
         public async Task Next(ParamType param, CancellationToken cancel = default(CancellationToken))
         {
-            var m = new MessageElement("param", stub.RRContext.PackVarType(param));
+            var m = new MessageElement("param", stub.RRContext.PackAnyType<ParamType>(ref param));
             var m_ret = await NextBase(m, cancel);
             stub.RRContext.UnpackVarType(m_ret);            
         }
@@ -215,9 +199,9 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                var p = (ParamType)skel.RRContext.UnpackVarType(m.FindElement("parameter"));
+                var p = (ParamType)skel.RRContext.UnpackAnyType<ParamType>(m.FindElement("parameter"));
                 var r = await generator.Next(p);
-                m_ret.AddElement("return", skel.RRContext.PackVarType(r));
+                m_ret.AddElement("return", skel.RRContext.PackAnyType<ReturnType>(ref r));
             }
             return m_ret;
         }
@@ -252,7 +236,7 @@ namespace RobotRaconteurWeb
             else
             {                
                 var r = await generator.Next();
-                m_ret.AddElement("return", skel.RRContext.PackVarType(r));
+                m_ret.AddElement("return", skel.RRContext.PackAnyType<ReturnType>(ref r));
             }
             return m_ret;
         }
@@ -286,7 +270,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                var p = (ParamType)skel.RRContext.UnpackVarType(m.FindElement("parameter"));
+                var p = (ParamType)skel.RRContext.UnpackAnyType<ParamType>(m.FindElement("parameter"));
                 await generator.Next(p);
                 m_ret.AddElement("return", 0);
             }

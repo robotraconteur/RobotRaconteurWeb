@@ -1859,6 +1859,11 @@ namespace RobotRaconteurWeb
             return NewMessageElement(name, node.PackVarType(val,client));
         }
 
+        public static MessageElement PackAnyType<T>(RobotRaconteurNode node, ClientContext client, string name, ref T val)
+        {
+            return node.PackAnyType<T>(name, ref val, client);
+        }
+
         public static MessageElement PackMapType<K, T>(RobotRaconteurNode node, ClientContext client, string name, Dictionary<K, T> val)
         {
             return NewMessageElement(name, node.PackMapType<K, T>(val,client));
@@ -1940,6 +1945,11 @@ namespace RobotRaconteurWeb
         public static object UnpackVarType(RobotRaconteurNode node, ClientContext client, MessageElement m)
         {
             return node.UnpackVarType(m, client);
+        }
+
+        public static T UnpackAnyType<T>(RobotRaconteurNode node, ClientContext client, MessageElement m)
+        {
+            return node.UnpackAnyType<T>(m, client);
         }
 
         public static Dictionary<K, T> UnpackMap<K, T>(RobotRaconteurNode node, ClientContext client, MessageElement m)

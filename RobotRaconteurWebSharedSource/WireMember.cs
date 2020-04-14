@@ -223,20 +223,11 @@ namespace RobotRaconteurWeb
             timespec = new TimeSpec(seconds, nanoseconds);
             object data;
             if (!rawelements)
-                data = UnpackVarType(MessageElement.FindElement(me, "packet"));
+                data = UnpackAnyType(MessageElement.FindElement(me, "packet"));
             else
                 data = MessageElement.FindElement(me, "packet");
 
-            if (data is Array)
-            {
-                if (typeof(T).IsArray)
-                    return (T)data;
-                else
-
-                    return ((T[])data)[0];
-            }
-            else
-                return (T)data;
+            return (T)data;
         }
 
         protected void DispatchPacket(List<MessageElement> me, WireConnection e)
@@ -259,7 +250,7 @@ namespace RobotRaconteurWeb
             elems.Add(new MessageElement("packettime", s));
             if (!rawelements)
             {
-                object pdata = PackVarType(data);
+                object pdata = PackAnyType(ref data);
                 elems.Add(new MessageElement("packet", pdata));
             }
             else
@@ -281,9 +272,9 @@ namespace RobotRaconteurWeb
 
         public abstract void Shutdown();
 
-        protected abstract object PackVarType(object o);
+        protected abstract object PackAnyType(ref T o);
 
-        protected abstract object UnpackVarType(MessageElement o);
+        protected abstract object UnpackAnyType(MessageElement o);
 
         public abstract Task<Tuple<T, TimeSpec>> PeekInValue(CancellationToken cancel = default(CancellationToken));
         public abstract Task<Tuple<T, TimeSpec>> PeekOutValue(CancellationToken cancel = default(CancellationToken));
@@ -418,14 +409,14 @@ namespace RobotRaconteurWeb
             catch { }
         }
 
-        protected override object PackVarType(object o)
+        protected override object PackAnyType(ref T o)
         {
-            return stub.RRContext.PackVarType(o);
+            return stub.RRContext.PackAnyType<T>(ref o);
         }
 
-        protected override object UnpackVarType(MessageElement o)
+        protected override object UnpackAnyType(MessageElement o)
         {
-            return stub.RRContext.UnpackVarType(o);
+            return stub.RRContext.UnpackAnyType<T>(o);
         }
 
         public override async Task<Tuple<T, TimeSpec>> PeekInValue(CancellationToken cancel = default(CancellationToken))
@@ -602,14 +593,14 @@ namespace RobotRaconteurWeb
             }
         }
 
-        protected override object PackVarType(object o)
+        protected override object PackAnyType(ref T o)
         {
-            return skel.RRContext.PackVarType(o);
+            return skel.RRContext.PackAnyType<T>(ref o);
         }
 
-        protected override object UnpackVarType(MessageElement o)
+        protected override object UnpackAnyType(MessageElement o)
         {
-            return skel.RRContext.UnpackVarType(o);
+            return skel.RRContext.UnpackAnyType<T>(o);
         }
 
         public override Task<Tuple<T, TimeSpec>> PeekInValue(CancellationToken cancel = default(CancellationToken))

@@ -292,7 +292,7 @@ namespace RobotRaconteurWeb
             return GetServiceFactoryForType(MessageElementUtil.GetMessageElementDataTypeString(l), context).UnpackNamedArray(l);
         }
 
-        private MessageElement PackContainerValue<T>(string name, ref T data, ClientContext context)
+        public MessageElement PackAnyType<T>(string name, ref T data, ClientContext context)
         {
             Type t = typeof(T);
 
@@ -353,6 +353,22 @@ namespace RobotRaconteurWeb
 
             if (t.IsGenericType)
             {
+                if (t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                {
+                    var method = typeof(RobotRaconteurNode).GetMethod("PackMapType");
+                    var dict_params = t.GetGenericArguments();
+                    var generic = method.MakeGenericMethod(dict_params);
+                    var packed_map = generic.Invoke(this, new object[] { data, context });
+                    return MessageElementUtil.NewMessageElement(name, packed_map);
+                }
+                if (t.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    var method = typeof(RobotRaconteurNode).GetMethod("PackListType");
+                    var list_params = t.GetGenericArguments();
+                    var generic = method.MakeGenericMethod(list_params);
+                    var packed_list = generic.Invoke(this, new object[] { data, context });
+                    return MessageElementUtil.NewMessageElement(name, packed_list);
+                }
                 throw new DataTypeException("Invalid Robot Raconteur container value type");
             }
 
@@ -375,12 +391,12 @@ namespace RobotRaconteurWeb
             }
         }
 
-        private MessageElement PackContainerValue<T>(int num, ref T data, ClientContext context)
+        private MessageElement PackAnyType<T>(int num, ref T data, ClientContext context)
         {
-            return PackContainerValue(num.ToString(), ref data, context);
+            return PackAnyType(num.ToString(), ref data, context);
         }
 
-        private T UnpackContainerValue<T>(MessageElement e, ClientContext context)
+        public T UnpackAnyType<T>(MessageElement e, ClientContext context=null)
         {
             switch (e.ElementType)
             {
@@ -462,21 +478,38 @@ namespace RobotRaconteurWeb
                     {                       
                         return (T)UnpackNamedArray(e.Data, context);
                     }
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                    {
+                        var t = typeof(T);
+                        var method = typeof(RobotRaconteurNode).GetMethod("UnpackMapType");
+                        var dict_params = t.GetGenericArguments();
+                        var generic = method.MakeGenericMethod(dict_params);
+                        return (T) generic.Invoke(this, new object[] { e.Data, context });
+                    }
+                case DataTypes.list_t:
+                    {
+                        var t = typeof(T);
+                        var method = typeof(RobotRaconteurNode).GetMethod("UnpackListType");
+                        var list_params = t.GetGenericArguments();
+                        var generic = method.MakeGenericMethod(list_params);
+                        return (T) generic.Invoke(this, new object[] { e.Data, context });
+                    }
                 default:
                     throw new DataTypeException("Invalid container data type");
             }
         }
 
-        private T UnpackContainerValue<T>(MessageElement e, out string name, ClientContext context)
+        public T UnpackAnyType<T>(MessageElement e, out string name, ClientContext context)
         {
             name = e.ElementName;
-            return UnpackContainerValue<T>(e, context);
+            return UnpackAnyType<T>(e, context);
         }
 
-        private T UnpackContainerValue<T>(MessageElement e, out int num, ClientContext context)
+        public T UnpackAnyType<T>(MessageElement e, out int num, ClientContext context)
         {
             num = MessageElementUtil.GetMessageElementNumber(e);
-            return UnpackContainerValue<T>(e, context);
+            return UnpackAnyType<T>(e, context);
         }
 
         public object PackMapType<Tkey, Tvalue>(object data, ClientContext context)
@@ -492,7 +525,7 @@ namespace RobotRaconteurWeb
                 foreach (KeyValuePair<Tkey, Tvalue> d in ddata)
                 {
                     var v = d.Value;
-                    MessageElementUtil.AddMessageElement(m, PackContainerValue(Convert.ToInt32(d.Key), ref v, context));
+                    MessageElementUtil.AddMessageElement(m, PackAnyType(Convert.ToInt32(d.Key), ref v, context));
                 }
                 return new MessageElementMap<int>(m);
             }
@@ -505,7 +538,7 @@ namespace RobotRaconteurWeb
                 foreach (KeyValuePair<Tkey, Tvalue> d in ddata)
                 {
                     var v = d.Value;
-                    MessageElementUtil.AddMessageElement(m, PackContainerValue(d.Key.ToString(), ref v, context));
+                    MessageElementUtil.AddMessageElement(m, PackAnyType(d.Key.ToString(), ref v, context));
                 }
                 return new MessageElementMap<string>(m);
             }            
@@ -528,7 +561,7 @@ namespace RobotRaconteurWeb
                     foreach (MessageElement e in cdataElements)
                     {
                         int num;
-                        var val = UnpackContainerValue<Tvalue>(e, out num, context);
+                        var val = UnpackAnyType<Tvalue>(e, out num, context);
                         o.Add(num, val);
 
                     }
@@ -545,7 +578,7 @@ namespace RobotRaconteurWeb
                     foreach (MessageElement e in cdataElements)
                     {
                         string name;
-                        var val = UnpackContainerValue<Tvalue>(e, out name, context);
+                        var val = UnpackAnyType<Tvalue>(e, out name, context);
                         o.Add(name, val);
                     }
                     return o;
@@ -569,7 +602,7 @@ namespace RobotRaconteurWeb
                 foreach (Tvalue d in ddata)
                 {
                     var v = d;
-                    MessageElementUtil.AddMessageElement(m, PackContainerValue(count, ref v, context));
+                    MessageElementUtil.AddMessageElement(m, PackAnyType(count, ref v, context));
                     count++;
                 }
 
@@ -588,7 +621,7 @@ namespace RobotRaconteurWeb
                 foreach (MessageElement e in cdataElements)
                 {
                     int num;
-                    var val = UnpackContainerValue<Tvalue>(e, out num, context);
+                    var val = UnpackAnyType<Tvalue>(e, out num, context);
                     if (count != num) throw new DataTypeException("Error in list format");
                     o.Add(val);
                     count++;

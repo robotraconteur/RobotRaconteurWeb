@@ -227,20 +227,10 @@ namespace RobotRaconteurWeb
             packetnumber = (MessageElement.FindElement(elems, "packetnumber").CastData<uint[]>())[0];
             object data;
             if (!rawelements)
-                data = UnpackVarType(MessageElement.FindElement(elems, "packet"));
+                data = UnpackAnyType(MessageElement.FindElement(elems, "packet"));
             else
                 data = MessageElement.FindElement(elems, "packet");
-
-            if (data is Array)
-            {
-                if (typeof(T).IsArray)
-                    e.PipePacketReceived((T)data, packetnumber);
-                else
-
-                    e.PipePacketReceived(((T[])data)[0], packetnumber);
-            }
-            else
-                e.PipePacketReceived((T)data, packetnumber);
+            e.PipePacketReceived((T)data, packetnumber);
 
             bool requestack=(elems.Any(x => x.ElementName == "requestack"));
             return requestack;
@@ -252,7 +242,7 @@ namespace RobotRaconteurWeb
             elems.Add(new MessageElement("packetnumber", packetnumber));
             if (!rawelements)
             {
-                object pdata = PackVarType(data);
+                object pdata = PackAnyType(ref data);
                 elems.Add(new MessageElement("packet", pdata));
             }
             else
@@ -276,9 +266,9 @@ namespace RobotRaconteurWeb
         
         protected abstract void DeleteEndpoint(PipeEndpoint e);
 
-        protected abstract object PackVarType(object o);
+        protected abstract object PackAnyType(ref T o);
 
-        protected abstract object UnpackVarType(MessageElement o);
+        protected abstract T UnpackAnyType(MessageElement o);
 
     }
 
@@ -467,14 +457,14 @@ namespace RobotRaconteurWeb
             }
         }
 
-        protected override object PackVarType(object o)
+        protected override object PackAnyType(ref T o)
         {
-            return stub.RRContext.PackVarType(o);
+            return stub.RRContext.PackAnyType<T>(ref o);
         }
 
-        protected override object UnpackVarType(MessageElement o)
+        protected override T UnpackAnyType(MessageElement o)
         {
-            return stub.RRContext.UnpackVarType(o);
+            return stub.RRContext.UnpackAnyType<T>(o);
         }
     }
     
@@ -669,14 +659,14 @@ namespace RobotRaconteurWeb
             }
         }
 
-        protected override object PackVarType(object o)
+        protected override object PackAnyType(ref T o)
         {
-            return skel.RRContext.PackVarType(o);
+            return skel.RRContext.PackAnyType<T>(ref o);
         }
 
-        protected override object UnpackVarType(MessageElement o)
+        protected override T UnpackAnyType(MessageElement o)
         {
-            return skel.RRContext.UnpackVarType(o);
+            return skel.RRContext.UnpackAnyType<T>(o);
         }
     }
 

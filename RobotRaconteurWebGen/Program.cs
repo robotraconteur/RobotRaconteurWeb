@@ -203,6 +203,10 @@ namespace RobotRaconteurWebGen
                 {                   
                     foreach (var s in sources)
                     {
+                        if (s.is_import)
+                        {
+                            continue;
+                        }
                         try
                         {
                             CSharpServiceLangGen.GenerateFiles(s.service_def, s.full_text, output_dir);
@@ -235,6 +239,10 @@ namespace RobotRaconteurWebGen
 
                         foreach (var s in sources)
                         {
+                            if (s.is_import)
+                            {
+                                continue;
+                            }
                             try
                             {
                                 CSharpServiceLangGen.GenerateOneFilePart(s.service_def, s.full_text, f2);

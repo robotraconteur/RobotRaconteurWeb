@@ -554,6 +554,11 @@ namespace RobotRaconteurWeb
             return ServiceDef.PackVarType(p);
         }
 
+        public virtual object PackAnyType<T>(ref T p)
+        {
+            return ServiceDef.PackAnyType<T>(ref p);
+        }
+
         public virtual object UnpackMapType<K, T>(object o)
         {
             return ServiceDef.UnpackMapType<K, T>(o);
@@ -572,6 +577,11 @@ namespace RobotRaconteurWeb
         public virtual object UnpackVarType(MessageElement o)
         {
             return ServiceDef.UnpackVarType(o);
+        }
+
+        public virtual T UnpackAnyType<T>(MessageElement o)
+        {
+            return ServiceDef.UnpackAnyType<T>(o);
         }
 
         protected string m_ServiceName;

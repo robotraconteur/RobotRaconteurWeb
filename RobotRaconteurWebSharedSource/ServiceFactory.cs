@@ -443,6 +443,11 @@ namespace RobotRaconteurWeb
             return node.PackVarType(p, context);
         }
 
+        public virtual object PackAnyType<T>(ref T p)
+        {
+            return node.PackAnyType<T>("value", ref p, context).Data;
+        }
+
         public virtual object UnpackMapType<K, T>(object o)
         {
             return node.UnpackMapType<K, T>(o, context);
@@ -461,6 +466,11 @@ namespace RobotRaconteurWeb
         public virtual object UnpackVarType(MessageElement o)
         {
             return node.UnpackVarType(o, context);
+        }
+
+        public virtual T UnpackAnyType<T>(MessageElement o)
+        {
+            return node.UnpackAnyType<T>(o, context);
         }
     }
 

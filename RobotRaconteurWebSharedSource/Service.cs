@@ -849,6 +849,11 @@ namespace RobotRaconteurWeb
             return ServiceDef.PackVarType(p);
         }
 
+        public virtual object PackAnyType<T>(ref T p)
+        {
+            return ServiceDef.PackAnyType(ref p);
+        }
+
         public virtual object UnpackMapType<K, T>(object o)
         {
             return ServiceDef.UnpackMapType<K, T>(o);
@@ -868,7 +873,11 @@ namespace RobotRaconteurWeb
         {
             return ServiceDef.UnpackVarType(o);
         }
-        
+
+        public virtual T UnpackAnyType<T>(MessageElement o)
+        {
+            return ServiceDef.UnpackAnyType<T>(o);
+        }
 
         private UserAuthenticator user_authenticator;
         private Dictionary<string, string> security_policies;
