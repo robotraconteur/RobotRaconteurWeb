@@ -981,10 +981,10 @@ namespace RobotRaconteurWeb
             return new List<NodeDiscoveryInfo>();
         }
 
-    }   
+    }
 
 
-    
+
     sealed class TcpClientTransport : AsyncStreamTransport
     {
 
@@ -1534,18 +1534,15 @@ namespace RobotRaconteurWeb
 
     [Flags]
     public enum  IPNodeDiscoveryFlags
-    {        
+    {
         NodeLocal=0x1,
         LinkLocal=0x2,
         SiteLocal=0x4,
         IPv4Broadcast = 0x8
-
     }
 
     sealed class IPNodeDiscovery
     {
-        
-        
         private const int ANNOUNCE_PORT=48653;
 
         private Socket recvsock;
@@ -1553,7 +1550,7 @@ namespace RobotRaconteurWeb
 
         byte[] recvbuf=new byte[4096];
         byte[] recvbufV6 = new byte[4096];
-                
+
         private bool listening = false;
         private bool broadcasting = false;
 
@@ -1574,7 +1571,7 @@ namespace RobotRaconteurWeb
         public void StartListeningForNodes(IPNodeDiscoveryFlags flags)
         {
             if (listening) throw new InvalidOperationException("Already listening for nodes");
-                                                
+
             this_request_id = NodeID.NewUniqueID();
             listen_flags = flags;
 
@@ -1646,14 +1643,14 @@ namespace RobotRaconteurWeb
                     foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
                     {
                         if (uniCast.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                        {
                             if (!scopeids.Contains(uniCast.Address.ScopeId))
                             {
                                 scopeids.Add(uniCast.Address.ScopeId);
                             }
-
+                        }
                     }
                 }
-
             }
 
 
@@ -1665,8 +1662,7 @@ namespace RobotRaconteurWeb
             if (GetUseIPv4(flags))
             {
                 //Initialize the ipv4 socket for UDP broadcast receive
-                recvsock = new Socket(AddressFamily.InterNetwork,
-                SocketType.Dgram, ProtocolType.Udp);                
+                recvsock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                 //recvsock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
                 recvsock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
                 recvsock.Bind(iep);
@@ -1690,7 +1686,7 @@ namespace RobotRaconteurWeb
                     //byte[] sid = BitConverter.GetBytes(14);
                     //recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastInterface, sid);
                     //recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.Broadcast, 1);
-                                        
+
 
                     // long sid2 = ((IPEndPoint)recvsock.LocalEndPoint).Address.ScopeId;
                     foreach (IPAddress ip in IPv6MulticastListenAddresses)
@@ -1845,8 +1841,8 @@ namespace RobotRaconteurWeb
             listening = false;
             var t = discovery_request_timer;
             discovery_request_timer = null;
-            t.Dispose();
-            
+            t?.Dispose();
+
         }
 
         public void StartAnnouncingNode(IPNodeDiscoveryFlags flags)
@@ -1859,7 +1855,7 @@ namespace RobotRaconteurWeb
             int backoff = random.Next(100, 250);
             broadcast_timer = new Timer(x=> BroadcastAnnouncePacket().ContinueWith(y=> { }), null, backoff, 55000);
             next_broadcast = DateTime.UtcNow + TimeSpan.FromMilliseconds(100);
-                        
+
             InitUDPRecvSockets();
         }
 
@@ -1932,11 +1928,11 @@ namespace RobotRaconteurWeb
         }
 
         private async Task BroadcastPacket(Func<string,BroadcastAddressInfo,string> packet_gen, IPNodeDiscoveryFlags flags, List<IPEndPoint> eps)
-        {             
+        {
             List<BroadcastAddressInfo> BroadcastAddresses = new List<BroadcastAddressInfo>();
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
             foreach (IPEndPoint ep in eps)
-            {                
+            {
                 BroadcastAddressInfo binfo = new BroadcastAddressInfo();
                 binfo.AdapterEndPoint = ep;
                 //Console.WriteLine(uniCast.Address.ToString());
@@ -1987,8 +1983,7 @@ namespace RobotRaconteurWeb
                                 await Task.Factory.FromAsync<int>(delegate (AsyncCallback cb, object state)
                                 {
                                     return sock.BeginSendTo(data, 0, data.Length, SocketFlags.None, broadcast_endpoint, cb, state);
-                                },
-                                        sock.EndSendTo, sock);
+                                }, sock.EndSendTo, sock);
                                 sock.Close();
                             }
                             catch { }
@@ -2078,11 +2073,11 @@ namespace RobotRaconteurWeb
                     var fromnow = next_broadcast - DateTime.UtcNow;
                     int backoff = random.Next(500, 1000);
                     if (fromnow.Milliseconds > backoff || fromnow.Milliseconds < 0)
-                    {                        
+                    {
                         var t = broadcast_timer;
 
                         t?.Change(backoff, 55000);
-                        next_broadcast = DateTime.UtcNow + TimeSpan.FromMilliseconds(500);                            
+                        next_broadcast = DateTime.UtcNow + TimeSpan.FromMilliseconds(500);
                     }
                 }
             }
@@ -2098,7 +2093,7 @@ namespace RobotRaconteurWeb
                 if (discovery_request_timer != null)
                     return;
                 int delay = random.Next(250, 1000);
-                discovery_request_timer = new Timer(HandleRequestTimer, 3, delay, Timeout.Infinite);                
+                discovery_request_timer = new Timer(HandleRequestTimer, 3, delay, Timeout.Infinite);
             }
         }
 

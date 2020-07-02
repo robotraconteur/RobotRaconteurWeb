@@ -82,7 +82,7 @@ namespace RobotRaconteurTest
             else if (command == "server")
             {
                 int port = int.Parse(args[1]);
-                      
+
                 //NodeID id = new NodeID(args[2]);
                 string name = args[2];
 
@@ -95,7 +95,7 @@ namespace RobotRaconteurTest
                 RobotRaconteurNode.s.RegisterTransport(t2);
 
                 t.StartServer(port);
-                
+
                 RobotRaconteurNode.s.RegisterTransport(t);
                 t.EnableNodeAnnounce();
 
@@ -183,6 +183,9 @@ namespace RobotRaconteurTest
                 var t = new TcpTransport();
                 t.EnableNodeDiscoveryListening();
                 RobotRaconteurNode.s.RegisterTransport(t);
+
+                var c2 = new LocalTransport();
+                RobotRaconteurNode.s.RegisterTransport(c2);
 
                 System.Threading.Thread.Sleep(6000);
 

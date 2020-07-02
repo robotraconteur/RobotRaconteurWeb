@@ -3,7 +3,7 @@
     "Start App": {
       "commandName": "Project",
       "commandLineArgs": "loopback2",
-      "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\RobotRaconteurWebTestSharedSource"
+      "workingDirectory": "$(SolutionDir)RobotRaconteurWebTestSharedSource"
     }
   }
 }

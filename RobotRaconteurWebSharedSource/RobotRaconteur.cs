@@ -1385,8 +1385,8 @@ namespace RobotRaconteurWeb
         }
 
 
-        
-              
+
+
 
         private Dictionary<string, NodeDiscoveryInfo> m_DiscoveredNodes = new Dictionary<string, NodeDiscoveryInfo>();
 
@@ -1401,16 +1401,15 @@ namespace RobotRaconteurWeb
                 {
                     lock (m_DiscoveredNodes)
                     {
-                    string[] lines = packet.Split(new char[] { '\n' });
-                    string[] idline = lines[1].Split(new char[] { ',' });
-                       
-                        NodeID nodeid = new NodeID(idline[0]);
-                       
-                    string nodename = idline[1];
-                    string url = lines[2];
-                    //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
+                        string[] lines = packet.Split(new char[] { '\n' });
+                        string[] idline = lines[1].Split(new char[] { ',' });
 
-                    
+                        NodeID nodeid = new NodeID(idline[0]);
+
+                        string nodename = idline[1];
+                        string url = lines[2];
+                        //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
+
                         if (m_DiscoveredNodes.Keys.Contains(nodeid.ToString()))
                         {
                             NodeDiscoveryInfo i = m_DiscoveredNodes[nodeid.ToString()];
@@ -1452,7 +1451,7 @@ namespace RobotRaconteurWeb
         }
 
         internal void NodeDetected(NodeDiscoveryInfo n)
-        {            
+        {
             try
             {
                 lock (m_DiscoveredNodes)
@@ -1748,7 +1747,6 @@ namespace RobotRaconteurWeb
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
         {
-
             try
             {
                 await UpdateDetectedNodes(cancel);
@@ -1759,12 +1757,10 @@ namespace RobotRaconteurWeb
             List<string> nodeids;
             lock (m_DiscoveredNodes)
             {
-
                  nodeids= DiscoveredNodes.Keys.ToList();
-
             }
 
-			var info_wait = new List<Task<Tuple<byte[],string,Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>>>();
+            var info_wait = new List<Task<Tuple<byte[],string,Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>>>();
 
             for (int i=0; i<nodeids.Count; i++)
             {
@@ -1783,14 +1779,14 @@ namespace RobotRaconteurWeb
                                     urls.Add(url.URL);
                                     break;
                                 }
-
                             }
                         }
                     }
-					if (urls.Count > 0)
-					{
-						info_wait.Add(DoFindServiceByType(urls.ToArray(), cancel));
-					}
+
+                    if (urls.Count > 0)
+                    {
+                        info_wait.Add(DoFindServiceByType(urls.ToArray(), cancel));
+                    }
                 }
                 catch (Exception)
                 {
@@ -1806,10 +1802,10 @@ namespace RobotRaconteurWeb
 
             }
 
-			if (info_wait.Count == 0) 
-			{
+            if (info_wait.Count == 0)
+            {
                 return new ServiceInfo2[0];
-			}
+            }
 
             try
             {
@@ -1831,7 +1827,6 @@ namespace RobotRaconteurWeb
                     }
 
                     var inf = await info_wait[i];
-                    
 
                     RobotRaconteurServiceIndex.NodeInfo n = new RobotRaconteurServiceIndex.NodeInfo();
                     n.NodeID = inf.Item1;
@@ -1851,10 +1846,9 @@ namespace RobotRaconteurWeb
                                 if (impl == servicetype)
                                     services.Add(new ServiceInfo2(ii, n));
                             }
-
                         }
                     }
-                }                
+                }
                 catch
                 {
                     try
@@ -1866,11 +1860,10 @@ namespace RobotRaconteurWeb
                     }
                     catch { }
                 }
-                
+
             }
 
-
-            return services.ToArray() ;
+            return services.ToArray();
         }
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes)
@@ -1955,7 +1948,7 @@ namespace RobotRaconteurWeb
                 foreach (var e in m_DiscoveredNodes)
                 {
                     if (e.Value.NodeName == name)
-                    {                        
+                    {
                         var n = new NodeInfo2();
                         var nodeid_str = e.Value.NodeID.ToString();
                         n.NodeID = new NodeID(nodeid_str);
@@ -2001,8 +1994,6 @@ namespace RobotRaconteurWeb
             ServiceStub s = (ServiceStub)obj;
 
             return await s.RRContext.RequestObjectLock(obj,flags, cancel);
-
-            
         }
 
 
