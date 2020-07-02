@@ -161,6 +161,9 @@ namespace RobotRaconteurTest
                 t.EnableNodeDiscoveryListening();
                 RobotRaconteurNode.s.RegisterTransport(t);
 
+                var c2 = new LocalTransport();
+                RobotRaconteurNode.s.RegisterTransport(c2);
+
                 System.Threading.Thread.Sleep(6000);
 
                 var r = RobotRaconteurNode.s.FindNodeByID(nodeid, schemes).Result;

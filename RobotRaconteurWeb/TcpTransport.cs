@@ -1828,7 +1828,7 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                recvsock.Close();
+                recvsock?.Close();
             }
             catch (Exception) { };
 
@@ -2139,7 +2139,7 @@ namespace RobotRaconteurWeb
                         int delay = random.Next(250, 1000);
                         var d = discovery_request_timer;
                         discovery_request_timer = new Timer(HandleRequestTimer, c, delay, Timeout.Infinite);
-                        d.Dispose();
+                        d?.Dispose();
                     }
                     else
                     {
