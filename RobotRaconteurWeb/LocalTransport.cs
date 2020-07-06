@@ -1486,7 +1486,7 @@ namespace RobotRaconteurWeb
 
                     var i = new NodeDiscoveryInfo();
                     i.NodeID = nodeid;
-                    i.NodeName = "";
+                    i.NodeName = info.GetValueOrDefault("nodename");
                     var iurl = new NodeDiscoveryInfoURL();
                     iurl.URL = url;
                     iurl.LastAnnounceTime = now;
