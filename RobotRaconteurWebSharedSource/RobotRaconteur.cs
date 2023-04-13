@@ -1874,18 +1874,4 @@ namespace RobotRaconteurWeb
         USER_LOCK=0,
         CLIENT_LOCK
     }
-
-    public class NodeDiscoveryInfo
-    {
-        public NodeID NodeID;
-        public string NodeName = "";
-        public List<NodeDiscoveryInfoURL> URLs = new List<NodeDiscoveryInfoURL>();
-        public string ServiceStateNonce;
-    }
-
-    public class NodeDiscoveryInfoURL
-    {
-        public string URL;
-        public DateTime LastAnnounceTime;
-    }
 }

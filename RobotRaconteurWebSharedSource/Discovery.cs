@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
@@ -53,7 +54,24 @@ namespace RobotRaconteurWeb
         //public Discovery_updateserviceinfo updater;
         public Queue<string> recent_service_nonce;
         public DateTime retry_window_start;
+        public uint retry_count;
 
+        public bool service_info_updating;
+
+    }
+
+    public class NodeDiscoveryInfo
+    {
+        public NodeID NodeID;
+        public string NodeName = "";
+        public List<NodeDiscoveryInfoURL> URLs = new List<NodeDiscoveryInfoURL>();
+        public string ServiceStateNonce;
+    }
+
+    public class NodeDiscoveryInfoURL
+    {
+        public string URL;
+        public DateTime LastAnnounceTime;
     }
 
     
@@ -69,6 +87,8 @@ namespace RobotRaconteurWeb
         internal RobotRaconteurNode node;
         internal Task cleandiscoverednodes_task;
         private CancellationTokenSource shutdown_token = new CancellationTokenSource();
+
+        uint NodeDiscoveryMaxCacheCount {get; set;} = 1000;
 
         public Discovery(RobotRaconteurNode node)
         {
@@ -122,18 +142,45 @@ namespace RobotRaconteurWeb
 
         internal void NodeDetected(NodeDiscoveryInfo n)
         {
+            if (n.ServiceStateNonce != null && n.ServiceStateNonce.Length > 32)
+            {
+                //TODO: Log service state nonce invalid
+                return;
+            }
+
             try
             {
                 lock (m_DiscoveredNodes)
                 {
                     if (m_DiscoveredNodes.Keys.Contains(n.NodeID.ToString()))
                     {
-                        NodeDiscoveryInfo i = m_DiscoveredNodes[n.NodeID.ToString()].info;
+                        var e1 = m_DiscoveredNodes[n.NodeID.ToString()];
+                        NodeDiscoveryInfo i = e1.info;
                         i.NodeName = n.NodeName;
                         foreach (var url in n.URLs)
                         {
                             if (!i.URLs.Any(x => x.URL == url.URL))
                             {
+                                if (i.URLs.Count > 256)
+                                {
+                                    continue;
+                                }
+                                // Parse the url and check if it is valid
+                                try
+                                {
+                                var uu = TransportUtil.ParseConnectionUrl(url.URL);
+                                if (uu.nodeid != i.NodeID)
+                                {
+                                    continue;
+                                }
+                                }
+                                catch
+                                {
+                                    // TODO: log error
+                                    continue;
+                                }
+                                    
+                                
                                 NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
                                 u.URL = url.URL;
                                 u.LastAnnounceTime = DateTime.UtcNow;
@@ -145,19 +192,55 @@ namespace RobotRaconteurWeb
                                 i.URLs.First(x => x.URL == url.URL).LastAnnounceTime = DateTime.UtcNow;
                             }
                         }
+
+                        if (i.ServiceStateNonce != n.ServiceStateNonce && !string.IsNullOrEmpty(n.ServiceStateNonce))
+                        {
+                            i.ServiceStateNonce = n.ServiceStateNonce;
+                        }
+
+                        if (!string.IsNullOrEmpty(n.ServiceStateNonce))
+                        {
+                            if(e1.recent_service_nonce.Contains(n.ServiceStateNonce))
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                e1.recent_service_nonce.Enqueue(n.ServiceStateNonce);
+                                if (e1.recent_service_nonce.Count > 16)
+                                {
+                                    e1.recent_service_nonce.Dequeue();
+                                }
+                            }
+
+
+                        }
                     }
                     else
                     {
+                        if (m_DiscoveredNodes.Count >= NodeDiscoveryMaxCacheCount)
+                        {
+                            // TODO: log ignored node
+                            return;
+                        }
+
                         var storage = new Discovery_nodestorage();
                         storage.info = n;
                         storage.last_update_nonce = "";
                         storage.retry_window_start = DateTime.UtcNow;
+                        storage.recent_service_nonce.Enqueue(n.ServiceStateNonce);
 
                         foreach (var u in n.URLs)
                         {
                             u.LastAnnounceTime = DateTime.UtcNow;
                         }
                         m_DiscoveredNodes.Add(n.NodeID.ToString(), storage);
+
+                        // TODO: check if subscriptions is empty
+                        //if (RobotRaconteurNode.s.NodeDiscoverySubscriptionCount > 0)
+                        //{
+                            CallUpdateServiceInfo(storage, n.ServiceStateNonce);
+                        //}
                     }
                 }
             }
@@ -501,7 +584,206 @@ namespace RobotRaconteurWeb
             return o.ToArray();
         }
 
+        internal async Task<Tuple<bool,ServiceInfo2[]>> DoUpdateServiceInfo(Discovery_nodestorage storage, string nonce, int extra_backoff, CancellationToken cancel)
+        {
+            lock(storage)
+            {
+                if (storage.service_info_updating)
+                {
+                    return Tuple.Create(false, new ServiceInfo2[0]);
+                }
+                storage.service_info_updating = true;
+            }
 
+            try
+            {
+                var r = new Random();
+                var backoff = r.Next(100, 600) + extra_backoff;
+
+                await Task.Delay(backoff, cancel);
+
+                var urls = storage.info.URLs.Select(x => x.URL).ToArray();
+
+                var c = (ServiceStub)await node.ConnectService(urls, cancel: cancel);
+
+                MessageEntry rr_res;
+                NodeID remote_nodeid;
+                string remote_nodename;
+                try
+                {
+
+                    remote_nodeid = c.rr_context.RemoteNodeID;
+                    remote_nodename = c.rr_context.RemoteNodeName;
+
+                    if (remote_nodeid != storage.info.NodeID || (!String.IsNullOrEmpty(storage.info.NodeName) && 
+                        remote_nodename != storage.info.NodeName))
+                    {
+                        throw new InvalidOperationException("NodeID or NodeName mismatch");
+                    }
+
+                    var rr_req = new MessageEntry(MessageEntryType.FunctionCallReq, "GetLocalNodeServices");
+                    rr_res = await c.ProcessRequest(rr_req, cancel);
+                }
+                finally
+                {
+                    try
+                    {
+                        await node.DisconnectService(c);
+                    }
+                    catch { }
+                }
+
+                if (rr_res == null)
+                {
+                    throw new InvalidOperationException("GetLocalNodeServices failed");
+                }
+
+                var o = new List<ServiceInfo2>();
+
+                var me = rr_res.FindElement("return");
+
+                if (me.ElementSize > 64 * 1024)
+                {
+                    throw new InvalidOperationException("GetLocalNodeServices response too large");
+                }
+
+                var service_list = (Dictionary<int,RobotRaconteurServiceIndex.ServiceInfo>)node.UnpackMapType<int,RobotRaconteurServiceIndex.ServiceInfo>(me.CastData<MessageElementMap<int>>(), null);
+
+                if (service_list != null)
+                {
+                    foreach (var e in service_list)
+                    {
+                        var s = new ServiceInfo2();
+                        s.NodeID = remote_nodeid;
+                        s.NodeName = remote_nodename;
+                        s.Name = e.Value.Name;
+                        s.ConnectionURL = e.Value.ConnectionURL.Values.ToArray();
+                        s.RootObjectType = e.Value.RootObjectType;
+                        s.RootObjectImplements = e.Value.RootObjectImplements.Values.ToArray();
+                        s.Attributes = e.Value.Attributes;
+                        o.Add(s);
+                    }
+                }
+
+                return Tuple.Create(true, o.ToArray());
+
+            }
+            finally
+            {
+                lock (storage)
+                {
+                    storage.service_info_updating = false;
+                }
+            }
+        }
+
+
+        internal async Task RetryUpdateServiceInfo(Discovery_nodestorage storage)
+        {
+            if (storage.service_info_updating)
+            {
+                return;
+            }
+
+            var now = DateTime.UtcNow;
+
+            if (now > storage.retry_window_start + TimeSpan.FromSeconds(60))
+            {
+                storage.retry_window_start = now;
+                storage.retry_count = 0;
+            }
+
+            var retry_count = storage.retry_count++;
+
+            var r = new Random();
+            var backoff = r.Next(100,600);
+            if (retry_count > 3)
+            {
+                backoff = r.Next(2000, 2500);
+            }
+            if (retry_count > 5)
+            {
+                backoff = r.Next(4500, 5500);
+            }
+            if (retry_count > 8)
+            {
+                backoff = r.Next(9000, 11000);
+            }
+            if (retry_count > 12)
+            {
+                backoff = r.Next(25000, 35000);
+            }
+
+            if (string.IsNullOrEmpty(storage.info.ServiceStateNonce) && string.IsNullOrEmpty(storage.last_update_nonce)
+                && storage.last_update_time != null)
+            {
+                backoff += 15000;
+            }
+
+            // TODO: log
+
+            var cancel = new CancellationTokenSource();
+            cancel.CancelAfter(backoff + 1000);
+
+            var ret = await DoUpdateServiceInfo(storage, storage.info.ServiceStateNonce, backoff, cancel.Token);
+            if (!ret.Item1)
+            {
+                return;
+            }
+
+            EndUpdateServiceInfo(storage, storage.info.ServiceStateNonce, ret.Item2);
+
+
+        }
+
+        internal void EndUpdateServiceInfo(Discovery_nodestorage storage, string nonce, ServiceInfo2[] service_info)
+        {
+            lock(m_DiscoveredNodes)
+            {
+                lock(storage)
+                {
+                    storage.services = service_info;
+                    storage.last_update_time = DateTime.UtcNow;
+                    storage.last_update_nonce = nonce;
+
+                    if(storage.last_update_nonce != storage.info.ServiceStateNonce)
+                    {
+                        // We missed an update, do another refresh but delay 5 seconds to prevent flooding
+                        Task.Run(async () =>
+                        {
+                            await Task.Delay(5000);
+                            _ = RetryUpdateServiceInfo(storage).IgnoreResult();
+                        });
+                    }
+                    else
+                    {
+                        storage.retry_count = 0;
+                    }
+                }
+
+                // TODO: subscriptions
+
+                // TODO: RobotRaconteurNode.FireNodeDetected
+            }
+
+            
+        }
+
+        void CallUpdateServiceInfo(Discovery_nodestorage storage, string nonce)
+        {
+            Task.Run(async () =>
+            {
+                var cancel = new CancellationTokenSource();
+                cancel.CancelAfter(10000);
+                var ret = await DoUpdateServiceInfo(storage, nonce, 0, cancel.Token);
+                if (!ret.Item1)
+                {
+                    return;
+                }
+
+                EndUpdateServiceInfo(storage, nonce, ret.Item2);
+            });
+        }
     }
 
 }
