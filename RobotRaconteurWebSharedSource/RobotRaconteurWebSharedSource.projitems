@@ -35,5 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Timer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WireMember.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Discovery.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceIndexer.cs" />
   </ItemGroup>
 </Project>

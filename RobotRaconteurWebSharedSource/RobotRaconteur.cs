@@ -132,10 +132,10 @@ namespace RobotRaconteurWeb
             serviceindexer = new ServiceIndexer(this);
             RegisterServiceType(new RobotRaconteurServiceIndex.RobotRaconteurServiceIndexFactory(this));
             RegisterService("RobotRaconteurServiceIndex", "RobotRaconteurServiceIndex", serviceindexer);
-            cleandiscoverednodes_task =  PeriodicTask.Run(CleanDiscoveredNodes, TimeSpan.FromSeconds(5), shutdown_token.Token);
 #if ROBOTRACONTEUR_BRIDGE
             browser_transport = new BrowserWebSocketTransport(this);
             RegisterTransport(browser_transport);
+            m_Discovery = new Discovery(this);
 #endif
         }
 
@@ -1339,6 +1339,7 @@ namespace RobotRaconteurWeb
         {
 
             shutdown_token.Cancel();
+            m_Discovery?.Shutdown();
 
             Transport[] cc;
             lock (transports)
@@ -1386,245 +1387,24 @@ namespace RobotRaconteurWeb
 
 
         
-              
+        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
-        private Dictionary<string, NodeDiscoveryInfo> m_DiscoveredNodes = new Dictionary<string, NodeDiscoveryInfo>();
-
-        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_DiscoveredNodes; } }
+        internal Discovery m_Discovery;
 
         public void NodeAnnouncePacketReceived(string packet)
         {
-            try
-            {
-                string seed = "Robot Raconteur Node Discovery Packet";
-                if (packet.Substring(0, seed.Length) == seed)
-                {
-                    lock (m_DiscoveredNodes)
-                    {
-                    string[] lines = packet.Split(new char[] { '\n' });
-                    string[] idline = lines[1].Split(new char[] { ',' });
-                       
-                        NodeID nodeid = new NodeID(idline[0]);
-                       
-                    string nodename = idline[1];
-                    string url = lines[2];
-                    //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
-
-                    
-                        if (m_DiscoveredNodes.Keys.Contains(nodeid.ToString()))
-                        {
-                            NodeDiscoveryInfo i = m_DiscoveredNodes[nodeid.ToString()];
-                            i.NodeName = nodename;
-                            if (!i.URLs.Any(x => x.URL == url))
-                            {
-                                NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                                u.URL = url;
-                                u.LastAnnounceTime = DateTime.UtcNow;
-                                i.URLs.Add(u);
-                                //Console.WriteLine(url);
-                            }
-                            else
-                            {
-                                i.URLs.First(x => x.URL == url).LastAnnounceTime = DateTime.UtcNow;
-                            }
-                        }
-                        else
-                        {
-                            NodeDiscoveryInfo i = new NodeDiscoveryInfo();
-                            i.NodeID = nodeid;
-                            i.NodeName = nodename;
-                            NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                            u.URL = url;
-                            u.LastAnnounceTime = DateTime.UtcNow;
-                            i.URLs.Add(u);
-                            m_DiscoveredNodes.Add(nodeid.ToString(),i);
-                        }
-                    }
-
-                    //RobotRaconteurNode.s.NodeAnnouncePacketReceived(packet);
-                }
-
-            }
-            catch { };
-
-            //Console.WriteLine(packet);
-
+            m_Discovery.NodeAnnouncePacketReceived(packet);
         }
 
         internal void NodeDetected(NodeDiscoveryInfo n)
         {            
-            try
-            {
-                lock (m_DiscoveredNodes)
-                {
-                    if (m_DiscoveredNodes.Keys.Contains(n.NodeID.ToString()))
-                    {
-                        NodeDiscoveryInfo i = m_DiscoveredNodes[n.NodeID.ToString()];
-                        i.NodeName = n.NodeName;
-                        foreach (var url in n.URLs)
-                        {
-                            if (!i.URLs.Any(x => x.URL == url.URL))
-                            {
-                                NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                                u.URL = url.URL;
-                                u.LastAnnounceTime = DateTime.UtcNow;
-                                i.URLs.Add(u);
-                                //Console.WriteLine(url);
-                            }
-                            else
-                            {
-                                i.URLs.First(x => x.URL == url.URL).LastAnnounceTime = DateTime.UtcNow;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (var u in n.URLs)
-                        {
-                            u.LastAnnounceTime = DateTime.UtcNow;
-                        }
-                        m_DiscoveredNodes.Add(n.NodeID.ToString(), n);
-                    }
-                }
-            }
-            catch (Exception) { }
-
+            m_Discovery.NodeDetected(n);
         }
 
-        private Task cleandiscoverednodes_task;
-
+        
         protected void CleanDiscoveredNodes()
         {
-            try
-            {
-                lock (m_DiscoveredNodes)
-                {
-                    DateTime now = DateTime.UtcNow;
-
-                    string[] keys = m_DiscoveredNodes.Keys.ToArray();
-                    foreach (string key in keys)
-                    {
-                        List<NodeDiscoveryInfoURL> newurls = new List<NodeDiscoveryInfoURL>();
-                        NodeDiscoveryInfoURL[] urls = m_DiscoveredNodes[key].URLs.ToArray();
-                        foreach (NodeDiscoveryInfoURL u in urls)
-                        {
-
-                            double time = (now - u.LastAnnounceTime).TotalMilliseconds;
-                            if (time < 60000)
-                            {
-                                newurls.Add(u);
-                            }
-                        }
-
-                        m_DiscoveredNodes[key].URLs = newurls;
-
-                        if (newurls.Count == 0)
-                        {
-                            m_DiscoveredNodes.Remove(key);
-                        }
-
-                    }
-
-
-                }
-            }
-            catch (Exception) { }
-
-        }
-
-        private class ServiceIndexer : RobotRaconteurServiceIndex.ServiceIndex
-        {
-
-            protected readonly  RobotRaconteurNode node;
-
-            public ServiceIndexer(RobotRaconteurNode node)
-            {
-                this.node = node;
-            }
-
-            public Task<Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>> GetLocalNodeServices(CancellationToken cancel=default(CancellationToken))
-            {
-                if (Transport.CurrentThreadTransportConnectionURL == null)
-                    throw new ServiceException("GetLocalNodeServices must be called through a transport that supports node discovery");
-
-                Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo> o = new Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>();
-                int count = 0;
-
-                ServerContext[] sc;
-                lock (node.services)
-                {
-                    sc = node.services.Values.ToArray();
-                }
-
-                foreach (ServerContext c in sc)
-                {
-                    RobotRaconteurServiceIndex.ServiceInfo s = new RobotRaconteurServiceIndex.ServiceInfo();
-                    s.Attributes = c.Attributes;
-                    s.Name = c.ServiceName;
-                    s.RootObjectType = c.RootObjectType;
-                    s.ConnectionURL = new Dictionary<int, string>();
-                    s.ConnectionURL.Add(1,Transport.CurrentThreadTransportConnectionURL + "?" + ("nodeid=" + node.NodeID.ToString().Trim(new char[] {'{','}'}) + "&service=" + RRUriExtensions.EscapeDataString(s.Name)));
-                    s.RootObjectImplements = new Dictionary<int, string>();
-                    
-                    List<string> implements=c.ServiceDef.ServiceDef().Objects[ServiceDefinitionUtil.SplitQualifiedName(c.RootObjectType).Item2].Implements;
-                    for (int i = 0; i < implements.Count; i++)
-                    {
-                        s.RootObjectImplements.Add(i, implements[i]);
-                    }
-
-                    
-                    o.Add(count, s);
-                    count++;
-                }
-
-                return Task.FromResult(o);
-            }
-
-            public Task<Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>> GetRoutedNodes(CancellationToken cancel = default(CancellationToken))
-            {
-                
-
-                Dictionary<int, RobotRaconteurServiceIndex.NodeInfo> ret = new Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>();
-
-               
-                return Task.FromResult(ret);
-
-            }
-
-            public Task<Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>> GetDetectedNodes(CancellationToken cancel = default(CancellationToken))
-            {
-                lock (node.m_DiscoveredNodes)
-                {
-                string[] nodeids = node.m_DiscoveredNodes.Keys.ToArray();
-                int len = nodeids.Length;
-
-                Dictionary<int, RobotRaconteurServiceIndex.NodeInfo> ret = new Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>();
-
-                for (int i = 0; i < len; i++)
-                {
-                    NodeDiscoveryInfo info = node.m_DiscoveredNodes[nodeids[i]];
-
-                    RobotRaconteurServiceIndex.NodeInfo ii = new RobotRaconteurServiceIndex.NodeInfo();
-                    ii.NodeID = info.NodeID.ToByteArray();
-                    ii.NodeName = info.NodeName;
-
-                    Dictionary<int,string> curl=new Dictionary<int,string>();
-                    for (int j = 0; j < info.URLs.Count; j++ )
-                    {
-                        curl.Add(j, info.URLs[j].URL);
-                    }
-
-                    ii.ServiceIndexConnectionURL=curl;
-                    ret.Add(i, ii);
-
-                }
-                return Task.FromResult(ret);
-
-                }
-            }
-
-            public event Action LocalNodeServicesChanged;
-
+            m_Discovery.CleanDiscoveredNodes();
         }
 
         public static string SelectRemoteNodeURL(string[] urls)
@@ -1698,301 +1478,38 @@ namespace RobotRaconteurWeb
 
         private async Task UpdateDetectedNodes(CancellationToken cancel)
         {
-            var tasks = new List<Task<List<NodeDiscoveryInfo>>>();
-            var t=new List<Transport>();
-            lock(transports)
-            {
-                foreach (var t2 in transports.Values) t.Add(t2);
-            }
-
-            foreach (var t2 in t)
-            {
-                var task1 = t2.GetDetectedNodes(cancel);
-                tasks.Add(task1);
-            }
-
-            await Task.WhenAll(tasks);
-
-            foreach (var t2 in tasks)
-            {
-                try
-                {
-                    var info=await t2;
-                    foreach (var i in info)
-                    {
-                        NodeDetected(i);
-                    }
-                }
-                catch (Exception) { }
-            }
-
+            await m_Discovery.UpdateDetectedNodes(cancel);
         }
-
-        private async Task<Tuple<byte[],string,Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>> DoFindServiceByType(string[] urls, CancellationToken cancel)
-        {
-            RobotRaconteurServiceIndex.ServiceIndex ind = (RobotRaconteurServiceIndex.ServiceIndex)await this.ConnectService(urls.ToArray(),cancel: cancel);
-            var NodeID = ((ServiceStub)ind).RRContext.RemoteNodeID.ToByteArray();
-            var NodeName = ((ServiceStub)ind).RRContext.RemoteNodeName;
-            var inf = await ind.GetLocalNodeServices(cancel);
-            return Tuple.Create(NodeID, NodeName, inf);
-
-        }
-
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes)
         {
-            var cancel=new CancellationTokenSource();
-            cancel.CancelAfter(5000);
-            return await FindServiceByType(servicetype, transportschemes, cancel.Token);
+            return await m_Discovery.FindServiceByType(servicetype, transportschemes);
         }
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
         {
 
-            try
-            {
-                await UpdateDetectedNodes(cancel);
-            }
-            catch { };
-
-            List<ServiceInfo2> services = new List<ServiceInfo2>();
-            List<string> nodeids;
-            lock (m_DiscoveredNodes)
-            {
-
-                 nodeids= DiscoveredNodes.Keys.ToList();
-
-            }
-
-			var info_wait = new List<Task<Tuple<byte[],string,Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>>>();
-
-            for (int i=0; i<nodeids.Count; i++)
-            {
-
-                try
-                {
-                    List<string> urls = new List<string>();
-                    lock (m_DiscoveredNodes)
-                    {
-                        foreach (NodeDiscoveryInfoURL url in m_DiscoveredNodes[nodeids[i]].URLs)
-                        {
-                            foreach (var s in transportschemes)
-                            {
-                                if (url.URL.StartsWith(s + "://"))
-                                {
-                                    urls.Add(url.URL);
-                                    break;
-                                }
-
-                            }
-                        }
-                    }
-					if (urls.Count > 0)
-					{
-						info_wait.Add(DoFindServiceByType(urls.ToArray(), cancel));
-					}
-                }
-                catch (Exception)
-                {
-                    try
-                    {
-                        lock (m_DiscoveredNodes)
-                        {
-                            m_DiscoveredNodes.Remove(nodeids[i]);
-                        }
-                    }
-                    catch { }
-                }
-
-            }
-
-			if (info_wait.Count == 0) 
-			{
-                return new ServiceInfo2[0];
-			}
-
-            try
-            {
-                Task waittask = Task.WhenAll(info_wait);
-
-                await waittask;
-            }
-            catch (Exception) { }
-
-            for (int i=0; i<nodeids.Count; i++)
-            {
-
-                try
-                {
-
-                    if (!info_wait[i].IsCompleted)
-                    {
-                        throw new TimeoutException("Timeout");
-                    }
-
-                    var inf = await info_wait[i];
-                    
-
-                    RobotRaconteurServiceIndex.NodeInfo n = new RobotRaconteurServiceIndex.NodeInfo();
-                    n.NodeID = inf.Item1;
-                    n.NodeName = inf.Item2;
-
-
-                    foreach (RobotRaconteurServiceIndex.ServiceInfo ii in inf.Item3.Values)
-                    {
-                        if (ii.RootObjectType == servicetype)
-                        {
-                            services.Add(new ServiceInfo2(ii, n));
-                        }
-                        else
-                        {
-                            foreach (string impl in ii.RootObjectImplements.Values)
-                            {
-                                if (impl == servicetype)
-                                    services.Add(new ServiceInfo2(ii, n));
-                            }
-
-                        }
-                    }
-                }                
-                catch
-                {
-                    try
-                    {
-                        lock (m_DiscoveredNodes)
-                        {
-                            m_DiscoveredNodes.Remove(nodeids[i]);
-                        }
-                    }
-                    catch { }
-                }
-                
-            }
-
-
-            return services.ToArray() ;
+            return await m_Discovery.FindServiceByType(servicetype, transportschemes, cancel);
         }
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes)
         {
-            var cancel = new CancellationTokenSource();
-            cancel.CancelAfter(5000);
-            return await FindNodeByID(id, schemes, cancel.Token);
+            return await m_Discovery.FindNodeByID(id, schemes);
         }
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes, CancellationToken cancel)
         {
-            try
-            {
-                await UpdateDetectedNodes(cancel);
-            }
-            catch { };
-
-            var o = new List<NodeInfo2>();
-
-            lock (m_DiscoveredNodes)
-            {
-                string nodeid_str=id.ToString();
-                if (m_DiscoveredNodes.ContainsKey(nodeid_str))
-                {
-                    var ni=m_DiscoveredNodes[nodeid_str];
-                    var n=new NodeInfo2();
-                    n.NodeID=new NodeID(nodeid_str);
-                    n.NodeName = ni.NodeName;
-
-                    var c=new List<string>();
-
-                    foreach (var url in ni.URLs)
-                    {
-                        var u = TransportUtil.ParseConnectionUrl(url.URL);
-                        if (schemes.Any(x=> x==u.scheme))
-                        {
-                            string short_url;
-                            if (u.port == -1)
-                            {
-                                short_url = u.scheme + "//" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                            }
-                            else
-                            {
-                                short_url = u.scheme + "//" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                            }
-
-                            c.Add(short_url);
-                        }
-
-                    }
-
-                    if (c.Count != 0)
-                    {
-                        n.ConnectionURL = c.ToArray();
-                        o.Add(n);
-                    }
-                }
-            }
-
-            return o.ToArray();
+            return await m_Discovery.FindNodeByID(id, schemes, cancel);
         }
 
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes)
         {
-            var cancel = new CancellationTokenSource();
-            cancel.CancelAfter(5000);
-            return await FindNodeByName(name, schemes, cancel.Token);
+            return await m_Discovery.FindNodeByName(name, schemes);
         }
 
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes, CancellationToken cancel)
         {
-            try
-            {
-                await UpdateDetectedNodes(cancel);
-            }
-            catch { };
-
-            var o = new List<NodeInfo2>();
-
-            lock (m_DiscoveredNodes)
-            {
-                foreach (var e in m_DiscoveredNodes)
-                {
-                    if (e.Value.NodeName == name)
-                    {                        
-                        var n = new NodeInfo2();
-                        var nodeid_str = e.Value.NodeID.ToString();
-                        n.NodeID = new NodeID(nodeid_str);
-                        n.NodeName = e.Value.NodeName;
-
-                        var c = new List<string>();
-
-                        foreach (var url in e.Value.URLs)
-                        {
-                            var u = TransportUtil.ParseConnectionUrl(url.URL);
-                            if (schemes.Any(x => x == u.scheme))
-                            {
-                                string short_url;
-                                if (u.port == -1)
-                                {
-                                    short_url = u.scheme + "//" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                                }
-                                else
-                                {
-                                    short_url = u.scheme + "//" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                                }
-
-                                c.Add(short_url);
-                            }
-
-                        }
-
-                        if (c.Count != 0)
-                        {
-                            n.ConnectionURL = c.ToArray();
-                            o.Add(n);
-                        }
-                    }
-                }
-            }
-
-            return o.ToArray();
+            return await m_Discovery.FindNodeByName(name, schemes, cancel);
         }
 
         public async Task<string> RequestObjectLock(object obj, RobotRaconteurObjectLockFlags flags, CancellationToken cancel = default(CancellationToken))
@@ -2120,40 +1637,6 @@ namespace RobotRaconteurWeb
         }
     }
         
-
-    public class ServiceInfo2
-    {
-        public string Name;
-        public string RootObjectType;
-        public string[] RootObjectImplements;
-        public string[] ConnectionURL;
-        public Dictionary<string, object> Attributes;
-        public NodeID NodeID;
-        public string NodeName;
-
-        public ServiceInfo2() { }
-
-        public ServiceInfo2(RobotRaconteurServiceIndex.ServiceInfo info,RobotRaconteurServiceIndex.NodeInfo ninfo)
-        {
-            Name = info.Name;
-            RootObjectType = info.RootObjectType;
-            RootObjectImplements = info.RootObjectImplements.Values.ToArray();
-            ConnectionURL = info.ConnectionURL.Values.ToArray();
-            Attributes = info.Attributes;
-            NodeID = new NodeID(ninfo.NodeID);
-            NodeName = ninfo.NodeName;
-
-        }
-
-    }
-
-    public class NodeInfo2
-    {
-        public NodeID NodeID;
-        public string NodeName;
-        public string[] ConnectionURL;
-    }
-
     public class TimeSpec
     {
         
