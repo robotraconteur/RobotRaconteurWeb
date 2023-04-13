@@ -79,7 +79,7 @@ namespace RobotRaconteurWeb
 
             for (int i = 0; i < len; i++)
             {
-                NodeDiscoveryInfo info = node.m_Discovery.m_DiscoveredNodes[nodeids[i]];
+                NodeDiscoveryInfo info = node.m_Discovery.m_DiscoveredNodes[nodeids[i]].info;
 
                 RobotRaconteurServiceIndex.NodeInfo ii = new RobotRaconteurServiceIndex.NodeInfo();
                 ii.NodeID = info.NodeID.ToByteArray();

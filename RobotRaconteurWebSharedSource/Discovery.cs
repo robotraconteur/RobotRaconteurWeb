@@ -42,30 +42,29 @@ namespace RobotRaconteurWeb
     }
 
 
-    namespace detail
+    
+
+    class Discovery_nodestorage
     {
-
-        class Discovery_nodestorage
-        {
-            public NodeDiscoveryInfo info;
-            public ServiceInfo2[] services;
-            public string last_update_nonce;
-            public DateTime last_update_time;
-            //public Discovery_updateserviceinfo updater;
-            public Queue<string> recent_service_nonce;
-            public DateTime retry_window_start;
-
-        }
+        public NodeDiscoveryInfo info;
+        public ServiceInfo2[] services;
+        public string last_update_nonce;
+        public DateTime last_update_time;
+        //public Discovery_updateserviceinfo updater;
+        public Queue<string> recent_service_nonce;
+        public DateTime retry_window_start;
 
     }
+
+    
 
     // Use Discovery_private.h and Discovery.cpp as reference
 
     public class Discovery
     {
-        internal Dictionary<string, NodeDiscoveryInfo> m_DiscoveredNodes = new Dictionary<string, NodeDiscoveryInfo>();
+        internal Dictionary<string, Discovery_nodestorage> m_DiscoveredNodes = new Dictionary<string, Discovery_nodestorage>();
 
-        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_DiscoveredNodes; } }
+        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_DiscoveredNodes.ToDictionary(x=>x.Key,x=>x.Value.info); } }
 
         internal RobotRaconteurNode node;
         internal Task cleandiscoverednodes_task;
@@ -100,41 +99,21 @@ namespace RobotRaconteurWeb
                         string nodename = idline[1];
                         string url = lines[2];
                         //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
+                        
+                        NodeDiscoveryInfo i = new NodeDiscoveryInfo();
+                        i.NodeID = nodeid;
+                        i.NodeName = nodename;
+                        NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
+                        u.URL = url;
+                        u.LastAnnounceTime = DateTime.UtcNow;
+                        i.URLs.Add(u);
 
-
-                        if (m_DiscoveredNodes.Keys.Contains(nodeid.ToString()))
-                        {
-                            NodeDiscoveryInfo i = m_DiscoveredNodes[nodeid.ToString()];
-                            i.NodeName = nodename;
-                            if (!i.URLs.Any(x => x.URL == url))
-                            {
-                                NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                                u.URL = url;
-                                u.LastAnnounceTime = DateTime.UtcNow;
-                                i.URLs.Add(u);
-                                //Console.WriteLine(url);
-                            }
-                            else
-                            {
-                                i.URLs.First(x => x.URL == url).LastAnnounceTime = DateTime.UtcNow;
-                            }
-                        }
-                        else
-                        {
-                            NodeDiscoveryInfo i = new NodeDiscoveryInfo();
-                            i.NodeID = nodeid;
-                            i.NodeName = nodename;
-                            NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                            u.URL = url;
-                            u.LastAnnounceTime = DateTime.UtcNow;
-                            i.URLs.Add(u);
-                            m_DiscoveredNodes.Add(nodeid.ToString(), i);
-                        }
-                    }
+                        NodeDetected(i);
 
                     //RobotRaconteurNode.s.NodeAnnouncePacketReceived(packet);
                 }
 
+            }
             }
             catch { };
 
@@ -149,7 +128,7 @@ namespace RobotRaconteurWeb
                 {
                     if (m_DiscoveredNodes.Keys.Contains(n.NodeID.ToString()))
                     {
-                        NodeDiscoveryInfo i = m_DiscoveredNodes[n.NodeID.ToString()];
+                        NodeDiscoveryInfo i = m_DiscoveredNodes[n.NodeID.ToString()].info;
                         i.NodeName = n.NodeName;
                         foreach (var url in n.URLs)
                         {
@@ -169,11 +148,16 @@ namespace RobotRaconteurWeb
                     }
                     else
                     {
+                        var storage = new Discovery_nodestorage();
+                        storage.info = n;
+                        storage.last_update_nonce = "";
+                        storage.retry_window_start = DateTime.UtcNow;
+
                         foreach (var u in n.URLs)
                         {
                             u.LastAnnounceTime = DateTime.UtcNow;
                         }
-                        m_DiscoveredNodes.Add(n.NodeID.ToString(), n);
+                        m_DiscoveredNodes.Add(n.NodeID.ToString(), storage);
                     }
                 }
             }
@@ -193,7 +177,7 @@ namespace RobotRaconteurWeb
                     foreach (string key in keys)
                     {
                         List<NodeDiscoveryInfoURL> newurls = new List<NodeDiscoveryInfoURL>();
-                        NodeDiscoveryInfoURL[] urls = m_DiscoveredNodes[key].URLs.ToArray();
+                        NodeDiscoveryInfoURL[] urls = m_DiscoveredNodes[key].info.URLs.ToArray();
                         foreach (NodeDiscoveryInfoURL u in urls)
                         {
 
@@ -204,7 +188,7 @@ namespace RobotRaconteurWeb
                             }
                         }
 
-                        m_DiscoveredNodes[key].URLs = newurls;
+                        m_DiscoveredNodes[key].info.URLs = newurls;
 
                         if (newurls.Count == 0)
                         {
@@ -296,7 +280,7 @@ namespace RobotRaconteurWeb
                     List<string> urls = new List<string>();
                     lock (m_DiscoveredNodes)
                     {
-                        foreach (NodeDiscoveryInfoURL url in m_DiscoveredNodes[nodeids[i]].URLs)
+                        foreach (NodeDiscoveryInfoURL url in m_DiscoveredNodes[nodeids[i]].info.URLs)
                         {
                             foreach (var s in transportschemes)
                             {
@@ -420,11 +404,11 @@ namespace RobotRaconteurWeb
                     var ni = m_DiscoveredNodes[nodeid_str];
                     var n = new NodeInfo2();
                     n.NodeID = new NodeID(nodeid_str);
-                    n.NodeName = ni.NodeName;
+                    n.NodeName = ni.info.NodeName;
 
                     var c = new List<string>();
 
-                    foreach (var url in ni.URLs)
+                    foreach (var url in ni.info.URLs)
                     {
                         var u = TransportUtil.ParseConnectionUrl(url.URL);
                         if (schemes.Any(x => x == u.scheme))
@@ -476,16 +460,16 @@ namespace RobotRaconteurWeb
             {
                 foreach (var e in m_DiscoveredNodes)
                 {
-                    if (e.Value.NodeName == name)
+                    if (e.Value.info.NodeName == name)
                     {
                         var n = new NodeInfo2();
-                        var nodeid_str = e.Value.NodeID.ToString();
+                        var nodeid_str = e.Value.info.NodeID.ToString();
                         n.NodeID = new NodeID(nodeid_str);
-                        n.NodeName = e.Value.NodeName;
+                        n.NodeName = e.Value.info.NodeName;
 
                         var c = new List<string>();
 
-                        foreach (var url in e.Value.URLs)
+                        foreach (var url in e.Value.info.URLs)
                         {
                             var u = TransportUtil.ParseConnectionUrl(url.URL);
                             if (schemes.Any(x => x == u.scheme))
