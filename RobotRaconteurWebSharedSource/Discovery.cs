@@ -684,7 +684,7 @@ namespace RobotRaconteurWeb
                     throw new InvalidOperationException("GetLocalNodeServices response too large");
                 }
 
-                var service_list = (Dictionary<int,RobotRaconteurServiceIndex.ServiceInfo>)node.UnpackMapType<int,RobotRaconteurServiceIndex.ServiceInfo>(me.CastData<MessageElementMap<int>>(), null);
+                var service_list = (Dictionary<int,RobotRaconteurServiceIndex.ServiceInfo>)node.UnpackMapType<int,RobotRaconteurServiceIndex.ServiceInfo>(me.CastDataToNestedList(DataTypes.vector_t), null);
 
                 if (service_list != null)
                 {

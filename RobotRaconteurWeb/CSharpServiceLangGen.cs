@@ -1230,7 +1230,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    private " + FixName(e.ServiceDefinition.Name).Replace(".", "__") + "Factory def;");
             w2.WriteLine("    private RobotRaconteurNode rr_node;");
             w2.WriteLine("    private ClientContext rr_context;");
-            w2.WriteLine("    public MessageElementStructure PackStructure(object s1) {");
+            w2.WriteLine("    public MessageElementNestedElementList PackStructure(object s1) {");
 
             w2.WriteLine("    List<MessageElement> m=new List<MessageElement>();");
             w2.WriteLine("    if (s1 ==null) return null;");
@@ -1241,11 +1241,11 @@ namespace RobotRaconteurWeb
                 w2.WriteLine("    MessageElementUtil.AddMessageElement(m," + str_pack_message_element(m.Name, "s." + FixName(m.Name), m.Type) + ");");
             }
 
-            w2.WriteLine("    return new MessageElementStructure(\"" + e.ServiceDefinition.Name + "." + e.Name + "\",m);");
+            w2.WriteLine("    return new MessageElementNestedElementList(DataTypes.structure_t,\"" + e.ServiceDefinition.Name + "." + e.Name + "\",m);");
             w2.WriteLine("    }");
 
             //Write Read
-            w2.WriteLine("    public T UnpackStructure<T>(MessageElementStructure m) {");
+            w2.WriteLine("    public T UnpackStructure<T>(MessageElementNestedElementList m) {");
             w2.WriteLine("    if (m == null ) return default(T);");
             w2.WriteLine("    " + FixName(e.Name) + " s=new " + FixName(e.Name) + "();");
             foreach (var m in MemberIter<PropertyDefinition>(e))
@@ -1269,7 +1269,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    private " + FixName(e.ServiceDefinition.Name).Replace(".", "__") + "Factory def;");
             w2.WriteLine("    private RobotRaconteurNode rr_node;");
             w2.WriteLine("    private ClientContext rr_context;");
-            w2.WriteLine("    public override MessageElementPod PackPod(ref " + FixName(e.Name) + " s1) {");
+            w2.WriteLine("    public override MessageElementNestedElementList PackPod(ref " + FixName(e.Name) + " s1) {");
             w2.WriteLine("    List<MessageElement> m=new List<MessageElement>();");
             w2.WriteLine("    " + FixName(e.Name) + " s = (" + FixName(e.Name) + ")s1;");
             foreach (var m in MemberIter<PropertyDefinition>(e))
@@ -1277,11 +1277,11 @@ namespace RobotRaconteurWeb
                 var t2 = RemoveMultiDimArray(m.Type);
                 w2.WriteLine("    MessageElementUtil.AddMessageElement(m," + str_pack_message_element(m.Name, "s." + FixName(m.Name), t2) + ");");
             }
-            w2.WriteLine("    return new MessageElementPod(m);");
+            w2.WriteLine("    return new MessageElementNestedElementList(DataTypes.pod_t, \"\", m);");
             w2.WriteLine("    }");
 
             //Write Read
-            w2.WriteLine("    public override " + FixName(e.Name) + " UnpackPod(MessageElementPod m) {");
+            w2.WriteLine("    public override " + FixName(e.Name) + " UnpackPod(MessageElementNestedElementList m) {");
 
             w2.WriteLine("    if (m == null ) throw new NullReferenceException(\"Pod must not be null\");");
             w2.WriteLine("    " + FixName(e.Name) + " s = new " + FixName(e.Name) + "();");

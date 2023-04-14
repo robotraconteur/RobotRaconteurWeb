@@ -74,7 +74,7 @@ namespace RobotRaconteurWeb
 
         public abstract string DefString();
 
-        public virtual MessageElementStructure PackStructure(object s)
+        public virtual MessageElementNestedElementList PackStructure(object s)
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.GetType()), out typename))
@@ -87,10 +87,10 @@ namespace RobotRaconteurWeb
             }                        
         }
 
-        public virtual T UnpackStructure<T>(MessageElementStructure l)
+        public virtual T UnpackStructure<T>(MessageElementNestedElementList l)
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return (T)FindStructureStub(typename).UnpackStructure<T>(l);
             }
@@ -118,7 +118,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public MessageElementPodArray PackPodToArray<T>(ref T s) where T : struct
+        public MessageElementNestedElementList PackPodToArray<T>(ref T s) where T : struct
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.GetType()), out typename))
@@ -131,10 +131,10 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public T UnpackPodFromArray<T>(MessageElementPodArray l) where T : struct
+        public T UnpackPodFromArray<T>(MessageElementNestedElementList l) where T : struct
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return ((PodStub<T>)FindPodStub(typename)).UnpackPodFromArray(l);
             }
@@ -144,7 +144,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public MessageElementPodArray PackPodArray<T>(T[] s) where T : struct
+        public MessageElementNestedElementList PackPodArray<T>(T[] s) where T : struct
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.GetType().GetElementType()), out typename))
@@ -157,10 +157,10 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public T[] UnpackPodArray<T>(MessageElementPodArray l) where T : struct
+        public T[] UnpackPodArray<T>(MessageElementNestedElementList l) where T : struct
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return ((PodStub<T>)FindPodStub(typename)).UnpackPodArray(l);
             }
@@ -170,7 +170,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public MessageElementPodMultiDimArray PackPodMultiDimArray<T>(PodMultiDimArray s) where T : struct
+        public MessageElementNestedElementList PackPodMultiDimArray<T>(PodMultiDimArray s) where T : struct
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.pod_array.GetType().GetElementType()), out typename))
@@ -183,10 +183,10 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public PodMultiDimArray UnpackPodMultiDimArray<T>(MessageElementPodMultiDimArray l) where T : struct
+        public PodMultiDimArray UnpackPodMultiDimArray<T>(MessageElementNestedElementList l) where T : struct
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return ((PodStub<T>)FindPodStub(typename)).UnpackPodMultiDimArray(l);
             }
@@ -245,7 +245,7 @@ namespace RobotRaconteurWeb
 
         //namedarray
 
-        public MessageElementNamedArray PackNamedArrayToArray<T>(ref T s) where T : struct
+        public MessageElementNestedElementList PackNamedArrayToArray<T>(ref T s) where T : struct
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.GetType()), out typename))
@@ -258,10 +258,10 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public T UnpackNamedArrayFromArray<T>(MessageElementNamedArray l) where T : struct
+        public T UnpackNamedArrayFromArray<T>(MessageElementNestedElementList l) where T : struct
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return ((INamedArrayStub<T>)FindNamedArrayStub(typename)).UnpackNamedArrayStructFromArray(l);
             }
@@ -271,7 +271,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public MessageElementNamedArray PackNamedArray<T>(T[] s) where T : struct
+        public MessageElementNestedElementList PackNamedArray<T>(T[] s) where T : struct
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.GetType().GetElementType()), out typename))
@@ -284,10 +284,10 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public T[] UnpackNamedArray<T>(MessageElementNamedArray l) where T : struct
+        public T[] UnpackNamedArray<T>(MessageElementNestedElementList l) where T : struct
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return ((INamedArrayStub<T>)FindNamedArrayStub(typename)).UnpackNamedArray(l);
             }
@@ -297,7 +297,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public MessageElementNamedMultiDimArray PackNamedMultiDimArray<T>(NamedMultiDimArray s) where T : struct
+        public MessageElementNestedElementList PackNamedMultiDimArray<T>(NamedMultiDimArray s) where T : struct
         {
             string typename;
             if (CompareNamespace(ServiceDefinitionUtil.FindStructRRType(s.namedarray_array.GetType().GetElementType()), out typename))
@@ -310,10 +310,10 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public NamedMultiDimArray UnpackNamedMultiDimArray<T>(MessageElementNamedMultiDimArray l) where T : struct
+        public NamedMultiDimArray UnpackNamedMultiDimArray<T>(MessageElementNestedElementList l) where T : struct
         {
             string typename;
-            if (CompareNamespace(l.Type, out typename))
+            if (CompareNamespace(l.TypeName, out typename))
             {
                 return ((INamedArrayStub<T>)FindNamedArrayStub(typename)).UnpackNamedMultiDimArray(l);
             }
@@ -458,7 +458,7 @@ namespace RobotRaconteurWeb
             return node.UnpackListType<T>(o, context);
         }
 
-        public virtual MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray o)
+        public virtual MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList o)
         {
             return node.UnpackMultiDimArray(o);
         }

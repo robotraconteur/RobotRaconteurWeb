@@ -160,51 +160,51 @@ namespace RobotRaconteurWeb
             return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);      
         }
 
-        public MessageElementStructure PackStructure(Object s, ClientContext context)
+        public MessageElementNestedElementList PackStructure(Object s, ClientContext context)
         {
             if (s == null) return null;
             
             return GetServiceFactoryForType(s.GetType(), context).PackStructure(s);
         }
         
-        public T UnpackStructure<T>(MessageElementStructure l, ClientContext context)
+        public T UnpackStructure<T>(MessageElementNestedElementList l, ClientContext context)
         {
             if (l == null) return default(T);
-            return GetServiceFactoryForType(l.Type, context).UnpackStructure<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackStructure<T>(l);
         }
 
-        public MessageElementPodArray PackPodToArray<T>(ref T s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackPodToArray<T>(ref T s, ClientContext context) where T : struct
         {
             return GetServiceFactoryForType(s.GetType(), context).PackPodToArray(ref s);
         }
 
-        public T UnpackPodFromArray<T>(MessageElementPodArray l, ClientContext context) where T : struct
+        public T UnpackPodFromArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
-            return GetServiceFactoryForType(l.Type, context).UnpackPodFromArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackPodFromArray<T>(l);
         }
 
-        public MessageElementPodArray PackPodArray<T>(T[] s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackPodArray<T>(T[] s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.GetType(), context).PackPodArray(s);
         }
 
-        public T[] UnpackPodArray<T>(MessageElementPodArray l, ClientContext context) where T : struct
+        public T[] UnpackPodArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackPodArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackPodArray<T>(l);
         }
 
-        public MessageElementPodMultiDimArray PackPodMultiDimArray<T>(PodMultiDimArray s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackPodMultiDimArray<T>(PodMultiDimArray s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.pod_array.GetType(), context).PackPodMultiDimArray<T>(s);
         }
 
-        public PodMultiDimArray UnpackPodMultiDimArray<T>(MessageElementPodMultiDimArray l, ClientContext context) where T : struct
+        public PodMultiDimArray UnpackPodMultiDimArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackPodMultiDimArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackPodMultiDimArray<T>(l);
         }
 
         public object PackPod(object s, ClientContext context)
@@ -235,38 +235,38 @@ namespace RobotRaconteurWeb
             return GetServiceFactoryForType(MessageElementUtil.GetMessageElementDataTypeString(l), context).UnpackPod(l);
         }
 
-        public MessageElementNamedArray PackNamedArrayToArray<T>(ref T s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackNamedArrayToArray<T>(ref T s, ClientContext context) where T : struct
         {
             return GetServiceFactoryForType(s.GetType(), context).PackNamedArrayToArray(ref s);
         }
 
-        public T UnpackNamedArrayFromArray<T>(MessageElementNamedArray l, ClientContext context) where T : struct
+        public T UnpackNamedArrayFromArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
-            return GetServiceFactoryForType(l.Type, context).UnpackNamedArrayFromArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackNamedArrayFromArray<T>(l);
         }
 
-        public MessageElementNamedArray PackNamedArray<T>(T[] s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackNamedArray<T>(T[] s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.GetType(), context).PackNamedArray(s);
         }
 
-        public T[] UnpackNamedArray<T>(MessageElementNamedArray l, ClientContext context) where T : struct
+        public T[] UnpackNamedArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackNamedArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackNamedArray<T>(l);
         }
 
-        public MessageElementNamedMultiDimArray PackNamedMultiDimArray<T>(NamedMultiDimArray s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackNamedMultiDimArray<T>(NamedMultiDimArray s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.namedarray_array.GetType(), context).PackNamedMultiDimArray<T>(s);
         }
 
-        public NamedMultiDimArray UnpackNamedMultiDimArray<T>(MessageElementNamedMultiDimArray l, ClientContext context) where T : struct
+        public NamedMultiDimArray UnpackNamedMultiDimArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackNamedMultiDimArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackNamedMultiDimArray<T>(l);
         }
 
         public object PackNamedArray(object s, ClientContext context)
@@ -430,12 +430,12 @@ namespace RobotRaconteurWeb
                     return (T)e.Data;
                 case DataTypes.multidimarray_t:
                     {
-                        MessageElementMultiDimArray md = (MessageElementMultiDimArray)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.multidimarray_t);
                         return (T)(object)UnpackMultiDimArray(md);
                     }
                 case DataTypes.structure_t:
                     {
-                        MessageElementStructure md = (MessageElementStructure)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.structure_t);
                         return UnpackStructure<T>(md, context);
                     }
                 /*case DataTypes.pod_t:
@@ -445,7 +445,7 @@ namespace RobotRaconteurWeb
                     }*/
                 case DataTypes.pod_array_t:
                     {
-                        MessageElementPodArray md = (MessageElementPodArray)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.pod_array_t);
                         if (typeof(T).IsValueType)
                         {
                             if (md.Elements.Count != 1) throw new DataTypeException("Invalid array size for scalar structure");
@@ -458,11 +458,12 @@ namespace RobotRaconteurWeb
                     }
                 case DataTypes.pod_multidimarray_t:                    
                     {
-                        return (T)UnpackPod(e.Data, context);
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.pod_multidimarray_t);
+                        return (T)UnpackPod(md, context);
                     }
                 case DataTypes.namedarray_array_t:
                     {
-                        MessageElementNamedArray md = (MessageElementNamedArray)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.namedarray_array_t);
                         if (typeof(T).IsValueType)
                         {
                             if (md.Elements.Count != 1) throw new DataTypeException("Invalid array size for scalar structure");
@@ -476,7 +477,8 @@ namespace RobotRaconteurWeb
                         }
                     }
                 case DataTypes.namedarray_multidimarray_t:
-                    {                       
+                    {
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.namedarray_multidimarray_t);
                         return (T)UnpackNamedArray(e.Data, context);
                     }
                 case DataTypes.vector_t:
@@ -528,7 +530,7 @@ namespace RobotRaconteurWeb
                     var v = d.Value;
                     MessageElementUtil.AddMessageElement(m, PackAnyType(Convert.ToInt32(d.Key), ref v, context));
                 }
-                return new MessageElementMap<int>(m);
+                return new MessageElementNestedElementList(DataTypes.vector_t, "", m);
             }
 
             if (typeof(Tkey) == typeof(String))
@@ -541,7 +543,7 @@ namespace RobotRaconteurWeb
                     var v = d.Value;
                     MessageElementUtil.AddMessageElement(m, PackAnyType(d.Key.ToString(), ref v, context));
                 }
-                return new MessageElementMap<string>(m);
+                return new MessageElementNestedElementList(DataTypes.dictionary_t, "", m);
             }            
 
             throw new DataTypeException("Indexed types can only be indexed by int32 and string");
@@ -550,13 +552,16 @@ namespace RobotRaconteurWeb
 
         public object UnpackMapType<Tkey, Tvalue>(object data, ClientContext context)
         {
+            
             if (data == null) return null;
 
-            if (data is MessageElementMap<int>)
+            var cdata = (MessageElementNestedElementList)data;
+
+            if (cdata.Type == DataTypes.vector_t)
             {
                 Dictionary<int, Tvalue> o = new Dictionary<int, Tvalue>();
 
-                MessageElementMap<int> cdata = (MessageElementMap<int>)data;
+                
                 var cdataElements = cdata.Elements;
                 {
                     foreach (MessageElement e in cdataElements)
@@ -569,11 +574,11 @@ namespace RobotRaconteurWeb
                     return o;
                 }
             }
-            else if (data is MessageElementMap<string>)
+            else if (cdata.Type == DataTypes.dictionary_t)
             {
                 Dictionary<string, Tvalue> o = new Dictionary<string, Tvalue>();
 
-                MessageElementMap<string> cdata = (MessageElementMap<string>)data;
+                
                 var cdataElements = cdata.Elements;
                 {
                     foreach (MessageElement e in cdataElements)
@@ -587,7 +592,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                throw new DataTypeException("Indexed types can only be indexed by int32 and string");
+                throw new DataTypeException("May types can only be keyed by int32 and string");
             }
         }
 
@@ -607,7 +612,7 @@ namespace RobotRaconteurWeb
                     count++;
                 }
 
-                return new MessageElementList(m);
+                return new MessageElementNestedElementList(DataTypes.list_t, "", m);
             }
         }
 
@@ -616,7 +621,7 @@ namespace RobotRaconteurWeb
             if (data == null) return null;
             List<Tvalue> o = new List<Tvalue>();
             int count = 0;
-            MessageElementList cdata = (MessageElementList)data;
+            MessageElementNestedElementList cdata = (MessageElementNestedElementList)data;
             var cdataElements = cdata.Elements;
             {
                 foreach (MessageElement e in cdataElements)
@@ -726,12 +731,12 @@ namespace RobotRaconteurWeb
                     return me.Data;
                 case DataTypes.multidimarray_t:
                     {
-                        MessageElementMultiDimArray md = (MessageElementMultiDimArray)me.Data;
+                        MessageElementNestedElementList md = me.CastDataToNestedList();
                         return UnpackMultiDimArray(md);
                     }
                 case DataTypes.structure_t:
                     {
-                        MessageElementStructure md = (MessageElementStructure)me.Data;              
+                        MessageElementNestedElementList md = me.CastDataToNestedList();
                         return UnpackStructure<object>(md, context);
                     }
                 //case DataTypes.pod_t:
@@ -762,16 +767,16 @@ namespace RobotRaconteurWeb
             }
         }
         
-        public MessageElementMultiDimArray PackMultiDimArray(MultiDimArray array)
+        public MessageElementNestedElementList PackMultiDimArray(MultiDimArray array)
         {
             if (array == null) return null;
             List<MessageElement> l = new List<MessageElement>();
             l.Add(new MessageElement("dims",array.Dims));            
             l.Add(new MessageElement("array", array.Array_));            
-            return new MessageElementMultiDimArray(l);
+            return new MessageElementNestedElementList(DataTypes.multidimarray_t, "", l);
         }
 
-        public MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray marray)
+        public MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList marray)
         {
             if (marray == null) return null;
 

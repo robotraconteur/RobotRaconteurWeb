@@ -349,7 +349,7 @@ namespace RobotRaconteurWeb
         protected override async Task DoWrite(ulong[] memorypos, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (MultiDimArrayMemory<T>)mem;
-            var buf1 = skel.RRContext.UnpackMultiDimArray((MessageElementMultiDimArray)buffer);
+            var buf1 = skel.RRContext.UnpackMultiDimArray((MessageElementNestedElementList)buffer);
             await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
         }
     }
@@ -953,7 +953,7 @@ namespace RobotRaconteurWeb
         protected override void UnpackReadResult(object res, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count)
         {
             var buffer1 = (MultiDimArray)buffer;
-            var data = stub.rr_node.UnpackMultiDimArray((MessageElementMultiDimArray)res);
+            var data = stub.rr_node.UnpackMultiDimArray((MessageElementNestedElementList)res);
 
             var data2 = new MultiDimArrayMemory<T>(data);
             data2.Read(new ulong[count.Length], buffer1, bufferpos, count);
@@ -1036,7 +1036,7 @@ namespace RobotRaconteurWeb
 
         protected override void UnpackReadResult(object res, object buffer, ulong bufferpos, ulong count)
         {            
-            var data = stub.rr_node.UnpackPodArray<T>((MessageElementPodArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackPodArray<T>((MessageElementNestedElementList)res, stub.RRContext);
             var buffer1 = (T[])buffer;
             Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
@@ -1158,7 +1158,7 @@ namespace RobotRaconteurWeb
         protected override void UnpackReadResult(object res, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count)
         {
             var buffer1 = (PodMultiDimArray)buffer;
-            var data = stub.rr_node.UnpackPodMultiDimArray<T>((MessageElementPodMultiDimArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)res, stub.RRContext);
 
             var data2 = new PodMultiDimArrayMemory<T>(data);
             data2.Read(new ulong[count.Length], buffer1, bufferpos, count);
@@ -1227,7 +1227,7 @@ namespace RobotRaconteurWeb
         protected override async Task DoWrite(ulong memorypos, object buffer, ulong bufferpos, ulong count, ArrayMemoryBase mem)
         {
             var mem1 = (PodArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackPodArray<T>((MessageElementPodArray)buffer, null);
+            var buf1 = skel.rr_node.UnpackPodArray<T>((MessageElementNestedElementList)buffer, null);
             await mem1.Write(memorypos, buf1, 0, count);
         }
     }
@@ -1250,7 +1250,7 @@ namespace RobotRaconteurWeb
         protected override async Task DoWrite(ulong[] memorypos, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (PodMultiDimArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementPodMultiDimArray)buffer, null);
+            var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
             await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
         }
     }
@@ -1288,7 +1288,7 @@ namespace RobotRaconteurWeb
 
         protected override void UnpackReadResult(object res, object buffer, ulong bufferpos, ulong count)
         {
-            var data = stub.rr_node.UnpackNamedArray<T>((MessageElementNamedArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackNamedArray<T>((MessageElementNestedElementList)res, stub.RRContext);
             var buffer1 = (T[])buffer;
             Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
@@ -1410,7 +1410,7 @@ namespace RobotRaconteurWeb
         protected override void UnpackReadResult(object res, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count)
         {
             var buffer1 = (NamedMultiDimArray)buffer;
-            var data = stub.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNamedMultiDimArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNestedElementList)res, stub.RRContext);
 
             var data2 = new NamedMultiDimArrayMemory<T>(data);
             data2.Read(new ulong[count.Length], buffer1, bufferpos, count);
@@ -1479,7 +1479,7 @@ namespace RobotRaconteurWeb
         protected override async Task DoWrite(ulong memorypos, object buffer, ulong bufferpos, ulong count, ArrayMemoryBase mem)
         {
             var mem1 = (NamedArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackNamedArray<T>((MessageElementNamedArray)buffer, null);
+            var buf1 = skel.rr_node.UnpackNamedArray<T>((MessageElementNestedElementList)buffer, null);
             await mem1.Write(memorypos, buf1, 0, count);
         }
     }
@@ -1502,7 +1502,7 @@ namespace RobotRaconteurWeb
         protected override async Task DoWrite(ulong[] memorypos, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (NamedMultiDimArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNamedMultiDimArray)buffer, null);
+            var buf1 = skel.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
             await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
         }
     }

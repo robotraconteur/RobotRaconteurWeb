@@ -17,8 +17,9 @@ public class com__robotraconteur__testing__TestService2Factory : ServiceFactory
     }
     public override string GetServiceName() {return "com.robotraconteur.testing.TestService2";}
     public ostruct2_stub ostruct2_stubentry;
+    public com__robotraconteur__testing__TestService2Factory() : this(null,null) {}
     public com__robotraconteur__testing__TestService2Factory(RobotRaconteurNode node = null, ClientContext context = null) : base(node,context)
-{
+    {
     ostruct2_stubentry=new ostruct2_stub(this,this.node,this.context);
     }
     public override IStructureStub FindStructureStub(string objecttype)
@@ -88,14 +89,14 @@ public class ostruct2_stub : IStructureStub {
     private com__robotraconteur__testing__TestService2Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public MessageElementStructure PackStructure(object s1) {
+    public MessageElementNestedElementList PackStructure(object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     ostruct2 s = (ostruct2)s1;
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("a1",s.a1));
-    return new MessageElementStructure("com.robotraconteur.testing.TestService2.ostruct2",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t,"com.robotraconteur.testing.TestService2.ostruct2",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     ostruct2 s=new ostruct2();
     s.a1 =MessageElementUtil.UnpackArray<double>(MessageElement.FindElement(m.Elements,"a1"));

@@ -18,8 +18,9 @@ public class com__robotraconteur__testing__TestService1Factory : ServiceFactory
     public override string GetServiceName() {return "com.robotraconteur.testing.TestService1";}
     public teststruct1_stub teststruct1_stubentry;
     public teststruct2_stub teststruct2_stubentry;
+    public com__robotraconteur__testing__TestService1Factory() : this(null,null) {}
     public com__robotraconteur__testing__TestService1Factory(RobotRaconteurNode node = null, ClientContext context = null) : base(node,context)
-{
+    {
     teststruct1_stubentry=new teststruct1_stub(this,this.node,this.context);
     teststruct2_stubentry=new teststruct2_stub(this,this.node,this.context);
     }
@@ -101,7 +102,7 @@ public class teststruct1_stub : IStructureStub {
     private com__robotraconteur__testing__TestService1Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public MessageElementStructure PackStructure(object s1) {
+    public MessageElementNestedElementList PackStructure(object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     teststruct1 s = (teststruct1)s1;
@@ -115,9 +116,9 @@ public class teststruct1_stub : IStructureStub {
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackListType<teststruct2>(rr_node, rr_context, "lstruct3",s.lstruct3));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMultiDimArray(rr_node, "multidimarray",(MultiDimArray)s.multidimarray));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "var3",s.var3));
-    return new MessageElementStructure("com.robotraconteur.testing.TestService1.teststruct1",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t,"com.robotraconteur.testing.TestService1.teststruct1",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     teststruct1 s=new teststruct1();
     s.dat1 =MessageElementUtil.UnpackArray<double>(MessageElement.FindElement(m.Elements,"dat1"));
@@ -140,14 +141,14 @@ public class teststruct2_stub : IStructureStub {
     private com__robotraconteur__testing__TestService1Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public MessageElementStructure PackStructure(object s1) {
+    public MessageElementNestedElementList PackStructure(object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     teststruct2 s = (teststruct2)s1;
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("mydat",s.mydat));
-    return new MessageElementStructure("com.robotraconteur.testing.TestService1.teststruct2",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t,"com.robotraconteur.testing.TestService1.teststruct2",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     teststruct2 s=new teststruct2();
     s.mydat =MessageElementUtil.UnpackArray<double>(MessageElement.FindElement(m.Elements,"mydat"));

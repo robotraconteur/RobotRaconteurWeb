@@ -24,8 +24,9 @@ public class com__robotraconteur__testing__TestService3Factory : ServiceFactory
     public transform_stub transform_stubentry;
     public pixel_stub pixel_stubentry;
     public pixel2_stub pixel2_stubentry;
+    public com__robotraconteur__testing__TestService3Factory() : this(null,null) {}
     public com__robotraconteur__testing__TestService3Factory(RobotRaconteurNode node = null, ClientContext context = null) : base(node,context)
-{
+    {
     teststruct3_stubentry=new teststruct3_stub(this,this.node,this.context);
     testpod1_stubentry=new testpod1_stub(this,this.node,this.context);
     testpod2_stubentry=new testpod2_stub(this,this.node,this.context);
@@ -132,7 +133,7 @@ public class teststruct3_stub : IStructureStub {
     private com__robotraconteur__testing__TestService3Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public MessageElementStructure PackStructure(object s1) {
+    public MessageElementNestedElementList PackStructure(object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     teststruct3 s = (teststruct3)s1;
@@ -162,9 +163,9 @@ public class teststruct3_stub : IStructureStub {
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "t9",s.t9));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "t10",s.t10));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "t11",s.t11));
-    return new MessageElementStructure("com.robotraconteur.testing.TestService3.teststruct3",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t,"com.robotraconteur.testing.TestService3.teststruct3",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     teststruct3 s=new teststruct3();
     s.s1 =MessageElementUtil.UnpackPodFromArray<testpod1>(rr_node, rr_context, MessageElement.FindElement(m.Elements,"s1"));
@@ -203,7 +204,7 @@ public class testpod1_stub : PodStub<testpod1> {
     private com__robotraconteur__testing__TestService3Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public override MessageElementPod PackPod(ref testpod1 s1) {
+    public override MessageElementNestedElementList PackPod(ref testpod1 s1) {
     List<MessageElement> m=new List<MessageElement>();
     testpod1 s = (testpod1)s1;
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("d1",s.d1));
@@ -218,9 +219,9 @@ public class testpod1_stub : PodStub<testpod1> {
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackNamedArray<transform>(rr_node, rr_context, "t2",DataTypeUtil.VerifyArrayLength(s.t2, 4, false)));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackNamedArray<transform>(rr_node, rr_context, "t3",DataTypeUtil.VerifyArrayLength(s.t3, 15, true)));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackNamedArray<transform>(rr_node, rr_context, "t4",DataTypeUtil.VerifyArrayLength(s.t4, 8, false)));
-    return new MessageElementPod(m);
+    return new MessageElementNestedElementList(DataTypes.pod_t, "", m);
     }
-    public override testpod1 UnpackPod(MessageElementPod m) {
+    public override testpod1 UnpackPod(MessageElementNestedElementList m) {
     if (m == null ) throw new NullReferenceException("Pod must not be null");
     testpod1 s = new testpod1();
     s.d1 =(MessageElementUtil.UnpackScalar<double>(MessageElement.FindElement(m.Elements,"d1")));
@@ -245,15 +246,15 @@ public class testpod2_stub : PodStub<testpod2> {
     private com__robotraconteur__testing__TestService3Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public override MessageElementPod PackPod(ref testpod2 s1) {
+    public override MessageElementNestedElementList PackPod(ref testpod2 s1) {
     List<MessageElement> m=new List<MessageElement>();
     testpod2 s = (testpod2)s1;
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<sbyte>("i1",s.i1));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<sbyte>("i2",DataTypeUtil.VerifyArrayLength(s.i2, 15, false)));
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<sbyte>("i3",DataTypeUtil.VerifyArrayLength(s.i3, 17, true)));
-    return new MessageElementPod(m);
+    return new MessageElementNestedElementList(DataTypes.pod_t, "", m);
     }
-    public override testpod2 UnpackPod(MessageElementPod m) {
+    public override testpod2 UnpackPod(MessageElementNestedElementList m) {
     if (m == null ) throw new NullReferenceException("Pod must not be null");
     testpod2 s = new testpod2();
     s.i1 =(MessageElementUtil.UnpackScalar<sbyte>(MessageElement.FindElement(m.Elements,"i1")));
@@ -1757,10 +1758,11 @@ public class testroot3_skel : ServiceSkel {
     }
     case "gen_func1":
     {
+    var rr_ep = ServerEndpoint.CurrentEndpoint;
     Generator2<double> rr_ret=await this.obj.gen_func1();
     lock(generators) {
     int rr_index = GetNewGeneratorIndex();
-    generators.Add(rr_index, new Generator2Server<double>(rr_ret,"gen_func1",rr_index, this, ServerEndpoint.CurrentEndpoint));
+    generators.Add(rr_index, new Generator2Server<double>(rr_ret,"gen_func1",rr_index, this, rr_ep));
     rr_mr.AddElement("index",rr_index);
     }
     break;
@@ -1768,10 +1770,11 @@ public class testroot3_skel : ServiceSkel {
     case "gen_func2":
     {
     string name=MessageElementUtil.UnpackString(MessageElementUtil.FindElement(rr_m,"name"));
+    var rr_ep = ServerEndpoint.CurrentEndpoint;
     Generator2<byte[]> rr_ret=await this.obj.gen_func2(name);
     lock(generators) {
     int rr_index = GetNewGeneratorIndex();
-    generators.Add(rr_index, new Generator2Server<byte[]>(rr_ret,"gen_func2",rr_index, this, ServerEndpoint.CurrentEndpoint));
+    generators.Add(rr_index, new Generator2Server<byte[]>(rr_ret,"gen_func2",rr_index, this, rr_ep));
     rr_mr.AddElement("index",rr_index);
     }
     break;
@@ -1779,30 +1782,33 @@ public class testroot3_skel : ServiceSkel {
     case "gen_func3":
     {
     string name=MessageElementUtil.UnpackString(MessageElementUtil.FindElement(rr_m,"name"));
+    var rr_ep = ServerEndpoint.CurrentEndpoint;
     Generator3<byte[]> rr_ret=await this.obj.gen_func3(name);
     lock(generators) {
     int rr_index = GetNewGeneratorIndex();
-    generators.Add(rr_index, new Generator3Server<byte[]>(rr_ret,"gen_func3",rr_index, this, ServerEndpoint.CurrentEndpoint));
+    generators.Add(rr_index, new Generator3Server<byte[]>(rr_ret,"gen_func3",rr_index, this, rr_ep));
     rr_mr.AddElement("index",rr_index);
     }
     break;
     }
     case "gen_func4":
     {
+    var rr_ep = ServerEndpoint.CurrentEndpoint;
     Generator1<byte[],byte[]> rr_ret=await this.obj.gen_func4();
     lock(generators) {
     int rr_index = GetNewGeneratorIndex();
-    generators.Add(rr_index, new Generator1Server<byte[],byte[]>(rr_ret,"gen_func4",rr_index, this, ServerEndpoint.CurrentEndpoint));
+    generators.Add(rr_index, new Generator1Server<byte[],byte[]>(rr_ret,"gen_func4",rr_index, this, rr_ep));
     rr_mr.AddElement("index",rr_index);
     }
     break;
     }
     case "gen_func5":
     {
+    var rr_ep = ServerEndpoint.CurrentEndpoint;
     Generator1<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2> rr_ret=await this.obj.gen_func5();
     lock(generators) {
     int rr_index = GetNewGeneratorIndex();
-    generators.Add(rr_index, new Generator1Server<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2>(rr_ret,"gen_func5",rr_index, this, ServerEndpoint.CurrentEndpoint));
+    generators.Add(rr_index, new Generator1Server<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2>(rr_ret,"gen_func5",rr_index, this, rr_ep));
     rr_mr.AddElement("index",rr_index);
     }
     break;

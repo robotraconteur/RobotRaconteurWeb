@@ -819,12 +819,12 @@ namespace RobotRaconteurWeb
             catch { }
         }
 
-        public virtual MessageElementStructure PackStructure(Object s)
+        public virtual MessageElementNestedElementList PackStructure(Object s)
         {
             return ServiceDef.PackStructure(s); ;
         }
 
-        public virtual T UnpackStructure<T>(MessageElementStructure l)
+        public virtual T UnpackStructure<T>(MessageElementNestedElementList l)
         {
             return ServiceDef.UnpackStructure<T>(l);
         }
@@ -864,7 +864,7 @@ namespace RobotRaconteurWeb
             return ServiceDef.UnpackListType<T>(o);
         }
 
-        public virtual MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray o)
+        public virtual MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList o)
         {
             return ServiceDef.UnpackMultiDimArray(o);
         }

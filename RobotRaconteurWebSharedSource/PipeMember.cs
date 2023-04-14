@@ -295,7 +295,7 @@ namespace RobotRaconteurWeb
         protected bool DispatchPacket(MessageElement me, PipeEndpoint e, out uint packetnumber)
         {
             int index = Int32.Parse(me.ElementName);
-            List<MessageElement> elems = ((MessageElementMap<string>)me.Data).Elements;
+            List<MessageElement> elems = (me.CastDataToNestedList()).Elements;
             packetnumber = (MessageElement.FindElement(elems, "packetnumber").CastData<uint[]>())[0];
             object data;
             if (!rawelements)
@@ -329,7 +329,7 @@ namespace RobotRaconteurWeb
                 elems.Add(new MessageElement("requestack", new int[] { 1 }));
             }
 
-            MessageElementMap<string> delems = new MessageElementMap<string>(elems);
+            var delems = new MessageElementNestedElementList(DataTypes.dictionary_t, "", elems);
             
             MessageElement me = new MessageElement(index.ToString(), delems);
 

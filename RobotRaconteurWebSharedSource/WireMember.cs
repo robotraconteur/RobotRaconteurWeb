@@ -307,7 +307,7 @@ namespace RobotRaconteurWeb
 
         protected T UnpackPacket(List<MessageElement> me, out TimeSpec timespec)
         {
-            MessageElementStructure s = (MessageElement.FindElement(me, "packettime").CastData<MessageElementStructure>());
+            var s = (MessageElement.FindElement(me, "packettime").CastDataToNestedList(DataTypes.structure_t));
             long seconds = MessageElement.FindElement(s.Elements, "seconds").CastData<long[]>()[0];
             int nanoseconds = MessageElement.FindElement(s.Elements, "nanoseconds").CastData<int[]>()[0];
             timespec = new TimeSpec(seconds, nanoseconds);
@@ -333,7 +333,7 @@ namespace RobotRaconteurWeb
             List<MessageElement> timespec1 = new List<MessageElement>();
             timespec1.Add(new MessageElement("seconds", time.seconds));
             timespec1.Add(new MessageElement("nanoseconds", time.nanoseconds));
-            MessageElementStructure s = new MessageElementStructure("RobotRaconteur.TimeSpec", timespec1);
+            var s = new MessageElementNestedElementList(DataTypes.structure_t, "RobotRaconteur.TimeSpec", timespec1);
 
 
             List<MessageElement> elems = new List<MessageElement>();

@@ -524,12 +524,12 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public MessageElementStructure PackStructure(Object s)
+        public MessageElementNestedElementList PackStructure(Object s)
         {
             return ServiceDef.PackStructure(s); ;
         }
 
-        public T UnpackStructure<T>(MessageElementStructure l)
+        public T UnpackStructure<T>(MessageElementNestedElementList l)
         {
             return ServiceDef.UnpackStructure<T>(l);
         }
@@ -569,7 +569,7 @@ namespace RobotRaconteurWeb
             return ServiceDef.UnpackListType<T>(o);
         }
 
-        public virtual MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray o)
+        public virtual MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList o)
         {
             return ServiceDef.UnpackMultiDimArray(o);
         }
@@ -1067,7 +1067,7 @@ namespace RobotRaconteurWeb
                 {
                     lock (this)
                     {
-                        Attributes = (Dictionary<string, object>)node.UnpackMapType<string, object>(res.FindElement("attributes").CastData<MessageElementMap<string>>(), null);
+                        Attributes = (Dictionary<string, object>)node.UnpackMapType<string, object>(res.FindElement("attributes").CastDataToNestedList(DataTypes.dictionary_t), null);
                     }
                 }
             }
