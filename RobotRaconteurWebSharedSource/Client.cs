@@ -616,6 +616,17 @@ namespace RobotRaconteurWeb
 
             TransportConnection = await c.CreateTransportConnection(url, this, cancel);
             m_Connected = true;
+
+            ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionConnected, null);
+
+            c.TransportListeners+= delegate(Transport c, TransportListenerEventType evt, object param)
+            {
+                if (evt == TransportListenerEventType.TransportConnectionClosed &&  ((uint)param) == LocalEndpoint )
+                {
+                    Task.Run(() => ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionClosed, null));
+                }
+            };
+
             try
             {
                 transport = c.TransportID;
@@ -1138,7 +1149,11 @@ namespace RobotRaconteurWeb
 
     public enum ClientServiceListenerEventType
     {
-        ClientClosed = 1
+        ClientClosed = 1,
+        ClientConnectionTimeout,
+        TransportConnectionConnected,
+        TransportConnectionClosed,
+        ServicePathReleased
     }
 
 }

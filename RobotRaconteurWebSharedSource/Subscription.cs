@@ -588,7 +588,9 @@ namespace RobotRaconteurWeb
                     ((ServiceStub)o).RRContext.ClientServiceListener += delegate (ClientContext context, ClientServiceListenerEventType evt, object param)
                     {
                         // TODO: ClientConnectionTimeout and TransportConnectionClosed
-                        if (evt == ClientServiceListenerEventType.ClientClosed)
+                        if (evt == ClientServiceListenerEventType.ClientClosed 
+                            || evt == ClientServiceListenerEventType.ClientConnectionTimeout
+                            || evt == ClientServiceListenerEventType.TransportConnectionClosed)
                         {
                             ClientDisconnected?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
                             client.claimed = false;
