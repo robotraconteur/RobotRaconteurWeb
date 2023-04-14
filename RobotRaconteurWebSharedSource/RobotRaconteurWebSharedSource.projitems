@@ -32,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServiceDefinition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceStructure.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Subscription.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Timer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WireMember.cs" />

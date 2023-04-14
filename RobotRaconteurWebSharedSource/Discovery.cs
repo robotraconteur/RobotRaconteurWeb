@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using RobotRaconteurWeb.Extensions;
+using System.Security.Cryptography;
 
 namespace RobotRaconteurWeb
 {
@@ -99,6 +100,18 @@ namespace RobotRaconteurWeb
         public void Shutdown()
         {
             shutdown_token.Cancel();
+
+            IServiceSubscription[] subs;
+            lock(subscriptions)
+            {
+                subs = subscriptions.ToArray();
+                subscriptions.Clear();
+            }
+
+            foreach(var s in subs)
+            {
+                Task.Run(() => s.Close()).IgnoreResult();
+            }
         }
 
         public void NodeAnnouncePacketReceived(string packet)
@@ -215,6 +228,14 @@ namespace RobotRaconteurWeb
 
 
                         }
+
+                        if (subscriptions.Count > 0)
+                        {
+                            if ((i.ServiceStateNonce != e1.last_update_nonce) || string.IsNullOrEmpty(i.ServiceStateNonce))
+                            {
+                                _ = RetryUpdateServiceInfo(e1).IgnoreResult();
+                            }
+                        }
                     }
                     else
                     {
@@ -237,10 +258,10 @@ namespace RobotRaconteurWeb
                         m_DiscoveredNodes.Add(n.NodeID.ToString(), storage);
 
                         // TODO: check if subscriptions is empty
-                        //if (RobotRaconteurNode.s.NodeDiscoverySubscriptionCount > 0)
-                        //{
+                        if (subscriptions.Count > 0)
+                        {
                             CallUpdateServiceInfo(storage, n.ServiceStateNonce);
-                        //}
+                        }
                     }
                 }
             }
@@ -275,7 +296,23 @@ namespace RobotRaconteurWeb
 
                         if (newurls.Count == 0)
                         {
+                            var d = m_DiscoveredNodes[key];
+
                             m_DiscoveredNodes.Remove(key);
+
+                            Task.Run(() =>
+                            {
+                                lock (subscriptions)
+                                {
+                                    foreach(var s in subscriptions)
+                                    {
+                                        Task.Run(() =>
+                                        {
+                                            s.NodeLost(d);
+                                        }).IgnoreResult();
+                                    }
+                                }
+                            });
                         }
 
                     }
@@ -759,11 +796,17 @@ namespace RobotRaconteurWeb
                     {
                         storage.retry_count = 0;
                     }
-                }
-
-                // TODO: subscriptions
+                }                
 
                 // TODO: RobotRaconteurNode.FireNodeDetected
+            }
+
+            lock(subscriptions)
+            {
+                foreach(var s in subscriptions)
+                {
+                    Task.Run(() => s.NodeUpdated(storage)).IgnoreResult();
+                }
             }
 
             
@@ -784,6 +827,64 @@ namespace RobotRaconteurWeb
                 EndUpdateServiceInfo(storage, nonce, ret.Item2);
             });
         }
+
+        internal void SubscriptionClosed(IServiceSubscription sub)
+        {
+            lock(subscriptions)
+            {
+                subscriptions.Remove(sub);
+            }
+        }
+
+        List<IServiceSubscription> subscriptions = new List<IServiceSubscription>();
+
+        internal ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string,object> credentials = null, string objecttype=null)
+        {
+            var s = new ServiceSubscription(this);
+            s.InitServiceURL(url, username, credentials, objecttype);
+            return s;
+        }
+
+        internal ServiceSubscription SubscribeServiceByType(string[] service_types, ServiceSubscriptionFilter filter = null)
+        {
+            var s = new ServiceSubscription(this);
+            DoSubscribe(service_types, filter, s);
+            return s;
+        }
+
+        internal ServiceInfo2Subscription SubscribeServiceInfo2(string[] service_types, ServiceSubscriptionFilter filter = null)
+        {
+            var s = new ServiceInfo2Subscription(this);
+            DoSubscribe(service_types, filter, s);
+            return s;
+        }
+
+        void DoSubscribe(string[] service_types, ServiceSubscriptionFilter filter, IServiceSubscription s)
+        {
+            Discovery_nodestorage[] d;
+            lock(m_DiscoveredNodes)
+            {
+                d = m_DiscoveredNodes.Values.ToArray();
+            }
+
+            lock(subscriptions)
+            {
+                subscriptions.Add(s);
+                s.Init(service_types, filter);
+            }
+
+            foreach(Discovery_nodestorage n in d)
+            {
+                if (n.last_update_nonce != n.info.ServiceStateNonce || string.IsNullOrEmpty(n.info.ServiceStateNonce))
+                {
+                    RetryUpdateServiceInfo(n).IgnoreResult();
+                }
+
+                s.NodeUpdated(n);
+            }
+        }
+
+
     }
 
 }

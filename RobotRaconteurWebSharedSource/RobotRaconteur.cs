@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Text.RegularExpressions;
 using RobotRaconteurWeb.Extensions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RobotRaconteurWeb
 {
@@ -1239,6 +1240,67 @@ namespace RobotRaconteurWeb
             throw new ConnectionException("Could not connect to service");
         }
 
+        public async Task<object> ConnectService(string[] url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
+        {
+            var connecting_tasks = new List<Task<object>>();
+
+            foreach (var u in url)
+            {
+                connecting_tasks.Add(ConnectService(u, username, credentials, null, objecttype, cancel));
+
+                await Task.WhenAny(Task.WhenAny(connecting_tasks), Task.Delay(250));
+
+                if (connecting_tasks.Any(x => x.IsCompletedSuccessfully))
+                {
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                object r = null;
+                if (connecting_tasks.Count == 1)
+                {
+                    r = await connecting_tasks[0];
+                }
+                else
+                {
+                    await Task.WhenAny(connecting_tasks);
+
+                    var completed_task = connecting_tasks.First(x => x.IsCompleted);
+                    connecting_tasks.Remove(completed_task);
+                    if (completed_task.IsCompletedSuccessfully)
+                    {
+                        r = await completed_task;
+                        foreach (var t in connecting_tasks)
+                        {
+                            try
+                            {                                
+                                _ = t.ContinueWith((x) =>
+                                {
+                                    try
+                                    {
+                                        Task.Run(() => ((ClientContext)x.Result).Close().IgnoreResult());
+                                    }
+                                    catch { }
+                                });
+                                
+                            }
+                            catch { }
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                
+                if (listener != null)
+                    ((ClientContext)r).ClientServiceListener += listener;
+                return r;
+            }
+        }
+
         public async Task DisconnectService(object obj, CancellationToken cancel=default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
@@ -1443,7 +1505,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        public async Task<object> ConnectService(string[] urls, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
+        /*public async Task<object> ConnectService(string[] urls, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
             List<string> urlsl = urls.ToList();
 
@@ -1472,7 +1534,7 @@ namespace RobotRaconteurWeb
             }
             throw new ConnectionException("Could not connect to service");
 
-        }
+        }*/
 
 
 
@@ -1634,6 +1696,21 @@ namespace RobotRaconteurWeb
                     t.LocalNodeServicesChanged();
                 }
             }
+        }
+
+        public ServiceInfo2Subscription SubscribeServiceInfo2(string[] service_types, ServiceSubscriptionFilter filter = null)
+        {
+            return m_Discovery.SubscribeServiceInfo2(service_types, filter);
+        }
+
+        public ServiceSubscription SubscribeServiceByType(string[] service_types, ServiceSubscriptionFilter filter = null)
+        {
+            return m_Discovery.SubscribeServiceByType(service_types, filter);
+        }
+
+        public ServiceSubscription SubscribeService(string[] url, string username= null, Dictionary<string,object> credentials = null, string objecttype = null)
+        {
+            return m_Discovery.SubscribeService(url, username, credentials, objecttype);
         }
     }
         
