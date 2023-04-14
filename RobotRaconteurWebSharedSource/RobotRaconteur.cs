@@ -22,6 +22,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using RobotRaconteurWeb.Extensions;
 using System.Security.Cryptography.X509Certificates;
+using System.Linq.Expressions;
 
 namespace RobotRaconteurWeb
 {
@@ -64,6 +65,17 @@ namespace RobotRaconteurWeb
             }
         }
 
+        public bool TryGetNodeID(out NodeID nodeid)
+        {
+            if (m_NodeID == null)
+            {
+                nodeid = null;
+                return false;
+            }
+            nodeid = m_NodeID;
+            return true;
+        }
+
 
         private string m_NodeName;
         public string NodeName
@@ -94,7 +106,16 @@ namespace RobotRaconteurWeb
 
         }
 
-
+        public bool TryGetNodeName(out string nodename)
+        {
+            if (m_NodeName == null)
+            {
+                nodename = null;
+                return false;
+            }
+            nodename = m_NodeName;
+            return true;
+        }
 
 
 
@@ -1717,6 +1738,109 @@ namespace RobotRaconteurWeb
         {
             return m_Discovery.SubscribeService(url, username, credentials, objecttype);
         }
+
+        ILogRecordHandler m_LogRecordHandler;
+
+        public RobotRaconteur_LogLevel LogLevel
+        {
+            get; set;
+        }
+
+        public bool CompareLogLevel(RobotRaconteur_LogLevel level)
+        {
+            return (int)level >= (int)LogLevel;
+        }
+
+        public void LogMessage(RobotRaconteur_LogLevel level, string message)
+        {            
+               LogRecord(new RRLogRecord() {Node=this, Level = level, Message = message });            
+        }
+
+        public void LogRecord(RRLogRecord record)
+        {
+            if ((int)record.Level < (int)LogLevel)
+                return;
+            if (m_LogRecordHandler != null)
+            {
+                m_LogRecordHandler.Log(record);
+                return;
+            }
+
+            RRLogFuncs.WriteLogRecord(Console.Error, record);
+            Console.Error.WriteLine();
+        }
+
+        public RobotRaconteur_LogLevel SetLogLevelFromString(string loglevel)
+        {
+            
+            if (loglevel == "DISABLE")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Disable;
+                return RobotRaconteur_LogLevel.Disable;
+            }
+
+            if (loglevel == "FATAL")
+            { 
+                LogLevel = RobotRaconteur_LogLevel.Fatal;
+                return RobotRaconteur_LogLevel.Fatal;
+            }
+
+            if (loglevel == "ERROR")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Error;
+                return RobotRaconteur_LogLevel.Error;
+            }
+
+            if (loglevel == "WARNING")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Warning;
+                return RobotRaconteur_LogLevel.Warning;
+            }
+
+            if (loglevel == "INFO")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Info;
+                return RobotRaconteur_LogLevel.Info;
+            }
+
+            if (loglevel == "DEBUG")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Debug;
+                return RobotRaconteur_LogLevel.Debug;
+            }
+
+            if (loglevel == "TRACE")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Trace;
+                return RobotRaconteur_LogLevel.Trace;
+            }
+
+            return LogLevel;
+        }
+
+        public RobotRaconteur_LogLevel SetLogLevelFromEnvVariable(string env_variable_name = "ROBOTRACONTEUR_LOG_LEVEL")
+        {
+            var loglevel = System.Environment.GetEnvironmentVariable(env_variable_name);
+            if (loglevel != null)
+            {
+                SetLogLevelFromString(loglevel);
+            }
+            return LogLevel;
+        }
+
+
+
+        public void SetLogRecordHandler(ILogRecordHandler handler)
+        {
+            m_LogRecordHandler = handler;
+        }
+
+        public ILogRecordHandler GetLogRecordHandler()
+        {
+            return m_LogRecordHandler;
+        }
+
+
     }
         
     public class TimeSpec
