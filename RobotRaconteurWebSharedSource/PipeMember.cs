@@ -89,8 +89,11 @@ namespace RobotRaconteurWeb
 
             public event PipePacketReceivedCallbackFunction PacketReceivedEvent;
 
+            AsyncValueWaiter<bool> recv_waiter = new AsyncValueWaiter<bool>();
+
             internal protected void PipePacketReceived(T packet, uint packetnum)
             {
+                if (IgnoreInValue) return;
                 lock (recv_lock)
                 {
                     if (packetnum == increment_packet_number(recv_packet_number))
@@ -107,6 +110,8 @@ namespace RobotRaconteurWeb
                                 out_of_order_packets.Remove(recv_packet_number);
                             }
                         }
+
+                        recv_waiter.NotifyAll(true);
 
                         if (PacketReceivedEvent != null)
                         {
@@ -159,6 +164,73 @@ namespace RobotRaconteurWeb
                     return recv_packets.Dequeue();
                 }
             }
+
+            public async Task<T> ReceivePacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
+            {
+                var ret = await TryReceivePacketWait(timeout, false, cancel);
+                if (!ret.Item1)
+                {
+                    throw new InvalidOperationException("Receive queue empty");
+                }
+                return ret.Item2;
+            }
+
+            public async Task<T> PeekPacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
+            {
+                var ret = await TryReceivePacketWait(timeout, true, cancel);
+                if (!ret.Item1)
+                {
+                    throw new InvalidOperationException("Receive queue empty");
+                }
+                return ret.Item2;
+            }
+
+            public async Task<Tuple<bool, T>> TryReceivePacketWait(int timeout = -1, bool peek = false, CancellationToken cancel = default)
+            {
+                AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter;
+                lock (recv_lock)
+                {              
+                    if (recv_packets.Count > 0)
+                    {
+                        if (!peek)
+                        {
+                            return Tuple.Create(true, recv_packets.Dequeue());
+                        }
+                        else
+                        {
+                            return Tuple.Create(true, recv_packets.Peek());
+                        }
+
+                    }
+                    else if (timeout == 0)
+                    {
+                        return Tuple.Create(false, default(T));
+                    }
+
+                    waiter = recv_waiter.CreateWaiterTask(timeout, cancel);
+                }
+
+                await waiter.Task.ConfigureAwait(false);
+
+                lock (recv_lock)
+                {
+                    if (recv_packets.Count > 0)
+                    {
+                        if (!peek)
+                        {
+                            return Tuple.Create(true, recv_packets.Dequeue());
+                        }
+                        else
+                        {
+                            return Tuple.Create(true, recv_packets.Peek());
+                        }
+
+                    }                    
+                    return Tuple.Create(false, default(T));                    
+                }
+            }
+
+            public bool IgnoreInValue { get; set; }
 
             private PipeDisconnectCallbackFunction close_callback;
 

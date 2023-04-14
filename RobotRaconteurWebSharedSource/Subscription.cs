@@ -548,7 +548,7 @@ namespace RobotRaconteurWeb
                     try
                     {
                         //ClientContext.ClientServiceListenerDelegate client_listener = delegate (ClientContext context, ClientServiceListenerEventType evt, object param) { };
-                        o = await node.ConnectService(client.urls, client.username, client.credentials, null, client.service_type, cancel.Token);
+                        o = await node.ConnectService(client.urls, client.username, client.credentials, null, client.service_type, cancel.Token).ConfigureAwait(false);
                         lock (client)
                         {
                             client.client = o;
@@ -579,7 +579,7 @@ namespace RobotRaconteurWeb
                             return;
                         }
 
-                        await Task.Delay((int)ConnectRetryDelay, cancel.Token).IgnoreResult();
+                        await Task.Delay((int)ConnectRetryDelay, cancel.Token).IgnoreResult().ConfigureAwait(false);
                         continue;
                     }
 
@@ -598,12 +598,9 @@ namespace RobotRaconteurWeb
 
                     ClientConnected?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
 
-                    lock (connect_wait_tasks)
+                    lock (connect_waiter)
                     {
-                        foreach (var connect_wait_task in connect_wait_tasks)
-                        {
-                            connect_wait_task?.TrySetResult(o);
-                        }
+                        connect_waiter.NotifyAll(o);
                     }
                     lock (this)
                     {
@@ -620,7 +617,7 @@ namespace RobotRaconteurWeb
 
                     try
                     {
-                        await wait_task.Task;
+                        await wait_task.Task.ConfigureAwait(false);
                     }
                     finally
                     {
@@ -648,7 +645,7 @@ namespace RobotRaconteurWeb
                         }
                     }
 
-                    await Task.Delay((int)ConnectRetryDelay, cancel.Token).IgnoreResult();
+                    await Task.Delay((int)ConnectRetryDelay, cancel.Token).IgnoreResult().ConfigureAwait(false);
                 }
             }
             finally
@@ -808,7 +805,7 @@ namespace RobotRaconteurWeb
             throw new NotImplementedException();
         }
 
-        public object GetDefaultClient<T>()
+        public T GetDefaultClient<T>()
         {
             lock (this)
             {
@@ -838,7 +835,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        List<TaskCompletionSource<object>> connect_wait_tasks = new List<TaskCompletionSource<object>>();
+        AsyncValueWaiter<object> connect_waiter = new AsyncValueWaiter<object>();
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel = default)
         {
             if (TryGetDefaultClient<T>(out var o))
@@ -846,21 +843,12 @@ namespace RobotRaconteurWeb
                 return o;
             }
 
-            var wait_task = new TaskCompletionSource<object>();
-            wait_task.AttachCancellationToken(cancel);
-            lock (connect_wait_tasks)
+            var waiter = connect_waiter.CreateWaiterTask(-1, cancel);
+            using (waiter)
             {
-                connect_wait_tasks.Add(wait_task);
-                wait_task.Task.ContinueWith((task) =>
-                {
-                    lock (connect_wait_tasks)
-                    {
-                        connect_wait_tasks.Remove(wait_task);
-                    }
-                });
+                await waiter.Task.ConfigureAwait(false);
+                return GetDefaultClient<T>();
             }
-
-            return (T)await wait_task.Task;
         }
 
         public string[] GetServiceURL()
@@ -1055,7 +1043,7 @@ namespace RobotRaconteurWeb
         protected internal bool in_value_valid;
         protected internal object in_value_connection;
         
-        protected internal List<TaskCompletionSource<object>> in_value_wait_tasks;
+        protected internal AsyncValueWaiter<object> in_value_waiter = new AsyncValueWaiter<object>();
 
         protected internal string membername;
         protected internal string servicepath;
@@ -1115,7 +1103,7 @@ namespace RobotRaconteurWeb
         protected internal bool closed;
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken cancel = default)
         {
-            TaskCompletionSource<object> wait_task;
+            AsyncValueWaiter<object>.AsyncValueWaiterTask waiter = null;
             lock(this)
             {
                 if (in_value_valid)
@@ -1130,43 +1118,13 @@ namespace RobotRaconteurWeb
 
                 if (timeout == 0)
                     return in_value_valid;
-
-                wait_task = new TaskCompletionSource<object>();
-                wait_task.AttachCancellationToken(cancel);
-
-                in_value_wait_tasks.Add(wait_task);
+                waiter = in_value_waiter.CreateWaiterTask(timeout, cancel);
+          
             }
-            try
-            {
-
-                if (timeout < 0)
-                {
-                    await wait_task.Task;
-                    return true;
-                }
-                else
-                {
-                    await Task.WhenAny(wait_task.Task, Task.Delay(timeout));
-                    if (wait_task.Task.IsCompleted)
-                    {
-                        await wait_task.Task;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            finally
-            {
-                lock(this)
-                {
-                    if (wait_task != null)
-                    {
-                        in_value_wait_tasks.Remove(wait_task);
-                    }
-                }
+            using (waiter)
+            { 
+                await waiter.Task.ConfigureAwait(false); ;
+                return (waiter.TaskCompleted);              
             }
         }
 
@@ -1237,7 +1195,7 @@ namespace RobotRaconteurWeb
                             {
                                 servicepath = servicepath.ReplaceFirst("*", ((ServiceStub)client).RRContext.ServiceName);
                             }
-                            obj = await ((ServiceStub)client).RRContext.FindObjRef(servicepath, null, c.cancel.Token);
+                            obj = await ((ServiceStub)client).RRContext.FindObjRef(servicepath, null, c.cancel.Token).ConfigureAwait(false);
                         }
 
                         var property_info = obj.GetType().GetProperty(this.membername);
@@ -1253,7 +1211,7 @@ namespace RobotRaconteurWeb
                             await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false); ;
                         }
 
-                        Wire<T>.WireConnection cc = await w.Connect();
+                        Wire<T>.WireConnection cc = await w.Connect().ConfigureAwait(false);
                         if (IgnoreInValue)
                         {
                             // TODO: ignore in value
@@ -1278,10 +1236,8 @@ namespace RobotRaconteurWeb
                                 in_value_connection = ev_c;
                                 in_value_valid = true;
                                 in_value_time_local = DateTime.UtcNow;
-                                foreach (var t in this.in_value_wait_tasks)
-                                {
-                                    t.TrySetResult(ev_v);
-                                }
+                                in_value_waiter.NotifyAll(ev_v);
+                                
                                 WireValueChanged?.Invoke(ev_c, ev_v, ev_t);
                                 
                             }
@@ -1418,29 +1374,11 @@ namespace RobotRaconteurWeb
                 }
             }
 
-            var wait_task = new TaskCompletionSource<bool>();
-            wait_task.AttachCancellationToken(cancel.Token);
-            lock(this)
+            AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter = null;
+            waiter = recv_packets_waiter.CreateWaiterTask(timeout, cancel.Token);
+            using (waiter)
             {
-                recv_packets_wait_tasks.Add(wait_task);
-            }
-            try
-            {
-                if (timeout > 0)
-                {
-                    await Task.WhenAny(wait_task.Task, Task.Delay(timeout));
-                }
-                else
-                {
-                    await wait_task.Task;
-                }
-            }
-            finally
-            {
-                lock (this)
-                {
-                    recv_packets_wait_tasks.Remove(wait_task);
-                }
+                await waiter.Task.ConfigureAwait(false);
             }
 
             lock (this)
@@ -1499,9 +1437,9 @@ namespace RobotRaconteurWeb
 
         protected internal RobotRaconteurNode node;
 
-        protected internal Queue<Tuple<object, object>> recv_packets;
+        protected internal Queue<Tuple<object, object>> recv_packets = new Queue<Tuple<object, object>>();
 
-        protected internal List<TaskCompletionSource<bool>> recv_packets_wait_tasks;
+        protected internal AsyncValueWaiter<bool> recv_packets_waiter = new AsyncValueWaiter<bool>();
 
         protected internal string membername;
         protected internal string servicepath;
@@ -1535,7 +1473,7 @@ namespace RobotRaconteurWeb
 
         public async Task<Tuple<bool,T, Pipe<T>.PipeEndpoint>> TryReceivePacketWait(int timeout= -1, bool peek=false)
         {
-            var r = await TryReceivedPacketWaitBase(timeout, peek);
+            var r = await TryReceivedPacketWaitBase(timeout, peek).ConfigureAwait(false);
             if (!r.Item1)
             {
                 return Tuple.Create(false, default(T), default(Pipe<T>.PipeEndpoint));
@@ -1605,7 +1543,7 @@ namespace RobotRaconteurWeb
                             {
                                 servicepath = servicepath.ReplaceFirst("*", ((ServiceStub)client).RRContext.ServiceName);
                             }
-                            obj = await ((ServiceStub)client).RRContext.FindObjRef(servicepath, null, c.cancel.Token);
+                            obj = await ((ServiceStub)client).RRContext.FindObjRef(servicepath, null, c.cancel.Token).ConfigureAwait(false);
                         }
 
                         var property_info = obj.GetType().GetProperty(this.membername);
@@ -1621,7 +1559,7 @@ namespace RobotRaconteurWeb
                             await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false); ;
                         }
 
-                        Pipe<T>.PipeEndpoint cc = await w.Connect(-1);
+                        Pipe<T>.PipeEndpoint cc = await w.Connect(-1).ConfigureAwait(false);
                         if (IgnoreInValue)
                         {
                             
@@ -1647,10 +1585,9 @@ namespace RobotRaconteurWeb
                                     recv_packets.Enqueue(Tuple.Create<object, object>(ev_ep.ReceivePacket(), ev_ep));
                                 }
 
-                                foreach (var t in this.recv_packets_wait_tasks)
-                                {
-                                    t.TrySetResult(true);
-                                }
+                                recv_packets_waiter.NotifyAll(true);
+
+                                
                                 PipePacketReceived?.Invoke(this);
 
                             }

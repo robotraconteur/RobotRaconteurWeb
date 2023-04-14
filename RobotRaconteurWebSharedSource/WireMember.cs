@@ -54,16 +54,30 @@ namespace RobotRaconteurWeb
                 get
                 {
                     if (!inval_valid) throw new Exception("Value not set");
+                    if (IsValueExpired(lasttime_recv_local, InValueLifespan))
+                    {
+                        throw new Exception("Value not set");
+                    }
                     return inval;
-                }
-                
+                }               
+            }
 
+            public bool TryGetInValue(out T value)
+            {
+                value = default;
+                if (!inval_valid) return false;
+                if (IsValueExpired(lasttime_recv_local, InValueLifespan))
+                {
+                    return false;
+                }
+                value = inval;
+                return true;
             }
 
             protected T outval;
             protected bool outval_valid=false;
             protected TimeSpec lasttime_send;
-
+            protected DateTime lasttime_send_local;
             protected bool send_closed = false;
 
             public virtual T OutValue
@@ -71,6 +85,10 @@ namespace RobotRaconteurWeb
                 get
                 {
                     if (!outval_valid) throw new Exception("Value not set");
+                    if (IsValueExpired(lasttime_send_local, OutValueLifespan))
+                    {
+                        throw new Exception("Value not set");
+                    }
                     return outval;
                 }
                 set
@@ -78,6 +96,18 @@ namespace RobotRaconteurWeb
                     SendOutValue(value).IgnoreResult();
                 }
 
+            }
+
+            public bool TryGetOutValue(out T value)
+            {
+                value = default;
+                if (!outval_valid) return false;
+                if (IsValueExpired(lasttime_send_local, OutValueLifespan))
+                {
+                    return false;
+                }
+                value = outval;
+                return true;
             }
 
             public Task SendOutValue(T value)
@@ -101,6 +131,8 @@ namespace RobotRaconteurWeb
                     outval = value;
                     outval_valid = true;
                     lasttime_send = TimeSpec.Now;
+                    lasttime_send_local = DateTime.UtcNow;
+                    inval_waiter.NotifyAll(true);
                     return t;
                 }
             }
@@ -139,18 +171,23 @@ namespace RobotRaconteurWeb
             private object recv_lock = new object();
 
             private TimeSpec lasttime_recv = null;
+            private DateTime lasttime_recv_local = default;
 
             protected internal virtual void WirePacketReceived(TimeSpec timespec, T packet)
             {
                 lock (recv_lock)
                 {
+                    if (IgnoreInValue) return;
 
 
                     if (lasttime_recv == null || timespec > lasttime_recv)
                     {
                         lasttime_recv = timespec;
+                        lasttime_recv_local = DateTime.UtcNow;
                         inval = packet;
                         inval_valid = true;
+
+                        inval_waiter.NotifyAll(true);
 
                         try
                         {
@@ -188,8 +225,56 @@ namespace RobotRaconteurWeb
                 Close();
             }
 
+            public bool IgnoreInValue { get; set; } = false;
 
+            public int InValueLifespan { get; set; } = -1;
 
+            public int OutValueLifespan { get; set; } = -1;
+
+            public const int RR_VALUE_LIFESPAN_INFINITE = -1;
+
+            internal static bool IsValueExpired(DateTime recv_time,int lifespan)
+            {
+                if (lifespan< 0)
+                {
+                    return false;
+                }
+                 
+                if (recv_time + TimeSpan.FromMilliseconds(lifespan) < DateTime.UtcNow)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            AsyncValueWaiter<bool> inval_waiter = new AsyncValueWaiter<bool>();
+            AsyncValueWaiter<bool> outval_waiter = new AsyncValueWaiter<bool>();
+
+            public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
+            {
+                var waiter = inval_waiter.CreateWaiterTask(timeout, token);
+                using (waiter)
+                {
+                    await waiter.Task.ConfigureAwait(false);
+                }
+
+                return inval_valid && !IsValueExpired(lasttime_recv_local, InValueLifespan);
+            }
+
+            public async Task<bool> WaitOutValueValid(int timeout = -1, CancellationToken token = default)
+            {
+                var waiter = outval_waiter.CreateWaiterTask(timeout, token);
+                using (waiter)
+                {
+                    await waiter.Task.ConfigureAwait(false);
+                }
+
+                return outval_valid && !IsValueExpired(lasttime_send_local, OutValueLifespan);
+            }
+
+            public bool InValueValid {  get { return inval_valid && !IsValueExpired(lasttime_recv_local, InValueLifespan); } }
+
+            public bool OutValueValid { get { return outval_valid && !IsValueExpired(lasttime_send_local, OutValueLifespan); } }
         }
 
         private bool rawelements = false;
@@ -207,6 +292,11 @@ namespace RobotRaconteurWeb
         public abstract string MemberName { get; }
 
         protected MemberDefinition_Direction direction = MemberDefinition_Direction.both;
+
+        public MemberDefinition_Direction Direction
+        {
+            get { return direction; }
+        }
 
         public Wire()
         {
@@ -762,6 +852,7 @@ namespace RobotRaconteurWeb
 
         T in_value;
         TimeSpec in_value_ts;
+        DateTime lasttime_recv_local;
         bool in_value_valid;
         uint in_value_ep;
 
@@ -812,7 +903,8 @@ namespace RobotRaconteurWeb
         {
             lock(this)
             {
-                if (!in_value_valid) throw new InvalidOperationException("Value not set");
+                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan)) 
+                    throw new InvalidOperationException("Value not set");
                 ts = in_value_ts;
                 ep = in_value_ep;
                 return in_value;
@@ -823,7 +915,7 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                if (!in_value_valid)
+                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan))
                 {
                     val = default;
                     ts = default;
@@ -857,14 +949,31 @@ namespace RobotRaconteurWeb
             {
                 in_value = v;
                 in_value_ts = ts;
+                lasttime_recv_local = DateTime.UtcNow;
                 in_value_valid = true;
                 in_value_ep = c;
+                inval_waiter.NotifyAll(true);
             }
 
             if (InValueChanged!=null) InValueChanged(v, ts, c);
         }
 
-        public event Action<T, TimeSpec, uint>  InValueChanged; 
+        public event Action<T, TimeSpec, uint>  InValueChanged;
+
+        public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
+        {
+            var waiter = inval_waiter.CreateWaiterTask(timeout, token);
+            using (waiter)
+            {
+                await waiter.Task.ConfigureAwait(false);
+            }
+
+            return in_value_valid && !Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan);
+        }
+
+        public int InValueLifespan { get; set; } = -1;
+
+        AsyncValueWaiter<bool> inval_waiter = new AsyncValueWaiter<bool>();
     }
 
 }
