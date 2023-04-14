@@ -778,7 +778,7 @@ namespace RobotRaconteurWeb
                     }
 
                     foreach (connected_connection ee in ceps)
-                    {
+                    {                        
                         try
                         {
                             Wire<T>.WireConnection c = ee.connection as Wire<T>.WireConnection;
@@ -786,6 +786,15 @@ namespace RobotRaconteurWeb
                             {
                                 connected_wires.Remove(ee);
                                 continue;
+                            }
+
+                            var ep_endpoint = c.Endpoint;
+                            if (Predicate != null)
+                            {
+                                if (!Predicate(this, ep_endpoint))
+                                {
+                                    continue;
+                                }
                             }
                             c.SendOutValue(value).ContinueWith(delegate(Task t)
                             {
@@ -832,6 +841,8 @@ namespace RobotRaconteurWeb
         {
             throw new ReadOnlyMemberException("Read only wire");
         }
+
+        public Func<object, uint, bool> Predicate { get; set; }
     }
 
     public class WireUnicastReceiver<T>

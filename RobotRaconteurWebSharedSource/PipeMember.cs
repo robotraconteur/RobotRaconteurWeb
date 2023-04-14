@@ -857,7 +857,10 @@ namespace RobotRaconteurWeb
                         continue;
                     }
 
-                    
+                    if(Predicate != null && !Predicate(this, ep.Endpoint, ep.Index))
+                    {
+                        continue;
+                    }
                     lock (endpoints)
                     {
                         if (maximum_backlog != -1 && cep.backlog.Count + cep.active_sends.Count > maximum_backlog)
@@ -940,5 +943,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+
+        public Func<object, uint, int, bool> Predicate { get; set; }
     }
 }

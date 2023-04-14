@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AsyncMutex.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BroadcastDownsampler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CallbackMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Endpoint.cs" />
