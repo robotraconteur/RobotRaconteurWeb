@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -517,7 +518,12 @@ namespace RobotRaconteurWeb
                 
                 
             }
-            catch (Exception) {
+            catch (Exception exp) {
+                // LogDebug transport connection lost
+#if RR_LOG_DEBUG
+                LogDebug("Transport connection lost: " + exp.Message, node, component: RobotRaconteur_LogComponent.Transport);
+#endif
+
                 tcpc.Close();
             }
 
@@ -615,6 +621,11 @@ namespace RobotRaconteurWeb
             catch { };
 
             base.Close();
+
+            // LogTrace connection closed
+            #if RR_LOG_TRACE
+            LogTrace("Connection closed", node, component: RobotRaconteur_LogComponent.Transport);
+            #endif
 
             return Task.FromResult(0);
         }

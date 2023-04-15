@@ -24,6 +24,9 @@ using RobotRaconteurWeb.Extensions;
 using System.Security.Cryptography.X509Certificates;
 using System.Linq.Expressions;
 
+using static RobotRaconteurWeb.RRLogFuncs;
+using System.Xml.Linq;
+
 namespace RobotRaconteurWeb
 {
     public class RobotRaconteurNode
@@ -48,7 +51,11 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                if (m_NodeID == null) m_NodeID = NodeID.NewUniqueID();
+                if (m_NodeID == null)
+                {
+                    m_NodeID = NodeID.NewUniqueID();
+                    LogInfo(string.Format("RobotRaconteurNode NodeID configured with random UUID {0}", m_NodeID.ToString()), this, component: RobotRaconteur_LogComponent.Node);
+                }
                 return m_NodeID;
             }
             set
@@ -56,10 +63,14 @@ namespace RobotRaconteurWeb
                 if (m_NodeID == null)
                 {
                     m_NodeID = value;
+                    LogInfo(string.Format("RobotRaconteurNode NodeID configured with UUID {0}", value.ToString()), this, component: RobotRaconteur_LogComponent.Node);
 
                 }
                 else
                 {
+#if RR_LOG_DEBUG
+                    LogDebug("RobotRaconteurNode attempt to set NodeID when already set", this, component: RobotRaconteur_LogComponent.Node);
+#endif
                     throw new InvalidOperationException("NodeID cannot be changed once it is set");
                 }
             }
@@ -83,15 +94,28 @@ namespace RobotRaconteurWeb
             get
             {
                 if (m_NodeName == null) m_NodeName = "";
+                LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
                 return m_NodeName;
             }
             set
             {
                 if (m_NodeName == null)
                 {
+                    if (value.Length > 1024)
+                    {
+#if RR_LOG_DEBUG
+                        LogDebug("RobotRaconteurNode attempt to set NodeName with length > 1024", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                        throw new InvalidOperationException("Invalid node name, too long");
+                    }
+
 
                     if (!Regex.Match(value, "^[a-zA-Z][a-zA-Z0-9_\\.\\-]*$").Success)
                     {
+#if RR_LOG_DEBUG
+                        LogDebug("RobotRaconteurNode attempt to set NodeName with invalid characters", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+
                         throw new InvalidOperationException("Invalid node name");
                     }
 
@@ -100,6 +124,9 @@ namespace RobotRaconteurWeb
                 }
                 else
                 {
+#if RR_LOG_DEBUG
+                    LogDebug("RobotRaconteurNode attempt to set NodeName when already set", this, component: RobotRaconteur_LogComponent.Node);
+#endif
                     throw new InvalidOperationException("NodeName cannot be changed once it is set");
                 }
             }
@@ -135,7 +162,7 @@ namespace RobotRaconteurWeb
 
 
         private uint transport_count = 0;
-        
+
 
         public uint EndpointInactivityTimeout = 600000;
         public uint TransportInactivityTimeout = 600000;
@@ -159,6 +186,8 @@ namespace RobotRaconteurWeb
             RegisterTransport(browser_transport);
             m_Discovery = new Discovery(this);
 #endif
+            LogInfo(string.Format("RobotRaconteurNode version {0} initialized", Version), this);
+
         }
 
         private ServiceFactory GetServiceFactoryForType(string type, ClientContext context)
@@ -168,26 +197,26 @@ namespace RobotRaconteurWeb
             if (context != null)
             {
                 ServiceFactory f;
-                if(context.TryGetPulledServiceType(servicename, out f))
+                if (context.TryGetPulledServiceType(servicename, out f))
                 {
                     return f;
                 }
-            }            
-            return GetServiceType(servicename);            
+            }
+            return GetServiceType(servicename);
         }
 
         private ServiceFactory GetServiceFactoryForType(Type type, ClientContext context)
         {
-            return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);      
+            return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);
         }
 
         public MessageElementNestedElementList PackStructure(Object s, ClientContext context)
         {
             if (s == null) return null;
-            
+
             return GetServiceFactoryForType(s.GetType(), context).PackStructure(s);
         }
-        
+
         public T UnpackStructure<T>(MessageElementNestedElementList l, ClientContext context)
         {
             if (l == null) return default(T);
@@ -334,9 +363,9 @@ namespace RobotRaconteurWeb
                 return MessageElementUtil.NewMessageElement(name, new T[] { data });
             }
 
-            if  (is_array && t.GetElementType().IsPrimitive)
+            if (is_array && t.GetElementType().IsPrimitive)
             {
-                return MessageElementUtil.NewMessageElement(name, data );
+                return MessageElementUtil.NewMessageElement(name, data);
             }
 
             if (t == typeof(string))
@@ -418,7 +447,7 @@ namespace RobotRaconteurWeb
             return PackAnyType(num.ToString(), ref data, context);
         }
 
-        public T UnpackAnyType<T>(MessageElement e, ClientContext context=null)
+        public T UnpackAnyType<T>(MessageElement e, ClientContext context = null)
         {
             switch (e.ElementType)
             {
@@ -470,14 +499,14 @@ namespace RobotRaconteurWeb
                         if (typeof(T).IsValueType)
                         {
                             if (md.Elements.Count != 1) throw new DataTypeException("Invalid array size for scalar structure");
-                            return ((T[])UnpackPod(md,context))[0];
+                            return ((T[])UnpackPod(md, context))[0];
                         }
                         else
                         {
-                            return (T)UnpackPod(md,context);
+                            return (T)UnpackPod(md, context);
                         }
                     }
-                case DataTypes.pod_multidimarray_t:                    
+                case DataTypes.pod_multidimarray_t:
                     {
                         MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.pod_multidimarray_t);
                         return (T)UnpackPod(md, context);
@@ -509,7 +538,7 @@ namespace RobotRaconteurWeb
                         var method = typeof(RobotRaconteurNode).GetMethod("UnpackMapType");
                         var dict_params = t.GetGenericArguments();
                         var generic = method.MakeGenericMethod(dict_params);
-                        return (T) generic.Invoke(this, new object[] { e.Data, context });
+                        return (T)generic.Invoke(this, new object[] { e.Data, context });
                     }
                 case DataTypes.list_t:
                     {
@@ -517,7 +546,7 @@ namespace RobotRaconteurWeb
                         var method = typeof(RobotRaconteurNode).GetMethod("UnpackListType");
                         var list_params = t.GetGenericArguments();
                         var generic = method.MakeGenericMethod(list_params);
-                        return (T) generic.Invoke(this, new object[] { e.Data, context });
+                        return (T)generic.Invoke(this, new object[] { e.Data, context });
                     }
                 default:
                     throw new DataTypeException("Invalid container data type");
@@ -565,7 +594,7 @@ namespace RobotRaconteurWeb
                     MessageElementUtil.AddMessageElement(m, PackAnyType(d.Key.ToString(), ref v, context));
                 }
                 return new MessageElementNestedElementList(DataTypes.dictionary_t, "", m);
-            }            
+            }
 
             throw new DataTypeException("Indexed types can only be indexed by int32 and string");
         }
@@ -573,7 +602,7 @@ namespace RobotRaconteurWeb
 
         public object UnpackMapType<Tkey, Tvalue>(object data, ClientContext context)
         {
-            
+
             if (data == null) return null;
 
             var cdata = (MessageElementNestedElementList)data;
@@ -582,7 +611,7 @@ namespace RobotRaconteurWeb
             {
                 Dictionary<int, Tvalue> o = new Dictionary<int, Tvalue>();
 
-                
+
                 var cdataElements = cdata.Elements;
                 {
                     foreach (MessageElement e in cdataElements)
@@ -599,7 +628,7 @@ namespace RobotRaconteurWeb
             {
                 Dictionary<string, Tvalue> o = new Dictionary<string, Tvalue>();
 
-                
+
                 var cdataElements = cdata.Elements;
                 {
                     foreach (MessageElement e in cdataElements)
@@ -729,7 +758,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-                
+
         public object UnpackVarType(MessageElement me, ClientContext context)
         {
             if (me == null) return null;
@@ -763,7 +792,7 @@ namespace RobotRaconteurWeb
                 //case DataTypes.pod_t:
                 case DataTypes.pod_array_t:
                 case DataTypes.pod_multidimarray_t:
-                    {                        
+                    {
                         return UnpackPod(me.Data, context);
                     }
                 case DataTypes.namedarray_array_t:
@@ -772,14 +801,14 @@ namespace RobotRaconteurWeb
                         return UnpackNamedArray(me.Data, context);
                     }
                 case DataTypes.vector_t:
-                    { 
+                    {
                         return UnpackMapType<int, object>(me.Data, context);
                     }
                 case DataTypes.dictionary_t:
                     {
                         return UnpackMapType<string, object>(me.Data, context);
                     }
-                case DataTypes.list_t:                    
+                case DataTypes.list_t:
                     {
                         return UnpackListType<object>(me.Data, context);
                     }
@@ -787,13 +816,13 @@ namespace RobotRaconteurWeb
                     throw new DataTypeException("Invalid varvalue data type");
             }
         }
-        
+
         public MessageElementNestedElementList PackMultiDimArray(MultiDimArray array)
         {
             if (array == null) return null;
             List<MessageElement> l = new List<MessageElement>();
-            l.Add(new MessageElement("dims",array.Dims));            
-            l.Add(new MessageElement("array", array.Array_));            
+            l.Add(new MessageElement("dims", array.Dims));
+            l.Add(new MessageElement("array", array.Array_));
             return new MessageElementNestedElementList(DataTypes.multidimarray_t, "", l);
         }
 
@@ -802,9 +831,9 @@ namespace RobotRaconteurWeb
             if (marray == null) return null;
 
             MultiDimArray m = new MultiDimArray();
-            
+
             m.Dims = (MessageElement.FindElement(marray.Elements, "dims").CastData<uint[]>());
-            m.Array_ = (MessageElement.FindElement(marray.Elements, "array").CastData<Array>());            
+            m.Array_ = (MessageElement.FindElement(marray.Elements, "array").CastData<Array>());
             return m;
         }
 
@@ -813,9 +842,11 @@ namespace RobotRaconteurWeb
 
             if (m.header.SenderNodeID != NodeID)
             {
-                
-                    throw new ConnectionException("Could not route message");
-                
+#if RR_LOG_DEBUG
+                LogDebug("Message sender node ID does not match node ID", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw new ConnectionException("Could not route message");
+
             }
 
             Endpoint e;
@@ -842,9 +873,12 @@ namespace RobotRaconteurWeb
             }
             catch (KeyNotFoundException)
             {
+#if RR_LOG_DEBUG
+                LogDebug("Could not find transport", this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 throw new ConnectionException("Could not find transport");
             }
-            
+
             await c.SendMessage(m, cancel);
 
         }
@@ -852,37 +886,43 @@ namespace RobotRaconteurWeb
         public void MessageReceived(Message m)
         {
             if (m.header.ReceiverNodeID != NodeID)
-            {                
+            {
                 Message eret = GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");
                 if (eret.entries.Count > 0)
-                    SendMessage(eret, default(CancellationToken)).IgnoreResult();               
+                    SendMessage(eret, default(CancellationToken)).IgnoreResult();
+#if RR_LOG_DEBUG
+                LogDebug("Message receiver node ID does not match node ID", this, component: RobotRaconteur_LogComponent.Node);
+#endif
 
             }
 
             else
             {
-                
 
-                    
-                    try
+
+
+                try
+                {
+
+                    Endpoint e;
+                    lock (endpoints)
                     {
-
-                        Endpoint e;
-                        lock (endpoints)
-                        {
-                            e = endpoints[m.header.ReceiverEndpoint];
-                        }
-
-                        e.MessageReceived(m);
+                        e = endpoints[m.header.ReceiverEndpoint];
                     }
-                    catch (KeyNotFoundException)
-                    {
-                        Message eret = GenerateErrorReturnMessage(m, MessageErrorType.InvalidEndpoint, "RobotRaconteur.InvalidEndpoint", "Invalid destination endpoint");
-                        if (eret.entries.Count > 0)
-                            SendMessage(eret, default(CancellationToken)).IgnoreResult();
-                    }
+
+                    e.MessageReceived(m);
+                }
+                catch (KeyNotFoundException)
+                {
+                    Message eret = GenerateErrorReturnMessage(m, MessageErrorType.InvalidEndpoint, "RobotRaconteur.InvalidEndpoint", "Invalid destination endpoint");
+                    if (eret.entries.Count > 0)
+                        SendMessage(eret, default(CancellationToken)).IgnoreResult();
+#if RR_LOG_DEBUG
+                    LogDebug(string.Format("Received message with invalid ReceiverEndpoint: {0}", m.header.ReceiverEndpoint), this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                }
             }
-           
+
 
 
         }
@@ -901,7 +941,7 @@ namespace RobotRaconteurWeb
             {
                 if (((int)me.EntryType) % 2 == 1)
                 {
-                    MessageEntry eret = new MessageEntry(me.EntryType+1, me.MemberName);
+                    MessageEntry eret = new MessageEntry(me.EntryType + 1, me.MemberName);
                     eret.RequestID = me.RequestID;
                     eret.ServicePath = me.ServicePath;
                     eret.AddElement("errorname", errname);
@@ -921,6 +961,10 @@ namespace RobotRaconteurWeb
             {
                 service_factories.Add(f.GetServiceName(), f);
             }
+#if RR_LOG_TRACE
+            LogTrace("Service type registered {0}", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+
         }
 
         public ServiceFactory GetServiceType(string servicetype)
@@ -928,16 +972,19 @@ namespace RobotRaconteurWeb
             ServiceFactory f;
             if (!TryGetServiceType(servicetype, out f))
             {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Cannot unregister nonexistant service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 throw new ServiceException("Service factory not found for " + servicetype);
             }
-            return f;            
+            return f;
         }
 
         public bool TryGetServiceType(string servicetype, out ServiceFactory f)
         {
             lock (service_factories)
-            {                
-                return service_factories.TryGetValue(servicetype,out f);
+            {
+                return service_factories.TryGetValue(servicetype, out f);
             }
         }
 
@@ -952,11 +999,20 @@ namespace RobotRaconteurWeb
 
         public void RegisterDynamicServiceFactory(DynamicServiceFactory f)
         {
-            if (this.dynamic_factory != null) throw new InvalidOperationException("Dynamic service factory already set");
+            if (this.dynamic_factory != null)
+            {
+#if RR_LOG_DEBUG
+                LogDebug("Attempt to register dynamic service factory when already registered", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw new InvalidOperationException("Dynamic service factory already set");
+            }
             this.dynamic_factory = f;
+#if RR_LOG_TRACE
+            LogTrace("Registered dynamic service factory", this, component: RobotRaconteur_LogComponent.Node);
+#endif
         }
 
-        public ServerContext RegisterService(string name, string servicetype, Object obj,ServiceSecurityPolicy securitypolicy=null)
+        public ServerContext RegisterService(string name, string servicetype, Object obj, ServiceSecurityPolicy securitypolicy = null)
         {
             lock (services)
             {
@@ -966,7 +1022,7 @@ namespace RobotRaconteurWeb
                     CloseService(name);
                 }
 
-                ServerContext c = new ServerContext(GetServiceType(servicetype),this);
+                ServerContext c = new ServerContext(GetServiceType(servicetype), this);
                 c.SetBaseObject(name, obj, securitypolicy);
 
                 //RegisterEndpoint(c);
@@ -974,11 +1030,13 @@ namespace RobotRaconteurWeb
 
                 UpdateServiceStateNonce();
 
+                LogInfo(string.Format("Service {0} registered", name), this, RobotRaconteur_LogComponent.Node);
+
                 return c;
             }
         }
 
-        
+
         public ServerContext RegisterService(ServerContext c)
         {
             lock (services)
@@ -989,6 +1047,7 @@ namespace RobotRaconteurWeb
                 }
 
                 services.Add(c.ServiceName, c);
+                LogInfo(string.Format("Service {0} registered", c.ServiceName), this, RobotRaconteur_LogComponent.Node);
                 return c;
             }
         }
@@ -1006,8 +1065,8 @@ namespace RobotRaconteurWeb
 
                 services.Remove(sname);
             }
+            LogInfo(string.Format("Service {0} removed", sname), this, RobotRaconteur_LogComponent.Node);
 
-            
 
 
         }
@@ -1023,6 +1082,9 @@ namespace RobotRaconteurWeb
             }
             catch (KeyNotFoundException)
             {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Service {0} not found", name), this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 throw new ServiceNotFoundException("Service " + name + " not found");
             }
 
@@ -1036,19 +1098,25 @@ namespace RobotRaconteurWeb
                 transport_count++;
                 c.TransportID = transport_count;
                 transports.Add(transport_count, c);
+#if RR_LOG_TRACE
+                LogTrace(string.Format("Transport {0} registered", c.UrlSchemeString), this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 return transport_count;
             }
         }
 
-       
+
         public async Task<Message> SpecialRequest(Message m, uint transportid)
         {
-           
 
-            if (!(m.header.ReceiverNodeID==NodeID.Any && (m.header.ReceiverNodeName=="" || m.header.ReceiverNodeName==NodeName))
+
+            if (!(m.header.ReceiverNodeID == NodeID.Any && (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == NodeName))
                 && !(m.header.ReceiverNodeID == NodeID))
-            {                
-                return GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");                
+            {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Received SpecialRequest with invalid ReceiverNodeID: {0}", m.header.ReceiverNodeID.ToString()), this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                return GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");
             }
 
 
@@ -1063,7 +1131,13 @@ namespace RobotRaconteurWeb
 
             foreach (MessageEntry e in m.entries)
             {
-                MessageEntry eret = ret.AddEntry(e.EntryType+1,e.MemberName);
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Special request received from {0} ep {1} to {2} ep {3} EntryType {4} Error {5}",
+                    m.header.SenderNodeID.ToString(), m.header.SenderEndpoint, m.header.ReceiverNodeID,
+                    m.header.ReceiverEndpoint, e.EntryType, e.Error), this, component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                    service_path: e.ServicePath, member: e.MemberName);
+#endif
+                MessageEntry eret = ret.AddEntry(e.EntryType + 1, e.MemberName);
                 eret.RequestID = e.RequestID;
                 eret.ServicePath = e.ServicePath;
 
@@ -1078,14 +1152,19 @@ namespace RobotRaconteurWeb
                             try
                             {
                                 ServerContext s;
-                                
-                                    s = GetService(s1[0]);
-                                
+
+                                s = GetService(s1[0]);
+
                                 string objtype = await s.GetObjectType(path);
                                 eret.AddElement("objecttype", objtype);
                             }
                             catch
                             {
+#if RR_LOG_DEBUG
+                                LogDebug("Client requested type of an invalid service path", this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ObjectNotFoundException");
                                 eret.AddElement("errorstring", "Object not found");
                                 eret.Error = MessageErrorType.ObjectNotFound;
@@ -1098,11 +1177,11 @@ namespace RobotRaconteurWeb
                             string name = e.ServicePath;
                             try
                             {
-                                string servicedef="";
-                                if (e.elements.Any(x =>x.ElementName == "ServiceType"))
+                                string servicedef = "";
+                                if (e.elements.Any(x => x.ElementName == "ServiceType"))
                                 {
                                     name = e.FindElement("ServiceType").CastData<string>();
-                                    servicedef=GetServiceType(name).DefString();
+                                    servicedef = GetServiceType(name).DefString();
                                 }
                                 else if (e.elements.Any(x => x.ElementName == "servicetype"))
                                 {
@@ -1111,13 +1190,18 @@ namespace RobotRaconteurWeb
                                 }
                                 else
                                 {
-                                 servicedef= GetService(name).ServiceDef.DefString();
-                                 eret.AddElement("attributes", PackMapType<string,object>(GetService(name).Attributes, null));
+                                    servicedef = GetService(name).ServiceDef.DefString();
+                                    eret.AddElement("attributes", PackMapType<string, object>(GetService(name).Attributes, null));
                                 }
                                 eret.AddElement("servicedef", servicedef);
                             }
                             catch
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Client requested type of an invalid service type {0}", name), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
@@ -1130,11 +1214,11 @@ namespace RobotRaconteurWeb
 
                             try
                             {
-                                
+
 
                                 ServerContext c = GetService(name);
-                                ServerEndpoint se = new ServerEndpoint(c,this);
-                                
+                                ServerEndpoint se = new ServerEndpoint(c, this);
+
                                 se.m_RemoteEndpoint = m.header.SenderEndpoint;
                                 se.m_RemoteNodeID = m.header.SenderNodeID;
                                 RegisterEndpoint(se);
@@ -1144,13 +1228,22 @@ namespace RobotRaconteurWeb
                                 c.AddClient(se);
 
                                 ret.header.SenderEndpoint = se.LocalEndpoint;
-                                
-                                
+
+                                // Info log client connected
+                                LogInfo(string.Format("Client connected to service {0} from {1} ep {2}", name, m.header.SenderNodeID.ToString(), m.header.SenderEndpoint), this,
+                                                                       component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                                                                                          service_path: e.ServicePath, member: e.MemberName);
+
                                 //services[name].AddClient(m.header.SenderEndpoint);
                                 //eret.AddElement("servicedef", servicedef);
                             }
-                            catch
+                            catch (Exception exp)
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Error connecting client: {0}",exp), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
@@ -1159,7 +1252,7 @@ namespace RobotRaconteurWeb
                         break;
                     case MessageEntryType.DisconnectClient:
                         {
-                            
+
 
                             try
                             {
@@ -1176,9 +1269,18 @@ namespace RobotRaconteurWeb
                                 }
                                 DeleteEndpoint(se);
                                 //eret.AddElement("servicedef", servicedef);
+                                // Info log client disconnected
+                                LogInfo(string.Format("Client disconnected from service {0} from {1} ep {2}", name, m.header.SenderNodeID.ToString(), m.header.SenderEndpoint), this,
+                                                                             component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                                                             service_path: e.ServicePath, member: e.MemberName);
                             }
-                            catch
+                            catch (Exception exp)
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Error disconnecting client: {0}", exp), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
@@ -1187,7 +1289,7 @@ namespace RobotRaconteurWeb
                         break;
                     case MessageEntryType.ConnectionTest:
                         break;
-                     
+
                     case MessageEntryType.NodeCheckCapability:
                         eret.AddElement("return", (uint)0);
                         break;
@@ -1201,11 +1303,16 @@ namespace RobotRaconteurWeb
 
                                 s = GetService(s1[0]);
 
-                                Dictionary<string,object> attr = s.Attributes;
-                                eret.AddElement("return", PackMapType<string,object>(attr, null));
+                                Dictionary<string, object> attr = s.Attributes;
+                                eret.AddElement("return", PackMapType<string, object>(attr, null));
                             }
-                            catch
+                            catch (Exception exp)
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Error returning attributes: {0}", exp), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceError");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceError;
@@ -1215,6 +1322,11 @@ namespace RobotRaconteurWeb
 
 
                     default:
+#if RR_LOG_DEBUG
+                        LogDebug(string.Format("Invalid special request EntryType: {0}", e.EntryType), this,
+                            component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                            service_path: e.ServicePath, member: e.MemberName);
+#endif
                         eret.Error = MessageErrorType.ProtocolError;
                         eret.AddElement("errorname", "RobotRaconteur.ProtocolError");
                         eret.AddElement("errorstring", "Invalid Special Operation");
@@ -1223,7 +1335,7 @@ namespace RobotRaconteurWeb
             }
 
             return ret;
-            
+
 
         }
 
@@ -1231,103 +1343,128 @@ namespace RobotRaconteurWeb
         {
 
             //TODO: Specify target object type
-
-            ClientContext c = new ClientContext(this);
-            RegisterEndpoint(c);
-            Transport[] atransports;
-            lock (transports)
-            {
-                atransports = transports.Values.ToArray();
-            }
-            foreach (Transport end in atransports)
-            {
-                if (end == null) continue;
-                if (end.IsClient)
-                {
-                    if (end.CanConnectService(url))
-                    {
-
-                        object r = await c.ConnectService(end, url,username,credentials,objecttype,cancel);
-                        
-                        if (listener!=null)
-                        c.ClientServiceListener += listener;
-                            return r;
-                        
-                    }
-                }
-            }
-
             try
             {
-                DeleteEndpoint(c);
+                ClientContext c = new ClientContext(this);
+                RegisterEndpoint(c);
+                Transport[] atransports;
+                lock (transports)
+                {
+                    atransports = transports.Values.ToArray();
+                }
+                foreach (Transport end in atransports)
+                {
+                    if (end == null) continue;
+                    if (end.IsClient)
+                    {
+                        if (end.CanConnectService(url))
+                        {
+
+                            object r = await c.ConnectService(end, url, username, credentials, objecttype, cancel);
+
+                            if (listener != null)
+                                c.ClientServiceListener += listener;
+                            return r;
+
+                        }
+                    }
+                }
+
+                try
+                {
+                    DeleteEndpoint(c);
+                }
+                catch { };
+
+                throw new ConnectionException("Could not connect to service");
             }
-            catch { };
-           
-            throw new ConnectionException("Could not connect to service");
+            catch (Exception exp)
+            {
+                //Debug log exception
+                #if RR_LOG_DEBUG
+                LogDebug(string.Format("Error connecting service: {0}", exp), this,
+                                       component: RobotRaconteur_LogComponent.Node);
+                #endif
+
+
+                throw;
+            }
         }
 
         public async Task<object> ConnectService(string[] url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
-            var connecting_tasks = new List<Task<object>>();
-
-            foreach (var u in url)
+            try
             {
-                connecting_tasks.Add(ConnectService(u, username, credentials, null, objecttype, cancel));
+                var connecting_tasks = new List<Task<object>>();
 
-                await Task.WhenAny(Task.WhenAny(connecting_tasks), Task.Delay(250));
-
-                if (connecting_tasks.Any(x => x.IsCompletedSuccessfully))
+                foreach (var u in url)
                 {
-                    break;
-                }
-            }
+                    connecting_tasks.Add(ConnectService(u, username, credentials, null, objecttype, cancel));
 
-            while (true)
-            {
-                object r = null;
-                if (connecting_tasks.Count == 1)
-                {
-                    r = await connecting_tasks[0];
-                }
-                else
-                {
-                    await Task.WhenAny(connecting_tasks);
+                    await Task.WhenAny(Task.WhenAny(connecting_tasks), Task.Delay(250));
 
-                    var completed_task = connecting_tasks.First(x => x.IsCompleted);
-                    connecting_tasks.Remove(completed_task);
-                    if (completed_task.IsCompletedSuccessfully)
+                    if (connecting_tasks.Any(x => x.IsCompletedSuccessfully))
                     {
-                        r = await completed_task;
-                        foreach (var t in connecting_tasks)
-                        {
-                            try
-                            {                                
-                                _ = t.ContinueWith((x) =>
-                                {
-                                    try
-                                    {
-                                        Task.Run(() => ((ClientContext)x.Result).Close().IgnoreResult());
-                                    }
-                                    catch { }
-                                });
-                                
-                            }
-                            catch { }
-                        }
+                        break;
+                    }
+                }
+
+                while (true)
+                {
+                    object r = null;
+                    if (connecting_tasks.Count == 1)
+                    {
+                        r = await connecting_tasks[0];
                     }
                     else
                     {
-                        continue;
+                        await Task.WhenAny(connecting_tasks);
+
+                        var completed_task = connecting_tasks.First(x => x.IsCompleted);
+                        connecting_tasks.Remove(completed_task);
+                        if (completed_task.IsCompletedSuccessfully)
+                        {
+                            r = await completed_task;
+                            foreach (var t in connecting_tasks)
+                            {
+                                try
+                                {
+                                    _ = t.ContinueWith((x) =>
+                                    {
+                                        try
+                                        {
+                                            Task.Run(() => ((ClientContext)x.Result).Close().IgnoreResult());
+                                        }
+                                        catch { }
+                                    });
+
+                                }
+                                catch { }
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
+
+                    if (listener != null)
+                        ((ClientContext)r).ClientServiceListener += listener;
+                    return r;
                 }
-                
-                if (listener != null)
-                    ((ClientContext)r).ClientServiceListener += listener;
-                return r;
+            }
+            catch (Exception exp)
+            {
+                //Debug log exception
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Error connecting service: {0}", exp), this,
+                                                          component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw;
             }
         }
 
-        public async Task DisconnectService(object obj, CancellationToken cancel=default(CancellationToken))
+        public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
             await stub.RRContext.Close(cancel);
@@ -1352,7 +1489,7 @@ namespace RobotRaconteurWeb
                     r.NextBytes(b);
                     local_endpoint = BitConverter.ToUInt32(b, 0);
                 } while (endpoints.ContainsKey(local_endpoint));
-                
+
                 e.m_LocalEndpoint = local_endpoint;
                 endpoints.Add(local_endpoint, e);
                 return local_endpoint;
@@ -1361,17 +1498,17 @@ namespace RobotRaconteurWeb
 
         public void DeleteEndpoint(Endpoint e)
         {
-           
+
             try
             {
                 Transport c;
                 lock (transports)
                 {
-                    c=transports[e.transport];
+                    c = transports[e.transport];
                 }
-                c.CloseTransportConnection(e,default(CancellationToken)).IgnoreResult();
+                c.CloseTransportConnection(e, default(CancellationToken)).IgnoreResult();
             }
-            catch {}
+            catch { }
 
             try
             {
@@ -1439,7 +1576,7 @@ namespace RobotRaconteurWeb
             {
                 try
                 {
-                   c.Close();
+                    c.Close();
                 }
                 catch { };
             }
@@ -1458,7 +1595,7 @@ namespace RobotRaconteurWeb
                 }
                 catch { };
             }
-            
+
             lock (endpoints)
             {
                 try
@@ -1468,13 +1605,13 @@ namespace RobotRaconteurWeb
                 catch { }
             }
 
-            
+
 
             //RobotRaconteurNode.sp = null;
         }
 
 
-        
+
         public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
         internal Discovery m_Discovery;
@@ -1485,11 +1622,11 @@ namespace RobotRaconteurWeb
         }
 
         internal void NodeDetected(NodeDiscoveryInfo n)
-        {            
+        {
             m_Discovery.NodeDetected(n);
         }
 
-        
+
         protected void CleanDiscoveredNodes()
         {
             m_Discovery.CleanDiscoveredNodes();
@@ -1497,7 +1634,7 @@ namespace RobotRaconteurWeb
 
         public static string SelectRemoteNodeURL(string[] urls)
         {
-            var url_order = new string[] { 
+            var url_order = new string[] {
                 "rr+local://",
                 "rr+pci://",
                 "rr+usb://",
@@ -1510,14 +1647,14 @@ namespace RobotRaconteurWeb
                 "rrs+tcp://[fe80",
                 "rrs+wss://[fe80",
                 "rrs+ws://[fe80",
-                "rrs+tcp://",                
-                "rrs+wss://",                
+                "rrs+tcp://",
+                "rrs+wss://",
                 "rrs+ws://",
                 "rr+tcp://[fe80",
                 "rr+wss://[fe80",
                 "rr+ws://[fe80",
-                "rr+tcp://",                
-                "rr+wss://",                
+                "rr+tcp://",
+                "rr+wss://",
                 "rr+ws://",
             };
 
@@ -1527,7 +1664,7 @@ namespace RobotRaconteurWeb
                 if (u1 != null) return u1;
             }
 
-            return urls.First() ;
+            return urls.First();
         }
 
 
@@ -1605,9 +1742,9 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only lock object opened through Robot Raconteur");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.RequestObjectLock(obj,flags, cancel);
+            return await s.RRContext.RequestObjectLock(obj, flags, cancel);
 
-            
+
         }
 
 
@@ -1630,12 +1767,12 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can be monitored by RobotRaconteurNode");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.MonitorEnter(obj,timeout, cancel);
+            return await s.RRContext.MonitorEnter(obj, timeout, cancel);
         }
 
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
         {
-            
+
             await lock_.stub.RRContext.MonitorExit(lock_, cancel);
         }
 
@@ -1676,10 +1813,10 @@ namespace RobotRaconteurWeb
 
         public string GetRandomString(int count)
         {
-            string o="";
+            string o = "";
             Random r = new Random();
             string strvals = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            
+
             for (int i = 0; i < count; i++)
             {
                 o += strvals[r.Next(0, (strvals.Length - 1))];
@@ -1693,7 +1830,7 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                lock(this)
+                lock (this)
                 {
                     return service_state_nonce;
                 }
@@ -1734,7 +1871,7 @@ namespace RobotRaconteurWeb
             return m_Discovery.SubscribeServiceByType(service_types, filter);
         }
 
-        public ServiceSubscription SubscribeService(string[] url, string username= null, Dictionary<string,object> credentials = null, string objecttype = null)
+        public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
         {
             return m_Discovery.SubscribeService(url, username, credentials, objecttype);
         }
@@ -1752,8 +1889,8 @@ namespace RobotRaconteurWeb
         }
 
         public void LogMessage(RobotRaconteur_LogLevel level, string message)
-        {            
-               LogRecord(new RRLogRecord() {Node=this, Level = level, Message = message });            
+        {
+            LogRecord(new RRLogRecord() { Node = this, Level = level, Message = message });
         }
 
         public void LogRecord(RRLogRecord record)
@@ -1772,7 +1909,7 @@ namespace RobotRaconteurWeb
 
         public RobotRaconteur_LogLevel SetLogLevelFromString(string loglevel)
         {
-            
+
             if (loglevel == "DISABLE")
             {
                 LogLevel = RobotRaconteur_LogLevel.Disable;
@@ -1780,7 +1917,7 @@ namespace RobotRaconteurWeb
             }
 
             if (loglevel == "FATAL")
-            { 
+            {
                 LogLevel = RobotRaconteur_LogLevel.Fatal;
                 return RobotRaconteur_LogLevel.Fatal;
             }
@@ -1842,34 +1979,34 @@ namespace RobotRaconteurWeb
 
 
     }
-        
+
     public class TimeSpec
     {
-        
+
         private static long start_ticks;
         private static long ticks_per_second;
 
         private static long start_seconds;
         private static int start_nanoseconds;
-        
+
         private static DateTime start_time;
         private static bool started = false;
 
         private static bool iswindows = false;
-        
+
         public long seconds;
         public int nanoseconds;
 
-        private static object start_lock=new object();
+        private static object start_lock = new object();
 
         public TimeSpec(long seconds, int nanoseconds)
         {
             this.seconds = seconds;
             this.nanoseconds = nanoseconds;
 
-            lock(start_lock)
+            lock (start_lock)
             {
-            if (!started) start();
+                if (!started) start();
             }
 
             cleanup_nanosecs();
@@ -1915,10 +2052,10 @@ namespace RobotRaconteurWeb
 
                         long diff_ticks = ticks - start_ticks;
                         long diff_secs = diff_ticks / ticks_per_second;
-                       
+
                         long diff_nanosecs = ((diff_ticks * (long)1e9) / ticks_per_second) % (long)1e9;
 
-                        
+
 
                         this.seconds = diff_secs + start_seconds;
                         this.nanoseconds = (int)diff_nanosecs + start_nanoseconds;
@@ -1926,10 +2063,10 @@ namespace RobotRaconteurWeb
                     else
                     {
                         TimeSpan t = DateTime.UtcNow.ToUniversalTime() - (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-						this.seconds = (long)Math.Round(t.TotalSeconds);
-						this.nanoseconds = (int)Math.IEEERemainder(t.TotalMilliseconds * 1e6, 1e9) ;
+                        this.seconds = (long)Math.Round(t.TotalSeconds);
+                        this.nanoseconds = (int)Math.IEEERemainder(t.TotalMilliseconds * 1e6, 1e9);
 
-                        
+
                     }
 
                 }
@@ -1952,8 +2089,8 @@ namespace RobotRaconteurWeb
                     iswindows = true;
                     QueryPerformanceCounter(out start_ticks);
                     QueryPerformanceFrequency(out ticks_per_second);
-                    
-                    
+
+
                 }
 #endif
 
@@ -1967,7 +2104,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        
+
 
 
         /*[DllImport("Kernel32.dll")]
@@ -1976,19 +2113,19 @@ namespace RobotRaconteurWeb
         [DllImport("Kernel32.dll")]
         private static extern bool QueryPerformanceFrequency(out long lpFrequency);*/
 
-        private static  bool QueryPerformanceCounter(out long lpPerformanceCount)
+        private static bool QueryPerformanceCounter(out long lpPerformanceCount)
         {
-            lpPerformanceCount=System.Diagnostics.Stopwatch.GetTimestamp();
+            lpPerformanceCount = System.Diagnostics.Stopwatch.GetTimestamp();
             return true;
         }
 
-        private static  bool QueryPerformanceFrequency(out long lpFrequency)
+        private static bool QueryPerformanceFrequency(out long lpFrequency)
         {
             lpFrequency = System.Diagnostics.Stopwatch.Frequency;
             return true;
         }
 
-        
+
 
         private void cleanup_nanosecs()
         {
@@ -1998,7 +2135,7 @@ namespace RobotRaconteurWeb
             nanoseconds = nanoseconds % (int)(1e9);
             seconds += nano_div;
 
-            
+
 
             if (seconds > 0 && nanoseconds < 0)
             {
@@ -2012,7 +2149,7 @@ namespace RobotRaconteurWeb
                 nanoseconds = nanoseconds - (int)1e9;
             }
 
-            
+
 
         }
 
@@ -2054,7 +2191,7 @@ namespace RobotRaconteurWeb
 
         public static bool operator <(TimeSpec t1, TimeSpec t2)
         {
-            return t2>= t1;
+            return t2 >= t1;
         }
 
         public static bool operator <=(TimeSpec t1, TimeSpec t2)
@@ -2071,13 +2208,13 @@ namespace RobotRaconteurWeb
 
         public override int GetHashCode()
         {
-            return nanoseconds+(int)seconds;
+            return nanoseconds + (int)seconds;
         }
     }
 
     public enum RobotRaconteurObjectLockFlags
     {
-        USER_LOCK=0,
+        USER_LOCK = 0,
         CLIENT_LOCK
     }
 }

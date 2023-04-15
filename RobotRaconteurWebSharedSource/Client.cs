@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -1048,6 +1049,11 @@ namespace RobotRaconteurWeb
                 ret.ServicePath = m.ServicePath;
                 ret.RequestID = m.RequestID;
                 RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
+
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Error processing callback call: {0}", e.ToString()), node,
+                    RobotRaconteur_LogComponent.Client, service_path: m.ServicePath, member: m.MemberName, endpoint: LocalEndpoint);
+#endif
 
             }
 

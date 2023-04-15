@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -645,7 +646,11 @@ namespace RobotRaconteurWeb
             }
                 catch (Exception e)
                 {
-                    ret = new MessageEntry(m.EntryType+1, m.MemberName);
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Error processing service entry: {0}", e.ToString()), node,
+                    RobotRaconteur_LogComponent.Service, service_path: m.ServicePath, member: m.MemberName, endpoint: c.LocalEndpoint);
+#endif
+                ret = new MessageEntry(m.EntryType+1, m.MemberName);
                     RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
 
                 }

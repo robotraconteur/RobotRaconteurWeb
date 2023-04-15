@@ -7,6 +7,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>$(DefineConstants);RR_LOG_DEBUG;RR_LOG_TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
