@@ -21,11 +21,10 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Text.RegularExpressions;
 using RobotRaconteurWeb.Extensions;
-using System.Security.Cryptography.X509Certificates;
 using System.Linq.Expressions;
 
 using static RobotRaconteurWeb.RRLogFuncs;
-using System.Xml.Linq;
+using System.IO;
 
 namespace RobotRaconteurWeb
 {
@@ -1403,7 +1402,7 @@ namespace RobotRaconteurWeb
 
                     await Task.WhenAny(Task.WhenAny(connecting_tasks), Task.Delay(250));
 
-                    if (connecting_tasks.Any(x => x.IsCompletedSuccessfully))
+                    if (connecting_tasks.Any(x => x.IsCompleted && x.Status == TaskStatus.RanToCompletion))
                     {
                         break;
                     }
@@ -1422,7 +1421,7 @@ namespace RobotRaconteurWeb
 
                         var completed_task = connecting_tasks.First(x => x.IsCompleted);
                         connecting_tasks.Remove(completed_task);
-                        if (completed_task.IsCompletedSuccessfully)
+                        if (completed_task.Status == TaskStatus.RanToCompletion)
                         {
                             r = await completed_task;
                             foreach (var t in connecting_tasks)
@@ -1903,8 +1902,14 @@ namespace RobotRaconteurWeb
                 return;
             }
 
+#if !ROBOTRACONTEUR_BRIDGE
             RRLogFuncs.WriteLogRecord(Console.Error, record);
             Console.Error.WriteLine();
+#else
+            var t = new StringWriter();
+            RRLogFuncs.WriteLogRecord(t, record);
+            Console.WriteLine(t.ToString());
+#endif
         }
 
         public RobotRaconteur_LogLevel SetLogLevelFromString(string loglevel)

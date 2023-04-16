@@ -60,8 +60,8 @@ Global
 		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{06048487-1017-44a9-9c2a-49e45eb070a9}*SharedItemsImports = 13
 		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{2b321cec-7aa3-437d-9340-19e8bd717bc0}*SharedItemsImports = 5
 		RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems*{36885650-cee6-417d-871b-489b7f2493ca}*SharedItemsImports = 5
-		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{58d9802b-f3a9-4abb-a35c-0bd5b3cab9e7}*SharedItemsImports = 4
-		RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems*{88a2b69f-af86-4dda-a0a3-9a3c45d27bed}*SharedItemsImports = 4
+		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{58d9802b-f3a9-4abb-a35c-0bd5b3cab9e7}*SharedItemsImports = 5
+		RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems*{88a2b69f-af86-4dda-a0a3-9a3c45d27bed}*SharedItemsImports = 5
 		RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems*{9648c599-747e-4bea-8af3-d24a07df8e22}*SharedItemsImports = 13
 		RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems*{fa3f5eb5-e868-4991-a62a-0e6f5ffafcf2}*SharedItemsImports = 5
 	EndGlobalSection

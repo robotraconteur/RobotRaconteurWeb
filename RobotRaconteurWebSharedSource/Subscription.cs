@@ -4,10 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Security.Cryptography.X509Certificates;
-using System.Collections.Specialized;
 using RobotRaconteurWeb.Extensions;
-using System.Linq.Expressions;
 
 namespace RobotRaconteurWeb
 {
@@ -208,10 +205,10 @@ namespace RobotRaconteurWeb
 
     interface IServiceSubscription
     {
-        internal void Init(string[] service_types, ServiceSubscriptionFilter filter);
-        internal void NodeUpdated(Discovery_nodestorage nodestorage);
-        internal void NodeLost(Discovery_nodestorage nodestorage);
-        public void Close();
+        void Init(string[] service_types, ServiceSubscriptionFilter filter);
+        void NodeUpdated(Discovery_nodestorage nodestorage);
+        void NodeLost(Discovery_nodestorage nodestorage);
+        void Close();
     }
 
     class ServiceInfo2Subscription_client
@@ -316,7 +313,7 @@ namespace RobotRaconteurWeb
                         var info2 = e.service_info2;
                         if (info.NodeName != info2.NodeName || info2.Name != info.Name ||
                             info2.RootObjectType != info.RootObjectType || info2.ConnectionURL != info.ConnectionURL ||
-                            !info.RootObjectImplements.ToHashSet().SetEquals(info2.RootObjectImplements.ToHashSet()))
+                            !new HashSet<string>(info.RootObjectImplements).SetEquals(new HashSet<string>(info2.RootObjectImplements)))
                         {
                             e.service_info2 = info;
                             ServiceDetected?.Invoke(this, k, info);
@@ -1497,7 +1494,7 @@ namespace RobotRaconteurWeb
                         if (ep!=null) {
                             ep.SendPacket(packet, cancel.Token).ContinueWith((t) =>
                             {
-                                if (t.IsCompletedSuccessfully)
+                                if (t.Status == TaskStatus.RanToCompletion)
                                 {
                                     lock(this)
                                     {

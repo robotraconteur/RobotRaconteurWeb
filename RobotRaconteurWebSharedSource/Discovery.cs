@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using RobotRaconteurWeb.Extensions;
-using System.Security.Cryptography;
 
 namespace RobotRaconteurWeb
 {

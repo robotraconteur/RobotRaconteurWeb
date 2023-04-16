@@ -272,6 +272,6 @@ namespace RobotRaconteurWeb
 
     public interface ILogRecordHandler
     {
-        public void Log(RRLogRecord record);
+        void Log(RRLogRecord record);
     }
 }

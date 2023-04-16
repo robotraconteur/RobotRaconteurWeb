@@ -166,7 +166,7 @@ namespace RobotRaconteurWeb
 
             public bool TaskCompleted { get { return tcs.Task.IsCompleted; } }
 
-            public bool TaskCompletedSuccessfully { get { return tcs.Task.IsCompletedSuccessfully; } }
+            public bool TaskCompletedSuccessfully { get { return tcs.Task.Status == TaskStatus.RanToCompletion; } }
 
             public void Dispose()
             {

@@ -620,7 +620,7 @@ namespace RobotRaconteurWeb
 
             ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionConnected, null);
 
-            c.TransportListeners+= delegate(Transport c, TransportListenerEventType evt, object param)
+            c.TransportListeners+= delegate(Transport _, TransportListenerEventType evt, object param)
             {
                 if (evt == TransportListenerEventType.TransportConnectionClosed &&  ((uint)param) == LocalEndpoint )
                 {

@@ -231,6 +231,11 @@ namespace RobotRaconteurWeb.Extensions
         {
             return t;
         }
+
+        public static Task ConfigureAwait(this Task t, bool v)
+        {
+            return t;
+        }
 #endif
 
     }
@@ -240,7 +245,7 @@ namespace RobotRaconteurWeb.Extensions
         public static string EscapeDataString(string s)
         {
 #if ROBOTRACONTEUR_BRIDGE
-            return Bridge.Script.EncodeURI(s);
+            return H5.Script.EncodeURI(s);
 #else
             return Uri.EscapeDataString(s);
 #endif
@@ -249,7 +254,7 @@ namespace RobotRaconteurWeb.Extensions
         public static string UnescapeDataString(string s)
         {
 #if ROBOTRACONTEUR_BRIDGE
-            return Bridge.Script.DecodeURI(s);
+            return H5.Script.DecodeURI(s);
 #else
             return Uri.UnescapeDataString(s);
 #endif
