@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -128,13 +129,13 @@ namespace RobotRaconteurWeb
         public async Task SendPipeMessage(MessageEntry m, Endpoint e, CancellationToken cancel)
         {
             m.ServicePath = ServicePath;
-            await RRContext.SendMessage(m, e, cancel);
+            await RRContext.SendMessage(m, e, cancel).ConfigureAwait(false);
         }
 
         public async Task SendWireMessage(MessageEntry m, Endpoint e, CancellationToken cancel)
         {
             m.ServicePath = ServicePath;
-            await RRContext.SendMessage(m, e, cancel);
+            await RRContext.SendMessage(m, e, cancel).ConfigureAwait(false);
         }
 
         public virtual void DispatchPipeMessage(MessageEntry m, Endpoint e) { }
@@ -209,7 +210,7 @@ namespace RobotRaconteurWeb
             {
                 throw new InvalidOperationException("Invalid generator");
             }
-            return await gen.CallNext(m);
+            return await gen.CallNext(m).ConfigureAwait(false);
         }
     }
 
@@ -333,7 +334,7 @@ namespace RobotRaconteurWeb
             //mm.header.ReceiverEndpoint = RemoteEndpoint;
             mm.entries.Add(m);
 
-            await e.SendMessage(mm, cancel);
+            await e.SendMessage(mm, cancel).ConfigureAwait(false);
 
 
         }
@@ -437,7 +438,7 @@ namespace RobotRaconteurWeb
 
                         }
 
-                        skel1 = await t;
+                        skel1 = await t.ConfigureAwait(false);
                     }
                     finally
                     {
@@ -461,7 +462,7 @@ namespace RobotRaconteurWeb
         {
             m_CurrentServicePath = ppath1;
             m_CurrentServerContext = this;
-            object obj1 = await skel.GetSubObj(objname);
+            object obj1 = await skel.GetSubObj(objname).ConfigureAwait(false);
             m_CurrentServicePath = null;
             m_CurrentServerContext = null;
 
@@ -488,7 +489,7 @@ namespace RobotRaconteurWeb
         public virtual async Task<string> GetObjectType(string servicepath)
         {
             
-            ServiceSkel s = await GetObjectSkel(servicepath);
+            ServiceSkel s = await GetObjectSkel(servicepath).ConfigureAwait(false);
 
             if (s is ServiceSkelDynamic)
             {
@@ -525,7 +526,7 @@ namespace RobotRaconteurWeb
                     //ClientSessionOp methods
                     if (m.EntryType == MessageEntryType.ClientSessionOpReq)
                     {
-                        return await ClientSessionOp(m, c);
+                        return await ClientSessionOp(m, c).ConfigureAwait(false);
 
                     }
 
@@ -552,14 +553,14 @@ namespace RobotRaconteurWeb
 
                     if (m.EntryType == MessageEntryType.PipePacket || m.EntryType == MessageEntryType.PipePacketRet)
                     {
-                        (await GetObjectSkel(m.ServicePath)).DispatchPipeMessage(m, c);
+                        (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchPipeMessage(m, c);
                         ret = null;
                         noreturn = true;
                     }
 
                     if (m.EntryType == MessageEntryType.WirePacket)
                     {
-                        (await GetObjectSkel(m.ServicePath)).DispatchWireMessage(m, c);
+                        (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchWireMessage(m, c);
                         ret = null;
                         noreturn = true;
                     }
@@ -575,46 +576,46 @@ namespace RobotRaconteurWeb
 
                     if (m.EntryType == MessageEntryType.PropertyGetReq)
                     {
-                        ServiceSkel skel=await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel=await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallGetProperty(m);
+                        ret = await skel.CallGetProperty(m).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.PropertySetReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallSetProperty(m);
+                        ret = await skel.CallSetProperty(m).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.FunctionCallReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallFunction(m);
+                        ret = await skel.CallFunction(m).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.PipeConnectReq || m.EntryType==MessageEntryType.PipeDisconnectReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallPipeFunction(m,c);
+                        ret = await skel.CallPipeFunction(m,c).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.WireConnectReq || m.EntryType == MessageEntryType.WireDisconnectReq || m.EntryType == MessageEntryType.WirePeekInValueReq || m.EntryType == MessageEntryType.WirePeekOutValueReq || m.EntryType == MessageEntryType.WirePokeOutValueReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallWireFunction(m, c);
+                        ret = await skel.CallWireFunction(m, c).ConfigureAwait(false);
                     }
 
                     
 
                     if (m.EntryType == MessageEntryType.MemoryWrite || m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret=await skel.CallMemoryFunction(m, c);
+                        ret=await skel.CallMemoryFunction(m, c).ConfigureAwait(false);
                     }
 
                     else if (m.EntryType == MessageEntryType.CallbackCallRet)
@@ -636,16 +637,20 @@ namespace RobotRaconteurWeb
                     }
                 else if (m.EntryType == MessageEntryType.GeneratorNextReq)
                 {
-                    var skel = await GetObjectSkel(m.ServicePath);
+                    var skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                     check_lock(skel, m);
-                    ret = await skel.CallGeneratorNext(m, c);
+                    ret = await skel.CallGeneratorNext(m, c).ConfigureAwait(false);
                     noreturn = true;
                 }
 
             }
                 catch (Exception e)
                 {
-                    ret = new MessageEntry(m.EntryType+1, m.MemberName);
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Error processing service entry: {0}", e.ToString()), node,
+                    RobotRaconteur_LogComponent.Service, service_path: m.ServicePath, member: m.MemberName, endpoint: c.LocalEndpoint);
+#endif
+                ret = new MessageEntry(m.EntryType+1, m.MemberName);
                     RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
 
                 }
@@ -738,12 +743,12 @@ namespace RobotRaconteurWeb
                     return;
                 }               
 
-                MessageEntry mmret=await ProcessMessageEntry(mm,e);
+                MessageEntry mmret=await ProcessMessageEntry(mm, e).ConfigureAwait(false);
                 if (mmret!=null)
                 mret.entries.Add(mmret);
             }
             if (mret.entries.Count > 0)
-            await e.SendMessage(mret,default(CancellationToken));
+            await e.SendMessage(mret,default(CancellationToken)).ConfigureAwait(false);
         }
 
         public virtual void AddClient(ServerEndpoint cendpoint)
@@ -819,12 +824,12 @@ namespace RobotRaconteurWeb
             catch { }
         }
 
-        public virtual MessageElementStructure PackStructure(Object s)
+        public virtual MessageElementNestedElementList PackStructure(Object s)
         {
             return ServiceDef.PackStructure(s); ;
         }
 
-        public virtual T UnpackStructure<T>(MessageElementStructure l)
+        public virtual T UnpackStructure<T>(MessageElementNestedElementList l)
         {
             return ServiceDef.UnpackStructure<T>(l);
         }
@@ -864,7 +869,7 @@ namespace RobotRaconteurWeb
             return ServiceDef.UnpackListType<T>(o);
         }
 
-        public virtual MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray o)
+        public virtual MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList o)
         {
             return ServiceDef.UnpackMultiDimArray(o);
         }
@@ -920,7 +925,7 @@ namespace RobotRaconteurWeb
                 case "MonitorExit":
                     {
 
-                        await ClientLockOp(m, ret);
+                        await ClientLockOp(m, ret).ConfigureAwait(false);
                         return ret;
                     }
 
@@ -973,7 +978,7 @@ namespace RobotRaconteurWeb
 
             string servicepath = m.ServicePath;
 
-            ServiceSkel skel = await GetObjectSkel(servicepath);
+            ServiceSkel skel = await GetObjectSkel(servicepath).ConfigureAwait(false);
 
             switch (m.MemberName)
             {
@@ -1043,7 +1048,7 @@ namespace RobotRaconteurWeb
                             s = new MonitorObjectSkel(skel);
                             timeout = m.FindElement("timeout").CastData<int[]>()[0];
                         }
-                        string retcode = await s.MonitorEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint, timeout);
+                        string retcode = await s.MonitorEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint, timeout).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
 
                         break;
@@ -1056,7 +1061,7 @@ namespace RobotRaconteurWeb
                             if (!skel.monitorlocks.ContainsKey(ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Not acquiring monitor lock");
                             s = skel.monitorlocks[ServerEndpoint.CurrentEndpoint.LocalEndpoint];
                         }
-                        string retcode = await s.MonitorContinueEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint);
+                        string retcode = await s.MonitorContinueEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
                         break;
                     }
@@ -1067,7 +1072,7 @@ namespace RobotRaconteurWeb
                         {
                             if (skel.monitorlock.LocalEndpoint != (ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Not monitor locked");
                         }
-                        string retcode = await skel.monitorlock.MonitorExit(ServerEndpoint.CurrentEndpoint.LocalEndpoint);
+                        string retcode = await skel.monitorlock.MonitorExit(ServerEndpoint.CurrentEndpoint.LocalEndpoint).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
                         break;
 
@@ -1451,11 +1456,11 @@ namespace RobotRaconteurWeb
 
                 Func<Task> r = async delegate()
                 {
-                    await SendMessage(m, e, cancel);
-                    rec_message = await rec_source.Task;
+                    await SendMessage(m, e, cancel).ConfigureAwait(false);
+                    rec_message = await rec_source.Task.ConfigureAwait(false);
                 };
 
-                await r().AwaitWithTimeout((int)node.RequestTimeout);
+                await r().AwaitWithTimeout((int)node.RequestTimeout).ConfigureAwait(false);
             }
             finally
             {
@@ -1526,7 +1531,7 @@ namespace RobotRaconteurWeb
             }
             try
             {
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             catch { }
             
@@ -1584,7 +1589,7 @@ namespace RobotRaconteurWeb
 
                 try
                 {
-                    await wait_event.Task.AwaitWithTimeout(5000);
+                    await wait_event.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
                 }
                 catch { }
 
@@ -1618,7 +1623,7 @@ namespace RobotRaconteurWeb
                 //wait_event.WaitOne(5000);
                 try
                 {
-                    await wait_event.Task.AwaitWithTimeout(5000);
+                    await wait_event.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
                 }
                 catch { }
 
@@ -1655,7 +1660,7 @@ namespace RobotRaconteurWeb
                 IDisposable l=null;
                 try
                 {
-                    l=await obj.RobotRaconteurMonitorEnter(timeout);
+                    l=await obj.RobotRaconteurMonitorEnter(timeout).ConfigureAwait(false);
                     monitor_acquired = true;
                     skel.monitorlock = this;
                 }
@@ -1680,7 +1685,7 @@ namespace RobotRaconteurWeb
                     {
                         try
                         {
-                            await monitor_thread_event.Task.AwaitWithTimeout(30000);
+                            await monitor_thread_event.Task.AwaitWithTimeout(30000).ConfigureAwait(false);
                         }
                         catch
                         {                            

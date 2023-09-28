@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AsyncMutex.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BroadcastDownsampler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CallbackMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Endpoint.cs" />
@@ -18,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IOUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MemoryMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArray.cs" />
@@ -32,8 +34,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServiceDefinition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceStructure.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Subscription.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Timer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timespec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WireMember.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Discovery.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceIndexer.cs" />
   </ItemGroup>
 </Project>

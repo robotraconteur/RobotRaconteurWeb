@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3_stubskel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RRAssert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTest2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient.cs" />

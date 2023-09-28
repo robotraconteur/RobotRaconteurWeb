@@ -96,7 +96,7 @@ namespace RobotRaconteurWeb
 
         private async Task RunOne()
         {
-            await Task.Delay(Period);
+            await Task.Delay(Period).ConfigureAwait(false);
             
             if (!cancel.IsCancellationRequested)
             {
@@ -203,7 +203,7 @@ namespace RobotRaconteurWeb
             var p2 = last_time + TimeSpan.FromMilliseconds(period);
             try
             {
-                await Task.Delay((int)(p2 - node.UtcNow).TotalMilliseconds);
+                await Task.Delay((int)(p2 - node.UtcNow).TotalMilliseconds).ConfigureAwait(false);
             }
             catch { }
             last_time = p2;            

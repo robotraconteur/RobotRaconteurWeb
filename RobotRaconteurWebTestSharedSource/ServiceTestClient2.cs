@@ -47,7 +47,7 @@ namespace RobotRaconteurTest
         {
             await ConnectService(url);
 
-            if (await r.get_testenum1_prop() != testenum1.anothervalue) throw new Exception();
+            RRAssert.AreEqual(await r.get_testenum1_prop(), testenum1.anothervalue);
             await r.set_testenum1_prop(testenum1.hexval1);
 
             await r.get_o4();
@@ -77,12 +77,12 @@ namespace RobotRaconteurTest
         {
 
             var v = await r.peekwire.PeekInValue();
-            if (v.Item1 != 56295674) throw new Exception();
+            RRAssert.AreEqual(v.Item1, 56295674);
 
 
             await r.pokewire.PokeOutValue(75738265);
             var v2 = await r.pokewire.PeekOutValue();
-            if (v2.Item1 != 75738265) throw new Exception();
+            RRAssert.AreEqual(v2.Item1, 75738265);
 
             var w = await r.pokewire.Connect();
             for (int i = 0; i < 3; i++)
@@ -93,13 +93,12 @@ namespace RobotRaconteurTest
             Thread.Sleep(100);
 
             var v3 = await r.pokewire.PeekOutValue();
-            if (v3.Item1 != 8638356) throw new Exception();
+            RRAssert.AreEqual(v3.Item1, 8638356);
         }
 
         public async Task TestEnums()
         {
-            if (await r.get_testenum1_prop() != testenum1.anothervalue)
-                throw new Exception("");
+            RRAssert.AreEqual(await r.get_testenum1_prop(), testenum1.anothervalue);
 
             await r.set_testenum1_prop(testenum1.hexval1);
 
@@ -195,7 +194,7 @@ namespace RobotRaconteurTest
                 ServiceTest2_pod.fill_testpod2(ref o1[i], 59174 + i);
             }
 
-            if (await r.pod_m1.GetLength() != 1024) throw new Exception("");
+            RRAssert.AreEqual(await r.pod_m1.GetLength(), 1024UL);
 
             await r.pod_m1.Write(52, o1, 3, 17);
 
@@ -274,7 +273,7 @@ namespace RobotRaconteurTest
             for (uint i = 0; i < s.Length; i++)
                 ServiceTest2_pod.fill_transform(ref s[i], 79174 + i);
 
-            if (await r.namedarray_m1.GetLength() != 512) throw new Exception();
+            RRAssert.AreEqual(await r.namedarray_m1.GetLength(), 512UL);
             await r.namedarray_m1.Write(23, s, 3, 21);
 
             var s2 = new transform[32];
@@ -306,12 +305,12 @@ namespace RobotRaconteurTest
 
         public void ca<T>(T[] v1, T[] v2, int count = -1)
         {
-            if (v1.Length != v2.Length) throw new Exception();
+            RRAssert.AreEqual(v1.Length, v2.Length);
             int len = v1.Length;
             if (count > 0) len = count;
             for (int i = 0; i < count; i++)
             {
-                if (!Object.Equals(v1[i], v2[i])) throw new Exception();
+                RRAssert.IsTrue(Object.Equals(v1[i], v2[i]));
             }
         }
 
@@ -335,7 +334,7 @@ namespace RobotRaconteurTest
         async Task TestComplex()
         {
             var c1_1 = new CDouble(5.708705e+01, -2.328294e-03);
-            if (await r.get_c1() != c1_1) throw new Exception();
+            RRAssert.AreEqual(await r.get_c1(), c1_1);
 
             var c1_2 = new CDouble(5.708705e+01, -2.328294e-03);
             await r.set_c1(c1_2);
@@ -368,7 +367,7 @@ namespace RobotRaconteurTest
             await r.set_c5(c5_2);
 
             var c7_1 = new CSingle(-5.527021e-18f, -9.848457e+03f);
-            if (await r.get_c7() != c7_1) throw new Exception();
+            RRAssert.AreEqual(await r.get_c7(), c7_1);
 
             var c7_2 = new CSingle(9.303345e-12f, -3.865684e-05f);
             await r.set_c7(c7_2);

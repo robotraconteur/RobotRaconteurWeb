@@ -172,7 +172,7 @@ namespace RobotRaconteurWeb
 
             var connection = new LocalClientTransport(this);
             connection.ReceiveTimeout = DefaultReceiveTimeout;
-            await connection.Connect(new NetworkStream(socket, true), url, e, cancel);
+            await connection.Connect(new NetworkStream(socket, true), url, e, cancel).ConfigureAwait(false);
             return connection;
         }
 
@@ -433,14 +433,14 @@ namespace RobotRaconteurWeb
                 transportopen = true;
             }
 
-            await Task.Delay(10);
+            await Task.Delay(10).ConfigureAwait(false);
 
             try
             {
                
                 while (!close_token.IsCancellationRequested)
                 {                    
-                    var s2 = await socket.AcceptAsync();
+                    var s2 = await socket.AcceptAsync().ConfigureAwait(false);
 
                     ClientConnected(new NetworkStream(s2, true));
                 }
@@ -512,7 +512,7 @@ namespace RobotRaconteurWeb
             }
             try
             {
-                await TransportConnections[m.header.SenderEndpoint].SendMessage(m, cancel);
+                await TransportConnections[m.header.SenderEndpoint].SendMessage(m, cancel).ConfigureAwait(false);
             }
             catch (System.Collections.Generic.KeyNotFoundException)
             {
@@ -683,7 +683,7 @@ namespace RobotRaconteurWeb
             {
                 lock (parent)
                 {
-                    parent.TransportConnections.Remove(transport.LocalEndpoint);
+                    parent.RemoveTransportConnection(transport.LocalEndpoint);
                 }
             }
 
@@ -740,7 +740,7 @@ namespace RobotRaconteurWeb
             m_LocalEndpoint = e.LocalEndpoint;
 
             m_Connected = true;
-            await ConnectStream(socket, true, null, null, false, false, parenttransport.HeartbeatPeriod, cancel);
+            await ConnectStream(socket, true, null, null, false, false, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
 
             parenttransport.TransportConnections.Add(LocalEndpoint, this);
         }
@@ -788,7 +788,7 @@ namespace RobotRaconteurWeb
             //socket.Client.NoDelay = true;
 
             m_Connected = true;
-            await ConnectStream(socket, true, null, null, false, false, parenttransport.HeartbeatPeriod, cancel);
+            await ConnectStream(socket, true, null, null, false, false, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
         }
 
 
@@ -1876,7 +1876,7 @@ namespace RobotRaconteurWeb
 
         public async Task Refresh(CancellationToken token)
         {
-            var n = await transport.GetDetectedNodes(token);
+            var n = await transport.GetDetectedNodes(token).ConfigureAwait(false);
             foreach (var n1 in n)
             {
                 node.NodeDetected(n1);
@@ -1887,7 +1887,7 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                Refresh(default(CancellationToken)).GetAwaiter().GetResult();
+                _ = Refresh(default(CancellationToken)).IgnoreResult();
             }
             catch (Exception) { }
         }
@@ -1896,7 +1896,7 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                Refresh(default(CancellationToken)).GetAwaiter().GetResult();
+                _ = Refresh(default(CancellationToken)).IgnoreResult();
             }
             catch (Exception) { }
         }

@@ -25,10 +25,10 @@ using RobotRaconteurWeb.Extensions;
 namespace RobotRaconteurWeb
 {    
     public interface IStructureStub
-    {        
-        MessageElementStructure PackStructure(Object s);
+    {
+        MessageElementNestedElementList PackStructure(Object s);
                 
-        T UnpackStructure<T>(MessageElementStructure m);
+        T UnpackStructure<T>(MessageElementNestedElementList m);
     }
 
     public interface IPodStub
@@ -40,21 +40,21 @@ namespace RobotRaconteurWeb
 
     public abstract class PodStub<T> : IPodStub where T : struct
     {
-        public abstract MessageElementPod PackPod(ref T s);
+        public abstract MessageElementNestedElementList PackPod(ref T s);
 
-        public abstract T UnpackPod(MessageElementPod m);
+        public abstract T UnpackPod(MessageElementNestedElementList m);
 
 
-        public virtual MessageElementPodArray PackPodToArray(ref T s2)
+        public virtual MessageElementNestedElementList PackPodToArray(ref T s2)
         {
             var mm = new List<MessageElement>();
             MessageElementUtil.AddMessageElement(mm,
                 MessageElementUtil.NewMessageElement(0, PackPod(ref s2))
                 );
-            return new MessageElementPodArray(TypeName, mm);
+            return new MessageElementNestedElementList(DataTypes.pod_array_t, TypeName, mm);
         }
 
-        public virtual MessageElementPodArray PackPodArray(T[] s2)
+        public virtual MessageElementNestedElementList PackPodArray(T[] s2)
         {
             if (s2 == null) return null;
 
@@ -65,34 +65,34 @@ namespace RobotRaconteurWeb
                     MessageElementUtil.NewMessageElement(i, PackPod(ref s2[i]))
                     );
             }
-            return new MessageElementPodArray(TypeName, mm);
+            return new MessageElementNestedElementList(DataTypes.pod_array_t, TypeName, mm);
         }
 
-        public virtual MessageElementPodMultiDimArray PackPodMultiDimArray(PodMultiDimArray s3)
+        public virtual MessageElementNestedElementList PackPodMultiDimArray(PodMultiDimArray s3)
         {
             if (s3 == null) return null;
             var l = new List<MessageElement>();
             MessageElementUtil.AddMessageElement(l, "dims", s3.Dims);
             var s4 = PackPodArray((T[])s3.pod_array);
             MessageElementUtil.AddMessageElement(l, "array", s4);
-            return new MessageElementPodMultiDimArray(TypeName, l);
+            return new MessageElementNestedElementList(DataTypes.pod_multidimarray_t,TypeName, l);
         }
 
-        public virtual T UnpackPodFromArray(MessageElementPodArray s2)
+        public virtual T UnpackPodFromArray(MessageElementNestedElementList s2)
         {
-            if (s2.Type != TypeName) throw new DataTypeException("pod type mismatch");
+            if (s2.TypeName != TypeName) throw new DataTypeException("pod type mismatch");
             var cdataElements = s2.Elements;
             if (cdataElements.Count != 1) throw new DataTypeException("pod type mismatch");
             var e = cdataElements[0];
             if (0 != MessageElementUtil.GetMessageElementNumber(e)) throw new DataTypeException("Error in list format");
-            var md = (MessageElementPod)e.Data;
+            var md = e.CastDataToNestedList(DataTypes.pod_t);
             return UnpackPod(md);
 
         }
 
-        public virtual T[] UnpackPodArray(MessageElementPodArray s2)
+        public virtual T[] UnpackPodArray(MessageElementNestedElementList s2)
         {
-            if (s2.Type != TypeName) throw new DataTypeException("pod type mismatch");
+            if (s2.TypeName != TypeName) throw new DataTypeException("pod type mismatch");
             int count = 0;
             {
                 var cdataElements = s2.Elements;
@@ -100,21 +100,21 @@ namespace RobotRaconteurWeb
                 foreach (MessageElement e in cdataElements)
                 {
                     if (count != MessageElementUtil.GetMessageElementNumber(e)) throw new DataTypeException("Error in list format");
-                    o[count] = UnpackPod((MessageElementPod)e.Data);
+                    o[count] = UnpackPod(e.CastDataToNestedList(DataTypes.pod_t));
                     count++;
                 }
                 return o;
             }
         }
 
-        public virtual PodMultiDimArray UnpackPodMultiDimArray(MessageElementPodMultiDimArray s3)
+        public virtual PodMultiDimArray UnpackPodMultiDimArray(MessageElementNestedElementList s3)
         {
-            if (s3.Type != TypeName) throw new DataTypeException("pod type mismatch");
+            if (s3.TypeName != TypeName) throw new DataTypeException("pod type mismatch");
             var o = new PodMultiDimArray();
             var marrayElements = s3.Elements;
             {
                 o.Dims = (MessageElementUtil.FindElementAndCast<uint[]>(marrayElements, "dims"));
-                var s2 = (MessageElementUtil.FindElementAndCast<MessageElementPodArray>(marrayElements, "array"));
+                var s2 = (MessageElementUtil.FindElementAndCast<MessageElementNestedElementList>(marrayElements, "array"));
                 o.pod_array = UnpackPodArray(s2);                
             }
             return o;
@@ -150,17 +150,17 @@ namespace RobotRaconteurWeb
                 
                 return UnpackPod(m2);           
             }*/
-
-            var m3 = m as MessageElementPodArray;
-            if (m3 != null)
+            var m2 = (MessageElementNestedElementList)m;
+            
+            if (m2.Type == DataTypes.pod_array_t)
             {
-                return UnpackPodArray(m3);
+                return UnpackPodArray(m2);
             }
 
-            var m4 = m as MessageElementPodMultiDimArray;
-            if (m4 != null)
+
+            if (m2.Type == DataTypes.pod_multidimarray_t)
             {
-                return UnpackPodMultiDimArray(m4);
+                return UnpackPodMultiDimArray(m2);
             }
 
             throw new DataTypeException("Unexpected message element type for UnpackPod");
@@ -203,17 +203,17 @@ namespace RobotRaconteurWeb
 
     public interface INamedArrayStub<T> : INamedArrayStub
     {
-        MessageElementNamedArray PackNamedArrayStructToArray(ref T s2);
+        MessageElementNestedElementList PackNamedArrayStructToArray(ref T s2);
 
-        MessageElementNamedArray PackNamedArray(T[] s2);
+        MessageElementNestedElementList PackNamedArray(T[] s2);
 
-        MessageElementNamedMultiDimArray PackNamedMultiDimArray(NamedMultiDimArray s3);
+        MessageElementNestedElementList PackNamedMultiDimArray(NamedMultiDimArray s3);
 
-        T UnpackNamedArrayStructFromArray(MessageElementNamedArray s2);
+        T UnpackNamedArrayStructFromArray(MessageElementNestedElementList s2);
 
-        T[] UnpackNamedArray(MessageElementNamedArray s2);
+        T[] UnpackNamedArray(MessageElementNestedElementList s2);
 
-        NamedMultiDimArray UnpackNamedMultiDimArray(MessageElementNamedMultiDimArray s3);
+        NamedMultiDimArray UnpackNamedMultiDimArray(MessageElementNestedElementList s3);
     }
 
     public abstract class NamedArrayStub<T, U> : INamedArrayStub<T> where T : struct
@@ -227,17 +227,17 @@ namespace RobotRaconteurWeb
         public abstract T[] GetNamedArrayFromNumericArray(U[] m);
 
 
-        public virtual MessageElementNamedArray PackNamedArrayStructToArray(ref T s2)
+        public virtual MessageElementNestedElementList PackNamedArrayStructToArray(ref T s2)
         {
             var mm = new List<MessageElement>();
             MessageElementUtil.AddMessageElement(mm,
                 MessageElementUtil.NewMessageElement("array", GetNumericArrayFromNamedArrayStruct(ref s2))
                 );
 
-            return new MessageElementNamedArray(TypeName, mm);
+            return new MessageElementNestedElementList(DataTypes.namedarray_array_t, TypeName, mm);
         }
 
-        public virtual MessageElementNamedArray PackNamedArray(T[] s2)
+        public virtual MessageElementNestedElementList PackNamedArray(T[] s2)
         {
             if (s2 == null) return null;
             var mm = new List<MessageElement>();
@@ -245,44 +245,44 @@ namespace RobotRaconteurWeb
                 MessageElementUtil.NewMessageElement("array", GetNumericArrayFromNamedArray(s2))
                 );
 
-            return new MessageElementNamedArray(TypeName, mm);
+            return new MessageElementNestedElementList(DataTypes.namedarray_array_t, TypeName, mm);
         }
 
-        public virtual MessageElementNamedMultiDimArray PackNamedMultiDimArray(NamedMultiDimArray s3)
+        public virtual MessageElementNestedElementList PackNamedMultiDimArray(NamedMultiDimArray s3)
         {
             if (s3 == null) return null;
             var l = new List<MessageElement>();
 
             MessageElementUtil.AddMessageElement(l, "dims", s3.Dims);
             MessageElementUtil.AddMessageElement(l, "array", PackNamedArray((T[])s3.namedarray_array));
-            return new MessageElementNamedMultiDimArray(TypeName, l);
+            return new MessageElementNestedElementList(DataTypes.namedarray_multidimarray_t, TypeName, l);
         }
 
-        public virtual T UnpackNamedArrayStructFromArray(MessageElementNamedArray s2)
+        public virtual T UnpackNamedArrayStructFromArray(MessageElementNestedElementList s2)
         {
-            if (s2.Type != TypeName) throw new DataTypeException("namedarray type mismatch");
+            if (s2.TypeName != TypeName) throw new DataTypeException("namedarray type mismatch");
             var cdataElements = s2.Elements;
-            if (cdataElements.Count != 1) throw new DataTypeException("pod type mismatch");
+            if (cdataElements.Count != 1) throw new DataTypeException("namedarray type mismatch");
             var a = MessageElementUtil.FindElementAndCast<U[]>(cdataElements, "array");
             return GetNamedArrayStructFromNumericArray(a);
         }
 
-        public virtual T[] UnpackNamedArray(MessageElementNamedArray s2)
+        public virtual T[] UnpackNamedArray(MessageElementNestedElementList s2)
         {
-            if (s2.Type != TypeName) throw new DataTypeException("namedarray type mismatch");
+            if (s2.TypeName != TypeName) throw new DataTypeException("namedarray type mismatch");
             var cdataElements = s2.Elements;
-            if (cdataElements.Count != 1) throw new DataTypeException("pod type mismatch");
+            if (cdataElements.Count != 1) throw new DataTypeException("namedarray type mismatch");
             var a = MessageElementUtil.FindElementAndCast<U[]>(cdataElements, "array");
             return GetNamedArrayFromNumericArray(a);
         }
 
-        public virtual NamedMultiDimArray UnpackNamedMultiDimArray(MessageElementNamedMultiDimArray s3)
+        public virtual NamedMultiDimArray UnpackNamedMultiDimArray(MessageElementNestedElementList s3)
         {
-            if (s3.Type != TypeName) throw new DataTypeException("pod type mismatch");
+            if (s3.TypeName != TypeName) throw new DataTypeException("namedarray type mismatch");
             var o = new NamedMultiDimArray();
             var marrayElements = s3.Elements;
             o.Dims = (MessageElementUtil.FindElementAndCast<uint[]>(marrayElements, "dims"));
-            var s2 = (MessageElementUtil.FindElementAndCast<MessageElementNamedArray>(marrayElements, "array"));
+            var s2 = (MessageElementUtil.FindElementAndCast<MessageElementNestedElementList>(marrayElements, "array"));
             o.namedarray_array = UnpackNamedArray(s2);
             return o;
         }
@@ -317,17 +317,16 @@ namespace RobotRaconteurWeb
                 
                 return UnpackPod(m2);           
             }*/
-
-            var m3 = m as MessageElementNamedArray;
-            if (m3 != null)
+            var m2 = (MessageElementNestedElementList)m;
+            
+            if (m2.Type ==DataTypes.namedarray_array_t)
             {
-                return UnpackNamedArray(m3);
+                return UnpackNamedArray(m2);
             }
 
-            var m4 = m as MessageElementNamedMultiDimArray;
-            if (m4 != null)
+            if (m2.Type == DataTypes.namedarray_multidimarray_t)                
             {
-                return UnpackNamedMultiDimArray(m4);
+                return UnpackNamedMultiDimArray(m2);
             }
 
             throw new DataTypeException("Unexpected message element type for UnpackNamedArray");

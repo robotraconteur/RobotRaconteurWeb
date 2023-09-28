@@ -17,8 +17,9 @@ public class com__robotraconteur__testing__TestService2Factory : ServiceFactory
     }
     public override string GetServiceName() {return "com.robotraconteur.testing.TestService2";}
     public ostruct2_stub ostruct2_stubentry;
+    public com__robotraconteur__testing__TestService2Factory() : this(null,null) {}
     public com__robotraconteur__testing__TestService2Factory(RobotRaconteurNode node = null, ClientContext context = null) : base(node,context)
-{
+    {
     ostruct2_stubentry=new ostruct2_stub(this,this.node,this.context);
     }
     public override IStructureStub FindStructureStub(string objecttype)
@@ -88,14 +89,14 @@ public class ostruct2_stub : IStructureStub {
     private com__robotraconteur__testing__TestService2Factory def;
     private RobotRaconteurNode rr_node;
     private ClientContext rr_context;
-    public MessageElementStructure PackStructure(object s1) {
+    public MessageElementNestedElementList PackStructure(object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     ostruct2 s = (ostruct2)s1;
     MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("a1",s.a1));
-    return new MessageElementStructure("com.robotraconteur.testing.TestService2.ostruct2",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t,"com.robotraconteur.testing.TestService2.ostruct2",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     ostruct2 s=new ostruct2();
     s.a1 =MessageElementUtil.UnpackArray<double>(MessageElement.FindElement(m.Elements,"a1"));
@@ -117,31 +118,31 @@ public class baseobj_stub : ServiceStub , baseobj {
     }
     public async Task<double> get_d1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<double>(me));
         }
     public async Task set_d1(double value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double[]> get_d2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<double>(me);
         }
     public async Task set_d2(double[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double> func3(double d1, double d2, CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func3");
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d1",d1));
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d2",d2));
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     return (MessageElementUtil.UnpackScalar<double>(rr_me.FindElement("return")));
     }
     public event Action ev1;
@@ -159,7 +160,7 @@ public class baseobj_stub : ServiceStub , baseobj {
     }
     }
     public async Task<subobj> get_o5(CancellationToken cancel=default(CancellationToken)) {
-    return (subobj)await FindObjRefTyped("o5","com.robotraconteur.testing.TestService2.subobj",cancel);
+    return (subobj)await FindObjRefTyped("o5","com.robotraconteur.testing.TestService2.subobj",cancel).ConfigureAwait(false);
     }
     public Pipe<double[]> p1 {
     get { return rr_p1;  }
@@ -195,7 +196,7 @@ public class baseobj_stub : ServiceStub , baseobj {
     case "cb2": {
     double d1=(MessageElementUtil.UnpackScalar<double>(rr_m.FindElement("d1")));
     double d2=(MessageElementUtil.UnpackScalar<double>(rr_m.FindElement("d2")));
-    await this.cb2.Function(d1, d2, default(CancellationToken));
+    await this.cb2.Function(d1, d2, default(CancellationToken)).ConfigureAwait(false);
     MessageElementUtil.AddMessageElement(rr_mr,MessageElementUtil.PackScalar<int>("return",0));
     break;
     }
@@ -221,7 +222,7 @@ public class subobj_stub : ServiceStub , subobj {
     public async Task<double> add_val(double v, CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"add_val");
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("v",v));
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     return (MessageElementUtil.UnpackScalar<double>(rr_me.FindElement("return")));
     }
     protected override void DispatchEvent(MessageEntry rr_m) {
@@ -267,13 +268,13 @@ public class baseobj_skel : ServiceSkel {
     switch (ename) {
     case "d1":
     {
-    double ret=await obj.get_d1();
+    double ret=await obj.get_d1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
     break;
     }
     case "d2":
     {
-    double[] ret=await obj.get_d2();
+    double[] ret=await obj.get_d2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<double>("value",ret));
     break;
     }
@@ -289,12 +290,12 @@ public class baseobj_skel : ServiceSkel {
     switch (ename) {
     case "d1":
     {
-    await obj.set_d1((MessageElementUtil.UnpackScalar<double>(me)));
+    await obj.set_d1((MessageElementUtil.UnpackScalar<double>(me))).ConfigureAwait(false);
     break;
     }
     case "d2":
     {
-    await obj.set_d2(MessageElementUtil.UnpackArray<double>(me));
+    await obj.set_d2(MessageElementUtil.UnpackArray<double>(me)).ConfigureAwait(false);
     break;
     }
     default:
@@ -310,7 +311,7 @@ public class baseobj_skel : ServiceSkel {
     {
     double d1=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d1")));
     double d2=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d2")));
-    double rr_ret=await this.obj.func3(d1, d2, default(CancellationToken));
+    double rr_ret=await this.obj.func3(d1, d2, default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(MessageElementUtil.PackScalar<double>("return",rr_ret));
     break;
     }
@@ -322,7 +323,7 @@ public class baseobj_skel : ServiceSkel {
     public override async Task<object> GetSubObj(string name, string ind) {
     switch (name) {
     case "o5": {
-    return await obj.get_o5();
+    return await obj.get_o5().ConfigureAwait(false);
     }
     default:
     break;
@@ -349,7 +350,7 @@ public class baseobj_skel : ServiceSkel {
     rr_mm.ServicePath=m_ServicePath;
     MessageElementUtil.AddMessageElement(rr_mm,MessageElementUtil.PackScalar<double>("d1",d1));
     MessageElementUtil.AddMessageElement(rr_mm,MessageElementUtil.PackScalar<double>("d2",d2));
-    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);
+    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     });
     }
@@ -378,7 +379,7 @@ public class baseobj_skel : ServiceSkel {
     string ename=m.MemberName;
     switch (ename) {
     case "p1":
-    return await this.rr_p1.PipeCommand(m,e);
+    return await this.rr_p1.PipeCommand(m,e).ConfigureAwait(false);
     default:
     throw new MemberNotFoundException("Member not found");
     }
@@ -387,7 +388,7 @@ public class baseobj_skel : ServiceSkel {
     string ename=m.MemberName;
     switch (ename) {
     case "w1":
-    return await this.rr_w1.WireCommand(m,e);
+    return await this.rr_w1.WireCommand(m,e).ConfigureAwait(false);
     default:
     throw new MemberNotFoundException("Member not found");
     }
@@ -416,7 +417,7 @@ public class baseobj_skel : ServiceSkel {
     string ename=m.MemberName;
     switch (ename) {
     case "m1":
-     return await (new ArrayMemoryServiceSkel<double>("m1",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m1);
+     return await (new ArrayMemoryServiceSkel<double>("m1",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m1).ConfigureAwait(false);
     break;
     default:
     throw new MemberNotFoundException("Member not found");
@@ -457,7 +458,7 @@ public class subobj_skel : ServiceSkel {
     case "add_val":
     {
     double v=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"v")));
-    double rr_ret=await this.obj.add_val(v, default(CancellationToken));
+    double rr_ret=await this.obj.add_val(v, default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(MessageElementUtil.PackScalar<double>("return",rr_ret));
     break;
     }

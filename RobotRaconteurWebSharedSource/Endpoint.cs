@@ -82,7 +82,7 @@ namespace RobotRaconteurWeb
                 MessageNumber = (ushort)((MessageNumber == ((ushort)UInt16.MaxValue)) ? 0 : MessageNumber + 1);
             }
 
-            await node.SendMessage(m, cancel);
+            await node.SendMessage(m, cancel).ConfigureAwait(false);
 
 
         }

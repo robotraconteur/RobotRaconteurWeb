@@ -1140,107 +1140,37 @@ namespace RobotRaconteurWeb
         {
             uint s = 16 + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName)+(uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName) + (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
 
-            if (ElementType == DataTypes.structure_t)
+            switch (ElementType)
             {
-
-                MessageElementStructure d = (MessageElementStructure)Data;
-
-                
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-
-                
-            }
-            else if (ElementType==DataTypes.vector_t)
-            {
-                MessageElementMap<int> d = (MessageElementMap<int>)Data;
-
-
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.dictionary_t)
-            {
-                MessageElementMap<string> d = (MessageElementMap<string>)Data;
+                case DataTypes.void_t:
+                    break;
+                case DataTypes.structure_t:
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                case DataTypes.multidimarray_t:
+                case DataTypes.list_t:
+                case DataTypes.pod_t:
+                case DataTypes.pod_array_t:
+                case DataTypes.pod_multidimarray_t:
+                case DataTypes.namedarray_array_t:
+                case DataTypes.namedarray_multidimarray_t:
+                    {
+                        MessageElementNestedElementList d = (MessageElementNestedElementList)Data;
 
 
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
+                        foreach (MessageElement e in d.Elements)
+                        {
+                            s += e.ComputeSize();
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        s += DataCount * DataTypeUtil.size(ElementType);
+                        break;
+                    }
             }
-            else if (ElementType == DataTypes.list_t)
-            {
-                MessageElementList d = (MessageElementList)Data;
-
-
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.multidimarray_t)
-            {
-                MessageElementMultiDimArray d = (MessageElementMultiDimArray)Data;                
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.pod_t)
-            {
-                MessageElementPod d = (MessageElementPod)Data;
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.pod_array_t)
-            {
-                MessageElementPodArray d = (MessageElementPodArray)Data;
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.pod_multidimarray_t)
-            {
-                MessageElementPodMultiDimArray d = (MessageElementPodMultiDimArray)Data;
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.namedarray_array_t)
-            {
-                MessageElementNamedArray d = (MessageElementNamedArray)Data;
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.namedarray_multidimarray_t)
-            {
-                MessageElementNamedMultiDimArray d = (MessageElementNamedMultiDimArray)Data;
-                foreach (MessageElement e in d.Elements)
-                {
-                    s += e.ComputeSize();
-                }
-            }
-            else if (ElementType == DataTypes.void_t)
-            {
-                s += 0;
-            }
-            else
-            {
-
-                s += DataCount * DataTypeUtil.size(ElementType);
-            }
-
+            
             return s; 
         }
 
@@ -1258,59 +1188,43 @@ namespace RobotRaconteurWeb
                 datatype = dat.GetType().GetElementType().ToString();
                 DataCount = (uint)((Array)dat).Length;
             }
-            else if (dat is MessageElementStructure) {
-                DataCount = (uint)((MessageElementStructure)dat).Elements.Count;
-                ElementTypeName = ((MessageElementStructure)dat).Type;
-                datatype = "RobotRaconteurWeb.MessageElementStructure";
-            }
-            else if (dat is MessageElementMap<int>)
-            {
-                DataCount = (uint)((MessageElementMap<int>)dat).Elements.Count;
-                datatype = "RobotRaconteurWeb.MessageElementMap<int>";
-            }
-            else if (dat is MessageElementMap<string>)
-            {
-                DataCount = (uint)((MessageElementMap<string>)dat).Elements.Count;
-                datatype = "RobotRaconteurWeb.MessageElementMap<string>";
-            }
-            else if (dat is MessageElementList)
-            {
-                DataCount = (uint)((MessageElementList)dat).Elements.Count;
-                datatype = "RobotRaconteurWeb.MessageElementList";
-            }
-            else if (dat is MessageElementMultiDimArray)
-            {
-                DataCount = (uint)((MessageElementMultiDimArray)dat).Elements.Count;
-                datatype = "RobotRaconteurWeb.MessageElementMultiDimArray";
-            }
-            else if (dat is MessageElementPod)
-            {
-                DataCount = (uint)((MessageElementPod)dat).Elements.Count;
-                datatype = "RobotRaconteurWeb.MessageElementPod";
-            }
-            else if (dat is MessageElementPodArray)
-            {
-                DataCount = (uint)((MessageElementPodArray)dat).Elements.Count;
-                ElementTypeName = ((MessageElementPodArray)dat).Type;
-                datatype = "RobotRaconteurWeb.MessageElementPodArray";
-            }
-            else if (dat is MessageElementPodMultiDimArray)
-            {
-                DataCount = (uint)((MessageElementPodMultiDimArray)dat).Elements.Count;
-                ElementTypeName = ((MessageElementPodMultiDimArray)dat).Type;
-                datatype = "RobotRaconteurWeb.MessageElementPodMultiDimArray";
-            }
-            else if (dat is MessageElementNamedArray)
-            {
-                DataCount = (uint)((MessageElementNamedArray)dat).Elements.Count;
-                ElementTypeName = ((MessageElementNamedArray)dat).Type;
-                datatype = "RobotRaconteurWeb.MessageElementNamedArray";
-            }
-            else if (dat is MessageElementNamedMultiDimArray)
-            {
-                DataCount = (uint)((MessageElementNamedMultiDimArray)dat).Elements.Count;
-                ElementTypeName = ((MessageElementNamedMultiDimArray)dat).Type;
-                datatype = "RobotRaconteurWeb.MessageElementNamedMultiDimArray";
+            else if (dat is MessageElementNestedElementList) {
+                var dat2 = (MessageElementNestedElementList)dat;
+                DataCount = (uint)dat2.Elements.Count;
+                ElementTypeName = dat2.TypeName ?? "";
+                switch (dat2.Type)
+                {
+                    case DataTypes.vector_t:
+                        datatype = "RobotRaconteurWeb.MessageElementMap<int>";
+                        break;
+                    case DataTypes.dictionary_t:
+                        datatype = "RobotRaconteurWeb.MessageElementMap<string>";
+                        break;
+                    case DataTypes.list_t:
+                        datatype = "RobotRaconteurWeb.MessageElementList";
+                        break;
+                    case DataTypes.multidimarray_t:
+                        datatype = "RobotRaconteurWeb.MessageElementMultiDimArray";
+                        break;
+                    case DataTypes.pod_t:
+                        datatype =  "RobotRaconteurWeb.MessageElementPod";
+                        break;
+                    case DataTypes.pod_array_t:
+                        datatype = "RobotRaconteurWeb.MessageElementPodArray";
+                        break;
+                    case DataTypes.pod_multidimarray_t:
+                        datatype = "RobotRaconteurWeb.MessageElementPodMultiDimArray";
+                        break;
+                    case DataTypes.namedarray_array_t:
+                        datatype = "RobotRaconteurWeb.MessageElementNamedArray";
+                        break;
+                    case DataTypes.namedarray_multidimarray_t:
+                        datatype = "RobotRaconteurWeb.MessageElementNamedMultiDimArray";
+                        break;
+                    default:
+                      datatype = "RobotRaconteurWeb.MessageElementStructure";
+                      break;
+                }
             }
             else if (dat is string) 
             {
@@ -1357,63 +1271,14 @@ namespace RobotRaconteurWeb
             {
                 w.WriteArray((Array)dat);
             }
-            else if (dat is MessageElementStructure)
+            else if (dat is MessageElementNestedElementList)
             {
-                List<MessageElement> l = ((MessageElementStructure)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-                 
-            }
-            else if (dat is MessageElementMap<int>)
-            {
-                List<MessageElement> l = ((MessageElementMap<int>)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-
-            }
-            else if (dat is MessageElementMap<string>)
-            {
-                List<MessageElement> l = ((MessageElementMap<string>)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-
-            }
-            else if (dat is MessageElementList)
-            {
-                List<MessageElement> l = ((MessageElementList)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-
-            }
+                List<MessageElement> l = ((MessageElementNestedElementList)dat).Elements;
+                foreach (MessageElement e in l) e.Write(w);                 
+            }            
             else if (dat is string)
             {
                 w.WriteString8((string)dat);
-            }
-            else if (dat is MessageElementMultiDimArray)
-            {
-                List<MessageElement> l = ((MessageElementMultiDimArray)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-            }
-            else if (dat is MessageElementPod)
-            {
-                List<MessageElement> l = ((MessageElementPod)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-            }
-            else if (dat is MessageElementPodArray)
-            {
-                List<MessageElement> l = ((MessageElementPodArray)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-            }
-            else if (dat is MessageElementPodMultiDimArray)
-            {
-                List<MessageElement> l = ((MessageElementPodMultiDimArray)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-            }
-            else if (dat is MessageElementNamedArray)
-            {
-                List<MessageElement> l = ((MessageElementNamedArray)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
-            }
-            else if (dat is MessageElementNamedMultiDimArray)
-            {
-                List<MessageElement> l = ((MessageElementNamedMultiDimArray)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);
             }
             else
             {
@@ -1438,168 +1303,64 @@ namespace RobotRaconteurWeb
             MetaData = r.ReadString8(metadata_s);
             DataCount = r.ReadUInt32();
 
-            if (ElementType == DataTypes.void_t)
+            switch (ElementType)
             {
-            }
-            else if (ElementType == DataTypes.structure_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m=new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-                    
-                }
+                case DataTypes.void_t:
+                    break;
+                case DataTypes.structure_t:
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                case DataTypes.multidimarray_t:
+                case DataTypes.list_t:
+                case DataTypes.pod_t:
+                case DataTypes.pod_array_t:
+                case DataTypes.pod_multidimarray_t:
+                case DataTypes.namedarray_array_t:
+                case DataTypes.namedarray_multidimarray_t:
+                    {
+                        List<MessageElement> l = new List<MessageElement>((int)DataCount);
+                        for (int i = 0; i < DataCount; i++)
+                        {
+                            MessageElement m = new MessageElement();
+                            m.Read(r);
+                            l.Add(m);
+                        }
 
-                dat = new MessageElementStructure(ElementTypeName,l);
-            } else
-            if (ElementType == DataTypes.vector_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-
-                dat = new MessageElementMap<int>(l);
-            }
-            else
-            if (ElementType == DataTypes.dictionary_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-
-                dat = new MessageElementMap<string>(l);
-            }
-            else
-            if (ElementType == DataTypes.list_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-
-                dat = new MessageElementList(l);
-            }
-            else if (ElementType == DataTypes.string_t)
-            {
-                if (DataCount > r.DistanceFromLimit) throw new IOException("Error reading message");
-                dat = r.ReadString8(DataCount);
-            }
-            else
-            if (ElementType == DataTypes.multidimarray_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementMultiDimArray(l);
-            }
-            else
-            if (ElementType == DataTypes.pod_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementPod(l);
-            }
-            else
-            if (ElementType == DataTypes.pod_array_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementPodArray(ElementTypeName, l);
-            }
-            else
-            if (ElementType == DataTypes.pod_multidimarray_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementPodMultiDimArray(ElementTypeName, l);
-            }
-            else
-            if (ElementType == DataTypes.pod_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementPod(l);
-            }
-            else
-            if (ElementType == DataTypes.namedarray_array_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementNamedArray(ElementTypeName, l);
-            }
-            else
-            if (ElementType == DataTypes.namedarray_multidimarray_t)
-            {
-                List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                for (int i = 0; i < DataCount; i++)
-                {
-                    MessageElement m = new MessageElement();
-                    m.Read(r);
-                    l.Add(m);
-
-                }
-                dat = new MessageElementNamedMultiDimArray(ElementTypeName, l);
-            }
-            else
-            {
-                if (DataCount*DataTypeUtil.size(ElementType) > r.DistanceFromLimit) throw new IOException("Error reading message");
-                Array d=DataTypeUtil.ArrayFromDataType(ElementType,DataCount);
-                r.ReadArray(d);
-                dat = (Object)d;
-
+                        dat = new MessageElementNestedElementList(ElementType, ElementTypeName, l);
+                        break;
+                    }      
+                
+                case DataTypes.double_t:
+                case DataTypes.single_t:
+                case DataTypes.int8_t:
+                case DataTypes.uint8_t:
+                case DataTypes.int16_t:
+                case DataTypes.uint16_t:
+                case DataTypes.int32_t:
+                case DataTypes.uint32_t:
+                case DataTypes.int64_t:
+                case DataTypes.uint64_t:
+                case DataTypes.cdouble_t:
+                case DataTypes.csingle_t:
+                case DataTypes.bool_t:
+                    {
+                        if (DataCount * DataTypeUtil.size(ElementType) > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        Array d = DataTypeUtil.ArrayFromDataType(ElementType, DataCount);
+                        r.ReadArray(d);
+                        dat = (Object)d;
+                    }
+                    break;
+                case DataTypes.string_t:
+                    {
+                        if (DataCount > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        dat = r.ReadString8(DataCount);
+                        break;
+                    }
+                default:
+                    throw new DataTypeException("Unknown data type");                    
             }
 
+            
             if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
             r.PopLimit();
 
@@ -1628,6 +1389,27 @@ namespace RobotRaconteurWeb
             throw new DataTypeException("Could not cast data to type " + typeof(T).ToString());
         }
 
+        public string CastDataToString()
+        {
+            return CastData<string>();
+        }
+
+        public MessageElementNestedElementList CastDataToNestedList()
+        {
+            return CastData<MessageElementNestedElementList>();
+        }
+
+        public MessageElementNestedElementList CastDataToNestedList(DataTypes expected_type)
+        {
+            var l= CastData<MessageElementNestedElementList>();
+
+            if (l !=null && l.Type != expected_type)
+            {
+                throw new DataTypeMismatchException("Unexpected MessageElementNestedElementList type");
+            }
+            return l;
+        }
+
         public static T CastData<T>(object Data)
         {
             if (Data == null) return default(T);
@@ -1637,101 +1419,20 @@ namespace RobotRaconteurWeb
         }
     }
 
-    public class MessageElementStructure
+    public class MessageElementNestedElementList
     {
-        public MessageElementStructure(string type_, List<MessageElement> elements_)
+        public MessageElementNestedElementList(DataTypes type_, string type_name_, List<MessageElement> elements_)
         {
             Elements = elements_;
             Type = type_;
+            TypeName = type_name_;
         }
         public List<MessageElement> Elements;
 
-        public string Type;
+        public DataTypes Type;
+        public string TypeName;
 
     }
-
-    public class MessageElementMap<T>
-    {
-        public MessageElementMap(List<MessageElement> e)
-        {
-            Elements = e;
-        }
-        public List<MessageElement> Elements;
-    }
-
-    public class MessageElementList
-    {
-        public MessageElementList(List<MessageElement> e)
-        {
-            Elements = e;
-        }
-        public List<MessageElement> Elements;
-    }
-    
-
-    public class MessageElementMultiDimArray
-    {
-         public MessageElementMultiDimArray(List<MessageElement> e)
-        {
-            Elements = e;
-        }
-
-        public List<MessageElement> Elements;
-    }
-
-    public class MessageElementPod
-    {        
-        public MessageElementPod(List<MessageElement> e)
-        {
-            Elements = e;
-        }        
-        public List<MessageElement> Elements;
-    }
-
-    public class MessageElementPodArray
-    {
-        public MessageElementPodArray(string type, List<MessageElement> e)
-        {
-            Elements = e;
-            this.Type = type;
-        }
-        public string Type;
-        public List<MessageElement> Elements;
-    }
-
-    public class MessageElementPodMultiDimArray
-    {
-        public MessageElementPodMultiDimArray(string type, List<MessageElement> e)
-        {
-            Elements = e;
-            this.Type = type;
-        }
-        public string Type;
-        public List<MessageElement> Elements;
-    }
-
-    public class MessageElementNamedArray
-    {
-        public MessageElementNamedArray(string type, List<MessageElement> e)
-        {
-            Elements = e;
-            this.Type = type;
-        }
-        public string Type;
-        public List<MessageElement> Elements;
-    }
-
-    public class MessageElementNamedMultiDimArray
-    {
-        public MessageElementNamedMultiDimArray(string type, List<MessageElement> e)
-        {
-            Elements = e;
-            this.Type = type;
-        }
-        public string Type;
-        public List<MessageElement> Elements;
-    }
-
     public static class MessageElementUtil
     {
         public static MessageElement NewMessageElement(string name, object data)
@@ -1804,6 +1505,21 @@ namespace RobotRaconteurWeb
         public static T CastData<T>(MessageElement m)
         {            
             return m.CastData<T>();
+        }
+
+        public static string CastDataToString(MessageElement m)
+        {
+            return m.CastDataToString();
+        }
+
+        public static MessageElementNestedElementList CastDataToNestedList(MessageElement m)
+        {
+            return m.CastDataToNestedList();
+        }
+
+        public static MessageElementNestedElementList CastDataToNestedList(MessageElement m, DataTypes expected_type)
+        {
+            return m.CastDataToNestedList(expected_type);
         }
 
         public static int GetMessageElementNumber(MessageElement e)
@@ -1925,7 +1641,7 @@ namespace RobotRaconteurWeb
 
         public static MultiDimArray UnpackMultiDimArray(RobotRaconteurNode node, MessageElement m)
         {
-            MultiDimArray a = node.UnpackMultiDimArray(MessageElementUtil.CastData<MessageElementMultiDimArray>(m));
+            MultiDimArray a = node.UnpackMultiDimArray(MessageElementUtil.CastDataToNestedList(m,DataTypes.multidimarray_t));
             if (a == null) throw new NullReferenceException();
             return a;
         }
@@ -1939,7 +1655,7 @@ namespace RobotRaconteurWeb
 
         public static T UnpackStructure<T>(RobotRaconteurNode node, ClientContext client, MessageElement m)
         {
-            return node.UnpackStructure<T>(MessageElementUtil.CastData<MessageElementStructure>(m), client);
+            return node.UnpackStructure<T>(MessageElementUtil.CastDataToNestedList(m,DataTypes.structure_t), client);
         }
 
         public static object UnpackVarType(RobotRaconteurNode node, ClientContext client, MessageElement m)
@@ -1971,32 +1687,32 @@ namespace RobotRaconteurWeb
 
         public static T UnpackPodFromArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackPodFromArray<T>(CastData<MessageElementPodArray>(m), client);
+            return node.UnpackPodFromArray<T>(CastDataToNestedList(m,DataTypes.pod_array_t), client);
         }
 
         public static T[] UnpackPodArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackPodArray<T>(CastData<MessageElementPodArray>(m), client);
+            return node.UnpackPodArray<T>(CastDataToNestedList(m,DataTypes.pod_array_t), client);
         }
 
         public static PodMultiDimArray UnpackPodMultiDimArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackPodMultiDimArray<T>(MessageElementUtil.CastData<MessageElementPodMultiDimArray>(m), client);
+            return node.UnpackPodMultiDimArray<T>(MessageElementUtil.CastDataToNestedList(m,DataTypes.pod_multidimarray_t), client);
         }
 
         public static T UnpackNamedArrayFromArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackNamedArrayFromArray<T>(CastData<MessageElementNamedArray>(m), client);
+            return node.UnpackNamedArrayFromArray<T>(CastDataToNestedList(m,DataTypes.namedarray_array_t), client);
         }
 
         public static T[] UnpackNamedArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackNamedArray<T>(CastData<MessageElementNamedArray>(m), client);
+            return node.UnpackNamedArray<T>(CastDataToNestedList(m, DataTypes.namedarray_array_t), client);
         }
 
         public static NamedMultiDimArray UnpackNamedMultiDimArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackNamedMultiDimArray<T>(MessageElementUtil.CastData<MessageElementNamedMultiDimArray>(m), client);
+            return node.UnpackNamedMultiDimArray<T>(MessageElementUtil.CastDataToNestedList(m, DataTypes.namedarray_multidimarray_t), client);
         }
 
         public static string GetMessageElementDataTypeString(object o)

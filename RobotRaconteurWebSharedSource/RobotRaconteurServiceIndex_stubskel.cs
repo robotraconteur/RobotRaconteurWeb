@@ -9,16 +9,16 @@ namespace RobotRaconteurServiceIndex{
 public class NodeInfo_stub : IStructureStub {
     public NodeInfo_stub(RobotRaconteurServiceIndexFactory d) {def=d;}
     private RobotRaconteurServiceIndexFactory def;
-    public MessageElementStructure PackStructure(Object s1) {
+    public MessageElementNestedElementList PackStructure(Object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     NodeInfo s = (NodeInfo)s1;
     m.Add(new MessageElement("NodeName",s.NodeName));
     m.Add(new MessageElement("NodeID",s.NodeID));
     m.Add(new MessageElement("ServiceIndexConnectionURL",def.PackMapType<int,string>(s.ServiceIndexConnectionURL)));
-    return new MessageElementStructure("RobotRaconteurServiceIndex.NodeInfo",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t,"RobotRaconteurServiceIndex.NodeInfo",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     NodeInfo s=new NodeInfo();
     s.NodeName=MessageElement.FindElement(m.Elements,"NodeName").CastData<string>();
@@ -32,7 +32,7 @@ public class NodeInfo_stub : IStructureStub {
 public class ServiceInfo_stub : IStructureStub {
     public ServiceInfo_stub(RobotRaconteurServiceIndexFactory d) {def=d;}
     private RobotRaconteurServiceIndexFactory def;
-    public MessageElementStructure PackStructure(Object s1) {
+    public MessageElementNestedElementList PackStructure(Object s1) {
     List<MessageElement> m=new List<MessageElement>();
     if (s1 ==null) return null;
     ServiceInfo s = (ServiceInfo)s1;
@@ -41,9 +41,9 @@ public class ServiceInfo_stub : IStructureStub {
     m.Add(new MessageElement("RootObjectImplements",def.PackMapType<int,string>(s.RootObjectImplements)));
     m.Add(new MessageElement("ConnectionURL",def.PackMapType<int,string>(s.ConnectionURL)));
     m.Add(new MessageElement("Attributes",def.PackMapType<string,object>(s.Attributes)));
-    return new MessageElementStructure("RobotRaconteurServiceIndex.ServiceInfo",m);
+    return new MessageElementNestedElementList(DataTypes.structure_t, "RobotRaconteurServiceIndex.ServiceInfo",m);
     }
-    public T UnpackStructure<T>(MessageElementStructure m) {
+    public T UnpackStructure<T>(MessageElementNestedElementList m) {
     if (m == null ) return default(T);
     ServiceInfo s=new ServiceInfo();
     s.Name=MessageElement.FindElement(m.Elements,"Name").CastData<string>();
@@ -62,19 +62,19 @@ public class ServiceIndex_stub : ServiceStub , ServiceIndex {
 
     public async Task<Dictionary<int,ServiceInfo>> GetLocalNodeServices(CancellationToken rr_cancel=default(CancellationToken)) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.FunctionCallReq,"GetLocalNodeServices");
-    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel);
+    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (Dictionary<int,ServiceInfo>)RRContext.UnpackMapType<int,ServiceInfo>(rr_me.Data);
     }
     public async Task<Dictionary<int,NodeInfo>> GetRoutedNodes(CancellationToken rr_cancel=default(CancellationToken)) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.FunctionCallReq,"GetRoutedNodes");
-    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel);
+    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (Dictionary<int,NodeInfo>)RRContext.UnpackMapType<int,NodeInfo>(rr_me.Data);
     }
     public async Task<Dictionary<int,NodeInfo>> GetDetectedNodes(CancellationToken rr_cancel=default(CancellationToken)) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.FunctionCallReq,"GetDetectedNodes");
-    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel);
+    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (Dictionary<int,NodeInfo>)RRContext.UnpackMapType<int,NodeInfo>(rr_me.Data);
     }
@@ -151,17 +151,17 @@ public class ServiceIndex_skel : ServiceSkel {
     MessageEntry rr_mr=new MessageEntry(MessageEntryType.FunctionCallRes, rr_ename);
     switch (rr_ename) {
     case "GetLocalNodeServices": {
-    object rr_ret=await obj.GetLocalNodeServices(default(CancellationToken));
+    object rr_ret=await obj.GetLocalNodeServices(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(new MessageElement("return",RRContext.PackMapType<int,ServiceInfo>(rr_ret)));
     break;
     }
     case "GetRoutedNodes": {
-    object rr_ret=await obj.GetRoutedNodes(default(CancellationToken));
+    object rr_ret=await obj.GetRoutedNodes(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(new MessageElement("return",RRContext.PackMapType<int,NodeInfo>(rr_ret)));
     break;
     }
     case "GetDetectedNodes": {
-    object rr_ret=await obj.GetDetectedNodes(default(CancellationToken));
+    object rr_ret=await obj.GetDetectedNodes(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(new MessageElement("return",RRContext.PackMapType<int,NodeInfo>(rr_ret)));
     break;
     }

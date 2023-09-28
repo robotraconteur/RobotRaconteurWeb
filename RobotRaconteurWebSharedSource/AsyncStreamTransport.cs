@@ -124,13 +124,13 @@ public abstract class AsyncStreamTransport : ITransportConnection
                 if (starttls)
                 {
 #if !ROBOTRACONTEUR_BRIDGE
-                await DoClientTlsHandshake(cancel);
+                await DoClientTlsHandshake(cancel).ConfigureAwait(false);
 #else
                     throw new NotImplementedException("TLS support not implemented");
 #endif
                 }
 
-            NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel);
+            NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
             lock (this)
             {
                 m_RemoteNodeID = rid;
@@ -169,7 +169,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             }
         }
 
-        await request_pause_task1.Task;
+        await request_pause_task1.Task.ConfigureAwait(false);
     }
 
     protected Task ResumeReceivePause()
@@ -209,7 +209,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
                 if (pause_receive_task != null && request_pause_task1 != null)
                 {
                     request_pause_task1.TrySetResult(0);
-                    await pause_receive_task.Task;
+                    await pause_receive_task.Task.ConfigureAwait(false);
                 }
 
                 lock (this)
@@ -270,7 +270,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
                             if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                             {
                                 //TODO: enforce direction of handshake
-                                await DoServerTlsHandshake(mes);
+                                await DoServerTlsHandshake(mes).ConfigureAwait(false);
                                     continue;
                             }
                             else if (mes.entries[0].EntryType == MessageEntryType.StreamOpRet && mes.entries[0].MemberName == "STARTTLS")
@@ -293,12 +293,12 @@ public abstract class AsyncStreamTransport : ITransportConnection
                                 else
                                 {
                                     ret.TrySetResult(mes);
-                                    await wait.Task;
+                                    await wait.Task.ConfigureAwait(false);
                                 }
                                     continue;
                             }
 #endif
-                                await StreamOpMessageReceived(mes);
+                                await StreamOpMessageReceived(mes).ConfigureAwait(false);
                             
                             continue;
 
@@ -385,7 +385,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
 
 
-            Message ret = await parent.SpecialRequest(mes);
+            Message ret = await parent.SpecialRequest(mes).ConfigureAwait(false);
             if (ret != null)
             {
                 try
@@ -439,10 +439,10 @@ public abstract class AsyncStreamTransport : ITransportConnection
 #if !ROBOTRACONTEUR_BRIDGE
                 if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                 {
-                    await DoServerTlsHandshake(mes);
+                    await DoServerTlsHandshake(mes).ConfigureAwait(false);
                 }
 #endif
-                await StreamOpMessageReceived(mes);                
+                await StreamOpMessageReceived(mes).ConfigureAwait(false);
                 return;
 
             }
@@ -491,7 +491,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             if (!((mes.entries.Count == 1) && ((mes.entries[0].EntryType == MessageEntryType.ConnectionTest) || (mes.entries[0].EntryType == MessageEntryType.ConnectionTestRet))))
             {
                 tlastrec_mes = DateTime.UtcNow;
-                await ProcessMessage2(mes);
+                await ProcessMessage2(mes).ConfigureAwait(false);
             }
             
         }
@@ -509,7 +509,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         {
             Transport.m_CurrentThreadTransportConnectionURL = GetConnectionURL();
             Transport.m_CurrentThreadTransport = this;
-            await MessageReceived(m);
+            await MessageReceived(m).ConfigureAwait(false);
         }
         catch
         {
@@ -524,7 +524,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
     public virtual async Task MessageReceived(Message m)
     {
-        await parent.MessageReceived(m);
+        await parent.MessageReceived(m).ConfigureAwait(false);
     }
 
     public abstract string GetConnectionURL();
@@ -580,7 +580,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
         if (request_pause_task1 != null)
         {
-            await request_pause_task1.Task;
+            await request_pause_task1.Task.ConfigureAwait(false);
         }
         
     }
@@ -704,7 +704,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
         if (waiter != null)
         {
-            if (await waiter.Task != 0) return; ;
+            if (await waiter.Task.ConfigureAwait(false) != 0) return; ;
             if (!Connected) throw new ConnectionException("Transport connection closed");
         }
 
@@ -723,7 +723,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         if (pause_send_task != null && request_pause_task1 != null)
         {
             request_pause_task1.TrySetResult(0);
-            await pause_send_task.Task;            
+            await pause_send_task.Task.ConfigureAwait(false);            
         }
 
         lock (this)
@@ -798,7 +798,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         {
             while (m_Connected)
             {
-                await Task.Delay(500, cancellationToken.Token);
+                await Task.Delay(500, cancellationToken.Token).ConfigureAwait(false);
 
 
                 if ((DateTime.UtcNow - tlastsend).TotalMilliseconds > m_HeartbeatPeriod)
@@ -809,7 +809,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
                     MessageEntry mm = new MessageEntry(MessageEntryType.ConnectionTest, "");
                     m.entries.Add(mm);
 
-                    await SendMessage(m, default(CancellationToken));
+                    await SendMessage(m, default(CancellationToken)).ConfigureAwait(false);
                 }
 
                 if ((tlastsend - tlastrec).TotalMilliseconds > ReceiveTimeout)
@@ -1080,7 +1080,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
         if (t != null)
         {
-            await t.Task;
+            await t.Task.ConfigureAwait(false);
         }
 
         try
@@ -1103,15 +1103,15 @@ public abstract class AsyncStreamTransport : ITransportConnection
             }
             else
             {
-                MessageEntry mm = await PackStreamOpRequest(command, args);
+                MessageEntry mm = await PackStreamOpRequest(command, args).ConfigureAwait(false);
                 m.entries.Add(mm);
             }
             
-            await SendMessage(m,cancel);
+            await SendMessage(m,cancel).ConfigureAwait(false);
             
-            Message streamop_ret1 = await streamop_ret.Task.AwaitWithTimeout(10000);
+            Message streamop_ret1 = await streamop_ret.Task.AwaitWithTimeout(10000).ConfigureAwait(false);
 
-            return await UnpackStreamOpResponse(streamop_ret1.entries[0], streamop_ret1.header);
+            return await UnpackStreamOpResponse(streamop_ret1.entries[0], streamop_ret1.header).ConfigureAwait(false);
         }
         finally
         {
@@ -1153,12 +1153,12 @@ public abstract class AsyncStreamTransport : ITransportConnection
             mret.header.ReceiverNodeName = m.header.SenderNodeName;
             mret.header.SenderNodeID = node.NodeID;
             mret.header.ReceiverNodeID = m.header.SenderNodeID;
-            MessageEntry mmret = await ProcessStreamOpRequest(mm, m.header);
+            MessageEntry mmret = await ProcessStreamOpRequest(mm, m.header).ConfigureAwait(false);
 
             if (mmret != null)
             {
                 mret.entries.Add(mmret);
-                await SendMessage(mret, default(CancellationToken)).IgnoreResult();
+                await SendMessage(mret, default(CancellationToken)).IgnoreResult().ConfigureAwait(false);
             }
         }
         else
@@ -1202,7 +1202,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
         if (t != null)
         {
-            await t.Task;
+            await t.Task.ConfigureAwait(false);
         }
 
         try
@@ -1215,9 +1215,9 @@ public abstract class AsyncStreamTransport : ITransportConnection
             MessageEntry mm = new MessageEntry(MessageEntryType.StreamCheckCapability, name);
             m.entries.Add(mm);
 
-            await SendMessage(m, cancel);
+            await SendMessage(m, cancel).ConfigureAwait(false);
             
-            Message mret = await CheckStreamCapability_ret.Task.AwaitWithTimeout<Message>((int)node.RequestTimeout);
+            Message mret = await CheckStreamCapability_ret.Task.AwaitWithTimeout<Message>((int)node.RequestTimeout).ConfigureAwait(false);
             return mret.entries[0].FindElement("return").CastData<uint>();
         }
         finally
@@ -1295,7 +1295,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         {
             mmret.AddElement("errorname", "RobotRaconteur.ConnectionError");
             mmret.AddElement("errorstring", "Server certificate not loaded");
-            await SendMessage(mret, default(CancellationToken));
+            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
             Close();
             return;       
         }
@@ -1324,7 +1324,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         {
             mmret.AddElement("errorname", "RobotRaconteur.NodeNotFound");
             mmret.AddElement("errorstring", "Node not found");
-            await SendMessage(mret, default(CancellationToken));
+            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
             Close();
             return;
         }
@@ -1341,15 +1341,15 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
         try
         {  
-            await SendMessage(mret, default(CancellationToken));
+            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
 
-            await RequestSendPause();
+            await RequestSendPause().ConfigureAwait(false);
            
             var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
             await ssl.AuthenticateAsServerAsync(cert.Item1, mutualauth, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
             basestream = ssl;            
             
-            await ResumeSendPause();
+            await ResumeSendPause().ConfigureAwait(false);
             
             return;
 
@@ -1378,7 +1378,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             clienthandshake_recv_done_task = new TaskCompletionSource<int>();
         }
 
-        await RequestSendPause();
+        await RequestSendPause().ConfigureAwait(false);
 
         try
         {        
@@ -1405,7 +1405,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             var mstream_buf = m_mstream.ToArray();
             await basestream.WriteAsync(mstream_buf, 0, mstream_buf.Length).ConfigureAwait(false);
 
-            var mret = await clienthandshake_recv_task.Task;
+            var mret = await clienthandshake_recv_task.Task.ConfigureAwait(false);
             NodeID recv_nodeid = mret.header.SenderNodeID;
             string recv_nodename = mret.header.SenderNodeName;
             if (!target_nodeid.IsAnyNode && target_nodeid != recv_nodeid)
@@ -1433,7 +1433,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             await ssl.AuthenticateAsClientAsync(host, certs, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
             basestream = ssl;            
 
-            await ResumeSendPause();
+            await ResumeSendPause().ConfigureAwait(false);
         }
         catch (Exception)
         {
