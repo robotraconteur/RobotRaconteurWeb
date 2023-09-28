@@ -85,7 +85,7 @@ namespace RobotRaconteurWeb
             if (cdataElements.Count != 1) throw new DataTypeException("pod type mismatch");
             var e = cdataElements[0];
             if (0 != MessageElementUtil.GetMessageElementNumber(e)) throw new DataTypeException("Error in list format");
-            var md = e.CastDataToNestedList(DataTypes.pod_array_t);
+            var md = e.CastDataToNestedList(DataTypes.pod_t);
             return UnpackPod(md);
 
         }
@@ -324,7 +324,7 @@ namespace RobotRaconteurWeb
                 return UnpackNamedArray(m2);
             }
 
-            if (m2.Type == DataTypes.namedarray_array_t)                
+            if (m2.Type == DataTypes.namedarray_multidimarray_t)                
             {
                 return UnpackNamedMultiDimArray(m2);
             }

@@ -192,670 +192,670 @@ public class testroot_stub : ServiceStub , testroot {
     }
     public async Task<double> get_d1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<double>(me));
         }
     public async Task set_d1(double value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double[]> get_d2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<double>(me);
         }
     public async Task set_d2(double[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double[]> get_d3(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d3");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackArray<double>(me), 16, false);
         }
     public async Task set_d3(double[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d3");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("value",DataTypeUtil.VerifyArrayLength(value, 16, false)));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double[]> get_d4(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d4");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackArray<double>(me), 16, true);
         }
     public async Task set_d4(double[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d4");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("value",DataTypeUtil.VerifyArrayLength(value, 16, true)));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<MultiDimArray> get_d5(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d5");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMultiDimArray(rr_node, me);
         }
     public async Task set_d5(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d5");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<MultiDimArray> get_d6(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d6");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackMultiDimArray(rr_node, me),9,new uint[] {3, 3});
         }
     public async Task set_d6(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d6");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)DataTypeUtil.VerifyArrayLength(value,9,new uint[] {3, 3})));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<float> get_s1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "s1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<float>(me));
         }
     public async Task set_s1(float value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"s1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<float>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<float[]> get_s2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "s2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<float>(me);
         }
     public async Task set_s2(float[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"s2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<float>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<sbyte> get_i8_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i8_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<sbyte>(me));
         }
     public async Task set_i8_1(sbyte value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i8_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<sbyte>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<sbyte[]> get_i8_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i8_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<sbyte>(me);
         }
     public async Task set_i8_2(sbyte[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i8_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<sbyte>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<byte> get_u8_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u8_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<byte>(me));
         }
     public async Task set_u8_1(byte value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u8_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<byte>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<byte[]> get_u8_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u8_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<byte>(me);
         }
     public async Task set_u8_2(byte[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u8_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<byte>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<MultiDimArray> get_u8_3(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u8_3");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMultiDimArray(rr_node, me);
         }
     public async Task set_u8_3(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u8_3");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<short> get_i16_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i16_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<short>(me));
         }
     public async Task set_i16_1(short value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i16_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<short>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<short[]> get_i16_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i16_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<short>(me);
         }
     public async Task set_i16_2(short[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i16_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<short>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<ushort> get_u16_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u16_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<ushort>(me));
         }
     public async Task set_u16_1(ushort value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u16_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<ushort>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<ushort[]> get_u16_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u16_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<ushort>(me);
         }
     public async Task set_u16_2(ushort[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u16_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<ushort>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<int> get_i32_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i32_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<int>(me));
         }
     public async Task set_i32_1(int value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i32_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<int>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<int[]> get_i32_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i32_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<int>(me);
         }
     public async Task set_i32_2(int[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i32_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<int>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<int[]> get_i32_huge(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i32_huge");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<int>(me);
         }
     public async Task set_i32_huge(int[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i32_huge");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<int>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<uint> get_u32_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u32_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<uint>(me));
         }
     public async Task set_u32_1(uint value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u32_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<uint>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<uint[]> get_u32_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u32_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<uint>(me);
         }
     public async Task set_u32_2(uint[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u32_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<uint>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<long> get_i64_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i64_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<long>(me));
         }
     public async Task set_i64_1(long value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i64_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<long>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<long[]> get_i64_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i64_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<long>(me);
         }
     public async Task set_i64_2(long[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i64_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<long>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<ulong> get_u64_1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u64_1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<ulong>(me));
         }
     public async Task set_u64_1(ulong value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u64_1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<ulong>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<ulong[]> get_u64_2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "u64_2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<ulong>(me);
         }
     public async Task set_u64_2(ulong[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"u64_2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<ulong>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<string> get_str1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "str1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackString(me);
         }
     public async Task set_str1(string value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"str1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackString("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<teststruct1> get_struct1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "struct1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackStructure<teststruct1>(rr_node, rr_context, me);
         }
     public async Task set_struct1(teststruct1 value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"struct1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackStructure(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<teststruct2> get_struct2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "struct2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackStructure<teststruct2>(rr_node, rr_context, me);
         }
     public async Task set_struct2(teststruct2 value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"struct2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackStructure(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<int,double>> get_is_d1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_d1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<int,double>(rr_node, rr_context, me);
         }
     public async Task set_is_d1(Dictionary<int,double> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_d1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<int,double>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<string,double>> get_is_d2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_d2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<string,double>(rr_node, rr_context, me);
         }
     public async Task set_is_d2(Dictionary<string,double> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_d2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<string,double>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<int,double[]>> get_is_d3(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_d3");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<int,double[]>(rr_node, rr_context, me);
         }
     public async Task set_is_d3(Dictionary<int,double[]> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_d3");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<int,double[]>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<string,double[]>> get_is_d4(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_d4");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<string,double[]>(rr_node, rr_context, me);
         }
     public async Task set_is_d4(Dictionary<string,double[]> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_d4");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<string,double[]>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<int,MultiDimArray>> get_is_d5(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_d5");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<int,MultiDimArray>(rr_node, rr_context, me);
         }
     public async Task set_is_d5(Dictionary<int,MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_d5");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<int,MultiDimArray>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<string,MultiDimArray>> get_is_d6(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_d6");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<string,MultiDimArray>(rr_node, rr_context, me);
         }
     public async Task set_is_d6(Dictionary<string,MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_d6");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<string,MultiDimArray>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<int,string>> get_is_str1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_str1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<int,string>(rr_node, rr_context, me);
         }
     public async Task set_is_str1(Dictionary<int,string> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_str1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<int,string>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<string,string>> get_is_str2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_str2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<string,string>(rr_node, rr_context, me);
         }
     public async Task set_is_str2(Dictionary<string,string> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_str2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<string,string>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<int,teststruct2>> get_is_struct1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_struct1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<int,teststruct2>(rr_node, rr_context, me);
         }
     public async Task set_is_struct1(Dictionary<int,teststruct2> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_struct1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<int,teststruct2>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<string,teststruct2>> get_is_struct2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "is_struct2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<string,teststruct2>(rr_node, rr_context, me);
         }
     public async Task set_is_struct2(Dictionary<string,teststruct2> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"is_struct2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<string,teststruct2>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<com.robotraconteur.testing.TestService2.ostruct2> get_struct3(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "struct3");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackStructure<com.robotraconteur.testing.TestService2.ostruct2>(rr_node, rr_context, me);
         }
     public async Task set_struct3(com.robotraconteur.testing.TestService2.ostruct2 value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"struct3");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackStructure(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<List<double>> get_list_d1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "list_d1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackList<double>(rr_node, rr_context, me);
         }
     public async Task set_list_d1(List<double> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"list_d1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackListType<double>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<List<double[]>> get_list_d3(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "list_d3");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackList<double[]>(rr_node, rr_context, me);
         }
     public async Task set_list_d3(List<double[]> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"list_d3");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackListType<double[]>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<List<MultiDimArray>> get_list_d5(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "list_d5");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackList<MultiDimArray>(rr_node, rr_context, me);
         }
     public async Task set_list_d5(List<MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"list_d5");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackListType<MultiDimArray>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<List<string>> get_list_str1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "list_str1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackList<string>(rr_node, rr_context, me);
         }
     public async Task set_list_str1(List<string> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"list_str1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackListType<string>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<List<teststruct2>> get_list_struct1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "list_struct1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackList<teststruct2>(rr_node, rr_context, me);
         }
     public async Task set_list_struct1(List<teststruct2> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"list_struct1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackListType<teststruct2>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var1(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<Dictionary<int,object>> get_var2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMap<int,object>(rr_node, rr_context, me);
         }
     public async Task set_var2(Dictionary<int,object> value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMapType<int,object>(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_num(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_num");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_num(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_num");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_str(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_str");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_str(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_str");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_struct(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_struct");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_struct(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_struct");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_vector(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_vector");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_vector(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_vector");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_dictionary(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_dictionary");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_dictionary(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_dictionary");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_list(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_list");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_list(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_list");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<object> get_var_multidimarray(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "var_multidimarray");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackVarType(rr_node, rr_context, me);
         }
     public async Task set_var_multidimarray(object value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"var_multidimarray");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackVarType(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double> get_errtest(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "errtest");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<double>(me));
         }
     public async Task set_errtest(double value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"errtest");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<teststruct1> get_nulltest(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "nulltest");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackStructure<teststruct1>(rr_node, rr_context, me);
         }
     public async Task set_nulltest(teststruct1 value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"nulltest");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackStructure(rr_node, rr_context, "value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task func1(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func1");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task func2(double d1, double d2, CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func2");
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d1",d1));
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d2",d2));
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task<double> func3(double d1, double d2, CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func3");
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d1",d1));
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d2",d2));
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     return (MessageElementUtil.UnpackScalar<double>(rr_me.FindElement("return")));
     }
     public async Task<int> meaning_of_life(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"meaning_of_life");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     return (MessageElementUtil.UnpackScalar<int>(rr_me.FindElement("return")));
     }
     public async Task func_errtest(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func_errtest");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task func_errtest1(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func_errtest1");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task func_errtest2(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func_errtest2");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task func_errtest3(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"func_errtest3");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task o6_op(int op, CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"o6_op");
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<int>("op",op));
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task pipe_check_error(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"pipe_check_error");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public async Task test_callbacks(CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"test_callbacks");
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     }
     public event Action ev1;
     public event Action<double, teststruct2> ev2;
@@ -882,22 +882,22 @@ public class testroot_stub : ServiceStub , testroot {
     }
     }
     public async Task<sub1> get_o1(CancellationToken cancel=default(CancellationToken)) {
-    return (sub1)await FindObjRefTyped("o1","com.robotraconteur.testing.TestService1.sub1",cancel);
+    return (sub1)await FindObjRefTyped("o1","com.robotraconteur.testing.TestService1.sub1",cancel).ConfigureAwait(false);
     }
     public async Task<sub1> get_o2(int ind, CancellationToken cancel=default(CancellationToken)) {
-    return (sub1)await FindObjRefTyped("o2",ind.ToString(),"com.robotraconteur.testing.TestService1.sub1",cancel);
+    return (sub1)await FindObjRefTyped("o2",ind.ToString(),"com.robotraconteur.testing.TestService1.sub1",cancel).ConfigureAwait(false);
     }
     public async Task<sub1> get_o3(int ind, CancellationToken cancel=default(CancellationToken)) {
-    return (sub1)await FindObjRefTyped("o3",ind.ToString(),"com.robotraconteur.testing.TestService1.sub1",cancel);
+    return (sub1)await FindObjRefTyped("o3",ind.ToString(),"com.robotraconteur.testing.TestService1.sub1",cancel).ConfigureAwait(false);
     }
     public async Task<sub1> get_o4(string ind, CancellationToken cancel=default(CancellationToken)) {
-    return (sub1)await FindObjRefTyped("o4",ind.ToString(),"com.robotraconteur.testing.TestService1.sub1",cancel);
+    return (sub1)await FindObjRefTyped("o4",ind.ToString(),"com.robotraconteur.testing.TestService1.sub1",cancel).ConfigureAwait(false);
     }
     public async Task<com.robotraconteur.testing.TestService2.subobj> get_o5(CancellationToken cancel=default(CancellationToken)) {
-    return (com.robotraconteur.testing.TestService2.subobj)await FindObjRefTyped("o5","com.robotraconteur.testing.TestService2.subobj",cancel);
+    return (com.robotraconteur.testing.TestService2.subobj)await FindObjRefTyped("o5","com.robotraconteur.testing.TestService2.subobj",cancel).ConfigureAwait(false);
     }
     public async Task<object> get_o6(CancellationToken cancel=default(CancellationToken)) {
-    return (object)await FindObjRef("o6", cancel);
+    return (object)await FindObjRef("o6", cancel).ConfigureAwait(false);
     }
     public Pipe<double[]> p1 {
     get { return rr_p1;  }
@@ -979,31 +979,31 @@ public class testroot_stub : ServiceStub , testroot {
     rr_mr.RequestID=rr_m.RequestID;
     switch (rr_ename) {
     case "cb1": {
-    await this.cb1.Function(default(CancellationToken));
+    await this.cb1.Function(default(CancellationToken)).ConfigureAwait(false);
     MessageElementUtil.AddMessageElement(rr_mr,MessageElementUtil.PackScalar<int>("return",0));
     break;
     }
     case "cb2": {
     double d1=(MessageElementUtil.UnpackScalar<double>(rr_m.FindElement("d1")));
     double d2=(MessageElementUtil.UnpackScalar<double>(rr_m.FindElement("d2")));
-    await this.cb2.Function(d1, d2, default(CancellationToken));
+    await this.cb2.Function(d1, d2, default(CancellationToken)).ConfigureAwait(false);
     MessageElementUtil.AddMessageElement(rr_mr,MessageElementUtil.PackScalar<int>("return",0));
     break;
     }
     case "cb3": {
     double d1=(MessageElementUtil.UnpackScalar<double>(rr_m.FindElement("d1")));
     double d2=(MessageElementUtil.UnpackScalar<double>(rr_m.FindElement("d2")));
-    var rr_ret=await cb3.Function(d1, d2, default(CancellationToken));
+    var rr_ret=await cb3.Function(d1, d2, default(CancellationToken)).ConfigureAwait(false);
     MessageElementUtil.AddMessageElement(rr_mr,MessageElementUtil.PackScalar<double>("return",rr_ret));
     break;
     }
     case "cb_meaning_of_life": {
-    var rr_ret=await cb_meaning_of_life.Function(default(CancellationToken));
+    var rr_ret=await cb_meaning_of_life.Function(default(CancellationToken)).ConfigureAwait(false);
     MessageElementUtil.AddMessageElement(rr_mr,MessageElementUtil.PackScalar<int>("return",rr_ret));
     break;
     }
     case "cb_errtest": {
-    await this.cb_errtest.Function(default(CancellationToken));
+    await this.cb_errtest.Function(default(CancellationToken)).ConfigureAwait(false);
     MessageElementUtil.AddMessageElement(rr_mr,MessageElementUtil.PackScalar<int>("return",0));
     break;
     }
@@ -1037,47 +1037,47 @@ public class sub1_stub : ServiceStub , sub1 {
     }
     public async Task<double[]> get_d1(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d1");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackArray<double>(me);
         }
     public async Task set_d1(double[] value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d1");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackArray<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<MultiDimArray> get_d2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "d2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackMultiDimArray(rr_node, me);
         }
     public async Task set_d2(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"d2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<string> get_s_ind(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "s_ind");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackString(me);
         }
     public async Task set_s_ind(string value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"s_ind");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackString("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<int> get_i_ind(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i_ind");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<int>(me));
         }
     public async Task set_i_ind(int value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i_ind");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<int>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     protected override void DispatchEvent(MessageEntry rr_m) {
     switch (rr_m.MemberName) {
@@ -1086,13 +1086,13 @@ public class sub1_stub : ServiceStub , sub1 {
     }
     }
     public async Task<sub2> get_o2_1(CancellationToken cancel=default(CancellationToken)) {
-    return (sub2)await FindObjRefTyped("o2_1","com.robotraconteur.testing.TestService1.sub2",cancel);
+    return (sub2)await FindObjRefTyped("o2_1","com.robotraconteur.testing.TestService1.sub2",cancel).ConfigureAwait(false);
     }
     public async Task<sub2> get_o2_2(int ind, CancellationToken cancel=default(CancellationToken)) {
-    return (sub2)await FindObjRefTyped("o2_2",ind.ToString(),"com.robotraconteur.testing.TestService1.sub2",cancel);
+    return (sub2)await FindObjRefTyped("o2_2",ind.ToString(),"com.robotraconteur.testing.TestService1.sub2",cancel).ConfigureAwait(false);
     }
     public async Task<sub2> get_o2_3(string ind, CancellationToken cancel=default(CancellationToken)) {
-    return (sub2)await FindObjRefTyped("o2_3",ind.ToString(),"com.robotraconteur.testing.TestService1.sub2",cancel);
+    return (sub2)await FindObjRefTyped("o2_3",ind.ToString(),"com.robotraconteur.testing.TestService1.sub2",cancel).ConfigureAwait(false);
     }
     protected override void DispatchPipeMessage(MessageEntry m)
     {
@@ -1125,36 +1125,36 @@ public class sub2_stub : ServiceStub , sub2 {
     }
     public async Task<string> get_s_ind(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "s_ind");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackString(me);
         }
     public async Task set_s_ind(string value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"s_ind");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackString("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<int> get_i_ind(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "i_ind");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<int>(me));
         }
     public async Task set_i_ind(int value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"i_ind");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<int>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<string> get_data(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "data");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackString(me);
         }
     public async Task set_data(string value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"data");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackString("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     protected override void DispatchEvent(MessageEntry rr_m) {
     switch (rr_m.MemberName) {
@@ -1163,7 +1163,7 @@ public class sub2_stub : ServiceStub , sub2 {
     }
     }
     public async Task<sub3> get_o3_1(string ind, CancellationToken cancel=default(CancellationToken)) {
-    return (sub3)await FindObjRefTyped("o3_1",ind.ToString(),"com.robotraconteur.testing.TestService1.sub3",cancel);
+    return (sub3)await FindObjRefTyped("o3_1",ind.ToString(),"com.robotraconteur.testing.TestService1.sub3",cancel).ConfigureAwait(false);
     }
     protected override void DispatchPipeMessage(MessageEntry m)
     {
@@ -1196,41 +1196,41 @@ public class sub3_stub : ServiceStub , sub3 {
     }
     public async Task<string> get_ind(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "ind");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackString(me);
         }
     public async Task set_ind(string value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"ind");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackString("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<string> get_data2(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "data2");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return MessageElementUtil.UnpackString(me);
         }
     public async Task set_data2(string value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"data2");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackString("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double> get_data3(CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, "data3");
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         MessageElement me=mr.FindElement("value");
         return (MessageElementUtil.UnpackScalar<double>(me));
         }
     public async Task set_data3(double value, CancellationToken cancel=default(CancellationToken)) {
         MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,"data3");
         MessageElementUtil.AddMessageElement(m,MessageElementUtil.PackScalar<double>("value",value));
-        MessageEntry mr=await ProcessRequest(m, cancel);
+        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     public async Task<double> add(double d, CancellationToken cancel = default(CancellationToken)) {
         MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"add");
     MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("d",d));
-        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
     return (MessageElementUtil.UnpackScalar<double>(rr_me.FindElement("return")));
     }
     protected override void DispatchEvent(MessageEntry rr_m) {
@@ -1276,337 +1276,337 @@ public class testroot_skel : ServiceSkel {
     switch (ename) {
     case "d1":
     {
-    double ret=await obj.get_d1();
+    double ret=await obj.get_d1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
     break;
     }
     case "d2":
     {
-    double[] ret=await obj.get_d2();
+    double[] ret=await obj.get_d2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<double>("value",ret));
     break;
     }
     case "d3":
     {
-    double[] ret=await obj.get_d3();
+    double[] ret=await obj.get_d3().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<double>("value",DataTypeUtil.VerifyArrayLength(ret, 16, false)));
     break;
     }
     case "d4":
     {
-    double[] ret=await obj.get_d4();
+    double[] ret=await obj.get_d4().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<double>("value",DataTypeUtil.VerifyArrayLength(ret, 16, true)));
     break;
     }
     case "d5":
     {
-    MultiDimArray ret=await obj.get_d5();
+    MultiDimArray ret=await obj.get_d5().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)ret));
     break;
     }
     case "d6":
     {
-    MultiDimArray ret=await obj.get_d6();
+    MultiDimArray ret=await obj.get_d6().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)DataTypeUtil.VerifyArrayLength(ret,9,new uint[] {3, 3})));
     break;
     }
     case "s1":
     {
-    float ret=await obj.get_s1();
+    float ret=await obj.get_s1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<float>("value",ret));
     break;
     }
     case "s2":
     {
-    float[] ret=await obj.get_s2();
+    float[] ret=await obj.get_s2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<float>("value",ret));
     break;
     }
     case "i8_1":
     {
-    sbyte ret=await obj.get_i8_1();
+    sbyte ret=await obj.get_i8_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<sbyte>("value",ret));
     break;
     }
     case "i8_2":
     {
-    sbyte[] ret=await obj.get_i8_2();
+    sbyte[] ret=await obj.get_i8_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<sbyte>("value",ret));
     break;
     }
     case "u8_1":
     {
-    byte ret=await obj.get_u8_1();
+    byte ret=await obj.get_u8_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<byte>("value",ret));
     break;
     }
     case "u8_2":
     {
-    byte[] ret=await obj.get_u8_2();
+    byte[] ret=await obj.get_u8_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<byte>("value",ret));
     break;
     }
     case "u8_3":
     {
-    MultiDimArray ret=await obj.get_u8_3();
+    MultiDimArray ret=await obj.get_u8_3().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)ret));
     break;
     }
     case "i16_1":
     {
-    short ret=await obj.get_i16_1();
+    short ret=await obj.get_i16_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<short>("value",ret));
     break;
     }
     case "i16_2":
     {
-    short[] ret=await obj.get_i16_2();
+    short[] ret=await obj.get_i16_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<short>("value",ret));
     break;
     }
     case "u16_1":
     {
-    ushort ret=await obj.get_u16_1();
+    ushort ret=await obj.get_u16_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<ushort>("value",ret));
     break;
     }
     case "u16_2":
     {
-    ushort[] ret=await obj.get_u16_2();
+    ushort[] ret=await obj.get_u16_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<ushort>("value",ret));
     break;
     }
     case "i32_1":
     {
-    int ret=await obj.get_i32_1();
+    int ret=await obj.get_i32_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<int>("value",ret));
     break;
     }
     case "i32_2":
     {
-    int[] ret=await obj.get_i32_2();
+    int[] ret=await obj.get_i32_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<int>("value",ret));
     break;
     }
     case "i32_huge":
     {
-    int[] ret=await obj.get_i32_huge();
+    int[] ret=await obj.get_i32_huge().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<int>("value",ret));
     break;
     }
     case "u32_1":
     {
-    uint ret=await obj.get_u32_1();
+    uint ret=await obj.get_u32_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<uint>("value",ret));
     break;
     }
     case "u32_2":
     {
-    uint[] ret=await obj.get_u32_2();
+    uint[] ret=await obj.get_u32_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<uint>("value",ret));
     break;
     }
     case "i64_1":
     {
-    long ret=await obj.get_i64_1();
+    long ret=await obj.get_i64_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<long>("value",ret));
     break;
     }
     case "i64_2":
     {
-    long[] ret=await obj.get_i64_2();
+    long[] ret=await obj.get_i64_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<long>("value",ret));
     break;
     }
     case "u64_1":
     {
-    ulong ret=await obj.get_u64_1();
+    ulong ret=await obj.get_u64_1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<ulong>("value",ret));
     break;
     }
     case "u64_2":
     {
-    ulong[] ret=await obj.get_u64_2();
+    ulong[] ret=await obj.get_u64_2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<ulong>("value",ret));
     break;
     }
     case "str1":
     {
-    string ret=await obj.get_str1();
+    string ret=await obj.get_str1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackString("value",ret));
     break;
     }
     case "struct1":
     {
-    teststruct1 ret=await obj.get_struct1();
+    teststruct1 ret=await obj.get_struct1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackStructure(rr_node, rr_context, "value",ret));
     break;
     }
     case "struct2":
     {
-    teststruct2 ret=await obj.get_struct2();
+    teststruct2 ret=await obj.get_struct2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackStructure(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_d1":
     {
-    Dictionary<int,double> ret=await obj.get_is_d1();
+    Dictionary<int,double> ret=await obj.get_is_d1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<int,double>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_d2":
     {
-    Dictionary<string,double> ret=await obj.get_is_d2();
+    Dictionary<string,double> ret=await obj.get_is_d2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<string,double>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_d3":
     {
-    Dictionary<int,double[]> ret=await obj.get_is_d3();
+    Dictionary<int,double[]> ret=await obj.get_is_d3().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<int,double[]>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_d4":
     {
-    Dictionary<string,double[]> ret=await obj.get_is_d4();
+    Dictionary<string,double[]> ret=await obj.get_is_d4().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<string,double[]>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_d5":
     {
-    Dictionary<int,MultiDimArray> ret=await obj.get_is_d5();
+    Dictionary<int,MultiDimArray> ret=await obj.get_is_d5().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<int,MultiDimArray>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_d6":
     {
-    Dictionary<string,MultiDimArray> ret=await obj.get_is_d6();
+    Dictionary<string,MultiDimArray> ret=await obj.get_is_d6().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<string,MultiDimArray>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_str1":
     {
-    Dictionary<int,string> ret=await obj.get_is_str1();
+    Dictionary<int,string> ret=await obj.get_is_str1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<int,string>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_str2":
     {
-    Dictionary<string,string> ret=await obj.get_is_str2();
+    Dictionary<string,string> ret=await obj.get_is_str2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<string,string>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_struct1":
     {
-    Dictionary<int,teststruct2> ret=await obj.get_is_struct1();
+    Dictionary<int,teststruct2> ret=await obj.get_is_struct1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<int,teststruct2>(rr_node, rr_context, "value",ret));
     break;
     }
     case "is_struct2":
     {
-    Dictionary<string,teststruct2> ret=await obj.get_is_struct2();
+    Dictionary<string,teststruct2> ret=await obj.get_is_struct2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<string,teststruct2>(rr_node, rr_context, "value",ret));
     break;
     }
     case "struct3":
     {
-    com.robotraconteur.testing.TestService2.ostruct2 ret=await obj.get_struct3();
+    com.robotraconteur.testing.TestService2.ostruct2 ret=await obj.get_struct3().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackStructure(rr_node, rr_context, "value",ret));
     break;
     }
     case "list_d1":
     {
-    List<double> ret=await obj.get_list_d1();
+    List<double> ret=await obj.get_list_d1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackListType<double>(rr_node, rr_context, "value",ret));
     break;
     }
     case "list_d3":
     {
-    List<double[]> ret=await obj.get_list_d3();
+    List<double[]> ret=await obj.get_list_d3().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackListType<double[]>(rr_node, rr_context, "value",ret));
     break;
     }
     case "list_d5":
     {
-    List<MultiDimArray> ret=await obj.get_list_d5();
+    List<MultiDimArray> ret=await obj.get_list_d5().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackListType<MultiDimArray>(rr_node, rr_context, "value",ret));
     break;
     }
     case "list_str1":
     {
-    List<string> ret=await obj.get_list_str1();
+    List<string> ret=await obj.get_list_str1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackListType<string>(rr_node, rr_context, "value",ret));
     break;
     }
     case "list_struct1":
     {
-    List<teststruct2> ret=await obj.get_list_struct1();
+    List<teststruct2> ret=await obj.get_list_struct1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackListType<teststruct2>(rr_node, rr_context, "value",ret));
     break;
     }
     case "var1":
     {
-    object ret=await obj.get_var1();
+    object ret=await obj.get_var1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var2":
     {
-    Dictionary<int,object> ret=await obj.get_var2();
+    Dictionary<int,object> ret=await obj.get_var2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMapType<int,object>(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_num":
     {
-    object ret=await obj.get_var_num();
+    object ret=await obj.get_var_num().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_str":
     {
-    object ret=await obj.get_var_str();
+    object ret=await obj.get_var_str().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_struct":
     {
-    object ret=await obj.get_var_struct();
+    object ret=await obj.get_var_struct().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_vector":
     {
-    object ret=await obj.get_var_vector();
+    object ret=await obj.get_var_vector().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_dictionary":
     {
-    object ret=await obj.get_var_dictionary();
+    object ret=await obj.get_var_dictionary().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_list":
     {
-    object ret=await obj.get_var_list();
+    object ret=await obj.get_var_list().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "var_multidimarray":
     {
-    object ret=await obj.get_var_multidimarray();
+    object ret=await obj.get_var_multidimarray().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackVarType(rr_node, rr_context, "value",ret));
     break;
     }
     case "errtest":
     {
-    double ret=await obj.get_errtest();
+    double ret=await obj.get_errtest().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
     break;
     }
     case "nulltest":
     {
-    teststruct1 ret=await obj.get_nulltest();
+    teststruct1 ret=await obj.get_nulltest().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackStructure(rr_node, rr_context, "value",ret));
     break;
     }
@@ -1622,282 +1622,282 @@ public class testroot_skel : ServiceSkel {
     switch (ename) {
     case "d1":
     {
-    await obj.set_d1((MessageElementUtil.UnpackScalar<double>(me)));
+    await obj.set_d1((MessageElementUtil.UnpackScalar<double>(me))).ConfigureAwait(false);
     break;
     }
     case "d2":
     {
-    await obj.set_d2(MessageElementUtil.UnpackArray<double>(me));
+    await obj.set_d2(MessageElementUtil.UnpackArray<double>(me)).ConfigureAwait(false);
     break;
     }
     case "d3":
     {
-    await obj.set_d3(DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackArray<double>(me), 16, false));
+    await obj.set_d3(DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackArray<double>(me), 16, false)).ConfigureAwait(false);
     break;
     }
     case "d4":
     {
-    await obj.set_d4(DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackArray<double>(me), 16, true));
+    await obj.set_d4(DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackArray<double>(me), 16, true)).ConfigureAwait(false);
     break;
     }
     case "d5":
     {
-    await obj.set_d5(MessageElementUtil.UnpackMultiDimArray(rr_node, me));
+    await obj.set_d5(MessageElementUtil.UnpackMultiDimArray(rr_node, me)).ConfigureAwait(false);
     break;
     }
     case "d6":
     {
-    await obj.set_d6(DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackMultiDimArray(rr_node, me),9,new uint[] {3, 3}));
+    await obj.set_d6(DataTypeUtil.VerifyArrayLength(MessageElementUtil.UnpackMultiDimArray(rr_node, me),9,new uint[] {3, 3})).ConfigureAwait(false);
     break;
     }
     case "s1":
     {
-    await obj.set_s1((MessageElementUtil.UnpackScalar<float>(me)));
+    await obj.set_s1((MessageElementUtil.UnpackScalar<float>(me))).ConfigureAwait(false);
     break;
     }
     case "s2":
     {
-    await obj.set_s2(MessageElementUtil.UnpackArray<float>(me));
+    await obj.set_s2(MessageElementUtil.UnpackArray<float>(me)).ConfigureAwait(false);
     break;
     }
     case "i8_1":
     {
-    await obj.set_i8_1((MessageElementUtil.UnpackScalar<sbyte>(me)));
+    await obj.set_i8_1((MessageElementUtil.UnpackScalar<sbyte>(me))).ConfigureAwait(false);
     break;
     }
     case "i8_2":
     {
-    await obj.set_i8_2(MessageElementUtil.UnpackArray<sbyte>(me));
+    await obj.set_i8_2(MessageElementUtil.UnpackArray<sbyte>(me)).ConfigureAwait(false);
     break;
     }
     case "u8_1":
     {
-    await obj.set_u8_1((MessageElementUtil.UnpackScalar<byte>(me)));
+    await obj.set_u8_1((MessageElementUtil.UnpackScalar<byte>(me))).ConfigureAwait(false);
     break;
     }
     case "u8_2":
     {
-    await obj.set_u8_2(MessageElementUtil.UnpackArray<byte>(me));
+    await obj.set_u8_2(MessageElementUtil.UnpackArray<byte>(me)).ConfigureAwait(false);
     break;
     }
     case "u8_3":
     {
-    await obj.set_u8_3(MessageElementUtil.UnpackMultiDimArray(rr_node, me));
+    await obj.set_u8_3(MessageElementUtil.UnpackMultiDimArray(rr_node, me)).ConfigureAwait(false);
     break;
     }
     case "i16_1":
     {
-    await obj.set_i16_1((MessageElementUtil.UnpackScalar<short>(me)));
+    await obj.set_i16_1((MessageElementUtil.UnpackScalar<short>(me))).ConfigureAwait(false);
     break;
     }
     case "i16_2":
     {
-    await obj.set_i16_2(MessageElementUtil.UnpackArray<short>(me));
+    await obj.set_i16_2(MessageElementUtil.UnpackArray<short>(me)).ConfigureAwait(false);
     break;
     }
     case "u16_1":
     {
-    await obj.set_u16_1((MessageElementUtil.UnpackScalar<ushort>(me)));
+    await obj.set_u16_1((MessageElementUtil.UnpackScalar<ushort>(me))).ConfigureAwait(false);
     break;
     }
     case "u16_2":
     {
-    await obj.set_u16_2(MessageElementUtil.UnpackArray<ushort>(me));
+    await obj.set_u16_2(MessageElementUtil.UnpackArray<ushort>(me)).ConfigureAwait(false);
     break;
     }
     case "i32_1":
     {
-    await obj.set_i32_1((MessageElementUtil.UnpackScalar<int>(me)));
+    await obj.set_i32_1((MessageElementUtil.UnpackScalar<int>(me))).ConfigureAwait(false);
     break;
     }
     case "i32_2":
     {
-    await obj.set_i32_2(MessageElementUtil.UnpackArray<int>(me));
+    await obj.set_i32_2(MessageElementUtil.UnpackArray<int>(me)).ConfigureAwait(false);
     break;
     }
     case "i32_huge":
     {
-    await obj.set_i32_huge(MessageElementUtil.UnpackArray<int>(me));
+    await obj.set_i32_huge(MessageElementUtil.UnpackArray<int>(me)).ConfigureAwait(false);
     break;
     }
     case "u32_1":
     {
-    await obj.set_u32_1((MessageElementUtil.UnpackScalar<uint>(me)));
+    await obj.set_u32_1((MessageElementUtil.UnpackScalar<uint>(me))).ConfigureAwait(false);
     break;
     }
     case "u32_2":
     {
-    await obj.set_u32_2(MessageElementUtil.UnpackArray<uint>(me));
+    await obj.set_u32_2(MessageElementUtil.UnpackArray<uint>(me)).ConfigureAwait(false);
     break;
     }
     case "i64_1":
     {
-    await obj.set_i64_1((MessageElementUtil.UnpackScalar<long>(me)));
+    await obj.set_i64_1((MessageElementUtil.UnpackScalar<long>(me))).ConfigureAwait(false);
     break;
     }
     case "i64_2":
     {
-    await obj.set_i64_2(MessageElementUtil.UnpackArray<long>(me));
+    await obj.set_i64_2(MessageElementUtil.UnpackArray<long>(me)).ConfigureAwait(false);
     break;
     }
     case "u64_1":
     {
-    await obj.set_u64_1((MessageElementUtil.UnpackScalar<ulong>(me)));
+    await obj.set_u64_1((MessageElementUtil.UnpackScalar<ulong>(me))).ConfigureAwait(false);
     break;
     }
     case "u64_2":
     {
-    await obj.set_u64_2(MessageElementUtil.UnpackArray<ulong>(me));
+    await obj.set_u64_2(MessageElementUtil.UnpackArray<ulong>(me)).ConfigureAwait(false);
     break;
     }
     case "str1":
     {
-    await obj.set_str1(MessageElementUtil.UnpackString(me));
+    await obj.set_str1(MessageElementUtil.UnpackString(me)).ConfigureAwait(false);
     break;
     }
     case "struct1":
     {
-    await obj.set_struct1(MessageElementUtil.UnpackStructure<teststruct1>(rr_node, rr_context, me));
+    await obj.set_struct1(MessageElementUtil.UnpackStructure<teststruct1>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "struct2":
     {
-    await obj.set_struct2(MessageElementUtil.UnpackStructure<teststruct2>(rr_node, rr_context, me));
+    await obj.set_struct2(MessageElementUtil.UnpackStructure<teststruct2>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_d1":
     {
-    await obj.set_is_d1(MessageElementUtil.UnpackMap<int,double>(rr_node, rr_context, me));
+    await obj.set_is_d1(MessageElementUtil.UnpackMap<int,double>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_d2":
     {
-    await obj.set_is_d2(MessageElementUtil.UnpackMap<string,double>(rr_node, rr_context, me));
+    await obj.set_is_d2(MessageElementUtil.UnpackMap<string,double>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_d3":
     {
-    await obj.set_is_d3(MessageElementUtil.UnpackMap<int,double[]>(rr_node, rr_context, me));
+    await obj.set_is_d3(MessageElementUtil.UnpackMap<int,double[]>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_d4":
     {
-    await obj.set_is_d4(MessageElementUtil.UnpackMap<string,double[]>(rr_node, rr_context, me));
+    await obj.set_is_d4(MessageElementUtil.UnpackMap<string,double[]>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_d5":
     {
-    await obj.set_is_d5(MessageElementUtil.UnpackMap<int,MultiDimArray>(rr_node, rr_context, me));
+    await obj.set_is_d5(MessageElementUtil.UnpackMap<int,MultiDimArray>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_d6":
     {
-    await obj.set_is_d6(MessageElementUtil.UnpackMap<string,MultiDimArray>(rr_node, rr_context, me));
+    await obj.set_is_d6(MessageElementUtil.UnpackMap<string,MultiDimArray>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_str1":
     {
-    await obj.set_is_str1(MessageElementUtil.UnpackMap<int,string>(rr_node, rr_context, me));
+    await obj.set_is_str1(MessageElementUtil.UnpackMap<int,string>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_str2":
     {
-    await obj.set_is_str2(MessageElementUtil.UnpackMap<string,string>(rr_node, rr_context, me));
+    await obj.set_is_str2(MessageElementUtil.UnpackMap<string,string>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_struct1":
     {
-    await obj.set_is_struct1(MessageElementUtil.UnpackMap<int,teststruct2>(rr_node, rr_context, me));
+    await obj.set_is_struct1(MessageElementUtil.UnpackMap<int,teststruct2>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "is_struct2":
     {
-    await obj.set_is_struct2(MessageElementUtil.UnpackMap<string,teststruct2>(rr_node, rr_context, me));
+    await obj.set_is_struct2(MessageElementUtil.UnpackMap<string,teststruct2>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "struct3":
     {
-    await obj.set_struct3(MessageElementUtil.UnpackStructure<com.robotraconteur.testing.TestService2.ostruct2>(rr_node, rr_context, me));
+    await obj.set_struct3(MessageElementUtil.UnpackStructure<com.robotraconteur.testing.TestService2.ostruct2>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "list_d1":
     {
-    await obj.set_list_d1(MessageElementUtil.UnpackList<double>(rr_node, rr_context, me));
+    await obj.set_list_d1(MessageElementUtil.UnpackList<double>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "list_d3":
     {
-    await obj.set_list_d3(MessageElementUtil.UnpackList<double[]>(rr_node, rr_context, me));
+    await obj.set_list_d3(MessageElementUtil.UnpackList<double[]>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "list_d5":
     {
-    await obj.set_list_d5(MessageElementUtil.UnpackList<MultiDimArray>(rr_node, rr_context, me));
+    await obj.set_list_d5(MessageElementUtil.UnpackList<MultiDimArray>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "list_str1":
     {
-    await obj.set_list_str1(MessageElementUtil.UnpackList<string>(rr_node, rr_context, me));
+    await obj.set_list_str1(MessageElementUtil.UnpackList<string>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "list_struct1":
     {
-    await obj.set_list_struct1(MessageElementUtil.UnpackList<teststruct2>(rr_node, rr_context, me));
+    await obj.set_list_struct1(MessageElementUtil.UnpackList<teststruct2>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var1":
     {
-    await obj.set_var1(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var1(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var2":
     {
-    await obj.set_var2(MessageElementUtil.UnpackMap<int,object>(rr_node, rr_context, me));
+    await obj.set_var2(MessageElementUtil.UnpackMap<int,object>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_num":
     {
-    await obj.set_var_num(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_num(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_str":
     {
-    await obj.set_var_str(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_str(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_struct":
     {
-    await obj.set_var_struct(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_struct(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_vector":
     {
-    await obj.set_var_vector(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_vector(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_dictionary":
     {
-    await obj.set_var_dictionary(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_dictionary(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_list":
     {
-    await obj.set_var_list(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_list(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "var_multidimarray":
     {
-    await obj.set_var_multidimarray(MessageElementUtil.UnpackVarType(rr_node, rr_context, me));
+    await obj.set_var_multidimarray(MessageElementUtil.UnpackVarType(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     case "errtest":
     {
-    await obj.set_errtest((MessageElementUtil.UnpackScalar<double>(me)));
+    await obj.set_errtest((MessageElementUtil.UnpackScalar<double>(me))).ConfigureAwait(false);
     break;
     }
     case "nulltest":
     {
-    await obj.set_nulltest(MessageElementUtil.UnpackStructure<teststruct1>(rr_node, rr_context, me));
+    await obj.set_nulltest(MessageElementUtil.UnpackStructure<teststruct1>(rr_node, rr_context, me)).ConfigureAwait(false);
     break;
     }
     default:
@@ -1911,7 +1911,7 @@ public class testroot_skel : ServiceSkel {
     switch (rr_ename) {
     case "func1":
     {
-    await this.obj.func1(default(CancellationToken));
+    await this.obj.func1(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
@@ -1919,7 +1919,7 @@ public class testroot_skel : ServiceSkel {
     {
     double d1=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d1")));
     double d2=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d2")));
-    await this.obj.func2(d1, d2, default(CancellationToken));
+    await this.obj.func2(d1, d2, default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
@@ -1927,56 +1927,56 @@ public class testroot_skel : ServiceSkel {
     {
     double d1=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d1")));
     double d2=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d2")));
-    double rr_ret=await this.obj.func3(d1, d2, default(CancellationToken));
+    double rr_ret=await this.obj.func3(d1, d2, default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(MessageElementUtil.PackScalar<double>("return",rr_ret));
     break;
     }
     case "meaning_of_life":
     {
-    int rr_ret=await this.obj.meaning_of_life(default(CancellationToken));
+    int rr_ret=await this.obj.meaning_of_life(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(MessageElementUtil.PackScalar<int>("return",rr_ret));
     break;
     }
     case "func_errtest":
     {
-    await this.obj.func_errtest(default(CancellationToken));
+    await this.obj.func_errtest(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
     case "func_errtest1":
     {
-    await this.obj.func_errtest1(default(CancellationToken));
+    await this.obj.func_errtest1(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
     case "func_errtest2":
     {
-    await this.obj.func_errtest2(default(CancellationToken));
+    await this.obj.func_errtest2(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
     case "func_errtest3":
     {
-    await this.obj.func_errtest3(default(CancellationToken));
+    await this.obj.func_errtest3(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
     case "o6_op":
     {
     int op=(MessageElementUtil.UnpackScalar<int>(MessageElementUtil.FindElement(rr_m,"op")));
-    await this.obj.o6_op(op, default(CancellationToken));
+    await this.obj.o6_op(op, default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
     case "pipe_check_error":
     {
-    await this.obj.pipe_check_error(default(CancellationToken));
+    await this.obj.pipe_check_error(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
     case "test_callbacks":
     {
-    await this.obj.test_callbacks(default(CancellationToken));
+    await this.obj.test_callbacks(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement("return",(int)0);
     break;
     }
@@ -1988,22 +1988,22 @@ public class testroot_skel : ServiceSkel {
     public override async Task<object> GetSubObj(string name, string ind) {
     switch (name) {
     case "o1": {
-    return await obj.get_o1();
+    return await obj.get_o1().ConfigureAwait(false);
     }
     case "o2": {
-    return await obj.get_o2(Int32.Parse(ind));
+    return await obj.get_o2(Int32.Parse(ind)).ConfigureAwait(false);
     }
     case "o3": {
-    return await obj.get_o3(Int32.Parse(ind));
+    return await obj.get_o3(Int32.Parse(ind)).ConfigureAwait(false);
     }
     case "o4": {
-    return await obj.get_o4(ind);
+    return await obj.get_o4(ind).ConfigureAwait(false);
     }
     case "o5": {
-    return await obj.get_o5();
+    return await obj.get_o5().ConfigureAwait(false);
     }
     case "o6": {
-    return await obj.get_o6();
+    return await obj.get_o6().ConfigureAwait(false);
     }
     default:
     break;
@@ -2036,7 +2036,7 @@ public class testroot_skel : ServiceSkel {
     return new Func<CancellationToken, Task>( async delegate(CancellationToken rr_cancel) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.CallbackCallReq,"cb1");
     rr_mm.ServicePath=m_ServicePath;
-    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);
+    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     });
     }
@@ -2046,7 +2046,7 @@ public class testroot_skel : ServiceSkel {
     rr_mm.ServicePath=m_ServicePath;
     MessageElementUtil.AddMessageElement(rr_mm,MessageElementUtil.PackScalar<double>("d1",d1));
     MessageElementUtil.AddMessageElement(rr_mm,MessageElementUtil.PackScalar<double>("d2",d2));
-    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);
+    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     });
     }
@@ -2056,7 +2056,7 @@ public class testroot_skel : ServiceSkel {
     rr_mm.ServicePath=m_ServicePath;
     MessageElementUtil.AddMessageElement(rr_mm,MessageElementUtil.PackScalar<double>("d1",d1));
     MessageElementUtil.AddMessageElement(rr_mm,MessageElementUtil.PackScalar<double>("d2",d2));
-    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);
+    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (MessageElementUtil.UnpackScalar<double>(rr_me));
     });
@@ -2065,7 +2065,7 @@ public class testroot_skel : ServiceSkel {
     return new Func<CancellationToken, Task<int>>( async delegate(CancellationToken rr_cancel) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.CallbackCallReq,"cb_meaning_of_life");
     rr_mm.ServicePath=m_ServicePath;
-    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);
+    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (MessageElementUtil.UnpackScalar<int>(rr_me));
     });
@@ -2074,7 +2074,7 @@ public class testroot_skel : ServiceSkel {
     return new Func<CancellationToken, Task>( async delegate(CancellationToken rr_cancel) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.CallbackCallReq,"cb_errtest");
     rr_mm.ServicePath=m_ServicePath;
-    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);
+    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     });
     }
@@ -2122,11 +2122,11 @@ public class testroot_skel : ServiceSkel {
     string ename=m.MemberName;
     switch (ename) {
     case "p1":
-    return await this.rr_p1.PipeCommand(m,e);
+    return await this.rr_p1.PipeCommand(m,e).ConfigureAwait(false);
     case "p2":
-    return await this.rr_p2.PipeCommand(m,e);
+    return await this.rr_p2.PipeCommand(m,e).ConfigureAwait(false);
     case "broadcastpipe":
-    return await this.rr_broadcastpipe.PipeCommand(m,e);
+    return await this.rr_broadcastpipe.PipeCommand(m,e).ConfigureAwait(false);
     default:
     throw new MemberNotFoundException("Member not found");
     }
@@ -2135,13 +2135,13 @@ public class testroot_skel : ServiceSkel {
     string ename=m.MemberName;
     switch (ename) {
     case "w1":
-    return await this.rr_w1.WireCommand(m,e);
+    return await this.rr_w1.WireCommand(m,e).ConfigureAwait(false);
     case "w2":
-    return await this.rr_w2.WireCommand(m,e);
+    return await this.rr_w2.WireCommand(m,e).ConfigureAwait(false);
     case "w3":
-    return await this.rr_w3.WireCommand(m,e);
+    return await this.rr_w3.WireCommand(m,e).ConfigureAwait(false);
     case "broadcastwire":
-    return await this.rr_broadcastwire.WireCommand(m,e);
+    return await this.rr_broadcastwire.WireCommand(m,e).ConfigureAwait(false);
     default:
     throw new MemberNotFoundException("Member not found");
     }
@@ -2185,13 +2185,13 @@ public class testroot_skel : ServiceSkel {
     string ename=m.MemberName;
     switch (ename) {
     case "m1":
-     return await (new ArrayMemoryServiceSkel<double>("m1",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m1);
+     return await (new ArrayMemoryServiceSkel<double>("m1",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m1).ConfigureAwait(false);
     break;
     case "m2":
-     return await (new MultiDimArrayMemoryServiceSkel<double>("m2",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m2);
+     return await (new MultiDimArrayMemoryServiceSkel<double>("m2",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m2).ConfigureAwait(false);
     break;
     case "m3":
-     return await (new MultiDimArrayMemoryServiceSkel<byte>("m3",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m3);
+     return await (new MultiDimArrayMemoryServiceSkel<byte>("m3",this,MemberDefinition_Direction.both)).CallMemoryFunction(m,e,obj.m3).ConfigureAwait(false);
     break;
     default:
     throw new MemberNotFoundException("Member not found");
@@ -2212,25 +2212,25 @@ public class sub1_skel : ServiceSkel {
     switch (ename) {
     case "d1":
     {
-    double[] ret=await obj.get_d1();
+    double[] ret=await obj.get_d1().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackArray<double>("value",ret));
     break;
     }
     case "d2":
     {
-    MultiDimArray ret=await obj.get_d2();
+    MultiDimArray ret=await obj.get_d2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackMultiDimArray(rr_node, "value",(MultiDimArray)ret));
     break;
     }
     case "s_ind":
     {
-    string ret=await obj.get_s_ind();
+    string ret=await obj.get_s_ind().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackString("value",ret));
     break;
     }
     case "i_ind":
     {
-    int ret=await obj.get_i_ind();
+    int ret=await obj.get_i_ind().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<int>("value",ret));
     break;
     }
@@ -2246,22 +2246,22 @@ public class sub1_skel : ServiceSkel {
     switch (ename) {
     case "d1":
     {
-    await obj.set_d1(MessageElementUtil.UnpackArray<double>(me));
+    await obj.set_d1(MessageElementUtil.UnpackArray<double>(me)).ConfigureAwait(false);
     break;
     }
     case "d2":
     {
-    await obj.set_d2(MessageElementUtil.UnpackMultiDimArray(rr_node, me));
+    await obj.set_d2(MessageElementUtil.UnpackMultiDimArray(rr_node, me)).ConfigureAwait(false);
     break;
     }
     case "s_ind":
     {
-    await obj.set_s_ind(MessageElementUtil.UnpackString(me));
+    await obj.set_s_ind(MessageElementUtil.UnpackString(me)).ConfigureAwait(false);
     break;
     }
     case "i_ind":
     {
-    await obj.set_i_ind((MessageElementUtil.UnpackScalar<int>(me)));
+    await obj.set_i_ind((MessageElementUtil.UnpackScalar<int>(me))).ConfigureAwait(false);
     break;
     }
     default:
@@ -2281,13 +2281,13 @@ public class sub1_skel : ServiceSkel {
     public override async Task<object> GetSubObj(string name, string ind) {
     switch (name) {
     case "o2_1": {
-    return await obj.get_o2_1();
+    return await obj.get_o2_1().ConfigureAwait(false);
     }
     case "o2_2": {
-    return await obj.get_o2_2(Int32.Parse(ind));
+    return await obj.get_o2_2(Int32.Parse(ind)).ConfigureAwait(false);
     }
     case "o2_3": {
-    return await obj.get_o2_3(ind);
+    return await obj.get_o2_3(ind).ConfigureAwait(false);
     }
     default:
     break;
@@ -2366,19 +2366,19 @@ public class sub2_skel : ServiceSkel {
     switch (ename) {
     case "s_ind":
     {
-    string ret=await obj.get_s_ind();
+    string ret=await obj.get_s_ind().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackString("value",ret));
     break;
     }
     case "i_ind":
     {
-    int ret=await obj.get_i_ind();
+    int ret=await obj.get_i_ind().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<int>("value",ret));
     break;
     }
     case "data":
     {
-    string ret=await obj.get_data();
+    string ret=await obj.get_data().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackString("value",ret));
     break;
     }
@@ -2394,17 +2394,17 @@ public class sub2_skel : ServiceSkel {
     switch (ename) {
     case "s_ind":
     {
-    await obj.set_s_ind(MessageElementUtil.UnpackString(me));
+    await obj.set_s_ind(MessageElementUtil.UnpackString(me)).ConfigureAwait(false);
     break;
     }
     case "i_ind":
     {
-    await obj.set_i_ind((MessageElementUtil.UnpackScalar<int>(me)));
+    await obj.set_i_ind((MessageElementUtil.UnpackScalar<int>(me))).ConfigureAwait(false);
     break;
     }
     case "data":
     {
-    await obj.set_data(MessageElementUtil.UnpackString(me));
+    await obj.set_data(MessageElementUtil.UnpackString(me)).ConfigureAwait(false);
     break;
     }
     default:
@@ -2424,7 +2424,7 @@ public class sub2_skel : ServiceSkel {
     public override async Task<object> GetSubObj(string name, string ind) {
     switch (name) {
     case "o3_1": {
-    return await obj.get_o3_1(ind);
+    return await obj.get_o3_1(ind).ConfigureAwait(false);
     }
     default:
     break;
@@ -2503,19 +2503,19 @@ public class sub3_skel : ServiceSkel {
     switch (ename) {
     case "ind":
     {
-    string ret=await obj.get_ind();
+    string ret=await obj.get_ind().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackString("value",ret));
     break;
     }
     case "data2":
     {
-    string ret=await obj.get_data2();
+    string ret=await obj.get_data2().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackString("value",ret));
     break;
     }
     case "data3":
     {
-    double ret=await obj.get_data3();
+    double ret=await obj.get_data3().ConfigureAwait(false);
     mr.AddElement(MessageElementUtil.PackScalar<double>("value",ret));
     break;
     }
@@ -2531,17 +2531,17 @@ public class sub3_skel : ServiceSkel {
     switch (ename) {
     case "ind":
     {
-    await obj.set_ind(MessageElementUtil.UnpackString(me));
+    await obj.set_ind(MessageElementUtil.UnpackString(me)).ConfigureAwait(false);
     break;
     }
     case "data2":
     {
-    await obj.set_data2(MessageElementUtil.UnpackString(me));
+    await obj.set_data2(MessageElementUtil.UnpackString(me)).ConfigureAwait(false);
     break;
     }
     case "data3":
     {
-    await obj.set_data3((MessageElementUtil.UnpackScalar<double>(me)));
+    await obj.set_data3((MessageElementUtil.UnpackScalar<double>(me))).ConfigureAwait(false);
     break;
     }
     default:
@@ -2556,7 +2556,7 @@ public class sub3_skel : ServiceSkel {
     case "add":
     {
     double d=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"d")));
-    double rr_ret=await this.obj.add(d, default(CancellationToken));
+    double rr_ret=await this.obj.add(d, default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(MessageElementUtil.PackScalar<double>("return",rr_ret));
     break;
     }

@@ -407,7 +407,7 @@ namespace RobotRaconteurWeb
                         
                     }
                     MessageEntry m = new MessageEntry(MessageEntryType.WireConnectReq, MemberName);
-                    MessageEntry ret = await stub.ProcessRequest(m, cancel);
+                    MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
 
 
                     return connection;
@@ -427,9 +427,9 @@ namespace RobotRaconteurWeb
             Task mutex = Close_mutex.Enter();
             try
             {
-                await mutex;
+                await mutex.ConfigureAwait(false);
                 MessageEntry m = new MessageEntry(MessageEntryType.WireDisconnectReq, MemberName);
-                MessageEntry ret = await stub.ProcessRequest(m, cancel);
+                MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
                 connection = null;
 
             }
@@ -512,7 +512,7 @@ namespace RobotRaconteurWeb
         public override async Task<Tuple<T, TimeSpec>> PeekInValue(CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageEntry(MessageEntryType.WirePeekInValueReq, MemberName);
-            var mr = await stub.ProcessRequest(m, cancel);
+            var mr = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             TimeSpec ts;
             var data =  UnpackPacket(mr.elements, out ts);
             return Tuple.Create(data, ts);
@@ -521,7 +521,7 @@ namespace RobotRaconteurWeb
         public override async Task<Tuple<T, TimeSpec>> PeekOutValue(CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageEntry(MessageEntryType.WirePeekOutValueReq, MemberName);
-            var mr = await stub.ProcessRequest(m, cancel);
+            var mr = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             TimeSpec ts;
             var data = UnpackPacket(mr.elements, out ts);
             return Tuple.Create(data, ts);
@@ -531,7 +531,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.WirePokeOutValueReq, MemberName);
             m.elements = PackPacket(value, TimeSpec.Now);
-            await stub.ProcessRequest(m, cancel);            
+            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);            
         }
     }
 
@@ -647,7 +647,7 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.WireClosed, MemberName);
 
-            await skel.SendWireMessage(m, ee, cancel);
+            await skel.SendWireMessage(m, ee, cancel).ConfigureAwait(false);
 
             try
             {

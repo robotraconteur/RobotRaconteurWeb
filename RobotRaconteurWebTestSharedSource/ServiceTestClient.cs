@@ -1036,6 +1036,7 @@ namespace RobotRaconteurTest
                 err = true;
                 try
                 {
+                    if (r3 != null)
                     RobotRaconteurNode.s.DisconnectService(r3).IgnoreResult();
                 }
                 catch { }

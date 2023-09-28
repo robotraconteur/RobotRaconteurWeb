@@ -158,7 +158,7 @@ namespace RobotRaconteurWeb
         }
         public static void WriteLogRecord(TextWriter writer, RRLogRecord record)
         {
-            writer.Write("[{0}] [{1}] [{2}] [{3}] [{4}]", 
+            writer.Write("[{0}] [{1}] [{2}] [{3}]", 
                 to_iso_extended_string(record.Time), LogLevel_ToString(record.Level), record.ThreadID,
                 Node_ToString(record.Node));
             if(!string.IsNullOrEmpty(record.ComponentName) || !string.IsNullOrEmpty(record.ComponentObjectID))
@@ -167,7 +167,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                writer.Write(" [{0}}]", LogComponent_ToString(record.Component));
+                writer.Write(" [{0}]", LogComponent_ToString(record.Component));
             }
 
             if (!string.IsNullOrEmpty(record.ServicePath) && !string.IsNullOrEmpty(record.Member))
@@ -207,6 +207,7 @@ namespace RobotRaconteurWeb
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "", 
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
         {
+            if (time == default) time = DateTime.UtcNow;
             var r = new RRLogRecord()
             {
                 Node = node,

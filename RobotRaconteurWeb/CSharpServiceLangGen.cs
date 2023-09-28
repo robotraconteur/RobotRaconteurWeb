@@ -1477,14 +1477,14 @@ namespace RobotRaconteurWeb
                 t.name = FixName(m.Name);
                 w2.WriteLine(String.Format("    public async Task<{0}{1}> get_{2}(CancellationToken cancel=default(CancellationToken))", t.cs_type, t.cs_arr_type, t.name) + " {");
                 w2.WriteLine("        MessageEntry m = new MessageEntry(MessageEntryType.PropertyGetReq, \"" + m.Name + "\");");
-                w2.WriteLine("        MessageEntry mr=await ProcessRequest(m, cancel);");
+                w2.WriteLine("        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);");
                 w2.WriteLine("        MessageElement me=mr.FindElement(\"value\");");
                 w2.WriteLine("        return " + str_unpack_message_element("me", m.Type) + ";");
                 w2.WriteLine("        }");
                 w2.WriteLine(String.Format("    public async Task set_{2}({0}{1} value, CancellationToken cancel=default(CancellationToken))", t.cs_type, t.cs_arr_type, t.name) + " {");
                 w2.WriteLine(String.Format("        MessageEntry m=new MessageEntry(MessageEntryType.PropertySetReq,\"{0}\");", m.Name));
                 w2.WriteLine("        MessageElementUtil.AddMessageElement(m," + str_pack_message_element("value", "value", m.Type) + ");");
-                w2.WriteLine(String.Format("        MessageEntry mr=await ProcessRequest(m, cancel);", t));
+                w2.WriteLine(String.Format("        MessageEntry mr=await ProcessRequest(m, cancel).ConfigureAwait(false);", t));
                 w2.WriteLine("        }");
             }
 
@@ -1512,7 +1512,7 @@ namespace RobotRaconteurWeb
                     {
                         w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_m," + str_pack_message_element(p.Name, FixName(p.Name), p) + ");");
                     }
-                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);", t));
+                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);", t));
                     if (m.ReturnType.Type != DataTypes.void_t)
                     {
                         w2.WriteLine("    return " + str_unpack_message_element("rr_me.FindElement(\"return\")", m.ReturnType) + ";");
@@ -1537,7 +1537,7 @@ namespace RobotRaconteurWeb
                     {
                         w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_m," + str_pack_message_element(p.Name, FixName(p.Name), p) + ");");
                     }
-                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, cancel);", t));
+                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);", t));
                     w2.WriteLine("    return new " + t.generator_csharp_base_type + "Client<" + t.generator_csharp_template_params + ">(\"" + m.Name + "\",this,rr_me.FindElement(\"index\").CastData<int[]>()[0]);");
                     w2.WriteLine("    }");
                 }
@@ -1590,13 +1590,13 @@ namespace RobotRaconteurWeb
                     if (GetObjRefIndType(m, out indtype))
                     {
                         w2.WriteLine("    public async Task<" + objtype + "> get_" + FixName(m.Name) + "(" + indtype + " ind, CancellationToken cancel=default(CancellationToken)) {");
-                        w2.WriteLine("    return (" + objtype + ")await FindObjRef(\"" + m.Name + "\",ind.ToString(),cancel);");
+                        w2.WriteLine("    return (" + objtype + ")await FindObjRef(\"" + m.Name + "\",ind.ToString(),cancel).ConfigureAwait(false);");
                         w2.WriteLine("    }");
                     }
                     else
                     {
                         w2.WriteLine("    public async Task<" + objtype + "> get_" + FixName(m.Name) + "(CancellationToken cancel=default(CancellationToken)) {");
-                        w2.WriteLine("    return (" + objtype + ")await FindObjRef(\"" + m.Name + "\", cancel);");
+                        w2.WriteLine("    return (" + objtype + ")await FindObjRef(\"" + m.Name + "\", cancel).ConfigureAwait(false);");
                         w2.WriteLine("    }");
                     }
                 }
@@ -1624,13 +1624,13 @@ namespace RobotRaconteurWeb
                     if (GetObjRefIndType(m, out indtype))
                     {
                         w2.WriteLine("    public async Task<" + objtype + "> get_" + FixName(m.Name) + "(" + indtype + " ind, CancellationToken cancel=default(CancellationToken)) {");
-                        w2.WriteLine("    return (" + objtype + ")await FindObjRefTyped(\"" + FixName(m.Name) + "\",ind.ToString(),\"" + objecttype2 + "\",cancel);");
+                        w2.WriteLine("    return (" + objtype + ")await FindObjRefTyped(\"" + FixName(m.Name) + "\",ind.ToString(),\"" + objecttype2 + "\",cancel).ConfigureAwait(false);");
                         w2.WriteLine("    }");
                     }
                     else
                     {
                         w2.WriteLine("    public async Task<" + objtype + "> get_" + FixName(m.Name) + "(CancellationToken cancel=default(CancellationToken)) {");
-                        w2.WriteLine("    return (" + objtype + ")await FindObjRefTyped(\"" + m.Name + "\",\"" + objecttype2 + "\",cancel);");
+                        w2.WriteLine("    return (" + objtype + ")await FindObjRefTyped(\"" + m.Name + "\",\"" + objecttype2 + "\",cancel).ConfigureAwait(false);");
                         w2.WriteLine("    }");
                     }
                 }
@@ -1759,14 +1759,14 @@ namespace RobotRaconteurWeb
 
                 if (m.ReturnType.Type != DataTypes.void_t)
                 {
-                    w2.WriteLine(String.Format("    var rr_ret=await {0}.Function({1});", FixName(m.Name), params_));
+                    w2.WriteLine(String.Format("    var rr_ret=await {0}.Function({1}).ConfigureAwait(false);", FixName(m.Name), params_));
                     w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_mr," + str_pack_message_element("return", "rr_ret", m.ReturnType) + ");");
                 }
                 else
                 {
                     TypeDefinition tvoid = new TypeDefinition();
                     tvoid.Type = DataTypes.int32_t;
-                    w2.WriteLine(String.Format("    await this.{0}.Function({1});", FixName(m.Name), params_));
+                    w2.WriteLine(String.Format("    await this.{0}.Function({1}).ConfigureAwait(false);", FixName(m.Name), params_));
                     w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_mr," + str_pack_message_element("return", "0", tvoid) + ");");
                 }
                 w2.WriteLine("    break;");
@@ -1830,7 +1830,7 @@ namespace RobotRaconteurWeb
                 w2.WriteLine("    case \"" + m.Name + "\":");
                 w2.WriteLine("    {");
                 convert_type_result t = convert_type(m.Type);
-                w2.WriteLine("    " + t.cs_type + t.cs_arr_type + " ret=await obj.get_" + FixName(m.Name) + "();");
+                w2.WriteLine("    " + t.cs_type + t.cs_arr_type + " ret=await obj.get_" + FixName(m.Name) + "().ConfigureAwait(false);");
                 w2.WriteLine("    mr.AddElement(" + str_pack_message_element("value", "ret", m.Type) + ");");
                 w2.WriteLine("    break;");
                 w2.WriteLine("    }");
@@ -1855,7 +1855,7 @@ namespace RobotRaconteurWeb
                 w2.WriteLine("    case \"" + m.Name + "\":");
                 w2.WriteLine("    {");
 
-                w2.WriteLine("    await obj.set_" + FixName(m.Name) + "(" + str_unpack_message_element("me", m.Type) + ");");
+                w2.WriteLine("    await obj.set_" + FixName(m.Name) + "(" + str_unpack_message_element("me", m.Type) + ").ConfigureAwait(false);");
                 w2.WriteLine("    break;");
                 w2.WriteLine("    }");
             }
@@ -1896,13 +1896,13 @@ namespace RobotRaconteurWeb
                     }
                     if (m.ReturnType.Type == DataTypes.void_t)
                     {
-                        w2.WriteLine("    await this.obj." + FixName(m.Name) + "(" + params_  + ");");
+                        w2.WriteLine("    await this.obj." + FixName(m.Name) + "(" + params_  + ").ConfigureAwait(false);");
                         w2.WriteLine("    rr_mr.AddElement(\"return\",(int)0);");
                     }
                     else
                     {
                         convert_type_result t = convert_type(m.ReturnType);
-                        w2.WriteLine("    " + t.cs_type + t.cs_arr_type + " rr_ret=await this.obj." + FixName(m.Name) + "(" + params_ + ");");
+                        w2.WriteLine("    " + t.cs_type + t.cs_arr_type + " rr_ret=await this.obj." + FixName(m.Name) + "(" + params_ + ").ConfigureAwait(false);");
                         w2.WriteLine("    rr_mr.AddElement(" + str_pack_message_element("return", "rr_ret", m.ReturnType) + ");");
                     }
                     w2.WriteLine("    break;");
@@ -1921,7 +1921,7 @@ namespace RobotRaconteurWeb
 
                     }
                     w2.WriteLine("    var rr_ep = ServerEndpoint.CurrentEndpoint;");
-                    w2.WriteLine("    " + t4.generator_csharp_type + " rr_ret=await this.obj." + FixName(m.Name) + "(" + params_ + ");");
+                    w2.WriteLine("    " + t4.generator_csharp_type + " rr_ret=await this.obj." + FixName(m.Name) + "(" + params_ + ").ConfigureAwait(false);");
                     w2.WriteLine("    lock(generators) {");
                     w2.WriteLine("    int rr_index = GetNewGeneratorIndex();");
                     w2.WriteLine("    generators.Add(rr_index, new " + t4.generator_csharp_base_type + "Server<" + t4.generator_csharp_template_params + ">(rr_ret,\""  + m.Name + "\",rr_index, this, rr_ep));");
@@ -1949,16 +1949,16 @@ namespace RobotRaconteurWeb
                 {
                     if (indtype == "int")
                     {
-                        w2.WriteLine("    return await obj.get_" + FixName(m.Name) + "(Int32.Parse(ind));");
+                        w2.WriteLine("    return await obj.get_" + FixName(m.Name) + "(Int32.Parse(ind)).ConfigureAwait(false);");
                     }
                     else
                     {
-                        w2.WriteLine("    return await obj.get_" + FixName(m.Name) + "(ind);");
+                        w2.WriteLine("    return await obj.get_" + FixName(m.Name) + "(ind).ConfigureAwait(false);");
                     }
                 }
                 else
                 {
-                    w2.WriteLine("    return await obj.get_" + FixName(m.Name) + "();");
+                    w2.WriteLine("    return await obj.get_" + FixName(m.Name) + "().ConfigureAwait(false);");
                 }
                 w2.WriteLine("    }");
             }
@@ -2031,7 +2031,7 @@ namespace RobotRaconteurWeb
                     w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_mm," + str_pack_message_element(p.Name, FixName(p.Name), p) + ");");
                 }
 
-                w2.WriteLine("    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel);");
+                w2.WriteLine("    MessageEntry rr_mr=await RRContext.ProcessCallbackRequest(rr_mm,rr_endpoint,rr_cancel).ConfigureAwait(false);");
                 w2.WriteLine("    MessageElement rr_me = rr_mr.FindElement(\"return\");");
                 if (m.ReturnType.Type != DataTypes.void_t)
                 {
@@ -2116,7 +2116,7 @@ namespace RobotRaconteurWeb
             foreach (var m in MemberIter<PipeDefinition>(e))
             {                
                 w2.WriteLine("    case \"" + m.Name + "\":");
-                w2.WriteLine("    return await this.rr_" + FixName(m.Name) + ".PipeCommand(m,e);");
+                w2.WriteLine("    return await this.rr_" + FixName(m.Name) + ".PipeCommand(m,e).ConfigureAwait(false);");
             }
                 
             w2.WriteLine("    default:");
@@ -2130,7 +2130,7 @@ namespace RobotRaconteurWeb
             foreach (var m in MemberIter<WireDefinition>(e))
             {
                 w2.WriteLine("    case \"" + m.Name + "\":");
-                w2.WriteLine("    return await this.rr_" + FixName(m.Name) + ".WireCommand(m,e);");
+                w2.WriteLine("    return await this.rr_" + FixName(m.Name) + ".WireCommand(m,e).ConfigureAwait(false);");
             }
             w2.WriteLine("    default:");
             w2.WriteLine("    throw new MemberNotFoundException(\"Member not found\");");
@@ -2182,11 +2182,11 @@ namespace RobotRaconteurWeb
                 {
                     if (m.Type.ArrayType == DataTypes_ArrayTypes.array)
                     {
-                        w2.WriteLine(String.Format("     return await (new ArrayMemoryServiceSkel<{1}>(\"{0}\",this," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2});", m.Name, t.cs_type, t.name));
+                        w2.WriteLine(String.Format("     return await (new ArrayMemoryServiceSkel<{1}>(\"{0}\",this," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2}).ConfigureAwait(false);", m.Name, t.cs_type, t.name));
                     }
                     else
                     {
-                        w2.WriteLine(String.Format("     return await (new MultiDimArrayMemoryServiceSkel<{1}>(\"{0}\",this," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2});", m.Name, t.cs_type, t.name));
+                        w2.WriteLine(String.Format("     return await (new MultiDimArrayMemoryServiceSkel<{1}>(\"{0}\",this," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2}).ConfigureAwait(false);", m.Name, t.cs_type, t.name));
                     }
                 }
                 else
@@ -2207,11 +2207,11 @@ namespace RobotRaconteurWeb
 
                     if (m.Type.ArrayType == DataTypes_ArrayTypes.array)
                     {
-                        w2.WriteLine(String.Format("     return await (new " + c +  "ArrayMemoryServiceSkel<{1}>(\"{0}\",this," + elem_size + "," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2});", m.Name, t.cs_type, t.name));
+                        w2.WriteLine(String.Format("     return await (new " + c +  "ArrayMemoryServiceSkel<{1}>(\"{0}\",this," + elem_size + "," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2}).ConfigureAwait(false);", m.Name, t.cs_type, t.name));
                     }
                     else
                     {
-                        w2.WriteLine(String.Format("     return await (new " + c + "MultiDimArrayMemoryServiceSkel<{1}>(\"{0}\",this," + elem_size + "," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2});", m.Name, t.cs_type, t.name));
+                        w2.WriteLine(String.Format("     return await (new " + c + "MultiDimArrayMemoryServiceSkel<{1}>(\"{0}\",this," + elem_size + "," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2}).ConfigureAwait(false);", m.Name, t.cs_type, t.name));
                     }
                 }
                 w2.WriteLine("    break;");

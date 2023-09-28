@@ -17,7 +17,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using com.robotraconteur.testing.TestService1;
 using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
@@ -396,7 +398,388 @@ namespace RobotRaconteurTest
                 RobotRaconteurNode.s.Shutdown();
 
                 Console.WriteLine("Test complete, no errors detected");
-            }            
+            }
+            else
+            if (command == "subscribertest")
+            {
+                RobotRaconteurNode.s.SetLogLevelFromEnvVariable();
+
+                if (args.Length < 2)
+                {
+                    Console.WriteLine("Usage for subscribertest:  RobotRaconteurTest subscribertest servicetype");
+                    return;
+                }
+
+                var servicetype = args[1];
+
+                LocalTransport t2 = new LocalTransport();
+                t2.EnableNodeDiscoveryListening();
+                RobotRaconteurNode.s.RegisterTransport(t2);
+
+                TcpTransport t = new TcpTransport();
+                t.EnableNodeDiscoveryListening();
+                RobotRaconteurNode.s.RegisterTransport(t);
+
+                RobotRaconteurNode.s.RegisterServiceType(
+                    new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                RobotRaconteurNode.s.RegisterServiceType(
+                    new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var subscription = RobotRaconteurNode.s.SubscribeServiceByType(new string[] { servicetype });
+
+                subscription.ClientConnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
+                {
+                    Console.WriteLine("Client connected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                    testroot e1 = (testroot)e;
+                    e1.get_d1().ContinueWith(
+                        delegate (Task<double> f)
+                        {
+                            if (f.IsFaulted)
+                            {
+                                return;
+                            }
+                            Console.WriteLine("d1 = " + f.Result);
+                        }
+                        );
+                };
+
+                subscription.ClientDisconnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
+                {
+                    Console.WriteLine("Client disconnected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                };
+
+                var wire_subscription = subscription.SubscribeWire<double>("broadcastwire");
+                wire_subscription.WireValueChanged += delegate (WireSubscription<double> c, double d, TimeSpec e) {
+                    // Console.WriteLine("Wire value changed: " + d);
+                };
+
+                var pipe_subscription = subscription.SubscribePipe<double>("broadcastpipe");
+                pipe_subscription.PipePacketReceived += delegate (PipeSubscription<double> c)
+                {
+                    double val;
+                    while (c.TryReceivePacket(out val))
+                    {
+                        Console.WriteLine("Received pipe packet: " + val);
+                    }
+                };
+
+                System.Threading.Thread.Sleep(6000);
+
+                var connected_clients = subscription.GetConnectedClients();
+
+                foreach (var c in connected_clients)
+                {
+                    Console.WriteLine("Client: " + c.Key.NodeID + ", " + c.Key.ServiceName);
+                }
+
+                TimeSpec w1_time = null;
+                double w1_value;
+                var w1_res = wire_subscription.TryGetInValue(out w1_value);
+
+                if (w1_res)
+                {
+                    Console.WriteLine("Got broadcastwire value: " + w1_value + " " + w1_time?.seconds);
+                }
+
+                Console.WriteLine("Waiting for services...");
+
+                Console.ReadLine();
+
+                RobotRaconteurNode.s.Shutdown();
+
+                return;
+            }
+            else
+            if (command == "subscriberurltest")
+            {
+                RobotRaconteurNode.s.SetLogLevelFromEnvVariable();
+
+                if (args.Length < 2)
+                {
+                    Console.WriteLine("Usage for subscriberurltest:  RobotRaconteurTest subscriberurltest url");
+                    return;
+                }
+
+                var url = args[1];
+
+                LocalTransport t2 = new LocalTransport();
+                t2.EnableNodeDiscoveryListening();
+                RobotRaconteurNode.s.RegisterTransport(t2);
+
+                TcpTransport t = new TcpTransport();
+                t.EnableNodeDiscoveryListening();
+                RobotRaconteurNode.s.RegisterTransport(t);
+                                
+                RobotRaconteurNode.s.RegisterServiceType(
+                    new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                RobotRaconteurNode.s.RegisterServiceType(
+                    new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var subscription = RobotRaconteurNode.s.SubscribeService(new string[]{ url});
+
+                subscription.ClientConnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
+                {
+                    Console.WriteLine("Client connected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                    //testroot e1 = (testroot)e;
+                    //Console.WriteLine("d1 = " + e1.get_d1().Result);
+                };
+
+                subscription.ClientDisconnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
+                {
+                    Console.WriteLine("Client disconnected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                };
+
+                subscription.ClientConnectFailed +=
+                    delegate (ServiceSubscription c, ServiceSubscriptionClientID d, string[] url2, Exception err)
+                    {
+                        Console.WriteLine("Client connect failed: " + d.NodeID.ToString() + " url: " + String.Join(",", url2) +
+                                      err.ToString());
+                    };
+
+                var cancel2 = new CancellationTokenSource();
+                cancel2.CancelAfter(6000);
+                subscription.GetDefaultClientWait<object>(cancel2.Token).ContinueWith(delegate (Task<object> res) {
+                    if (res.IsFaulted)
+                    {
+                        Console.WriteLine("AsyncGetDefaultClient failed");
+                    }
+                    else if (res.Result == null)
+                    {
+                        Console.WriteLine("AsyncGetDefaultClient returned null");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"AsyncGetDefaultClient successful: {res.Result}");
+                    }
+                });
+                var cancel1 = new CancellationTokenSource();
+                cancel1.CancelAfter(6000);
+                var client2 = subscription.GetDefaultClientWait<object>(cancel1.Token).GetAwaiter().GetResult();
+                object client3;
+                var cancel3 = new CancellationTokenSource();
+                cancel3.CancelAfter(6000);
+                var try_res = subscription.TryGetDefaultClientWait<object>(cancel3.Token).Result;
+                
+                Console.WriteLine($"try_res = {try_res.Item1}");
+
+                var connected_clients = subscription.GetConnectedClients();
+
+                foreach (var c in connected_clients)
+                {
+                    Console.WriteLine("Client: " + c.Key.NodeID + ", " + c.Key.ServiceName);
+                }
+
+                try
+                {
+                    Console.WriteLine(subscription.GetDefaultClient<testroot>().get_d1().Result);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    Console.WriteLine("Client not connected");
+                }
+
+                object client1;
+                subscription.TryGetDefaultClient(out client1);
+
+                Console.WriteLine("Waiting for services...");
+
+                Console.ReadLine();
+
+                RobotRaconteurNode.s.Shutdown();
+
+                return;
+            }
+            else
+            if (command == "subscriberfiltertest")
+            {
+                RobotRaconteurNode.s.SetLogLevelFromEnvVariable();
+
+                if (args.Length < 2)
+                {
+                    throw new Exception(
+                        "Usage for subscriberfiltertest:  RobotRaconteurTest subscriberfiltertest servicetype");
+                }
+
+                var servicetype = args[1];
+
+                var f = new ServiceSubscriptionFilter();
+
+                if (args.Length >= 3)
+                {
+                    var subcommand = args[2];
+
+                    if (subcommand == "nodeid")
+                    {
+                        if (args.Length < 4)
+                        {
+                            throw new Exception(
+                                "Usage for subscriberfiltertest:  RobotRaconteurTest subscriberfiltertest nodeid <nodeid>");
+                        }
+
+                        var n = new ServiceSubscriptionFilterNode();
+                        n.NodeID = new NodeID(args[3]);
+                        f.Nodes = new ServiceSubscriptionFilterNode[] { n };
+                    }
+
+                    else if (subcommand == "nodename")
+                    {
+                        if (args.Length < 4)
+                        {
+                            throw new Exception(
+                                "Usage for subscriberfiltertest:  RobotRaconteurTest subscriberfiltertest nodename <nodename>");
+                        }
+
+                        var n = new ServiceSubscriptionFilterNode();
+                        n.NodeName = args[3];
+                        f.Nodes = new ServiceSubscriptionFilterNode[] { n };
+                    }
+                    else if (subcommand == "nodeidscheme")
+                    {
+                        if (args.Length < 5)
+                        {
+                            throw new Exception(
+                                "Usage for subscriberfiltertest:  RobotRaconteurTest subscriberfiltertest nodeidscheme <nodeid> <schemes>");
+                        }
+
+                        var n = new ServiceSubscriptionFilterNode();
+                        n.NodeID = new NodeID(args[3]);
+                        f.Nodes = new ServiceSubscriptionFilterNode[] { n };
+                        f.TransportSchemes = args[4].Split(new char[] { ',' });
+                    }
+                    else if (subcommand == "nodeidauth")
+                    {
+                        if (args.Length < 6)
+                        {
+                            throw new Exception(
+                                "Usage for subscriberfiltertest:  RobotRaconteurTest subscriberfiltertest nodeidauth <nodeid> <username> <password>");
+                        }
+
+                        var n = new ServiceSubscriptionFilterNode();
+                        n.NodeID = new NodeID(args[3]);
+                        n.Username = args[4];
+                        n.Credentials = new Dictionary<string, object>() { { "password", args[5] } };
+                        f.Nodes = new ServiceSubscriptionFilterNode[] { n };
+                    }
+                    else if (subcommand == "servicename")
+                    {
+                        if (args.Length < 4)
+                        {
+                            throw new Exception(
+                                "Usage for subscriberfiltertest:  RobotRaconteurTest subscriberfiltertest servicename <servicename>");
+                        }
+
+                        var n = new ServiceSubscriptionFilterNode();
+                        f.ServiceNames = new string[] { args[3] };
+                    }
+                    else if (subcommand == "predicate")
+                    {
+                        f.Predicate = delegate (ServiceInfo2 info)
+                        {
+                            Console.WriteLine("Predicate: " + info.NodeName);
+                            return info.NodeName == "testprog";
+                        };
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown subscriberfiltertest command");
+                    }
+
+                    LocalTransport t2 = new LocalTransport();
+                    t2.EnableNodeDiscoveryListening();
+                    RobotRaconteurNode.s.RegisterTransport(t2);
+
+                    TcpTransport t = new TcpTransport();
+                    t.EnableNodeDiscoveryListening();
+                    RobotRaconteurNode.s.RegisterTransport(t);
+
+                    RobotRaconteurNode.s.RegisterServiceType(
+                        new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                    RobotRaconteurNode.s.RegisterServiceType(
+                        new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                    var subscription = RobotRaconteurNode.s.SubscribeServiceByType(new string[] { servicetype }, f);
+
+                    subscription.ClientConnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
+                    {
+                        Console.WriteLine("Client connected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                        testroot e1 = (testroot)e;
+                        Console.WriteLine("d1 = " + e1.get_d1().Result);
+                    };
+
+                    subscription.ClientDisconnected +=
+                        delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
+                        {
+                            Console.WriteLine("Client disconnected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                        };
+
+                    Console.ReadLine();
+
+                    RobotRaconteurNode.s.Shutdown();
+
+                    return;
+                }
+
+                return;
+            }
+            else
+            if (command == "serviceinfo2subscribertest")
+            {
+                RobotRaconteurNode.s.SetLogLevelFromEnvVariable();
+
+                if (args.Length < 2)
+                {
+                    Console.WriteLine("Usage for subscribertest:  RobotRaconteurTest subscribertest servicetype");
+                    return;
+                }
+
+                var servicetype = args[1];
+
+                LocalTransport t2 = new LocalTransport();
+                t2.EnableNodeDiscoveryListening();
+                RobotRaconteurNode.s.RegisterTransport(t2);
+
+                TcpTransport t = new TcpTransport();
+                t.EnableNodeDiscoveryListening();
+                RobotRaconteurNode.s.RegisterTransport(t);
+
+              
+                RobotRaconteurNode.s.RegisterServiceType(
+                    new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                RobotRaconteurNode.s.RegisterServiceType(
+                    new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var subscription = RobotRaconteurNode.s.SubscribeServiceInfo2(new string[] { servicetype });
+                subscription.ServiceDetected +=
+                    delegate (ServiceInfo2Subscription sub, ServiceSubscriptionClientID id, ServiceInfo2 info)
+                    {
+                        Console.WriteLine("Service detected: " + info.NodeID.ToString() + ", " + info.Name);
+                    };
+
+                subscription.ServiceLost +=
+                    delegate (ServiceInfo2Subscription sub, ServiceSubscriptionClientID id, ServiceInfo2 info)
+                    {
+                        Console.WriteLine("Service lost: " + info.NodeID.ToString() + ", " + info.Name);
+                    };
+
+                System.Threading.Thread.Sleep(6000);
+
+                var connected_clients = subscription.GetDetectedServiceInfo2();
+
+                foreach (var c in connected_clients)
+                {
+                    Console.WriteLine("Client: " + c.Key.NodeID + ", " + c.Key.ServiceName);
+                }
+
+                Console.WriteLine("Waiting for services...");
+
+                Console.ReadLine();
+
+                RobotRaconteurNode.s.Shutdown();
+
+                return;
+            }
+
             else
             {
                 throw new Exception("Unknown command");

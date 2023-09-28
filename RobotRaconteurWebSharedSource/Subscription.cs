@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using RobotRaconteurWeb.Extensions;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -416,7 +417,7 @@ namespace RobotRaconteurWeb
         bool active = false;
         Dictionary<ServiceSubscriptionClientID, ServiceSubscription_client> clients = new Dictionary<ServiceSubscriptionClientID, ServiceSubscription_client>();
 
-        RobotRaconteurNode node;
+        internal RobotRaconteurNode node;
         Discovery parent;
         string[] service_types;
         ServiceSubscriptionFilter filter;
@@ -428,7 +429,7 @@ namespace RobotRaconteurWeb
         string service_url_username;
         Dictionary<string, object> service_url_credentials;
 
-        CancellationTokenSource cancel;
+        CancellationTokenSource cancel = new CancellationTokenSource();
 
         public void Close()
         {
@@ -564,7 +565,14 @@ namespace RobotRaconteurWeb
                     }
                     catch (Exception ex)
                     {
-                        ClientConnectFailed?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.service_name), client.urls, ex);
+                        try
+                        {
+                            ClientConnectFailed?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.service_name), client.urls, ex);
+                        }
+                        catch (Exception ex2)
+                        {
+                            LogDebug(string.Format("Error in ServiceSubscription.ConnectClientFailed callback {0}", ex2), node, RobotRaconteur_LogComponent.Subscription);
+                        }
                         client.error_count++;
                         if (client.error_count > 25 && !use_service_url)
                         {
@@ -582,6 +590,7 @@ namespace RobotRaconteurWeb
 
                     wait_task = new TaskCompletionSource<bool>();
                     wait_task.AttachCancellationToken(cancel.Token);
+                    bool closed_sent = false;
                     ((ServiceStub)o).RRContext.ClientServiceListener += delegate (ClientContext context, ClientServiceListenerEventType evt, object param)
                     {
                         // TODO: ClientConnectionTimeout and TransportConnectionClosed
@@ -589,13 +598,36 @@ namespace RobotRaconteurWeb
                             || evt == ClientServiceListenerEventType.ClientConnectionTimeout
                             || evt == ClientServiceListenerEventType.TransportConnectionClosed)
                         {
-                            ClientDisconnected?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
+                            
+                            try
+                            {
+                                bool send_closed = false;
+                                lock (this)
+                                {
+                                    send_closed = !closed_sent;
+                                    closed_sent = true;
+                                }
+                                if (send_closed)
+                                {
+                                    ClientDisconnected?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
+                                }
+                            }
+                            catch (Exception ex2)
+                            {
+                                LogDebug(string.Format("Error in ServiceSubscription.ConnectClientFailed callback {0}", ex2), node, RobotRaconteur_LogComponent.Subscription);
+                            }
                             client.claimed = false;
                             wait_task.SetResult(true);
                         }
                     };
-
-                    ClientConnected?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
+                    try
+                    {
+                        ClientConnected?.Invoke(this, new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogDebug(string.Format("Error in ServiceSubscription.ClientConnected callback {0}",ex), node, RobotRaconteur_LogComponent.Subscription);
+                    }
 
                     lock (connect_waiter)
                     {
@@ -605,12 +637,12 @@ namespace RobotRaconteurWeb
                     {
                         foreach (var p in pipe_subscriptions)
                         {
-                            p.ClientConnected(new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
+                            p.ClientConnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                         }
 
                         foreach (var w in wire_subscriptions)
                         {
-                            w.ClientConnected(new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
+                            w.ClientConnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                         }
                     }
 
@@ -626,7 +658,14 @@ namespace RobotRaconteurWeb
 
                         try
                         {
-                            _ = node.DisconnectService(o).IgnoreResult();
+                            _ = Task.Run(delegate ()
+                            {
+                                try
+                                {
+                                    _ = node.DisconnectService(o).IgnoreResult();
+                                }
+                                catch { }
+                            }).IgnoreResult();
                         }
                         catch { }
 
@@ -634,12 +673,12 @@ namespace RobotRaconteurWeb
                         {
                             foreach (var p in pipe_subscriptions)
                             {
-                                p.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
+                                p.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                             }
 
                             foreach (var w in wire_subscriptions)
                             {
-                                w.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.nodename), o);
+                                w.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                             }
                         }
                     }
@@ -793,28 +832,17 @@ namespace RobotRaconteurWeb
 
         public uint ConnectRetryDelay { get; set; } = 2500;
 
-        public WireSubscription<T> SubscribeWireClient<T>(string membername, string servicepath = null)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public PipeSubscription<T> SubscribePipeClient<T>(string membername, string servicepath = null)
-        {
-            throw new NotImplementedException();
-        }
-
         public T GetDefaultClient<T>()
         {
             lock (this)
             {
-                object ret = clients.Values.FirstOrDefault();
-                if (ret == null)
+                T ret;
+                if (!TryGetDefaultClient(out ret))
                 {
                     throw new ConnectionException("No clients connected");
                 }
 
-                return (T)ret;
+                return ret;
             }
         }
 
@@ -822,13 +850,18 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                object ret = clients.Values.FirstOrDefault();
+                var client_storage = clients.Values.FirstOrDefault();
+                if (client_storage == null)
+                {
+                    client = default;
+                    return false;
+                }
+                var ret = client_storage.client;
                 if (ret == null)
                 {
                     client = default;
                     return false;
                 }
-
                 client = (T)ret;
                 return true;
             }
@@ -837,16 +870,31 @@ namespace RobotRaconteurWeb
         AsyncValueWaiter<object> connect_waiter = new AsyncValueWaiter<object>();
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel = default)
         {
-            if (TryGetDefaultClient<T>(out var o))
-            {
-                return o;
-            }
-
             var waiter = connect_waiter.CreateWaiterTask(-1, cancel);
             using (waiter)
             {
+                if (TryGetDefaultClient<T>(out var o))
+                {
+                    return o;
+                }
                 await waiter.Task.ConfigureAwait(false);
                 return GetDefaultClient<T>();
+            }
+        }
+
+        public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel = default)
+        {
+            var waiter = connect_waiter.CreateWaiterTask(-1, cancel);
+            using (waiter)
+            {
+                if (TryGetDefaultClient<T>(out var o))
+                {
+                    return Tuple.Create(true, o);
+                }
+                await waiter.Task.ConfigureAwait(false);
+                T client;
+                bool res = TryGetDefaultClient<T>(out client);
+                return Tuple.Create(res, client);
             }
         }
 
@@ -967,19 +1015,20 @@ namespace RobotRaconteurWeb
         public WireSubscription<T> SubscribeWire<T>(string membername, string servicepath = null)
         {
             var o = new WireSubscription<T>(this, membername, servicepath);
-            lock(this)
+            lock (this)
             {
                 if (wire_subscriptions.FirstOrDefault(x => x.membername == membername && x.servicepath == servicepath) != null)
                 {
-                    throw new InvalidOperationException("Already subscribet to wire member: " + membername);
+                    throw new InvalidOperationException("Already subscribed to wire member: " + membername);
                 }
-            }
 
-            wire_subscriptions.Add(o);
 
-            foreach( var c in clients.Values)
-            {
-                o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c);
+                wire_subscriptions.Add(o);
+
+                foreach (var c in clients.Values)
+                {
+                    o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c);
+                }
             }
             return o;
         }
@@ -991,15 +1040,16 @@ namespace RobotRaconteurWeb
             {
                 if (pipe_subscriptions.FirstOrDefault(x => x.membername == membername && x.servicepath == servicepath) != null)
                 {
-                    throw new InvalidOperationException("Already subscribet to wire member: " + membername);
+                    throw new InvalidOperationException("Already subscribed to pipe member: " + membername);
                 }
-            }
 
-            pipe_subscriptions.Add(o);
 
-            foreach (var c in clients.Values)
-            {
-                o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c);
+                pipe_subscriptions.Add(o);
+
+                foreach (var c in clients.Values)
+                {
+                    o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c);
+                }
             }
             return o;
         }
@@ -1047,9 +1097,9 @@ namespace RobotRaconteurWeb
         protected internal string membername;
         protected internal string servicepath;
 
-        protected internal CancellationTokenSource cancel;
+        protected internal CancellationTokenSource cancel = new CancellationTokenSource();
 
-        internal Dictionary<ServiceSubscriptionClientID, WireSubscription_connection> connections;
+        internal Dictionary<ServiceSubscriptionClientID, WireSubscription_connection> connections = new Dictionary<ServiceSubscriptionClientID, WireSubscription_connection>();
         public void Close()
         {
             this.cancel.Cancel();
@@ -1135,7 +1185,10 @@ namespace RobotRaconteurWeb
 
         internal WireSubscriptionBase(ServiceSubscription parent, string membernname, string servicepath)
         {
-
+            this.parent = parent;
+            this.node = parent.node;
+            this.membername = membernname;
+            this.servicepath = servicepath;
         }
 
         internal void ClientConnected(ServiceSubscriptionClientID id, object client)
@@ -1183,7 +1236,8 @@ namespace RobotRaconteurWeb
             }
             try
             {
-                while (!c.cancel.IsCancellationRequested)
+                var wait_task = new TaskCompletionSource<bool>();
+                while (!c.cancel.IsCancellationRequested && !wait_task.Task.IsCompleted)
                 {
                     try
                     {
@@ -1218,7 +1272,6 @@ namespace RobotRaconteurWeb
 
                         c.connection = cc;
 
-                        var wait_task = new TaskCompletionSource<bool>();
                         wait_task.AttachCancellationToken(c.cancel.Token);
 
                         Wire<T>.WireValueChangedFunction wire_changed_ev = delegate (Wire<T>.WireConnection ev_c, T ev_v, TimeSpec ev_t) 
@@ -1237,7 +1290,7 @@ namespace RobotRaconteurWeb
                                 in_value_time_local = DateTime.UtcNow;
                                 in_value_waiter.NotifyAll(ev_v);
                                 
-                                WireValueChanged?.Invoke(ev_c, ev_v, ev_t);
+                                WireValueChanged?.Invoke(this, ev_v, ev_t);
                                 
                             }
                         };
@@ -1269,8 +1322,13 @@ namespace RobotRaconteurWeb
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        LogDebug(string.Format("WireSubscription RunClient exception {0}", ex), node, RobotRaconteur_LogComponent.Subscription);
                     }
+                    try
+                    {
+                        await Task.Delay(2500, c.cancel.Token);
+                    }
+                    catch { }
                 }                
                
             }
@@ -1280,6 +1338,67 @@ namespace RobotRaconteurWeb
                 {
                     connections.Remove(id);
                 }
+            }
+        }
+
+        public T InValue
+        {
+            get
+            {
+                lock (this)
+                {
+                    if (!in_value_valid)
+                    {
+                        throw new InvalidOperationException("InValue is not valid");
+                    }
+                    return (T)in_value;
+                }
+            }
+        }
+
+        public T GetInValue(out TimeSpec ts, out Wire<T>.WireConnection connection)
+        {
+            lock(this)
+            {
+                if (!in_value_valid)
+                {
+                    throw new InvalidOperationException("InValue is not valid");
+                }
+                ts = in_value_time;
+                connection = (Wire<T>.WireConnection)in_value_connection;
+                return (T)in_value;
+            }
+        }
+
+        public bool TryGetInValue(out T val, out TimeSpec ts, out Wire<T>.WireConnection connection)
+        {
+            lock (this)
+            {
+                if (!in_value_valid)
+                {
+                    val = default;
+                    ts = default;
+                    connection = default;
+                    return false;
+                }
+                ts = in_value_time;
+                connection = (Wire<T>.WireConnection)in_value_connection;
+                val=(T)in_value;
+                return true;
+            }
+        }
+
+        public bool TryGetInValue(out T val)
+        {
+            lock (this)
+            {
+                if (!in_value_valid)
+                {
+                    val = default;                    
+                    return false;
+                }
+                val = (T)in_value;
+                return true;
             }
         }
 
@@ -1299,13 +1418,13 @@ namespace RobotRaconteurWeb
                     }
                     catch (System.Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        LogDebug(string.Format("WireSubscription SetOutValueAll exception {0}", ex), node, RobotRaconteur_LogComponent.Subscription);
                     }
                 }
             }
         }
 
-        public event Action<Wire<T>.WireConnection, T, TimeSpec> WireValueChanged;
+        public event Action<WireSubscription<T>, T, TimeSpec> WireValueChanged;
     }
 
     internal class PipeSubscription_connection
@@ -1404,6 +1523,7 @@ namespace RobotRaconteurWeb
         internal protected PipeSubscriptionBase(ServiceSubscription parent, string membername, string servicepath="", int max_recv_packets = -1, int max_send_backlog = 5)
         {
             this.parent = parent;
+            this.node = parent.node;
             this.membername = membername;
             this.servicepath = servicepath;
             this.max_recv_packets=max_recv_packets; 
@@ -1444,7 +1564,7 @@ namespace RobotRaconteurWeb
         protected internal string servicepath;
         protected internal int max_recv_packets;
         protected internal int max_send_backlog;
-        protected internal CancellationTokenSource cancel;
+        protected internal CancellationTokenSource cancel = new CancellationTokenSource();
     }
     public class PipeSubscription<T> : PipeSubscriptionBase
     {
@@ -1527,11 +1647,16 @@ namespace RobotRaconteurWeb
 
             lock (this)
             {
+                if (connections.ContainsKey(id))
+                {
+                    return;
+                }
                 connections.Add(id, c);
             }
             try
             {
-                while (!c.cancel.IsCancellationRequested)
+                var wait_task = new TaskCompletionSource<bool>();
+                while (!c.cancel.IsCancellationRequested && !wait_task.Task.IsCompleted)
                 {
                     try
                     {
@@ -1567,7 +1692,6 @@ namespace RobotRaconteurWeb
 
                         c.endpoint = cc;
 
-                        var wait_task = new TaskCompletionSource<bool>();
                         wait_task.AttachCancellationToken(c.cancel.Token);
 
                         Pipe<T>.PipePacketReceivedCallbackFunction pipe_changed_ev = delegate (Pipe<T>.PipeEndpoint ev_ep)
@@ -1631,8 +1755,13 @@ namespace RobotRaconteurWeb
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        LogDebug(string.Format("PipeSubscription RunClient exception {0}", ex), node, RobotRaconteur_LogComponent.Subscription);
                     }
+                    try
+                    {
+                        await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false);
+                    }
+                    catch { }
                 }
 
             }

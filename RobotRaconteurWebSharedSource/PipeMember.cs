@@ -59,11 +59,11 @@ namespace RobotRaconteurWeb
                 Task mutex = send_mutex.Enter();
                 try
                 {
-                    await mutex;
+                    await mutex.ConfigureAwait(false);
                     send_packet_number = (send_packet_number < UInt32.MaxValue)
                         ? send_packet_number + 1 : 0;
 
-                    await parent.SendPipePacket(packet, index, send_packet_number, RequestPacketAck, endpoint, cancel);
+                    await parent.SendPipePacket(packet, index, send_packet_number, RequestPacketAck, endpoint, cancel).ConfigureAwait(false);
                     return send_packet_number;
                 }
                 finally
@@ -75,7 +75,7 @@ namespace RobotRaconteurWeb
             
             public async Task Close()
             {
-                await parent.Close(this);
+                await parent.Close(this).ConfigureAwait(false);
             }
 
             private uint increment_packet_number(uint packetnum)
@@ -167,7 +167,7 @@ namespace RobotRaconteurWeb
 
             public async Task<T> ReceivePacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
-                var ret = await TryReceivePacketWait(timeout, false, cancel);
+                var ret = await TryReceivePacketWait(timeout, false, cancel).ConfigureAwait(false);
                 if (!ret.Item1)
                 {
                     throw new InvalidOperationException("Receive queue empty");
@@ -177,7 +177,7 @@ namespace RobotRaconteurWeb
 
             public async Task<T> PeekPacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
-                var ret = await TryReceivePacketWait(timeout, true, cancel);
+                var ret = await TryReceivePacketWait(timeout, true, cancel).ConfigureAwait(false);
                 if (!ret.Item1)
                 {
                     throw new InvalidOperationException("Receive queue empty");
@@ -367,7 +367,7 @@ namespace RobotRaconteurWeb
             MessageElement me = PackPacket(data, index, packetnumber, requestack);
             MessageEntry m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
             m.AddElement(me);
-            await stub.SendPipeMessage(m, cancel);
+            await stub.SendPipeMessage(m, cancel).ConfigureAwait(false);
         }
 
         List<Tuple<int,object>> connecting = new List<Tuple<int,object>>();
@@ -382,7 +382,7 @@ namespace RobotRaconteurWeb
             {
                 MessageEntry m = new MessageEntry(MessageEntryType.PipeConnectReq, MemberName);
                 m.AddElement("index", index);
-                MessageEntry ret = await stub.ProcessRequest(m, cancel);
+                MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
 
                 rindex = (ret.FindElement("index").CastData<int[]>())[0];
 
@@ -413,7 +413,7 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeDisconnectReq, MemberName);
             m.AddElement("index", e.Index);
-            MessageEntry ret = await stub.ProcessRequest(m, cancel);
+            MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
         
         public override PipeConnectCallbackFunction PipeConnectCallback
@@ -568,7 +568,7 @@ namespace RobotRaconteurWeb
             MessageEntry m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
             m.AddElement(me);
 
-            await skel.SendPipeMessage(m, e, cancel);
+            await skel.SendPipeMessage(m, e, cancel).ConfigureAwait(false);
         }
         
         public override Task<PipeEndpoint> Connect(int endpoint, CancellationToken cancel = default(CancellationToken))
@@ -580,7 +580,7 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeClosed, MemberName);
             m.AddElement("index", e.Index);
-            await skel.SendPipeMessage(m, ee, cancel);
+            await skel.SendPipeMessage(m, ee, cancel).ConfigureAwait(false);
 
             DeleteEndpoint(e);            
         }
@@ -882,7 +882,7 @@ namespace RobotRaconteurWeb
 
             while (eps.Count > 0)
             {
-                await Task.WhenAny(eps.Select(x => x.Item1).ToArray());
+                await Task.WhenAny(eps.Select(x => x.Item1).ToArray()).ConfigureAwait(false);
 
                 for (int i = 0; i < eps.Count; )
                 {
@@ -892,7 +892,7 @@ namespace RobotRaconteurWeb
                     {
                         try
                         {
-                            uint pnum = await t;
+                            uint pnum = await t.ConfigureAwait(false);
                             lock (endpoints)
                             {
                                 cep1.active_sends.Remove(eps[i].Item3);

@@ -27,7 +27,7 @@ namespace RobotRaconteurWeb
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(period, cancellationToken);
+                await Task.Delay(period, cancellationToken).ConfigureAwait(false);
                 if (cancellationToken.IsCancellationRequested) break;
                 action();
             }

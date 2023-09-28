@@ -233,7 +233,7 @@ namespace RobotRaconteurWeb
         public object UnpackPod(object m)
         {
             string typename;
-            if (CompareNamespace(MessageElementUtil.GetMessageElementDataTypeString(m), out typename))
+            if (CompareNamespace(((MessageElementNestedElementList)m).TypeName, out typename))
             {
                 return FindPodStub(typename).UnpackPod(m);
             }
@@ -360,7 +360,7 @@ namespace RobotRaconteurWeb
         public object UnpackNamedArray(object m)
         {
             string typename;
-            if (CompareNamespace(MessageElementUtil.GetMessageElementDataTypeString(m), out typename))
+            if (CompareNamespace(((MessageElementNestedElementList)m).TypeName, out typename))
             {
                 return FindNamedArrayStub(typename).UnpackNamedArray(m);
             }

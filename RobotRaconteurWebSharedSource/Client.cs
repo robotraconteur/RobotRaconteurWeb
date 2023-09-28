@@ -70,7 +70,7 @@ namespace RobotRaconteurWeb
             if (RRContext == null) throw new ServiceException("Reference has been released");
 
             m.ServicePath = RRServicePath;
-            return await RRContext.ProcessRequest(m, cancel);
+            return await RRContext.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
 
         protected internal abstract void DispatchEvent(MessageEntry m);
@@ -103,14 +103,14 @@ namespace RobotRaconteurWeb
         {
             if (RRContext == null) throw new ServiceException("Reference has been released");
             m.ServicePath = RRServicePath;
-            await RRContext.SendPipeMessage(m, cancel);
+            await RRContext.SendPipeMessage(m, cancel).ConfigureAwait(false);
         }
 
         protected internal async Task SendWireMessage(MessageEntry m, CancellationToken cancel)
         {
             if (RRContext == null) throw new ServiceException("Reference has been released");
             m.ServicePath = RRServicePath;
-            await RRContext.SendWireMessage(m, cancel);
+            await RRContext.SendWireMessage(m, cancel).ConfigureAwait(false);
         }
 
         protected internal virtual void DispatchPipeMessage(MessageEntry m) { }
@@ -174,7 +174,7 @@ namespace RobotRaconteurWeb
             MessageEntry e = new MessageEntry(MessageEntryType.ObjectTypeName, "");
             //MessageElement m = e.AddElement("ObjectPath", path);
             e.ServicePath = path;
-            MessageEntry ret = await ProcessRequest(e, cancel);
+            MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
             string objecttype2 = ret.FindElement("objecttype").CastData<string>();
 
             if (objecttype2 == "") throw new ObjectNotFoundException("Object type was not returned.");
@@ -194,7 +194,7 @@ namespace RobotRaconteurWeb
                 }
                 if (pull)
                 {
-                    ServiceDefinition[] d = await PullServiceDefinitionAndImports(null, cancel: cancel);
+                    ServiceDefinition[] d = await PullServiceDefinitionAndImports(null, cancel: cancel).ConfigureAwait(false);
 
                     lock (pulled_service_defs)
                     {
@@ -281,10 +281,10 @@ namespace RobotRaconteurWeb
                 Func<Task> r = async delegate ()
                 {
                     await SendMessage(m, cancel);
-                    rec_message = await rec_source.Task;
+                    rec_message = await rec_source.Task.ConfigureAwait(false);
                 };
 
-                await r().AwaitWithTimeout((int)node.RequestTimeout);
+                await r().AwaitWithTimeout((int)node.RequestTimeout).ConfigureAwait(false);
             }
             finally
             {
@@ -353,7 +353,7 @@ namespace RobotRaconteurWeb
                 }
                 try
                 {
-                    await Task.Delay(500);
+                    await Task.Delay(500).ConfigureAwait(false);
                 }
                 catch { }
             }
@@ -373,7 +373,7 @@ namespace RobotRaconteurWeb
 
             LastMessageSentTime = DateTime.UtcNow;
 
-            await SendMessage(mm, cancel);
+            await SendMessage(mm, cancel).ConfigureAwait(false);
 
 
         }
@@ -615,7 +615,7 @@ namespace RobotRaconteurWeb
             //if (RobotRaconteurService.s.transports[c] == null) return null;
             if (!c.CanConnectService(url)) throw new ServiceException("Invalid transport");
 
-            TransportConnection = await c.CreateTransportConnection(url, this, cancel);
+            TransportConnection = await c.CreateTransportConnection(url, this, cancel).ConfigureAwait(false);
             m_Connected = true;
 
             ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionConnected, null);
@@ -633,7 +633,7 @@ namespace RobotRaconteurWeb
                 transport = c.TransportID;
                 m_RemoteEndpoint = 0;
 
-                ServiceDefinition[] d = await PullServiceDefinitionAndImports(null, cancel: cancel);
+                ServiceDefinition[] d = await PullServiceDefinitionAndImports(null, cancel: cancel).ConfigureAwait(false);
 
                 lock (pulled_service_defs)
                 {
@@ -670,7 +670,7 @@ namespace RobotRaconteurWeb
                 //e.AddElement("servicepath", ServiceName);
                 e.ServicePath = ServiceName;
 
-                MessageEntry ret = await ProcessRequest(e, cancel);
+                MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
                 if (ret.Error != MessageErrorType.None) return null;
                 string type = ret.FindElement("objecttype").CastData<string>();
                 if (type == "") return new ObjectNotFoundException("Could not find object type"); ;
@@ -680,7 +680,8 @@ namespace RobotRaconteurWeb
                 {
                     VerifyObjectImplements(type, objecttype);
                     type = objecttype;
-                    await PullServiceDefinitionAndImports(ServiceDefinitionUtil.SplitQualifiedName(type).Item2, cancel);
+                    var type_ns = ServiceDefinitionUtil.SplitQualifiedName(type);
+                    await PullServiceDefinitionAndImports(type_ns.Item1, cancel).ConfigureAwait(false);
                 }
 
 
@@ -688,10 +689,10 @@ namespace RobotRaconteurWeb
                 e2.ServicePath = ServiceName;
                 e2.MemberName = "registerclient";
                 e2.EntryType = MessageEntryType.ConnectClient;
-                await ProcessRequest(e2, cancel);
+                await ProcessRequest(e2, cancel).ConfigureAwait(false);
 
                 if (username != null)
-                    await AuthenticateUser(username, credentials, cancel);
+                    await AuthenticateUser(username, credentials, cancel).ConfigureAwait(false);
 
                 ServiceStub stub = ServiceDef.CreateStub(type, ServiceName, this);
                 stubs.Add(ServiceName, stub);
@@ -728,7 +729,7 @@ namespace RobotRaconteurWeb
             {
                 MessageEntry e = new MessageEntry(MessageEntryType.DisconnectClient, "");
                 e.AddElement("servicename", ServiceName);
-                await ProcessRequest(e, cancel);
+                await ProcessRequest(e, cancel).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -801,14 +802,14 @@ namespace RobotRaconteurWeb
         public async Task SendPipeMessage(MessageEntry m, CancellationToken cancel)
         {
             //m.EntryType= MessageEntryType.PipePacket;
-            await SendMessage(m, cancel);
+            await SendMessage(m, cancel).ConfigureAwait(false);
         }
 
 
         public async Task SendWireMessage(MessageEntry m, CancellationToken cancel)
         {
             //m.EntryType= MessageEntryType.PipePacket;
-            await SendMessage(m, cancel);
+            await SendMessage(m, cancel).ConfigureAwait(false);
         }
 
         private bool m_UserAuthenticated = false;
@@ -832,7 +833,7 @@ namespace RobotRaconteurWeb
                 mcredentials.ElementName = "credentials";
                 m.AddElement(mcredentials);
             }
-            MessageEntry ret = await ProcessRequest(m, cancel);
+            MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
             m_AuthenticatedUsername = username;
             m_UserAuthenticated = true;
             return ret.FindElement("return").CastData<string>();
@@ -848,7 +849,7 @@ namespace RobotRaconteurWeb
             MessageEntry m = new MessageEntry(MessageEntryType.ClientSessionOpReq, "LogoutUser");
             m.ServicePath = ServiceName;
             m.AddElement("username", AuthenticatedUsername);
-            MessageEntry ret = await ProcessRequest(m, cancel);
+            MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<string>();
 
         }
@@ -872,7 +873,7 @@ namespace RobotRaconteurWeb
             MessageEntry m = new MessageEntry(MessageEntryType.ClientSessionOpReq, command);
             m.ServicePath = s.RRServicePath;
 
-            MessageEntry ret = await ProcessRequest(m, cancel);
+            MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<string>();
 
 
@@ -886,7 +887,7 @@ namespace RobotRaconteurWeb
             MessageEntry m = new MessageEntry(MessageEntryType.ClientSessionOpReq, "ReleaseObjectLock");
             m.ServicePath = s.RRServicePath;
 
-            MessageEntry ret = await ProcessRequest(m, cancel);
+            MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<string>();
 
 
@@ -902,14 +903,14 @@ namespace RobotRaconteurWeb
 
                 if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only unlock object opened through Robot Raconteur");
                 ServiceStub s = (ServiceStub)obj;
-                lock_ = await s.rr_async_mutex.Lock();
+                lock_ = await s.rr_async_mutex.Lock().ConfigureAwait(false);
 
                 bool keep_trying = true;
                 MessageEntry m = new MessageEntry(MessageEntryType.ClientSessionOpReq, "MonitorEnter");
                 m.ServicePath = s.RRServicePath;
                 m.AddElement("timeout", timeout);
 
-                MessageEntry ret = await ProcessRequest(m, cancel);
+                MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
                 string retcode = ret.FindElement("return").CastData<string>();
 
                 if (retcode == "OK")
@@ -930,7 +931,7 @@ namespace RobotRaconteurWeb
                         MessageEntry m1 = new MessageEntry(MessageEntryType.ClientSessionOpReq, "MonitorContinueEnter");
                         m1.ServicePath = s.RRServicePath;
 
-                        MessageEntry ret1 = await ProcessRequest(m1, cancel);
+                        MessageEntry ret1 = await ProcessRequest(m1, cancel).ConfigureAwait(false);
                         string retcode1 = ret1.FindElement("return").CastData<string>();
                         if (retcode1 == "OK")
                         {
@@ -979,7 +980,7 @@ namespace RobotRaconteurWeb
                 MessageEntry m = new MessageEntry(MessageEntryType.ClientSessionOpReq, "MonitorExit");
                 m.ServicePath = lock_.stub.RRServicePath;
 
-                MessageEntry ret = await ProcessRequest(m, cancel);
+                MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
                 string retcode = ret.FindElement("return").CastData<string>();
                 if (retcode != "OK") throw new ProtocolException("Unknown return code");
             }
@@ -1020,7 +1021,7 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.ServiceCheckCapabilityReq, name);
             m.ServicePath = m_ServiceName;
-            MessageEntry ret = await ProcessRequest(m, cancel);
+            MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
             uint res = ret.FindElement("return").CastData<uint>();
             return res;
         }
@@ -1041,7 +1042,7 @@ namespace RobotRaconteurWeb
                     if (!stubs.ContainsKey(m.ServicePath)) throw new ServiceException("Stub not found");
                     s = stubs[m.ServicePath];
                 }
-                ret = await s.CallbackCall(m);
+                ret = await s.CallbackCall(m).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -1057,7 +1058,7 @@ namespace RobotRaconteurWeb
 
             }
 
-            await SendMessage(ret, default(CancellationToken));
+            await SendMessage(ret, default(CancellationToken)).ConfigureAwait(false);
 
         }
 
@@ -1070,7 +1071,7 @@ namespace RobotRaconteurWeb
                 e3.AddElement("ServiceType", servicetype);
             }
 
-            var res = await ProcessRequest(e3, cancel);
+            var res = await ProcessRequest(e3, cancel).ConfigureAwait(false);
 
             var def = res.FindElement("servicedef").CastData<string>();
             if (def == "") throw new ServiceNotFoundException("Could not find service definition");
@@ -1095,7 +1096,7 @@ namespace RobotRaconteurWeb
         protected async Task<ServiceDefinition[]> PullServiceDefinitionAndImports(string servicetype, CancellationToken cancel)
         {
             var defs = new List<ServiceDefinition>();
-            var root = await PullServiceDefinition(servicetype, cancel);
+            var root = await PullServiceDefinition(servicetype, cancel).ConfigureAwait(false);
             defs.Add(root);
             if (root.Imports.Count == 0)
             {
@@ -1106,7 +1107,7 @@ namespace RobotRaconteurWeb
             {
                 if (defs.Count(x => x.Name == i) == 0)
                 {
-                    var defs2 = await PullServiceDefinitionAndImports(i, cancel);
+                    var defs2 = await PullServiceDefinitionAndImports(i, cancel).ConfigureAwait(false);
                     foreach (var d in defs2)
                     {
                         if (defs.Count(x => x.Name == d.Name) == 0)

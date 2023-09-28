@@ -28,21 +28,21 @@ namespace RobotRaconteurWeb.Extensions
         {
             if (timeout < 0)
             {
-                await task;
+                await task.ConfigureAwait(false);
                 return;
             }
 
             var c = new CancellationTokenSource();
             Task timeout_task = Task.Delay(timeout, c.Token);
 
-            var r1 = await Task.WhenAny(task, timeout_task);
+            var r1 = await Task.WhenAny(task, timeout_task).ConfigureAwait(false);
             if (task.IsCompleted || task.IsFaulted || task.IsCanceled)
             {
 
                 var noop = timeout_task.IgnoreResult();
                 c.Cancel();
 
-                await task;
+                await task.ConfigureAwait(false);
                 return;
             }
             else
@@ -56,19 +56,19 @@ namespace RobotRaconteurWeb.Extensions
         {
             if (timeout < 0)
             {
-                return await task;
+                return await task.ConfigureAwait(false);
             }
 
             var c = new CancellationTokenSource();
             Task timeout_task = Task.Delay(timeout, c.Token);
 
-            var r1 = await Task.WhenAny(task, timeout_task);
+            var r1 = await Task.WhenAny(task, timeout_task).ConfigureAwait(false);
             if (task.IsCompleted || task.IsFaulted || task.IsCanceled)
             {
                 var noop = timeout_task.IgnoreResult();
                 c.Cancel();
 
-                return await task;
+                return await task.ConfigureAwait(false);
             }
             else
             {

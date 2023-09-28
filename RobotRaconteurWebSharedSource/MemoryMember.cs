@@ -148,7 +148,7 @@ namespace RobotRaconteurWeb
 
                         ulong memorypos = m.FindElement("memorypos").CastData<ulong[]>()[0];
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
-                        var data = await DoRead(memorypos, 0, count, mem);
+                        var data = await DoRead(memorypos, 0, count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -166,7 +166,7 @@ namespace RobotRaconteurWeb
                         ulong memorypos = m.FindElement("memorypos").CastData<ulong[]>()[0];
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
                         var data = m.FindElement("data").Data;
-                        await DoWrite(memorypos, data, 0, count, mem);
+                        await DoWrite(memorypos, data, 0, count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -178,7 +178,7 @@ namespace RobotRaconteurWeb
                         if (param == "Length")
                         {
                             var ret = new MessageEntry(MessageEntryType.MemoryGetParamRet, MemberName);
-                            var len = await mem.GetLength();
+                            var len = await mem.GetLength().ConfigureAwait(false);
                             ret.AddElement("return", len);
                             return ret;
 
@@ -218,7 +218,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (ArrayMemory<T>)mem;
             var buf1 = (T[])DataTypeUtil.ArrayFromDataType(element_type, (uint)count);
-            await mem1.Read(memorypos, buf1, 0, count);
+            await mem1.Read(memorypos, buf1, 0, count).ConfigureAwait(false);
             return buf1;
         }
 
@@ -226,7 +226,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (ArrayMemory<T>)mem;
             var buf1 = (T[])buffer;
-            await mem1.Write(memorypos, buf1, 0, count);
+            await mem1.Write(memorypos, buf1, 0, count).ConfigureAwait(false);
         }
     }
 
@@ -263,7 +263,7 @@ namespace RobotRaconteurWeb
                         ulong[] memorypos = m.FindElement("memorypos").CastData<ulong[]>();
                         ulong[] count = m.FindElement("count").CastData<ulong[]>();
                         ulong elem_count = count.Aggregate((ulong)1, (x, y) => x * y);
-                        var data = await DoRead(memorypos, new ulong[count.Length], count, elem_count, mem);
+                        var data = await DoRead(memorypos, new ulong[count.Length], count, elem_count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -282,7 +282,7 @@ namespace RobotRaconteurWeb
                         ulong[] count = m.FindElement("count").CastData<ulong[]>();
                         ulong elem_count = count.Aggregate((ulong)1, (x, y) => x * y);
                         var data = m.FindElement("data").Data;
-                        await DoWrite(memorypos, data, new ulong[count.Length], count, elem_count, mem);
+                        await DoWrite(memorypos, data, new ulong[count.Length], count, elem_count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -294,7 +294,7 @@ namespace RobotRaconteurWeb
                         if (param == "Dimensions")
                         {
                             var ret = new MessageEntry(MessageEntryType.MemoryGetParamRet, MemberName);
-                            var l = await mem.GetDimensions();
+                            var l = await mem.GetDimensions().ConfigureAwait(false);
                             ret.AddElement("return", l);
                             return ret;
 
@@ -302,7 +302,7 @@ namespace RobotRaconteurWeb
                         if (param == "DimCount")
                         {
                             var ret = new MessageEntry(MessageEntryType.MemoryGetParamRet, MemberName);
-                            var l = await mem.GetDimCount();
+                            var l = await mem.GetDimCount().ConfigureAwait(false);
                             ret.AddElement("return", l);
                             return ret;
 
@@ -342,7 +342,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (MultiDimArrayMemory<T>)mem;
             var buf1 = new MultiDimArray(count.Select(x=>(uint)x).ToArray(), (T[])DataTypeUtil.ArrayFromDataType(element_type, (uint)elem_count));
-            await mem1.Read(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.RRContext.PackMultiDimArray(buf1);
         }
 
@@ -350,7 +350,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (MultiDimArrayMemory<T>)mem;
             var buf1 = skel.RRContext.UnpackMultiDimArray((MessageElementNestedElementList)buffer);
-            await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
     }
 
@@ -377,7 +377,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "Length");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>()[0];
         }
 
@@ -401,7 +401,7 @@ namespace RobotRaconteurWeb
 
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "MaxTransferSize");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             var remote_max_size1 = ret.FindElement("return").CastData<uint[]>()[0];
             lock (this)
             {
@@ -425,7 +425,7 @@ namespace RobotRaconteurWeb
                 throw new WriteOnlyMemberException("Write only member");
             }
 
-            uint max_transfer_size = await GetMaxTransferSize(cancel);
+            uint max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
             uint max_elems = (max_transfer_size) / element_size;
 
             if (count <= max_elems)
@@ -434,7 +434,7 @@ namespace RobotRaconteurWeb
                 var e = new MessageEntry(MessageEntryType.MemoryRead, MemberName);
                 e.AddElement("memorypos", memorypos);
                 e.AddElement("count", count);
-                var ret = await stub.ProcessRequest(e, cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
                 UnpackReadResult(ret.FindElement("data").Data, buffer, bufferpos, count);
             }
             else
@@ -447,7 +447,7 @@ namespace RobotRaconteurWeb
                     ulong bufferpos_i = bufferpos + max_elems * i;
                     ulong memorypos_i = memorypos + max_elems * i;
 
-                    await ReadImpl(memorypos_i, buffer, bufferpos_i, max_elems);
+                    await ReadImpl(memorypos_i, buffer, bufferpos_i, max_elems).ConfigureAwait(false);
 
                 }
 
@@ -456,7 +456,7 @@ namespace RobotRaconteurWeb
                     ulong bufferpos_i = bufferpos + max_elems * blocks;
                     ulong memorypos_i = memorypos + max_elems * blocks;
 
-                    await ReadImpl(memorypos_i, buffer, bufferpos_i, blockrem);
+                    await ReadImpl(memorypos_i, buffer, bufferpos_i, blockrem).ConfigureAwait(false);
                 }
             }
         }
@@ -467,7 +467,7 @@ namespace RobotRaconteurWeb
                 throw new ReadOnlyMemberException("Read only member");
             }
 
-            ulong max_transfer_size = await GetMaxTransferSize(cancel);
+            ulong max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
             ulong max_elems = max_transfer_size / element_size;
 
             if (count <= max_elems)
@@ -492,14 +492,14 @@ namespace RobotRaconteurWeb
                 {
                     ulong bufferpos_i = bufferpos + max_elems * i;
                     ulong memorypos_i = memorypos + max_elems * i;
-                    await WriteImpl(memorypos_i, buffer, bufferpos_i, max_elems);
+                    await WriteImpl(memorypos_i, buffer, bufferpos_i, max_elems).ConfigureAwait(false);
                 }
 
                 if (blockrem > 0)
                 {
                     ulong bufferpos_i = bufferpos + max_elems * blocks;
                     ulong memorypos_i = memorypos + max_elems * blocks;
-                    await WriteImpl(memorypos_i, buffer, bufferpos_i, blockrem);
+                    await WriteImpl(memorypos_i, buffer, bufferpos_i, blockrem).ConfigureAwait(false);
                 }
             }
         }
@@ -612,7 +612,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "DimCount");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>()[0];
         }
 
@@ -620,7 +620,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "Dimensions");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>();
         }
         
@@ -642,7 +642,7 @@ namespace RobotRaconteurWeb
 
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "MaxTransferSize");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             var remote_max_size1 = ret.FindElement("return").CastData<uint[]>()[0];
             lock (this)
             {
@@ -666,7 +666,7 @@ namespace RobotRaconteurWeb
                 throw new WriteOnlyMemberException("Write only member");
             }
 
-            uint max_transfer_size = await GetMaxTransferSize(cancel);
+            uint max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
 
             ulong elemcount = count.Aggregate((ulong)1,(x,y) => x*y);            
             ulong max_elems = max_transfer_size / element_size;
@@ -678,7 +678,7 @@ namespace RobotRaconteurWeb
                 var e = new MessageEntry(MessageEntryType.MemoryRead, MemberName);
                 e.AddElement("memorypos", memorypos);
                 e.AddElement("count", count);
-                var ret = await stub.ProcessRequest(e,cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
 
                 UnpackReadResult(ret.FindElement("data").Data, buffer, bufferpos, count, elemcount);
 
@@ -715,7 +715,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count);
+                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count).ConfigureAwait(false);
                     }
 
                     if (split_remainder != 0)
@@ -730,7 +730,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge);
+                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge).ConfigureAwait(false);
                     }
 
                     if (split_dim == count.Length - 1)
@@ -772,7 +772,7 @@ namespace RobotRaconteurWeb
                 throw new ReadOnlyMemberException("Read only member");
             }
 
-             uint max_transfer_size = await GetMaxTransferSize();
+             uint max_transfer_size = await GetMaxTransferSize().ConfigureAwait(false);
 
             ulong elemcount = count.Aggregate((ulong)1, (x,y) => x*y);
             
@@ -821,7 +821,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count);
+                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count).ConfigureAwait(false);
                     }
 
                     if (split_remainder != 0)
@@ -836,7 +836,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge);
+                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge).ConfigureAwait(false);
                     }
 
                     if (split_dim == (count.Length - 1))
@@ -994,12 +994,12 @@ namespace RobotRaconteurWeb
 
         public override async Task Read(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
         
         public override async Task Write(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
     }
 
@@ -1199,12 +1199,12 @@ namespace RobotRaconteurWeb
 
         public override async Task Read(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
 
         public override async Task Write(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
     }
 
@@ -1220,7 +1220,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (PodArrayMemory<T>)mem;
             var buf1 = new T[count];
-            await mem1.Read(memorypos, buf1, 0, count);
+            await mem1.Read(memorypos, buf1, 0, count).ConfigureAwait(false);
             return skel.rr_node.PackPodArray(buf1, null);
         }
 
@@ -1228,7 +1228,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (PodArrayMemory<T>)mem;
             var buf1 = skel.rr_node.UnpackPodArray<T>((MessageElementNestedElementList)buffer, null);
-            await mem1.Write(memorypos, buf1, 0, count);
+            await mem1.Write(memorypos, buf1, 0, count).ConfigureAwait(false);
         }
     }
 
@@ -1243,7 +1243,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (PodMultiDimArrayMemory<T>)mem;
             var buf1 = new PodMultiDimArray(count.Select(x => (uint)x).ToArray(), new T[elem_count]);
-            await mem1.Read(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.rr_node.PackPodMultiDimArray<T>(buf1, null);
         }
 
@@ -1251,7 +1251,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (PodMultiDimArrayMemory<T>)mem;
             var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
-            await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
     }
 
@@ -1451,12 +1451,12 @@ namespace RobotRaconteurWeb
 
         public override async Task Read(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
 
         public override async Task Write(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
     }
 
@@ -1472,7 +1472,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (NamedArrayMemory<T>)mem;
             var buf1 = new T[count];
-            await mem1.Read(memorypos, buf1, 0, count);
+            await mem1.Read(memorypos, buf1, 0, count).ConfigureAwait(false);
             return skel.rr_node.PackNamedArray(buf1, null);
         }
 
@@ -1480,7 +1480,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (NamedArrayMemory<T>)mem;
             var buf1 = skel.rr_node.UnpackNamedArray<T>((MessageElementNestedElementList)buffer, null);
-            await mem1.Write(memorypos, buf1, 0, count);
+            await mem1.Write(memorypos, buf1, 0, count).ConfigureAwait(false);
         }
     }
 
@@ -1495,7 +1495,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (NamedMultiDimArrayMemory<T>)mem;
             var buf1 = new NamedMultiDimArray(count.Select(x => (uint)x).ToArray(), new T[elem_count]);
-            await mem1.Read(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.rr_node.PackNamedMultiDimArray<T>(buf1, null);
         }
 
@@ -1503,7 +1503,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (NamedMultiDimArrayMemory<T>)mem;
             var buf1 = skel.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
-            await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
     }
 

@@ -92,8 +92,11 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                if (m_NodeName == null) m_NodeName = "";
-                LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
+                if (m_NodeName == null)
+                { 
+                    m_NodeName = "";
+                    LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
+                }
                 return m_NodeName;
             }
             set
@@ -117,6 +120,8 @@ namespace RobotRaconteurWeb
 
                         throw new InvalidOperationException("Invalid node name");
                     }
+
+                    LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
 
                     m_NodeName = value;
 
@@ -183,8 +188,8 @@ namespace RobotRaconteurWeb
 #if ROBOTRACONTEUR_BRIDGE
             browser_transport = new BrowserWebSocketTransport(this);
             RegisterTransport(browser_transport);
-            m_Discovery = new Discovery(this);
 #endif
+            m_Discovery = new Discovery(this);
             LogInfo(string.Format("RobotRaconteurNode version {0} initialized", Version), this);
 
         }
@@ -281,7 +286,7 @@ namespace RobotRaconteurWeb
 
         public object UnpackPod(object l, ClientContext context)
         {
-            return GetServiceFactoryForType(MessageElementUtil.GetMessageElementDataTypeString(l), context).UnpackPod(l);
+            return GetServiceFactoryForType(((MessageElementNestedElementList)l).TypeName, context).UnpackPod(l);
         }
 
         public MessageElementNestedElementList PackNamedArrayToArray<T>(ref T s, ClientContext context) where T : struct
@@ -339,7 +344,7 @@ namespace RobotRaconteurWeb
 
         public object UnpackNamedArray(object l, ClientContext context)
         {
-            return GetServiceFactoryForType(MessageElementUtil.GetMessageElementDataTypeString(l), context).UnpackNamedArray(l);
+            return GetServiceFactoryForType(((MessageElementNestedElementList)l).TypeName, context).UnpackNamedArray(l);
         }
 
         public MessageElement PackAnyType<T>(string name, ref T data, ClientContext context)
@@ -878,7 +883,7 @@ namespace RobotRaconteurWeb
                 throw new ConnectionException("Could not find transport");
             }
 
-            await c.SendMessage(m, cancel);
+            await c.SendMessage(m, cancel).ConfigureAwait(false);
 
         }
 
@@ -961,7 +966,7 @@ namespace RobotRaconteurWeb
                 service_factories.Add(f.GetServiceName(), f);
             }
 #if RR_LOG_TRACE
-            LogTrace("Service type registered {0}", this, component: RobotRaconteur_LogComponent.Node);
+            LogTrace(string.Format("Service type registered {0}", f.GetServiceName()), this, component: RobotRaconteur_LogComponent.Node);
 #endif
 
         }
@@ -1154,7 +1159,7 @@ namespace RobotRaconteurWeb
 
                                 s = GetService(s1[0]);
 
-                                string objtype = await s.GetObjectType(path);
+                                string objtype = await s.GetObjectType(path).ConfigureAwait(false);
                                 eret.AddElement("objecttype", objtype);
                             }
                             catch
@@ -1359,7 +1364,7 @@ namespace RobotRaconteurWeb
                         if (end.CanConnectService(url))
                         {
 
-                            object r = await c.ConnectService(end, url, username, credentials, objecttype, cancel);
+                            object r = await c.ConnectService(end, url, username, credentials, objecttype, cancel).ConfigureAwait(false);
 
                             if (listener != null)
                                 c.ClientServiceListener += listener;
@@ -1395,17 +1400,30 @@ namespace RobotRaconteurWeb
             try
             {
                 var connecting_tasks = new List<Task<object>>();
+                Exception connecting_exp = null;
 
                 foreach (var u in url)
                 {
-                    connecting_tasks.Add(ConnectService(u, username, credentials, null, objecttype, cancel));
-
-                    await Task.WhenAny(Task.WhenAny(connecting_tasks), Task.Delay(250));
-
-                    if (connecting_tasks.Any(x => x.IsCompleted && x.Status == TaskStatus.RanToCompletion))
+                    try
                     {
-                        break;
+                        connecting_tasks.Add(ConnectService(u, username, credentials, null, objecttype, cancel));
                     }
+                    catch (Exception e)
+                    {
+                        if (connecting_exp == null)
+                        {
+                            connecting_exp = e;
+                        }
+                    }
+                }
+
+                if (connecting_tasks.Count == 0)
+                {
+                    if (connecting_exp != null)
+                    {
+                        throw connecting_exp;
+                    }
+                    throw new ConnectionException("Could not connect to service");
                 }
 
                 while (true)
@@ -1413,17 +1431,17 @@ namespace RobotRaconteurWeb
                     object r = null;
                     if (connecting_tasks.Count == 1)
                     {
-                        r = await connecting_tasks[0];
+                        r = await connecting_tasks[0].ConfigureAwait(false);
                     }
                     else
                     {
-                        await Task.WhenAny(connecting_tasks);
+                        await Task.WhenAny(connecting_tasks).ConfigureAwait(false);
 
                         var completed_task = connecting_tasks.First(x => x.IsCompleted);
                         connecting_tasks.Remove(completed_task);
                         if (completed_task.Status == TaskStatus.RanToCompletion)
                         {
-                            r = await completed_task;
+                            r = await completed_task.ConfigureAwait(false);
                             foreach (var t in connecting_tasks)
                             {
                                 try
@@ -1432,7 +1450,13 @@ namespace RobotRaconteurWeb
                                     {
                                         try
                                         {
-                                            Task.Run(() => ((ClientContext)x.Result).Close().IgnoreResult());
+                                            Task.Run( delegate() {
+                                                try
+                                                {
+                                                    ((ServiceStub)x.Result).RRContext.Close().IgnoreResult();
+                                                }
+                                                catch { }
+                                            });
                                         }
                                         catch { }
                                     });
@@ -1466,7 +1490,7 @@ namespace RobotRaconteurWeb
         public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
-            await stub.RRContext.Close(cancel);
+            await stub.RRContext.Close(cancel).ConfigureAwait(false);
 
         }
 
@@ -1702,38 +1726,38 @@ namespace RobotRaconteurWeb
 
         private async Task UpdateDetectedNodes(CancellationToken cancel)
         {
-            await m_Discovery.UpdateDetectedNodes(cancel);
+            await m_Discovery.UpdateDetectedNodes(cancel).ConfigureAwait(false);
         }
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes)
         {
-            return await m_Discovery.FindServiceByType(servicetype, transportschemes);
+            return await m_Discovery.FindServiceByType(servicetype, transportschemes).ConfigureAwait(false);
         }
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
         {
 
-            return await m_Discovery.FindServiceByType(servicetype, transportschemes, cancel);
+            return await m_Discovery.FindServiceByType(servicetype, transportschemes, cancel).ConfigureAwait(false);
         }
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes)
         {
-            return await m_Discovery.FindNodeByID(id, schemes);
+            return await m_Discovery.FindNodeByID(id, schemes).ConfigureAwait(false);
         }
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes, CancellationToken cancel)
         {
-            return await m_Discovery.FindNodeByID(id, schemes, cancel);
+            return await m_Discovery.FindNodeByID(id, schemes, cancel).ConfigureAwait(false);
         }
 
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes)
         {
-            return await m_Discovery.FindNodeByName(name, schemes);
+            return await m_Discovery.FindNodeByName(name, schemes).ConfigureAwait(false);
         }
 
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes, CancellationToken cancel)
         {
-            return await m_Discovery.FindNodeByName(name, schemes, cancel);
+            return await m_Discovery.FindNodeByName(name, schemes, cancel).ConfigureAwait(false);
         }
 
         public async Task<string> RequestObjectLock(object obj, RobotRaconteurObjectLockFlags flags, CancellationToken cancel = default(CancellationToken))
@@ -1741,7 +1765,7 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only lock object opened through Robot Raconteur");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.RequestObjectLock(obj, flags, cancel);
+            return await s.RRContext.RequestObjectLock(obj, flags, cancel).ConfigureAwait(false);
 
 
         }
@@ -1752,7 +1776,7 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only unlock object opened through Robot Raconteur");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.ReleaseObjectLock(obj, cancel);
+            return await s.RRContext.ReleaseObjectLock(obj, cancel).ConfigureAwait(false);
         }
 
         public class MonitorLock
@@ -1766,13 +1790,13 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can be monitored by RobotRaconteurNode");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.MonitorEnter(obj, timeout, cancel);
+            return await s.RRContext.MonitorEnter(obj, timeout, cancel).ConfigureAwait(false);
         }
 
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
         {
 
-            await lock_.stub.RRContext.MonitorExit(lock_, cancel);
+            await lock_.stub.RRContext.MonitorExit(lock_, cancel).ConfigureAwait(false);
         }
 
         public async Task<object> FindObjRefTyped(object obj, string objref, string objecttype, CancellationToken cancel)
@@ -1780,7 +1804,7 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.FindObjRefTyped(objref, objecttype, cancel);
+            return await s.FindObjRefTyped(objref, objecttype, cancel).ConfigureAwait(false);
         }
 
         public async Task<object> FindObjRefTyped(object obj, string objref, string index, string objecttype, CancellationToken cancel)
@@ -1788,7 +1812,7 @@ namespace RobotRaconteurWeb
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.FindObjRefTyped(objref, index, objecttype, cancel);
+            return await s.FindObjRefTyped(objref, index, objecttype, cancel).ConfigureAwait(false);
         }
 
         public DateTime UtcNow
@@ -1877,10 +1901,10 @@ namespace RobotRaconteurWeb
 
         ILogRecordHandler m_LogRecordHandler;
 
-        public RobotRaconteur_LogLevel LogLevel
+        public RobotRaconteur_LogLevel LogLevel 
         {
             get; set;
-        }
+        } = RobotRaconteur_LogLevel.Warning;
 
         public bool CompareLogLevel(RobotRaconteur_LogLevel level)
         {

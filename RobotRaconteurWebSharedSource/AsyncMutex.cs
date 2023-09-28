@@ -48,7 +48,7 @@ namespace RobotRaconteurWeb
         public async Task<IDisposable> Lock()
         {
             var t =Enter();
-            await t;
+            await t.ConfigureAwait(false);
             return new LockHandle(this, t);
         }
 
@@ -56,10 +56,10 @@ namespace RobotRaconteurWeb
         {
             Task t = null;            
             t = Enter();
-            await Task.WhenAny(t, Task.Delay(timeout));
+            await Task.WhenAny(t, Task.Delay(timeout)).ConfigureAwait(false);
             if (t.IsCompleted || t.IsFaulted || t.IsCanceled)
             {
-                await t;
+                await t.ConfigureAwait(false);
                 return new LockHandle(this, t);
             }
 
@@ -177,16 +177,22 @@ namespace RobotRaconteurWeb
             }
         }
 
-        internal List<TaskCompletionSource<T>> wait_tasks;
+        internal List<TaskCompletionSource<T>> wait_tasks = new List<TaskCompletionSource<T>>();
 
         public void NotifyAll(T res)
         {
-            lock(this)
+            var wait_tasks2 = new List<TaskCompletionSource<T>>();
+            lock (this)
             {
                 foreach (var t in wait_tasks)
                 {
-                    t.TrySetResult(res);
+                    wait_tasks2.Add(t);
                 }
+            }
+
+            foreach (var t in wait_tasks2)
+            {
+                Task.Run(()=>t.TrySetResult(res));
             }
         }
 

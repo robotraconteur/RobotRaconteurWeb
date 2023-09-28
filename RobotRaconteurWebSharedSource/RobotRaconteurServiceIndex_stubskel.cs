@@ -62,19 +62,19 @@ public class ServiceIndex_stub : ServiceStub , ServiceIndex {
 
     public async Task<Dictionary<int,ServiceInfo>> GetLocalNodeServices(CancellationToken rr_cancel=default(CancellationToken)) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.FunctionCallReq,"GetLocalNodeServices");
-    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel);
+    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (Dictionary<int,ServiceInfo>)RRContext.UnpackMapType<int,ServiceInfo>(rr_me.Data);
     }
     public async Task<Dictionary<int,NodeInfo>> GetRoutedNodes(CancellationToken rr_cancel=default(CancellationToken)) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.FunctionCallReq,"GetRoutedNodes");
-    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel);
+    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (Dictionary<int,NodeInfo>)RRContext.UnpackMapType<int,NodeInfo>(rr_me.Data);
     }
     public async Task<Dictionary<int,NodeInfo>> GetDetectedNodes(CancellationToken rr_cancel=default(CancellationToken)) {
     MessageEntry rr_mm=new MessageEntry(MessageEntryType.FunctionCallReq,"GetDetectedNodes");
-    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel);
+    MessageEntry rr_mr=await ProcessRequest(rr_mm,rr_cancel).ConfigureAwait(false);
     MessageElement rr_me = rr_mr.FindElement("return");
     return (Dictionary<int,NodeInfo>)RRContext.UnpackMapType<int,NodeInfo>(rr_me.Data);
     }
@@ -151,17 +151,17 @@ public class ServiceIndex_skel : ServiceSkel {
     MessageEntry rr_mr=new MessageEntry(MessageEntryType.FunctionCallRes, rr_ename);
     switch (rr_ename) {
     case "GetLocalNodeServices": {
-    object rr_ret=await obj.GetLocalNodeServices(default(CancellationToken));
+    object rr_ret=await obj.GetLocalNodeServices(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(new MessageElement("return",RRContext.PackMapType<int,ServiceInfo>(rr_ret)));
     break;
     }
     case "GetRoutedNodes": {
-    object rr_ret=await obj.GetRoutedNodes(default(CancellationToken));
+    object rr_ret=await obj.GetRoutedNodes(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(new MessageElement("return",RRContext.PackMapType<int,NodeInfo>(rr_ret)));
     break;
     }
     case "GetDetectedNodes": {
-    object rr_ret=await obj.GetDetectedNodes(default(CancellationToken));
+    object rr_ret=await obj.GetDetectedNodes(default(CancellationToken)).ConfigureAwait(false);
     rr_mr.AddElement(new MessageElement("return",RRContext.PackMapType<int,NodeInfo>(rr_ret)));
     break;
     }

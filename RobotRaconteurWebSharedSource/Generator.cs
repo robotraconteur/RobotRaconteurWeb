@@ -67,7 +67,7 @@ namespace RobotRaconteurWeb
             var err = new AbortOperationException("Generator abort requested");
             RobotRaconteurExceptionUtil.ExceptionToMessageEntry(err, m);
             m.AddElement("index", id);
-            await stub.ProcessRequest(m, cancel);
+            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
         public async Task Close(CancellationToken cancel = default(CancellationToken))
         {
@@ -75,7 +75,7 @@ namespace RobotRaconteurWeb
             var err = new StopIterationException("Generator abort requested");
             RobotRaconteurExceptionUtil.ExceptionToMessageEntry(err, m);
             m.AddElement("index", id);
-            await stub.ProcessRequest(m, cancel);
+            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
 
         public async Task<MessageElement> NextBase(MessageElement v, CancellationToken cancel)
@@ -87,7 +87,7 @@ namespace RobotRaconteurWeb
                 v.ElementName = "parameter";
                 m.elements.Add(v);
             }
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             MessageElement mret;
             ret.TryFindElement("return", out mret);
             return mret;
@@ -103,7 +103,7 @@ namespace RobotRaconteurWeb
         public async Task<ReturnType> Next(ParamType param, CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageElement("param", stub.RRContext.PackAnyType<ParamType>(ref param));
-            var m_ret = await NextBase(m, cancel);
+            var m_ret = await NextBase(m, cancel).ConfigureAwait(false);
             var data = stub.RRContext.UnpackAnyType<ReturnType>(m_ret);
             return (ReturnType)data;
         }
@@ -117,7 +117,7 @@ namespace RobotRaconteurWeb
 
         public async Task<ReturnType> Next(CancellationToken cancel = default(CancellationToken))
         {            
-            var m_ret = await NextBase(null, cancel);
+            var m_ret = await NextBase(null, cancel).ConfigureAwait(false);
             var data = stub.RRContext.UnpackAnyType<ReturnType>(m_ret);
             return (ReturnType)data;
         }
@@ -127,7 +127,7 @@ namespace RobotRaconteurWeb
             var ret = new List<ReturnType>();
             try
             {
-                ret.Add(await Next(cancel));
+                ret.Add(await Next(cancel).ConfigureAwait(false));
             }
             catch (StopIterationException) { }
             return ret.ToArray();
@@ -143,7 +143,7 @@ namespace RobotRaconteurWeb
         public async Task Next(ParamType param, CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageElement("param", stub.RRContext.PackAnyType<ParamType>(ref param));
-            var m_ret = await NextBase(m, cancel);
+            var m_ret = await NextBase(m, cancel).ConfigureAwait(false);
             stub.RRContext.UnpackVarType(m_ret);            
         }
     }
@@ -189,18 +189,18 @@ namespace RobotRaconteurWeb
             {
                 if (m.Error == MessageErrorType.StopIteration)
                 {
-                    await generator.Close();                    
+                    await generator.Close().ConfigureAwait(false);                    
                 }
                 else
                 {
-                    await generator.Abort();
+                    await generator.Abort().ConfigureAwait(false);
                 }
                 m_ret.AddElement("return", 0);
             }
             else
             {
                 var p = (ParamType)skel.RRContext.UnpackAnyType<ParamType>(m.FindElement("parameter"));
-                var r = await generator.Next(p);
+                var r = await generator.Next(p).ConfigureAwait(false);
                 m_ret.AddElement("return", skel.RRContext.PackAnyType<ReturnType>(ref r));
             }
             return m_ret;
@@ -225,17 +225,17 @@ namespace RobotRaconteurWeb
             {
                 if (m.Error == MessageErrorType.StopIteration)
                 {
-                    await generator.Close();
+                    await generator.Close().ConfigureAwait(false);
                 }
                 else
                 {
-                    await generator.Abort();
+                    await generator.Abort().ConfigureAwait(false);
                 }
                 m_ret.AddElement("return", 0);
             }
             else
             {                
-                var r = await generator.Next();
+                var r = await generator.Next().ConfigureAwait(false);
                 m_ret.AddElement("return", skel.RRContext.PackAnyType<ReturnType>(ref r));
             }
             return m_ret;
@@ -260,18 +260,18 @@ namespace RobotRaconteurWeb
             {
                 if (m.Error == MessageErrorType.StopIteration)
                 {
-                    await generator.Close();
+                    await generator.Close().ConfigureAwait(false);
                 }
                 else
                 {
-                    await generator.Abort();
+                    await generator.Abort().ConfigureAwait(false);
                 }
                 m_ret.AddElement("return", 0);
             }
             else
             {
                 var p = (ParamType)skel.RRContext.UnpackAnyType<ParamType>(m.FindElement("parameter"));
-                await generator.Next(p);
+                await generator.Next(p).ConfigureAwait(false);
                 m_ret.AddElement("return", 0);
             }
             return m_ret;
@@ -329,7 +329,7 @@ namespace RobotRaconteurWeb
             {
                 while (true)
                 {
-                    o.Add(await Next());
+                    o.Add(await Next().ConfigureAwait(false));
                 }
             }
             catch (StopIterationException) { }

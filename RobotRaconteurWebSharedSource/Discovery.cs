@@ -52,7 +52,7 @@ namespace RobotRaconteurWeb
         public string last_update_nonce;
         public DateTime last_update_time;
         //public Discovery_updateserviceinfo updater;
-        public Queue<string> recent_service_nonce;
+        public Queue<string> recent_service_nonce = new Queue<string>();
         public DateTime retry_window_start;
         public uint retry_count;
 
@@ -338,13 +338,13 @@ namespace RobotRaconteurWeb
                 tasks.Add(task1);
             }
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             foreach (var t2 in tasks)
             {
                 try
                 {
-                    var info = await t2;
+                    var info = await t2.ConfigureAwait(false);
                     foreach (var i in info)
                     {
                         NodeDetected(i);
@@ -357,10 +357,10 @@ namespace RobotRaconteurWeb
 
         private async Task<Tuple<byte[], string, Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>> DoFindServiceByType(string[] urls, CancellationToken cancel)
         {
-            RobotRaconteurServiceIndex.ServiceIndex ind = (RobotRaconteurServiceIndex.ServiceIndex)await node.ConnectService(urls.ToArray(), cancel: cancel);
+            RobotRaconteurServiceIndex.ServiceIndex ind = (RobotRaconteurServiceIndex.ServiceIndex)await node.ConnectService(urls.ToArray(), cancel: cancel).ConfigureAwait(false);
             var NodeID = ((ServiceStub)ind).RRContext.RemoteNodeID.ToByteArray();
             var NodeName = ((ServiceStub)ind).RRContext.RemoteNodeName;
-            var inf = await ind.GetLocalNodeServices(cancel);
+            var inf = await ind.GetLocalNodeServices(cancel).ConfigureAwait(false);
             return Tuple.Create(NodeID, NodeName, inf);
         }
 
@@ -368,7 +368,7 @@ namespace RobotRaconteurWeb
         {
             var cancel = new CancellationTokenSource();
             cancel.CancelAfter(5000);
-            return await FindServiceByType(servicetype, transportschemes, cancel.Token);
+            return await FindServiceByType(servicetype, transportschemes, cancel.Token).ConfigureAwait(false);
         }
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
@@ -376,7 +376,7 @@ namespace RobotRaconteurWeb
 
             try
             {
-                await UpdateDetectedNodes(cancel);
+                await UpdateDetectedNodes(cancel).ConfigureAwait(false);
             }
             catch { };
 
@@ -440,7 +440,7 @@ namespace RobotRaconteurWeb
             {
                 Task waittask = Task.WhenAll(info_wait);
 
-                await waittask;
+                await waittask.ConfigureAwait(false);
             }
             catch (Exception) { }
 
@@ -455,7 +455,7 @@ namespace RobotRaconteurWeb
                         throw new TimeoutException("Timeout");
                     }
 
-                    var inf = await info_wait[i];
+                    var inf = await info_wait[i].ConfigureAwait(false);
 
 
                     RobotRaconteurServiceIndex.NodeInfo n = new RobotRaconteurServiceIndex.NodeInfo();
@@ -502,14 +502,14 @@ namespace RobotRaconteurWeb
         {
             var cancel = new CancellationTokenSource();
             cancel.CancelAfter(5000);
-            return await FindNodeByID(id, schemes, cancel.Token);
+            return await FindNodeByID(id, schemes, cancel.Token).ConfigureAwait(false);
         }
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes, CancellationToken cancel)
         {
             try
             {
-                await UpdateDetectedNodes(cancel);
+                await UpdateDetectedNodes(cancel).ConfigureAwait(false);
             }
             catch { };
 
@@ -562,14 +562,14 @@ namespace RobotRaconteurWeb
         {
             var cancel = new CancellationTokenSource();
             cancel.CancelAfter(5000);
-            return await FindNodeByName(name, schemes, cancel.Token);
+            return await FindNodeByName(name, schemes, cancel.Token).ConfigureAwait(false);
         }
 
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes, CancellationToken cancel)
         {
             try
             {
-                await UpdateDetectedNodes(cancel);
+                await UpdateDetectedNodes(cancel).ConfigureAwait(false);
             }
             catch { };
 
@@ -636,11 +636,11 @@ namespace RobotRaconteurWeb
                 var r = new Random();
                 var backoff = r.Next(100, 600) + extra_backoff;
 
-                await Task.Delay(backoff, cancel);
+                await Task.Delay(backoff, cancel).ConfigureAwait(false);
 
                 var urls = storage.info.URLs.Select(x => x.URL).ToArray();
 
-                var c = (ServiceStub)await node.ConnectService(urls, cancel: cancel);
+                var c = (ServiceStub)await node.ConnectService(urls, cancel: cancel).ConfigureAwait(false);
 
                 MessageEntry rr_res;
                 NodeID remote_nodeid;
@@ -658,13 +658,13 @@ namespace RobotRaconteurWeb
                     }
 
                     var rr_req = new MessageEntry(MessageEntryType.FunctionCallReq, "GetLocalNodeServices");
-                    rr_res = await c.ProcessRequest(rr_req, cancel);
+                    rr_res = await c.ProcessRequest(rr_req, cancel).ConfigureAwait(false);
                 }
                 finally
                 {
                     try
                     {
-                        await node.DisconnectService(c);
+                        await node.DisconnectService(c).ConfigureAwait(false);
                     }
                     catch { }
                 }
@@ -761,7 +761,7 @@ namespace RobotRaconteurWeb
             var cancel = new CancellationTokenSource();
             cancel.CancelAfter(backoff + 1000);
 
-            var ret = await DoUpdateServiceInfo(storage, storage.info.ServiceStateNonce, backoff, cancel.Token);
+            var ret = await DoUpdateServiceInfo(storage, storage.info.ServiceStateNonce, backoff, cancel.Token).ConfigureAwait(false);
             if (!ret.Item1)
             {
                 return;
@@ -787,7 +787,7 @@ namespace RobotRaconteurWeb
                         // We missed an update, do another refresh but delay 5 seconds to prevent flooding
                         Task.Run(async () =>
                         {
-                            await Task.Delay(5000);
+                            await Task.Delay(5000).ConfigureAwait(false);
                             _ = RetryUpdateServiceInfo(storage).IgnoreResult();
                         });
                     }
@@ -817,7 +817,7 @@ namespace RobotRaconteurWeb
             {
                 var cancel = new CancellationTokenSource();
                 cancel.CancelAfter(10000);
-                var ret = await DoUpdateServiceInfo(storage, nonce, 0, cancel.Token);
+                var ret = await DoUpdateServiceInfo(storage, nonce, 0, cancel.Token).ConfigureAwait(false);
                 if (!ret.Item1)
                 {
                     return;

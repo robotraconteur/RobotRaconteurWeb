@@ -110,7 +110,7 @@ namespace RobotRaconteurWeb
                 uint type = ((uint)m.entries[0].EntryType);
                 if (type < 500 && (type % 2 == 1))
                 {
-                    Message r = await node.SpecialRequest(m, TransportID);
+                    Message r = await node.SpecialRequest(m, TransportID).ConfigureAwait(false);
                     return r;
                 }
             }
