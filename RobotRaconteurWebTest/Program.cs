@@ -812,6 +812,40 @@ namespace RobotRaconteurTest
                 RobotRaconteurNode.s.Shutdown();
 
             }
+            else if (command == "intraloopback2")
+            {
+                RobotRaconteurNode.s.NodeName = "intra_testprog";
+                var t = new TcpTransport();
+                RobotRaconteurNode.s.RegisterTransport(t);
+
+                var t2 = new IntraTransport();
+                t2.StartServer();
+                RobotRaconteurNode.s.RegisterTransport(t2);
+
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory());
+
+                var s1 = new RobotRaconteurTestServiceSupport2();
+                s1.RegisterServices(t);
+
+                var client_node = new RobotRaconteurNode();
+
+                client_node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                client_node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+                client_node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory());
+
+                var client_t2 = new IntraTransport(client_node);
+                client_t2.StartClient();
+                client_node.RegisterTransport(client_t2);
+
+                ServiceTestClient2 s = new ServiceTestClient2(client_node);
+                s.RunFullTest("rr+intra:///?nodename=intra_testprog&service=RobotRaconteurTestService2")
+                    .GetAwaiter().GetResult();
+
+                RobotRaconteurNode.s.Shutdown();
+
+            }
             else
             {
                 throw new Exception("Unknown command");

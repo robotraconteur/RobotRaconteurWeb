@@ -29,15 +29,25 @@ namespace RobotRaconteurTest
 
     public class ServiceTestClient2
     {
+        RobotRaconteurNode node;
 
+        public ServiceTestClient2(RobotRaconteurNode node)
+        {
+            this.node = node;
+        }
+
+        public ServiceTestClient2()
+        {
+            this.node = RobotRaconteurNode.s;
+        }
         public async Task ConnectService(string url)
         {
-            r = (testroot3)await RobotRaconteurNode.s.ConnectService(url);
+            r = (testroot3)await node.ConnectService(url);
         }
 
         public async Task DisconnectService()
         {
-            await RobotRaconteurNode.s.DisconnectService(r);
+            await node.DisconnectService(r);
         }
 
 
@@ -110,14 +120,14 @@ namespace RobotRaconteurTest
             ServiceTest2_pod.fill_testpod1(ref s1, 563921043);
             ServiceTest2_pod.verify_testpod1(ref s1, 563921043);
 
-            var s1_m = RobotRaconteurNode.s.PackPodToArray(ref s1);
-            var s1_1 = RobotRaconteurNode.s.UnpackPodFromArray<testpod1>(s1_m);
+            var s1_m = node.PackPodToArray(ref s1);
+            var s1_1 = node.UnpackPodFromArray<testpod1>(s1_m);
             ServiceTest2_pod.verify_testpod1(ref s1_1, 563921043);
 
             var s2 = ServiceTest2_pod.fill_teststruct3(858362);
             ServiceTest2_pod.verify_teststruct3(s2, 858362);
-            var s2_m = RobotRaconteurNode.s.PackStructure(s2);
-            var s2_1 = RobotRaconteurNode.s.UnpackStructure<teststruct3>(s2_m);
+            var s2_m = node.PackStructure(s2);
+            var s2_1 = node.UnpackStructure<teststruct3>(s2_m);
             ServiceTest2_pod.verify_teststruct3(s2_1, 858362);*/
 
             var p1 = await r.get_testpod1_prop();
