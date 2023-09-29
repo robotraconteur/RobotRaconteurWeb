@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using RobotRaconteurWeb.Extensions;
 using static RobotRaconteurWeb.RRLogFuncs;
+using System.Text.RegularExpressions;
+using System.IO;
 
 namespace RobotRaconteurWeb
 {
@@ -23,8 +25,343 @@ namespace RobotRaconteurWeb
         public ServiceSubscriptionFilterNode[] Nodes;
         public string[] ServiceNames;
         public string[] TransportSchemes;
+        public Dictionary<string, ServiceSubscriptionFilterAttributeGroup> Attributes;
+        public ServiceSubscriptionFilterAttributeGroupOperation AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.AND;
         public Func<ServiceInfo2, bool> Predicate;
         public uint MaxConnection;
+    }
+
+    public class ServiceSubscriptionFilterAttribute
+    {
+        public string Name = string.Empty;
+        public string Value = string.Empty;
+        public Regex ValueRegex;
+        public bool UseRegex = false;
+
+        public ServiceSubscriptionFilterAttribute() { }
+
+        public ServiceSubscriptionFilterAttribute(string value)
+        {
+            Value = value;
+        }
+
+        public ServiceSubscriptionFilterAttribute(Regex valueRegex)
+        {
+            ValueRegex = valueRegex;
+            UseRegex = true;
+        }
+
+        public ServiceSubscriptionFilterAttribute(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        public ServiceSubscriptionFilterAttribute(string name, Regex valueRegex)
+        {
+            Name = name;
+            ValueRegex = valueRegex;
+            UseRegex = true;
+        }
+
+        public bool IsMatch(string value)
+        {
+            if (!string.IsNullOrEmpty(Name))
+            {
+                return false;
+            }
+            if (UseRegex)
+            {
+                return ValueRegex.IsMatch(value);
+            }
+            else
+            {
+                return value == Value;
+            }
+        }
+
+        public bool IsMatch(string name, string value)
+        {
+            if (!string.IsNullOrEmpty(Name) && Name != name)
+            {
+                return false;
+            }
+            if (UseRegex)
+            {
+                return ValueRegex.IsMatch(value);
+            }
+            else
+            {
+                return value == Value;
+            }
+        }
+
+        public bool IsMatch(List<string> values)
+        {
+            foreach (string e in values)
+            {
+                if (IsMatch(e))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsMatch(List<object> values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+
+            foreach (object e in values)
+            {
+                if (e == null)
+                {
+                    continue;
+                }
+
+                string s = e as string;
+
+                if (s == null)
+                {
+                    continue;
+                }
+
+               
+                if (IsMatch(s))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsMatch(Dictionary<string, object> values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+
+            foreach (KeyValuePair<string, object> e in values)
+            {
+                if (e.Value == null)
+                {
+                    continue;
+                }
+
+                string s = e.Value as string;  // Assuming RRArray<char> is somewhat like char[]
+
+                if (s == null)
+                {
+                    continue;
+                }
+
+                
+                if (IsMatch(e.Key, s))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsMatch(Dictionary<string, string> values)
+        {
+            foreach (KeyValuePair<string, string> e in values)
+            {
+                if (IsMatch(e.Key, e.Value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public static class ServiceSubscriptionFilterAttributeFactory
+    {
+        public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeRegex(string regexValue)
+        {
+            return new ServiceSubscriptionFilterAttribute(new Regex(regexValue));
+        }
+
+        public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeRegex(string name, string regexValue)
+        {
+            return new ServiceSubscriptionFilterAttribute(name, new Regex(regexValue));
+        }
+    }
+
+    public enum ServiceSubscriptionFilterAttributeGroupOperation
+    {
+        OR,
+        AND,
+        NOR,  // Also used for NOT
+        NAND
+    }
+
+    public class ServiceSubscriptionFilterAttributeGroup
+    {
+        public List<ServiceSubscriptionFilterAttribute> Attributes = new List<ServiceSubscriptionFilterAttribute>();
+        public List<ServiceSubscriptionFilterAttributeGroup> Groups = new List<ServiceSubscriptionFilterAttributeGroup>();
+        public ServiceSubscriptionFilterAttributeGroupOperation Operation = ServiceSubscriptionFilterAttributeGroupOperation.OR;
+        public bool SplitStringAttribute = true;
+        public char SplitStringDelimiter = ',';
+
+        public ServiceSubscriptionFilterAttributeGroup() { }
+
+        public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation)
+        {
+            Operation = operation;
+        }
+
+        public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttribute> attributes)
+        {
+            Operation = operation;
+            Attributes = attributes;
+        }
+
+        public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttributeGroup> groups)
+        {
+            Operation = operation;
+            Groups = groups;
+        }
+
+        public static bool ServiceSubscriptionFilterAttributeGroupDoFilter<T>(
+    ServiceSubscriptionFilterAttributeGroupOperation operation,
+    List<ServiceSubscriptionFilterAttribute> attributes,
+    List<ServiceSubscriptionFilterAttributeGroup> groups,
+    List<object> values)
+        {
+            switch (operation)
+            {
+                case ServiceSubscriptionFilterAttributeGroupOperation.OR:
+                    {
+                        if (!attributes.Any() && !groups.Any())
+                        {
+                            return true;
+                        }
+                        foreach (var e in groups)
+                        {
+                            if (e.IsMatch(values))
+                            {
+                                return true;
+                            }
+                        }
+                        foreach (var e in attributes)
+                        {
+                            if (e.IsMatch(values))
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                case ServiceSubscriptionFilterAttributeGroupOperation.AND:
+                    {
+                        if (!attributes.Any() && !groups.Any())
+                        {
+                            return true;
+                        }
+                        foreach (var e in groups)
+                        {
+                            if (!e.IsMatch(values))
+                            {
+                                return false;
+                            }
+                        }
+                        foreach (var e in attributes)
+                        {
+                            if (!e.IsMatch(values))
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                case ServiceSubscriptionFilterAttributeGroupOperation.NOR:
+                    {
+                        return !ServiceSubscriptionFilterAttributeGroupDoFilter<T>(ServiceSubscriptionFilterAttributeGroupOperation.OR, attributes, groups, values);
+                    }
+                case ServiceSubscriptionFilterAttributeGroupOperation.NAND:
+                    {
+                        return !ServiceSubscriptionFilterAttributeGroupDoFilter<T>(ServiceSubscriptionFilterAttributeGroupOperation.AND, attributes, groups, values);
+                    }
+                default:
+                    {
+                        throw new ArgumentException("Invalid attribute filter operation");
+                    }
+            }
+        }
+
+        public bool IsMatch(string value)
+        {
+            if (!SplitStringAttribute)
+            {
+                List<string> value_v = new List<string>();
+                value_v.Add(value);
+                return IsMatch(value_v);
+            }
+            else
+            {
+                List<string> value_v = new List<string>(value.Split(','));
+                return IsMatch(value_v);
+            }
+        }
+
+       
+        public bool IsMatch(List<string> values)
+        {
+            return ServiceSubscriptionFilterAttributeGroupDoFilter<string>(Operation, Attributes, Groups, values.Select(x => (object)x).ToList());
+        }
+
+        public bool IsMatch(List<object> values)
+        {
+            return ServiceSubscriptionFilterAttributeGroupDoFilter<object>(Operation, Attributes, Groups, values);
+        }
+
+        /*public bool IsMatch(Dictionary<string, object> values)
+        {
+            // TODO: Implementation
+            throw new NotImplementedException();
+        }
+
+        public bool IsMatch(Dictionary<string, string> values)
+        {
+            // TODO: Implementation
+            throw new NotImplementedException();
+        }*/
+
+        public bool IsMatch(object value)
+        {
+            if (value == null)
+            {
+                List<string> empty_values = new List<string>();
+                return IsMatch(empty_values);
+            }
+
+            string a0 = value as string;
+            if (a0 != null)
+            {
+                return IsMatch(a0);
+            }
+
+            List<object> a1 = value as List<object>;
+            if (a1 != null)
+            {
+                return IsMatch(a1);            
+            }
+
+            List<string> a2 = value as List<string>;
+            if (a2 != null)
+            {
+                return IsMatch(a2);
+            }
+
+            return false;
+        }
     }
 
     public struct ServiceSubscriptionClientID
@@ -160,7 +497,7 @@ namespace RobotRaconteurWeb
                         }
                     }
 
-                    if (urls.Count == 0)
+                    if (urls.Count == 0 && storage!=null)
                     {
                         // We didn't find a match with the ServiceInfo2 urls, attempt to use NodeDiscoveryInfo
                         // TODO: test this....
@@ -187,6 +524,48 @@ namespace RobotRaconteurWeb
                     }
                 }
 
+                if (filter.Attributes!=null && filter.Attributes.Any())
+                {
+                    List<bool> attrMatches = new List<bool>();
+
+                    foreach (var e in filter.Attributes)
+                    {
+                        if (!info.Attributes.TryGetValue(e.Key, out var e2Value))
+                        {
+                            object nullValue = null;
+                            attrMatches.Add(e.Value.IsMatch(nullValue));
+                        }
+                        else
+                        {
+                            attrMatches.Add(e.Value.IsMatch(e2Value));
+                        }
+                    }
+
+                    switch (filter.AttributesMatchOperation)
+                    {
+                        case ServiceSubscriptionFilterAttributeGroupOperation.OR:
+                            if (!attrMatches.Contains(true))
+                                return false;
+                            break;
+
+                        case ServiceSubscriptionFilterAttributeGroupOperation.NOR:
+                            if (attrMatches.Contains(true))
+                                return false;
+                            break;
+
+                        case ServiceSubscriptionFilterAttributeGroupOperation.NAND:
+                            if (!attrMatches.Contains(false))
+                                return false;
+                            break;
+
+                        case ServiceSubscriptionFilterAttributeGroupOperation.AND:
+                        default:
+                            if (attrMatches.Contains(false))
+                                return false;
+                            break;
+                    }
+                }
+               
                 if (filter.Predicate != null)
                 {
                     if (!filter.Predicate(info))
