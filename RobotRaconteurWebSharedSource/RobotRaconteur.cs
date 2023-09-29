@@ -180,7 +180,7 @@ namespace RobotRaconteurWeb
         public readonly BrowserWebSocketTransport browser_transport;
 #endif
 
-        RobotRaconteurNode()
+        public RobotRaconteurNode()
         {
             serviceindexer = new ServiceIndexer(this);
             RegisterServiceType(new RobotRaconteurServiceIndex.RobotRaconteurServiceIndexFactory(this));
