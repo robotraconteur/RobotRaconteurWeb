@@ -2006,6 +2006,31 @@ namespace RobotRaconteurWeb
             return m_LogRecordHandler;
         }
 
+        internal NodeDirectories node_dirs;
+
+        public NodeDirectories NodeDirectories
+        {
+            get
+            {
+                lock (this)
+                {
+                    if (node_dirs == null)
+                    {
+                        node_dirs = NodeDirectoriesUtil.GetDefaultNodeDirectories(this);
+                    }
+                    return node_dirs;
+                }
+            }
+            set
+            {
+                if (node_dirs != null)
+                {
+                    throw new InvalidOperationException("Node directories already set");
+                }
+                node_dirs = value;
+            }
+        }
+
 
     }
 

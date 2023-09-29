@@ -846,6 +846,38 @@ namespace RobotRaconteurTest
                 RobotRaconteurNode.s.Shutdown();
 
             }
+            else if (command == "localloopback")
+            {
+                var t2 = new LocalTransport();
+                t2.StartServerAsNodeName("local_testprog");
+                RobotRaconteurNode.s.RegisterTransport(t2);
+                
+                var t = new TcpTransport();
+                RobotRaconteurNode.s.RegisterTransport(t);
+
+
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var s1 = new RobotRaconteurTestServiceSupport();
+                s1.RegisterServices(t);
+
+                var client_node = new RobotRaconteurNode();
+
+                client_node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                client_node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var client_t2 = new LocalTransport(client_node);
+                client_node.RegisterTransport(client_t2);
+
+                ServiceTestClient s = new ServiceTestClient(client_node);
+                s.RunFullTest("rr+local:///?nodename=local_testprog&service=RobotRaconteurTestService",
+                    "rr+local:///?nodename=local_testprog&service=RobotRaconteurTestService_auth")
+                    .GetAwaiter().GetResult();
+                client_node.Shutdown();
+                RobotRaconteurNode.s.Shutdown();
+
+            }
             else
             {
                 throw new Exception("Unknown command");
