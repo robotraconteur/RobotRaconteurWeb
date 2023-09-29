@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MemoryMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Message.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NodeDirectories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NodeID.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PeriodicTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeMember.cs" />
