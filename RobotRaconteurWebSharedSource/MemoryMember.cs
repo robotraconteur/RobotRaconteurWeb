@@ -56,13 +56,19 @@ namespace RobotRaconteurWeb
 
         public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
         {
-            Array.Copy(memory, (long)memorypos, buffer, (long)bufferpos, (long)count);
+            lock (this)
+            {
+                Array.Copy(memory, (long)memorypos, buffer, (long)bufferpos, (long)count);
+            }
             return Task.FromResult(0);
         }
 
         public virtual Task Write(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
-            Array.Copy(buffer, (long)bufferpos, memory, (long)memorypos, (long)count);
+            lock (this)
+            {
+                Array.Copy(buffer, (long)bufferpos, memory, (long)memorypos, (long)count);
+            }
             return Task.FromResult(0);
         }
     }
@@ -478,7 +484,7 @@ namespace RobotRaconteurWeb
                 e.AddElement("count", count);
                 e.AddElement("data", PackWriteRequest(buffer, bufferpos, count));
 
-                var ret = stub.ProcessRequest(e, cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
             }
             else
             {

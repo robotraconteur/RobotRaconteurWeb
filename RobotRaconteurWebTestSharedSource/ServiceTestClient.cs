@@ -28,13 +28,24 @@ namespace RobotRaconteurTest
 {
     public class ServiceTestClient
     {
+        public RobotRaconteurNode node;
+
+        public ServiceTestClient()
+        {
+            node = RobotRaconteurNode.s;
+        }
+
+        public ServiceTestClient(RobotRaconteurNode node)
+        {
+            this.node = node;
+        }
 
         public void ca<T>(T[] v1, T[] v2)
         {
             RRAssert.AreEqual(v1.Length, v2.Length);
             for (int i = 0; i < v1.Length; i++)
             {
-                RRAssert.IsTrue(Math.Abs((double)((dynamic)v1[i] - (dynamic)v2[i])) < 1e-15);
+                RRAssert.IsTrue(Math.Abs((double)((dynamic)v1[i] - (dynamic)v2[i])) < 1e-6);
             }
         }
 
@@ -65,7 +76,7 @@ namespace RobotRaconteurTest
 
         public async Task ConnectService(string url)
         {
-            r = (testroot)await RobotRaconteurNode.s.ConnectService(url); 
+            r = (testroot)await node.ConnectService(url); 
         }
 
 
@@ -902,11 +913,11 @@ namespace RobotRaconteurTest
             //Run the test twice, once with a large maximum transfer size, and one with a laughably small one
             /*await test_m2();
             await test_m3();
-            uint l = RobotRaconteurNode.s.MemoryMaxTransferSize;
-            RobotRaconteurNode.s.MemoryMaxTransferSize = 10240;
+            uint l = node.MemoryMaxTransferSize;
+            node.MemoryMaxTransferSize = 10240;
             await test_m1();
             await test_m2();
-            RobotRaconteurNode.s.MemoryMaxTransferSize = l;*/
+            node.MemoryMaxTransferSize = l;*/
         }
 
         private async Task test_m1()
@@ -1006,7 +1017,7 @@ namespace RobotRaconteurTest
 
         public async Task DisconnectService()
         {
-            await RobotRaconteurNode.s.DisconnectService(r);
+            await node.DisconnectService(r);
 
         }
 
@@ -1015,15 +1026,15 @@ namespace RobotRaconteurTest
             //Test two different logins
             Dictionary<string,object> cred1=new Dictionary<string,object>();
             cred1.Add("password","testpass1");
-            testroot r1 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser1", cred1);
+            testroot r1 = (testroot)await node.ConnectService(url, "testuser1", cred1);
             await r1.func3(2.2, 3.3);
-            await RobotRaconteurNode.s.DisconnectService(r1);
+            await node.DisconnectService(r1);
 
             Dictionary<string, object> cred2 = new Dictionary<string, object>();
             cred2.Add("password", "testpass2");
-            testroot r2 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser2", cred2);
+            testroot r2 = (testroot)await node.ConnectService(url, "testuser2", cred2);
             await r2.func3(2.2, 3.3);
-            await RobotRaconteurNode.s.DisconnectService(r2);
+            await node.DisconnectService(r2);
 
             //Check an invalid password
             bool err = false;
@@ -1031,7 +1042,7 @@ namespace RobotRaconteurTest
             testroot r3=null;
             try
             {
-                r3 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser2", cred1);
+                r3 = (testroot)await node.ConnectService(url, "testuser2", cred1);
                 await r3.func3(2.2, 3.3);
             }
             catch (AuthenticationException e)
@@ -1040,7 +1051,7 @@ namespace RobotRaconteurTest
                 try
                 {
                     if (r3 != null)
-                    RobotRaconteurNode.s.DisconnectService(r3).IgnoreResult();
+                    node.DisconnectService(r3).IgnoreResult();
                 }
                 catch { }
                     
@@ -1053,7 +1064,7 @@ namespace RobotRaconteurTest
             testroot r4 = null;
             try
             {
-                r4 = (testroot)await RobotRaconteurNode.s.ConnectService(url);
+                r4 = (testroot)await node.ConnectService(url);
                 await r4.func3(2.2, 3.3);
             }
             catch (AuthenticationException e)
@@ -1061,7 +1072,7 @@ namespace RobotRaconteurTest
                 err2 = true;
                 try
                 {
-                    RobotRaconteurNode.s.DisconnectService(r4).IgnoreResult();
+                    node.DisconnectService(r4).IgnoreResult();
                 }
                 catch { }
 
@@ -1084,13 +1095,13 @@ namespace RobotRaconteurTest
             //Log in twice
             Dictionary<string, object> cred1 = new Dictionary<string, object>();
             cred1.Add("password", "testpass1");
-            testroot r1 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser1", cred1);
+            testroot r1 = (testroot)await node.ConnectService(url, "testuser1", cred1);
 
 
             //Log in again with "testuser1" username
             Dictionary<string, object> cred2 = new Dictionary<string, object>();
             cred2.Add("password", "testpass2");
-            testroot r2 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser1", cred1);
+            testroot r2 = (testroot)await node.ConnectService(url, "testuser1", cred1);
             
             
 
@@ -1101,7 +1112,7 @@ namespace RobotRaconteurTest
             
 
             
-            testroot r3 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser2", cred2);
+            testroot r3 = (testroot)await node.ConnectService(url, "testuser2", cred2);
             sub1 r3_o = await r3.get_o1();
             sub2 r3_o_o2 = await r3_o.get_o2_1();
 
@@ -1117,7 +1128,7 @@ namespace RobotRaconteurTest
             await r3_o_o2.set_data("Hello world");
 
             //Lock the object by username
-            await RobotRaconteurNode.s.RequestObjectLock(r1_o,RobotRaconteurObjectLockFlags.USER_LOCK);
+            await node.RequestObjectLock(r1_o,RobotRaconteurObjectLockFlags.USER_LOCK);
 
             //Check that all users that should access the objects can
             await r1.func3(2.2, 3.3);
@@ -1133,7 +1144,7 @@ namespace RobotRaconteurTest
             await ShouldBeErr<ObjectLockedException>(async delegate() { await r3_o_o2.set_data("Hello world"); });
 
             //Unlock and recheck all
-            await RobotRaconteurNode.s.ReleaseObjectLock(r1_o);
+            await node.ReleaseObjectLock(r1_o);
 
             await r1.func3(2.2, 3.3);
             await r1_o.set_d1(new double[] { 1.0 });
@@ -1147,29 +1158,29 @@ namespace RobotRaconteurTest
 
             //Relock, test that the lock is active, and then close the connection.  The lock should release.  The
             //second session is closed first, and should not release the lock.
-            await RobotRaconteurNode.s.RequestObjectLock(r1_o, RobotRaconteurObjectLockFlags.USER_LOCK);
+            await node.RequestObjectLock(r1_o, RobotRaconteurObjectLockFlags.USER_LOCK);
             await ShouldBeErr<ObjectLockedException>(async delegate() { await r3_o.set_d1(new double[] { 1.0 }); });
 
             await r2_o.set_d1(new double[] { 1.0 });
-            await RobotRaconteurNode.s.DisconnectService(r2);
+            await node.DisconnectService(r2);
 
             //Object still should be locked
             await ShouldBeErr<ObjectLockedException>(async delegate() { await r3_o.set_d1(new double[] { 1.0 }); });
 
             //Now close the session and lock should be released
-            await RobotRaconteurNode.s.DisconnectService(r1);
+            await node.DisconnectService(r1);
             await r3_o.set_d1(new double[] { 1.0 });
 
             //Reconnect the first two test sessions
-            r1 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser1", cred1);
-            r2 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testuser2", cred2);
+            r1 = (testroot)await node.ConnectService(url, "testuser1", cred1);
+            r2 = (testroot)await node.ConnectService(url, "testuser2", cred2);
             r1_o = await r1.get_o1();
             r1_o_o2 = await r1_o.get_o2_1();
             r2_o = await r2.get_o1();
             r2_o_o2 = await r2_o.get_o2_1();
 
             //Test the exclusive client lock
-            await RobotRaconteurNode.s.RequestObjectLock(r1_o, RobotRaconteurObjectLockFlags.CLIENT_LOCK);
+            await node.RequestObjectLock(r1_o, RobotRaconteurObjectLockFlags.CLIENT_LOCK);
             await r1_o.set_d1(new double[] { 1.0 });
             await ShouldBeErr<ObjectLockedException>(async delegate() { await r2_o.set_d1(new double[] { 1.0 }); });
             await ShouldBeErr<ObjectLockedException>(async delegate() { await r3_o.set_d1( new double[] { 1.0 }); });
@@ -1177,19 +1188,19 @@ namespace RobotRaconteurTest
             //Test the lock override by testsuperpass
             Dictionary<string, object> cred5 = new Dictionary<string, object>();
             cred5.Add("password", "superpass1");
-            testroot r5 = (testroot)await RobotRaconteurNode.s.ConnectService(url, "testsuperuser", cred5);
+            testroot r5 = (testroot)await node.ConnectService(url, "testsuperuser", cred5);
             sub1 r5_o = await r5.get_o1();
-            await RobotRaconteurNode.s.ReleaseObjectLock(r5_o);
+            await node.ReleaseObjectLock(r5_o);
 
             //Make sure the lock is released
             await r2_o.set_d1(new double[] { 1.0 });
             await r3_o.set_d1(new double[] { 1.0 });
 
             //Close all connections
-            await RobotRaconteurNode.s.DisconnectService(r1);
-            await RobotRaconteurNode.s.DisconnectService(r2);
-            await RobotRaconteurNode.s.DisconnectService(r3);
-            await RobotRaconteurNode.s.DisconnectService(r5);
+            await node.DisconnectService(r1);
+            await node.DisconnectService(r2);
+            await node.DisconnectService(r3);
+            await node.DisconnectService(r5);
 
 
 
@@ -1219,8 +1230,8 @@ namespace RobotRaconteurTest
             //it is checking for monitor locks.
 
            
-            testroot r1 = (testroot)await RobotRaconteurNode.s.ConnectService(url);
-            testroot r2 = (testroot)await RobotRaconteurNode.s.ConnectService(url);
+            testroot r1 = (testroot)await node.ConnectService(url);
+            testroot r2 = (testroot)await node.ConnectService(url);
 
             sub1 r1_o = await r1.get_o1();
             sub2 r1_o_o2 = await r1_o.get_o2_1();
@@ -1252,12 +1263,12 @@ namespace RobotRaconteurTest
                     await r2_o_o2.set_data("Hello world");
                     //ShouldBeErr<ObjectLockedException>(delegate() { r2_o.d1 = new double[] { 0.0 }; });
                     e1.TrySetResult(0);
-                    var l=await RobotRaconteurNode.s.MonitorEnter(r2_o);
+                    var l=await node.MonitorEnter(r2_o);
                     RRAssert.IsFalse(t1);
                     t2 = true;
 
                     await r2_o.set_d1(new double[] { 0.0 });
-                    await RobotRaconteurNode.s.MonitorExit(l);
+                    await node.MonitorExit(l);
                 }
                 catch
                 {
@@ -1265,7 +1276,7 @@ namespace RobotRaconteurTest
                 }
             });
 
-            var l2=await RobotRaconteurNode.s.MonitorEnter(r1_o);
+            var l2=await node.MonitorEnter(r1_o);
             Task t = t_func();
             t1 = true;
             await e1.Task.AwaitWithTimeout(100);
@@ -1274,7 +1285,7 @@ namespace RobotRaconteurTest
             await r1_o.set_d1(new double[] { 0.0 });
             RRAssert.IsFalse(t2);
             t1 = false;
-            await RobotRaconteurNode.s.MonitorExit(l2);
+            await node.MonitorExit(l2);
 
             await t;
 

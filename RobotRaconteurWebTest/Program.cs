@@ -779,7 +779,39 @@ namespace RobotRaconteurTest
 
                 return;
             }
+            else if (command == "intraloopback")
+            {
+                RobotRaconteurNode.s.NodeName = "intra_testprog";
+                var t = new TcpTransport();
+                RobotRaconteurNode.s.RegisterTransport(t);
 
+                var t2 = new IntraTransport();
+                t2.StartServer();
+                RobotRaconteurNode.s.RegisterTransport(t2);
+
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+                RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var s1 = new RobotRaconteurTestServiceSupport();
+                s1.RegisterServices(t);
+
+                var client_node = new RobotRaconteurNode();
+
+               client_node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
+               client_node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
+
+                var client_t2 = new IntraTransport(client_node);
+                client_t2.StartClient();
+                client_node.RegisterTransport(client_t2);
+
+                ServiceTestClient s = new ServiceTestClient(client_node);
+                s.RunFullTest("rr+intra:///?nodename=intra_testprog&service=RobotRaconteurTestService",
+                    "rr+intra:///?nodename=intra_testprog&service=RobotRaconteurTestService_auth")
+                    .GetAwaiter().GetResult();
+                client_node.Shutdown();
+                RobotRaconteurNode.s.Shutdown();
+
+            }
             else
             {
                 throw new Exception("Unknown command");
