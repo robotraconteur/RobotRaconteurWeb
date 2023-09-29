@@ -28,11 +28,47 @@ using System.IO;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    The central node implementation
+    </summary>
+    <remarks>
+    <para>
+    RobotRaconteurNode implements the current Robot Raconteur instance
+    and acts as the central switchpoint for the instance. The user
+    registers types, connects clients, registers services, and
+    registers transports through this class.
+    </para>
+    <para>
+    If the current program only needs one instance of RobotRaconteurNode,
+    the singleton can be used. The singleton is accessed using:
+    </para>
+    <code>
+    RobotRaconteurNode.s
+    </code>
+    <para>
+    The node must be shut down before existing the program,
+    or a memory leak/hard crash will occur. This can either be
+    accomplished manually using the `Shutdown()` function,
+    or automatically by using the ClientNodeSetup or
+    ServerNodeSetup classes.
+    </para>
+    </remarks>
+    */
     public class RobotRaconteurNode
     {
 
         private static RobotRaconteurNode sp;
-
+        /**
+        <summary>
+        Singleton accessor
+        </summary>
+        <remarks>
+        The RobotRaconteurNode singleton can be used when only
+        one instance of Robot Raconteur is required in a program.
+        The singleton must be shut down when the program exits.
+        </remarks>
+        */
         public static RobotRaconteurNode s
         {
             get
@@ -45,7 +81,16 @@ namespace RobotRaconteurWeb
         public const string Version = "0.9.2";
 
         private NodeID m_NodeID;
-
+        /**
+        <summary>
+        Get or set the current NodeID
+        </summary>
+        <remarks>
+        Gets or setthe current NodeID. If one has not been set,
+        one will be automatically generated. Cannot be set if a NodeID has been assigned.
+        </remarks>
+        <value />
+        */
         public NodeID NodeID
         {
             get
@@ -88,6 +133,15 @@ namespace RobotRaconteurWeb
 
 
         private string m_NodeName;
+        /**
+        <summary>
+        Get or set the current NodeName
+        </summary>
+        <remarks>
+        Gets or set the current NodeName. If one has not been set using,
+        it will be an empty string. Cannot be set if a NodeName has been assigned.
+        </remarks>
+        */
         public string NodeName
         {
             get
@@ -167,13 +221,53 @@ namespace RobotRaconteurWeb
 
         private uint transport_count = 0;
 
-
+        /**
+        <summary>
+        Get or set the timeout for endpoint activity in milliseconds
+        </summary>
+        <remarks>
+        Sets a timeout for endpoint inactivity. If no message
+        is sent or received by the endpoint for the specified time,
+        the endpoint is closed. Default timeout is 10 minutes.
+        </remarks>
+        */
         public uint EndpointInactivityTimeout = 600000;
+        /**
+        <summary>
+        Get or set the timeout for transport activity in milliseconds
+        </summary>
+        <remarks>
+        Sets a timeout for transport inactivity. If no message
+        is sent or received on the transport for the specified time,
+        the transport is closed. Default timeout is 10 minutes.
+        </remarks>
+        */
         public uint TransportInactivityTimeout = 600000;
+        /**
+        <summary>
+        Get or set the timeout for requests in milliseconds
+        </summary>
+        <remarks>
+        Requests are calls to a remote node that expect a response. `function`,
+        `property`, `callback`, `memory`, and setup calls in `pipe` and `wire`
+        are all requests. All other Robot Raconteur functions that call the remote
+        node and expect a response are requests. Default timeout is 15 seconds.
+        </remarks>
+        */
         public uint RequestTimeout = 15000;
         private ServiceIndexer serviceindexer;
 
-
+        /**
+        <summary>
+        Get or set the maximum chunk size for memory transfers in bytes
+        </summary>
+        <remarks>
+        `memory` members break up large transfers into chunks to avoid
+        sending messages larger than the transport maximum, which is normally
+        approximately 10 MB. The memory max transfer size is the largest
+        data chunk the memory will send, in bytes. Default is 100 kB.
+        </remarks>
+        */
         public uint MemoryMaxTransferSize = 102400;
 
 #if ROBOTRACONTEUR_BRIDGE
@@ -958,7 +1052,13 @@ namespace RobotRaconteurWeb
             return ret;
 
         }
-
+        /**
+        <summary>
+        Register a service type
+        </summary>
+        <remarks>None</remarks>
+        <param name="servicetype">The service factory implementing the type to register</param>
+        */
         public void RegisterServiceType(ServiceFactory f)
         {
             lock (service_factories)
@@ -971,6 +1071,13 @@ namespace RobotRaconteurWeb
 
         }
 
+        /**
+         <summary>
+        Returns a previously registered service type
+        </summary>
+        <remarks>None</remarks>
+        <param name="servicetype">The name of the service type to retrieve</param>
+        */
         public ServiceFactory GetServiceType(string servicetype)
         {
             ServiceFactory f;
@@ -992,7 +1099,13 @@ namespace RobotRaconteurWeb
             }
         }
 
-
+        /**
+        <summary>
+            Return names of registered service types
+        </summary>
+        <remarks>None</remarks>
+        <returns>The registered service types</returns>
+        */
         public string[] GetServiceTypes()
         {
             lock (service_factories)
@@ -1015,7 +1128,31 @@ namespace RobotRaconteurWeb
             LogTrace("Registered dynamic service factory", this, component: RobotRaconteur_LogComponent.Node);
 #endif
         }
-
+        /**
+        <summary>
+        Registers a service for clients to connect
+        </summary>
+        <remarks>
+        <para>
+        The supplied object becomes the root object in the service. Other objects may
+        be accessed by clients using `objref` members. The name of the service must conform
+        to the naming rules of Robot Raconteur member names. A service is closed using
+        either CloseService() or when Shutdown() is called.
+        </para>
+        <para>
+        Multiple services can be registered within the same node. Service names
+        within a single node must be unique.
+        </para>
+        </remarks>
+        <param name="name">The name of the service, must follow member naming rules</param>
+        <param name="servicetype">The name of the service definition containing the object type.
+        Do not include the object type.</param>
+        <param name="obj">The root object of the service</param>
+        <param name="securitypolicy">An optional security policy for the service to control authentication
+        and other security functions</param>
+        <returns>The instantiated ServerContext. This object is owned
+        by the node and the return can be safely ignored.</returns>
+        */
         public ServerContext RegisterService(string name, string servicetype, Object obj, ServiceSecurityPolicy securitypolicy = null)
         {
             lock (services)
@@ -1055,7 +1192,16 @@ namespace RobotRaconteurWeb
                 return c;
             }
         }
-
+        /**
+        <summary>
+            Closes a previously registered service
+        </summary>
+        <remarks>
+            Services are automatically closed by Shutdown, so this function
+            is rarely used.
+        </remarks>
+        <param name="sname">The name of the service to close</param>
+        */
         public void CloseService(string sname)
         {
             lock (services)
@@ -1094,7 +1240,14 @@ namespace RobotRaconteurWeb
 
 
         }
-
+        /**
+        <summary>
+            Register a transport for use by the node
+        </summary>
+        <remarks>None</remarks>
+        <param name="transport">The transport to register</param>
+        <returns>The transport internal id</returns>
+        */
         public uint RegisterTransport(Transport c)
         {
             lock (transports)
@@ -1342,7 +1495,38 @@ namespace RobotRaconteurWeb
 
 
         }
-
+        /**
+        <summary>
+        Create a client connection to a remote service using a URL
+        </summary>
+        <remarks>
+        <para>
+        Creates a connection to a remote service using a URL. URLs are either provided by
+        the service, or are determined using discovery functions such as FindServiceByType().
+        This function is the primary way to create client connections.
+        </para>
+        <para>
+        username and credentials can be used to specify authentication information. Credentials will
+        often contain a "password" or token entry.
+        </para>
+        <para>
+        The listener is a function that is called during various events. See ClientServiceListenerEventType
+        for a description of the possible events.
+        </para>
+        <para>
+        ConnectService will attempt to instantiate a client object reference (proxy) based on the type
+        information provided by the service. The type information will contain the type of the object,
+        and all the implemented types. The client will normally want a specific one of the implement types.
+        Specify this desired type in objecttype to avoid future compatibility issues.
+        </para>
+        </remarks>
+        <param name="url">The URL of the service to connect</param>
+        <param name="username">An optional username for authentication</param>
+        <param name="credentials">Optional credentials for authentication</param>
+        <param name="listener">An optional listener callback function</param>
+        <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <returns>The root object reference of the connected service</returns>
+        */
         public async Task<object> ConnectService(string url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
 
@@ -1394,7 +1578,38 @@ namespace RobotRaconteurWeb
                 throw;
             }
         }
-
+        /**
+        <summary>
+        Create a client connection to a remote service using a URL
+        </summary>
+        <remarks>
+        <para>
+        Creates a connection to a remote service using a URL. URLs are either provided by
+        the service, or are determined using discovery functions such as FindServiceByType().
+        This function is the primary way to create client connections.
+        </para>
+        <para>
+        username and credentials can be used to specify authentication information. Credentials will
+        often contain a "password" or token entry.
+        </para>
+        <para>
+        The listener is a function that is called during various events. See ClientServiceListenerEventType
+        for a description of the possible events.
+        </para>
+        <para>
+        ConnectService will attempt to instantiate a client object reference (proxy) based on the type
+        information provided by the service. The type information will contain the type of the object,
+        and all the implemented types. The client will normally want a specific one of the implement types.
+        Specify this desired type in objecttype to avoid future compatibility issues.
+        </para>
+        </remarks>
+        <param name="url">The candidate URLs of the service to connect</param>
+        <param name="username">An optional username for authentication</param>
+        <param name="credentials">Optional credentials for authentication</param>
+        <param name="listener">An optional listener callback function</param>
+        <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <returns>The root object reference of the connected service</returns>
+        */
         public async Task<object> ConnectService(string[] url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
             try
@@ -1486,14 +1701,36 @@ namespace RobotRaconteurWeb
                 throw;
             }
         }
-
+        /**
+        <summary>
+        Disconnects a client connection to a service
+        </summary>
+        <remarks>
+        <para>
+        Disconnects a client connection. Client connections
+        are automatically closed by Shutdown(), so this function
+        is optional.
+        </para>
+        </remarks>
+        <param name="obj">The root object of the service to disconnect</param>
+        */
         public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
             await stub.RRContext.Close(cancel).ConfigureAwait(false);
 
         }
-
+        /**
+        <summary>
+        Get the service attributes of a client connection
+        </summary>
+        <remarks>
+        Returns the service attributes of a client connected using
+        ConnectService()
+        </remarks>
+        <param name="obj">The root object of the client to use to retrieve service attributes</param>
+        <returns>Dictionary of the service attributes</returns>
+        */
         public Dictionary<string, object> GetServiceAttributes(object obj)
         {
             ServiceStub stub = (ServiceStub)obj;
@@ -1542,7 +1779,14 @@ namespace RobotRaconteurWeb
             }
             catch { }
         }
-
+        /**
+        <summary>
+            Check that the TransportConnection associated with an endpoint
+            is connected
+        </summary>
+        <remarks>None</remarks>
+        <param name="endpoint">The LocalEndpoint identifier to check</param>
+        */
         public void CheckConnection(uint endpoint)
         {
             try
@@ -1582,7 +1826,27 @@ namespace RobotRaconteurWeb
         }
 
         private CancellationTokenSource shutdown_token = new CancellationTokenSource();
-
+        /**
+        <summary>
+        Shuts down the node. Called automatically by ClientNodeSetup and ServerNodeSetup
+        </summary>
+        <remarks>
+        <para>
+        Shutdown must be called before program exit to avoid segfaults and other undefined
+        behavior. The use of ClientNodeSetup and ServerNodeSetup is recommended to automate
+        the node lifecycle. Calling this function does the following:
+        </para>
+        <list type="number">
+        <item>1. Closes all services and releases all service objects</item>
+        <item>2. Closes all client connections</item>
+        <item>3. Shuts down discovery</item>
+        <item>4. Shuts down all transports</item>
+        <item>5. Notifies all shutdown listeners</item>
+        <item>6. Releases all periodic cleanup task listeners</item>
+        <item>7. Shuts down and releases the thread pool</item>
+        </list>
+        </remarks>
+        */
         public void Shutdown()
         {
 
@@ -1654,7 +1918,35 @@ namespace RobotRaconteurWeb
         {
             m_Discovery.CleanDiscoveredNodes();
         }
-
+        /**
+        <summary>
+            Select the "best" URL from a std::vector of candidates
+        </summary>
+        <remarks>
+            <para>
+            Service discovery will often return a list of candidate URLs to
+            use to connect to a node. This function uses hueristics to select
+            the "best" URL to use. The selection criteria ranks URLs in roughly
+            the following order, lower number being better:
+            </para>
+            <list type="number">
+            <term>"rr+intra" for IntraTransport</term>
+            <term>"rr+local" for LocalTransport</term>
+            <term>"rr+pci" or "rr+usb" for HardwareTransport</term>
+            <term>"rrs+tcp://127.0.0.1" for secure TcpTransport loopback</term>
+            <term>"rrs+tcp://[::1]" for secure TcpTransport IPv6 loopback</term>
+            <term>"rrs+tcp://localhost" for secure TcpTransport loopback</term>
+            <term>"rrs+tcp://[fe80" for secure TcpTransport link-local IPv6</term>
+            <term>"rrs+tcp://" for any secure TcpTransport</term>
+            <term>"rr+tcp://127.0.0.1" for TcpTransport loopback</term>
+            <term>"rr+tcp://[::1]" for TcpTransport IPv6 loopback</term>
+            <term>"rr+tcp://localhost" for TcpTransport loopback</term>
+            <term>"rr+tcp://[fe80" for TcpTransport link-local IPv6</term>
+            <term>"rr+tcp://" for any TcpTransport</term>
+            </list>
+        </remarks>
+        <param name="urls">The candidate URLs</param>
+        */
         public static string SelectRemoteNodeURL(string[] urls)
         {
             var url_order = new string[] {
@@ -1728,38 +2020,136 @@ namespace RobotRaconteurWeb
         {
             await m_Discovery.UpdateDetectedNodes(cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Use discovery to find available services by service type
+        </summary>
+        <remarks>
+        <para>
+        Uses discovery to find available services based on a service type. This
+        service type is the type of the root object, ie
+        `com.robotraconteur.robotics.robot.Robot`. This process will update the detected
+        node cache.
+        </para>
+        </remarks>
+        <param name="servicetype">The service type to find, ie `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="transportschemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param>
+        <returns>The detected services</returns>
+        */
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes)
         {
             return await m_Discovery.FindServiceByType(servicetype, transportschemes).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Use discovery to find available services by service type
+        </summary>
+        <remarks>
+        <para>
+        Uses discovery to find available services based on a service type. This
+        service type is the type of the root object, ie
+        `com.robotraconteur.robotics.robot.Robot`. This process will update the detected
+        node cache.
+        </para>
+        </remarks>
+        <param name="servicetype">The service type to find, ie `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="transportschemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param>
+        <returns>The detected services</returns>
+        */
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
         {
 
             return await m_Discovery.FindServiceByType(servicetype, transportschemes, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeID
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeID.
+        This function returns unverified cache information.
+        </para>
+        </remarks>
+        <param name="id">The NodeID to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> <returns>The detected nodes</returns>
+        */
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes)
         {
             return await m_Discovery.FindNodeByID(id, schemes).ConfigureAwait(false);
         }
+/**
+        <summary>
+        Finds nodes on the network with a specified NodeID
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeID.
+        This function returns unverified cache information.
+        </para>
+        </remarks>
+        <param name="id">The NodeID to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> <returns>The detected nodes</returns>
+        */
 
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes, CancellationToken cancel)
         {
             return await m_Discovery.FindNodeByID(id, schemes, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeName
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeName.
+        This function returns unverified cache information.
+        </remarks>
+        <param name="name">The NodeName to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> <returns>The detected nodes</returns>
+        */
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes)
         {
             return await m_Discovery.FindNodeByName(name, schemes).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeName
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeName.
+        This function returns unverified cache information.
+        </remarks>
+        <param name="name">The NodeName to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> <returns>The detected nodes</returns>
+        */
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes, CancellationToken cancel)
         {
             return await m_Discovery.FindNodeByName(name, schemes, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Request an exclusive access lock to a service object
+        </summary>
+        <remarks>
+        <para>
+        Called by clients to request an exclusive lock on a service object and
+        all subobjects (`objrefs`) in the service. The exclusive access lock will
+        prevent other users ("User" lock) or client connections  ("Session" lock)
+        from interacting with the objects.
+        </para>
+        </remarks>
+        <param name="obj">The object to lock. Must be returned by ConnectService or returned by an `objref`</param>
+        <param name="flags">Select either a "User" or "Session" lock</param>
+        <returns>"OK" on success</returns>
+        */
         public async Task<string> RequestObjectLock(object obj, RobotRaconteurObjectLockFlags flags, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only lock object opened through Robot Raconteur");
@@ -1770,7 +2160,18 @@ namespace RobotRaconteurWeb
 
         }
 
-
+        /**
+        <summary>
+        Release an excluse access lock previously locked with RequestObjectLock()
+        </summary>
+        <remarks>
+        <para>
+        Object must have previously been locked using RequestObjectLock()
+        </para>
+        </remarks>
+        <param name="obj">The object previously locked</param>
+        <returns>"OK" on success</returns>
+        */
         public async Task<string> ReleaseObjectLock(object obj, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only unlock object opened through Robot Raconteur");
@@ -1784,7 +2185,23 @@ namespace RobotRaconteurWeb
             internal IDisposable lock_;
             internal ServiceStub stub;
         }
-
+        /**
+        <summary>
+        Creates a monitor lock on a specified object
+        </summary>
+        <remarks>
+        <para>
+        Monitor locks are intendended for short operations that require
+        guarding to prevent races, corruption, or other concurrency problems.
+        Monitors emulate a single thread locking the service object.
+        </para>
+        <para>
+        Monitor locks do not lock any sub-objects (objref)
+        </para>
+        </remarks>
+        <param name="obj">The object to lock</param>
+        <param name="timeout">The timeout in milliseconds to acquire the monitor lock, or RR_TIMEOUT_INFINITE</param>
+        */
         public async Task<MonitorLock> MonitorEnter(object obj, int timeout = -1, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can be monitored by RobotRaconteurNode");
@@ -1792,13 +2209,40 @@ namespace RobotRaconteurWeb
 
             return await s.RRContext.MonitorEnter(obj, timeout, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Releases a monitor lock
+        </summary>
+        <remarks>None
+        </remarks>
+        <param name="obj">The object previously locked by MonitorEnter()</param>
+        */
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
         {
 
             await lock_.stub.RRContext.MonitorExit(lock_, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Returns an objref as a specific type
+        </summary>
+        <remarks>
+        <para>
+        Robot Raconteur service object types are polymorphic using inheritence,
+        meaning that an object may be represented using multiple object types.
+        `objref` will attempt to return the relevant type, but it is sometimes
+        necessary to request a specific type for an objref.
+        </para>
+        <para>
+        This function will return the object from an `objref` as the specified type,
+        or throw an error if the type is invalid.
+        </para>
+        </remarks>
+        <param name="obj">The object with the desired `objref`</param>
+        <param name="objref">The name of the `objref` member</param>
+        <param name="objecttype">The desired service object type</param>
+        <returns>The object with the specified interface type. Must be cast to the desired type</returns>
+        */
         public async Task<object> FindObjRefTyped(object obj, string objref, string objecttype, CancellationToken cancel)
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
@@ -1806,7 +2250,21 @@ namespace RobotRaconteurWeb
 
             return await s.FindObjRefTyped(objref, objecttype, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Returns an indexed objref as a specified type
+        </summary>
+        <remarks>
+        <para>
+        Same as FindObjRefTyped() but includes an `objref` index
+        </para>
+        </remarks>
+        <param name="obj">The object with the desired `objref`</param>
+        <param name="objref">The name of the `objref` member</param>
+        <param name="index">The index for the `objref`, convert int to string for int32 index type</param>
+        <param name="objecttype">The desired service object type</param>
+        <returns>The object with the specified interface type. Must be cast to the desired type</returns>
+        */
         public async Task<object> FindObjRefTyped(object obj, string objref, string index, string objecttype, CancellationToken cancel)
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
@@ -1815,6 +2273,16 @@ namespace RobotRaconteurWeb
             return await s.FindObjRefTyped(objref, index, objecttype, cancel).ConfigureAwait(false);
         }
 
+        /**
+        <summary>
+        The current time in UTC time zone
+        </summary>
+        <remarks>
+        Uses the internal node clock to get the current time in UTC.
+        While this will normally use the system clock, this may
+        use simulation time in certain circumstances
+        </remarks>
+        */
         public DateTime UtcNow
         {
             get
@@ -1822,16 +2290,45 @@ namespace RobotRaconteurWeb
                 return DateTime.UtcNow;
             }
         }
-
+        /**
+        <summary>
+        Create a Timer object
+        </summary>
+        <remarks>
+        <para>
+        This function will normally return a WallTimer instance
+        </para>
+        <para>
+        Start() must be called after timer creation
+        </para>
+        </remarks>
+        <param name="period">The period of the timer in milliseconds</param>
+        <param name="handler">The handler function to call when timer times out</param>
+        <param name="oneshot">True if timer is a one-shot timer, false for repeated timer</param>
+        <returns>The new Timer object. Must call Start()</returns>
+        */
         public ITimer CreateTimer(int period, Action<TimerEvent> handler, bool oneshot = false)
         {
             var t = new WallTimer(period, handler, oneshot, this);
             return t;
         }
-
-        public IRate CreateRate(double period)
+        /**
+        <summary>
+            Create a Rate object
+        </summary>
+        <remarks>
+            <para>
+            Rate is used to stabilize periodic loops to a specified frequency
+            </para>
+            <para> This function will normally return a WallRate instance
+            </para>
+        </remarks>
+        <param name="frequency">Frequency of loop in Hz</param>
+        <returns>The new Rate object</returns>
+        */        
+        public IRate CreateRate(double frequency)
         {
-            return new WallRate(period, this);
+            return new WallRate(frequency, this);
         }
 
         public string GetRandomString(int count)
@@ -1883,39 +2380,119 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-
+        /**
+        <summary>
+        Subscribe to listen for available services information
+        </summary>
+        <remarks>
+        A ServiceInfo2Subscription will track the availability of service types and
+        inform when services become available or are lost. If connections to
+        available services are also required, ServiceSubscription should be used.
+        </remarks>
+        <param name="service_types">An array of service types to listen for, ie
+        `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="filter">A filter to select individual services based on specified criteria</param>
+        <returns>The active subscription</returns>
+        */
         public ServiceInfo2Subscription SubscribeServiceInfo2(string[] service_types, ServiceSubscriptionFilter filter = null)
         {
             return m_Discovery.SubscribeServiceInfo2(service_types, filter);
         }
-
+        /**
+        <summary>
+        Subscribe to listen for available services and automatically connect
+        </summary>
+        <remarks>
+        A ServiceSubscription will track the availability of service types and
+        create connections when available.
+        </remarks>
+        <param name="service_types">An arrayof service types to listen for, ie
+        `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="filter">A filter to select individual services based on specified criteria</param>
+        <returns>The active subscription</returns>
+        */
         public ServiceSubscription SubscribeServiceByType(string[] service_types, ServiceSubscriptionFilter filter = null)
         {
             return m_Discovery.SubscribeServiceByType(service_types, filter);
         }
-
-        public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
+        /**
+        <summary>
+        Subscribe to a service using one or more URL. Used to create robust connections to services
+        </summary>
+        <remarks>
+        Creates a ServiceSubscription assigned to a service with one or more candidate connection URLs. The
+        subscription will attempt to maintain a persistent connection, reconnecting if the connection is lost.
+        </remarks>
+        <param name="url">One or more candidate connection urls</param>
+        <param name="username">An optional username for authentication</param>
+        <param name="credentials">Optional credentials for authentication</param>
+        <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <returns>The active subscription</returns>
+        */        public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
         {
             return m_Discovery.SubscribeService(url, username, credentials, objecttype);
         }
 
         ILogRecordHandler m_LogRecordHandler;
-
+        /**
+        <summary>
+            The current log level for the node
+        </summary>
+        <remarks>
+            Default level is "warning". Set RobotRaconteur.RobotRaconteur_LogLevel_Disable to disable logging
+        </remarks>
+        */
         public RobotRaconteur_LogLevel LogLevel 
         {
             get; set;
         } = RobotRaconteur_LogLevel.Warning;
-
+        /**
+        <summary>
+            Test if the specified log level would be accepted
+        </summary>
+        <remarks>None</remarks>
+        <param name="level">Log level to test</param>
+        <returns>true if the log would be accepted</returns>
+        */
         public bool CompareLogLevel(RobotRaconteur_LogLevel level)
         {
             return (int)level >= (int)LogLevel;
         }
-
+        /**
+        <summary>
+            Log a simple message using the current node
+        </summary>
+        <remarks>
+            <para>
+            The record will be sent to the configured log handler,
+            or sent to cerr if none is configured
+            </para>
+            <para> If the level of the message is below the current log level
+            for the node, the record will be ignored
+            </para>
+        </remarks>
+        <param name="level">The level for the log message</param>
+        <param name="message">The log message</param>
+        */
         public void LogMessage(RobotRaconteur_LogLevel level, string message)
         {
             LogRecord(new RRLogRecord() { Node = this, Level = level, Message = message });
         }
-
+        /**
+        <summary>
+            Log a record to the node.
+        </summary>
+        <remarks>
+            <para>
+            The record will be sent to the configured log handler,
+            or sent to stderr if none is configured
+            </para>
+            <para> If the level of the message is below the current log level
+            for the node, it will be ignored
+            </para>
+        </remarks>
+        <param name="record">The record to log</param>
+        */
         public void LogRecord(RRLogRecord record)
         {
             if ((int)record.Level < (int)LogLevel)
@@ -1935,7 +2512,16 @@ namespace RobotRaconteurWeb
             Console.WriteLine(t.ToString());
 #endif
         }
-
+        /**
+        <summary>
+            Set the log level for the node from a string
+        </summary>
+        <remarks>
+            Must be one of the following values: DISABLE, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE
+            Defaults to WARNING
+        </remarks>
+        <param name="loglevel">The desired log level</param>
+        */
         public RobotRaconteur_LogLevel SetLogLevelFromString(string loglevel)
         {
 
@@ -1983,7 +2569,21 @@ namespace RobotRaconteurWeb
 
             return LogLevel;
         }
-
+        /**
+        <summary>
+            Set the log level for the node from specified environmental variable
+        </summary>
+        <remarks>
+            <para>
+            Retrieves the specified environmental variable and sets the log level based
+            on one of the following values: DISABLE, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE
+            </para>
+            <para> If an invalid value or the variable does not exist, the log level is left unchanged.
+            </para>
+        </remarks>
+        <param name="env_variable_name">The environmental variable to use. Defaults to
+            `ROBOTRACONTEUR_LOG_LEVEL`</param>
+        */
         public RobotRaconteur_LogLevel SetLogLevelFromEnvVariable(string env_variable_name = "ROBOTRACONTEUR_LOG_LEVEL")
         {
             var loglevel = System.Environment.GetEnvironmentVariable(env_variable_name);
@@ -1995,12 +2595,28 @@ namespace RobotRaconteurWeb
         }
 
 
-
+        /**
+        <summary>
+            Set the handler for log records
+        </summary>
+        <remarks>
+            If handler is NULL, records are sent to stderr
+        </remarks>
+        <param name="handler">The log record handler function</param>
+        */
         public void SetLogRecordHandler(ILogRecordHandler handler)
         {
             m_LogRecordHandler = handler;
         }
 
+        /**
+        <summary>
+            Get the currently configured log record handler
+        </summary>
+        <remarks>
+            If null, records are sent to stderr
+        </remarks>
+        */
         public ILogRecordHandler GetLogRecordHandler()
         {
             return m_LogRecordHandler;
@@ -2034,9 +2650,32 @@ namespace RobotRaconteurWeb
 
     }
 
+    /**
+    <summary>
+        The type of object lock
+      </summary>
+    */
     public enum RobotRaconteurObjectLockFlags
     {
+        /**
+        <summary>
+            User level lock
+        </summary>
+        <remarks>
+            The object will be accesible for all client connections
+            authenticated by the current user
+        </remarks>
+        */
         USER_LOCK = 0,
+        /**
+        <summary>
+            Client level lock
+        </summary>
+        <remarks>
+            Only the current client connection will have access
+            to the locked object
+        </remarks>  
+        */
         CLIENT_LOCK
     }
 }

@@ -19,7 +19,79 @@ using System.Diagnostics;
 
 namespace RobotRaconteurWeb
 {
-
+    /**
+    <summary>
+    Transport for communication between processes using UNIX domain sockets
+    </summary>
+    <remarks>
+    <para>
+    It is recommended that ClientNodeSetup, ServerNodeSetup, or SecureServerNodeSetup
+    be used to construct this class.
+    </para>
+    <para>
+    See robotraconteur_url for more information on URLs.
+    </para>
+    <para>
+    The LocalTransport implements transport connections between processes running on the
+    same host operating system using UNIX domain sockets. UNIX domain sockets are similar
+    to standard networking sockets, but are used when both peers are on the same machine
+    instead of connected through a network. This provides faster operation and greater
+    security, since the kernel simply passes data between the processes. UNIX domain
+    sockets work using Information Node (inode) files, which are special files on
+    the standard filesystem. Servers "listen" on a specified inode, and clients
+    use the inode as the address to connect. The LocalTransport uses UNIX sockets
+    in `SOCK_STREAM` mode. This provides a reliable stream transport connection similar
+    to TCP, but with significantly improved performance due the lower overhead.
+    </para>
+    <para>
+    UNIX domain sockets were added to Windows 10 with the 1803 update. Robot Raconteur
+    switch to UNIX domain sockets for the LocalTransport on Windows in version 0.9.2.
+    Previous versions used Named Pipes, but these were inferior to UNIX sockets. The
+    LocalTransport will not function on versions of Windows prior to Windows 10 1803 update
+    due to the lack of support for UNIX sockets. A warning will be issued to the log if
+    the transport is not available, and all connection attempts will fail. All other
+    transports will continue to operate normally.
+    </para>
+    <para>
+    The LocalTransport stores inode and node information files in the filesystem at various
+    operator system dependent locations. See the Robot Raconteur Standards documents
+    for details on where these files are stored.
+    </para>
+    <para>
+    Discovery is implemented using file watchers. The file watchens must be activated
+    using the node setup flags, or by calling EnableNodeDiscoveryListening().
+    After being initialized the file watchers operate automatically.
+    </para>
+    <para>
+    The LocalTransport can be used to dynamically assign NodeIDs to nodes based on a NodeName.
+    StartServerAsNodeName() and StartClientAsNodeName() take a NodeName that will identify the
+    node to clients, and manage a system-local NodeID corresponding to that NodeName. The
+    generated NodeIDs are stored on the local filesystem. If LocalTransport finds a
+    corresponding
+    NodeID on the filesystem, it will load and use that NodeID. If it does not, a new random
+    NodeID
+    is automatically generated.
+    </para>
+    <para>
+    The server can be started in "public" or "private" mode. Private servers store their
+    inode and
+    information in a location only the account owner can access, while "public" servers are
+    placed in a location that all users with the appropriate permissions can access. By
+    default,
+    public LocalTransport servers are assigned to the "robotraconteur" group. Clients that
+    belong to the
+    "robotraconteur" group will be able to connect to these public servers.
+    </para>
+    <para>
+    The use of RobotRaconteurNodeSetup and subclasses is recommended to construct
+    transports.
+    </para>
+    <para> The transport must be registered with the node using
+    RobotRaconteurNode.RegisterTransport() after construction if node
+    setup is not used.
+    </para>
+    </remarks>
+    */
     public sealed class LocalTransport : Transport
     {
 
@@ -62,6 +134,14 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+        <summary>
+        Construct a new LocalTransport for a non-default node. Must be registered with node using
+        node.RegisterTransport()
+        </summary>
+        <remarks>None</remarks>
+        <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
+        */
         public LocalTransport(RobotRaconteurNode node = null)
             : base(node)
         {
@@ -187,7 +267,20 @@ namespace RobotRaconteurWeb
         }
 
         NodeDirectoriesFD f_node_lock_file = null;
-
+        /**
+        <summary>
+        Initialize the LocalTransport by assigning a NodeID based on NodeName
+        </summary>
+        <remarks>
+        <para>
+        Assigns the specified name to be the NodeName of the node, and manages
+        a corresponding NodeID. See LocalTransport for more information.
+        </para>
+        <para> Throws NodeNameAlreadyInUse if another node is using name
+        </para>
+        </remarks>
+        <param name="name">The node name</param>
+        */
         public void StartClientAsNodeName(string name)
         {
             if (!Regex.IsMatch(name, "^[a-zA-Z][a-zA-Z0-9_\\.\\-]*$"))
@@ -241,7 +334,28 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-                        
+        /**
+        <summary>
+        Start the server using the specified NodeName and assigns a NodeID
+        </summary>
+        <remarks>
+        <para>
+        The LocalTransport will listen on a UNIX domain socket for incoming clients,
+        using information files and inodes on the local filesystem. Clients
+        can locate the node using the NodeID and/or NodeName. The NodeName is assigned
+        to the node, and the transport manages a corresponding NodeID. See
+        LocalTransport for more information.
+        </para>
+        <para>
+        Throws NodeNameAlreadyInUse if another node is using name.
+        </para>
+        <para> Throws NodeIDAlreadyInUse if another node is using the managed NodeID.
+        </para>
+        </remarks>
+        <param name="name">The NodeName</param>
+        <param name="public_">If True, other users can access the server. If False, only
+        the account owner can access the server. Defaults to false.</param>
+        */
         public void StartServerAsNodeName(string name, bool public_= false)
         {
             lock (this)
@@ -417,7 +531,18 @@ namespace RobotRaconteurWeb
                 throw;
             }
         }
-
+        /**
+        <summary>
+        
+        The LocalTransport will listen on a UNIX domain socket for incoming clients,
+        using information files and inodes on the local filesystem. This function
+        leaves the NodeName blank, so clients must use NodeID to identify the node.
+        </summary>
+        <remarks>
+        Throws NodeIDAlreadyInUse if another node is using nodeid
+        </remarks>
+        <param name="name">The NodeName</param>
+        */
         public void StartServerAsNodeID(NodeID nodeid)
         {
             lock (this)
@@ -535,7 +660,12 @@ namespace RobotRaconteurWeb
 
         LocalTransportFDs fds = new LocalTransportFDs();
 
-        /// <inheretdoc/>
+        /**
+        <summary>
+        Close the transport. Done automatically by node shutdown.
+        </summary>
+        <remarks>None</remarks>
+        */
         public override Task Close()
         {
             lock (this)

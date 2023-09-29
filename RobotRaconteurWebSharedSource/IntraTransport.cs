@@ -21,7 +21,36 @@ using Mono.Unix.Native;
 
 namespace RobotRaconteurWeb
 {
-
+    /**
+    <summary>
+            Transport for intra-process communication
+            </summary>
+            <remarks>
+            <para>
+                It is recommended that ClientNodeSetup, ServerNodeSetup, or SecureServerNodeSetup
+                be used to construct this class.
+            </para>
+            <para>
+                See robotraconteur_url for more information on URLs.
+            </para>
+            <para>
+                The IntraTransport implements transport connections between nodes running
+                within the same process. This is often true for simulation environments, where
+                there may be multiple simulated devices running within the simulation. The
+                IntraTransport uses a singleton to keep track of the different nodes running
+                in the same process, and to form connections. The singleton also implements
+                discovery updates.
+            </para>
+            <para>
+                The use of RobotRaconteurNodeSetup and subclasses is recommended to construct
+                transports.
+            </para>
+            <para> The transport must be registered with the node using
+                RobotRaconteurNode.RegisterTransport() after construction if node
+                setup is not used.
+            </para>
+            </remarks>
+    */
     public sealed class IntraTransport : Transport
     {
 
@@ -66,7 +95,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        protected internal void Init()
+        internal void Init()
         {
             lock(this)
             {
@@ -82,7 +111,14 @@ namespace RobotRaconteurWeb
                 peer_transports.Add(new WeakReference<IntraTransport>(this));
             }
         }
-
+        /**
+        <summary>
+        Construct a new IntraTransport for a non-default node. Must be registered with node using
+        node.RegisterTransport()
+        </summary>
+        <remarks>None</remarks>
+        <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
+        */
         public IntraTransport(RobotRaconteurNode node = null)
             : base(node)
         {
@@ -206,7 +242,12 @@ namespace RobotRaconteurWeb
                 TransportConnections[e.LocalEndpoint].Close();
             return Task.FromResult(0);
         }
-
+        /**
+        <summary>
+        Start the server to listen for incoming client connections
+        </summary>
+        <remarks>None</remarks>
+        */
         public void StartServer()
         {
             _ = node.NodeID;
@@ -217,6 +258,12 @@ namespace RobotRaconteurWeb
             DiscoverAllNodes();
 
         }
+        /**
+        <summary>
+        Start the transport for use by clients
+        </summary>
+        <remarks>None</remarks>
+        */
         public void StartClient()
         {
             serverstarted = false;
@@ -289,7 +336,12 @@ namespace RobotRaconteurWeb
             node.MessageReceived(m);
         }
 
-        /// <inheretdoc/>
+        /**
+        <summary>
+        Close the transport. Done automatically by node shutdown.
+        </summary>
+        <remarks>None</remarks>
+        */
         public override Task Close()
         {
             lock (this)

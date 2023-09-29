@@ -22,25 +22,117 @@ using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    A timer to invoke a callback
+    </summary>
+    <remarks>
+    <para>
+    Timers invoke a callback at a specified rate. The timer
+    can either be one-short, or repeating.
+    </para>
+    <para> Use RobotRaconteurNode.CreateTimer() to create timers.
+    </para>
+    </remarks>
+    */
     public interface ITimer
     {
+        /**
+        <summary>
+        Start the timer
+        </summary>
+        <remarks>
+        Must be called after RobotRaconteurNode.CreateTimer()
+        </remarks>
+        */
         void Start();
+        /**
+        <summary>
+        Stop the timer
+        </summary>
+        <remarks>None</remarks>
+        */
         void Stop();
+        /**
+        <summary>
+        Get/Set the period of the timer in milliseconds
+        </summary>
+        <remarks>None</remarks>
+        */
         int Period {get; set;}
+        /**
+        <summary>
+        Get if the timer is running
+        </summary>
+        <remarks>None</remarks>
+        */
         bool IsRunning { get; }        
     }
 
+    /**
+    <summary>
+    Rate to stabilize a loop
+    </summary>
+    <remarks>
+    Rate is used to stabilize the period of a loop. Use
+    RobotRaconteur.CreateRate() to create rates.
+    </remarks>
+    */
     public interface IRate
     {
+        /**
+        <summary>
+        Sleep the calling thread until the current loop period expires
+        </summary>
+        <remarks>None</remarks>
+        */
         Task Sleep();
     }
-
+    /**
+    <summary>
+    Timer event structure
+    </summary>
+    <remarks>
+    Contains information about the state of the timer. Passed to the
+    callback on invocation.
+    </remarks>
+    */
     public struct TimerEvent
     {
+        /**
+        <summary>
+        True if timer has been stopped
+        </summary>
+        <remarks>None</remarks>
+        */
         public bool stopped;
+        /**
+        <summary>
+        The last expected callback invocation time
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime last_expected;
+        /**
+        <summary>
+        The last real callback invocation time
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime last_real;
+        /**
+        <summary>
+        The current expected callback invocation time
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime current_expected;
+        /**
+        <summary>
+        The current real callback invocation time
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime current_real;
     }
 

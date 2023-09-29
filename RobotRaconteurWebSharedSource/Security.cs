@@ -24,6 +24,46 @@ using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    Security policy for Robot Raconteur service
+    </summary>
+    <remarks>
+    <para>
+    The security policy sets an authenticator, and a set of policies.
+    PasswordFileUserAuthenticator is
+    an example of an authenticator. The valid options for Policies are as follows:
+    </para>
+    <list type="table">
+    <listheader>
+    <term>Policy name</term>
+    <term>Possible Values</term>
+    <term>Default</term>
+    <term>Description</term>
+    </listheader>
+    <item>
+    <term>requirevaliduser</term>
+    <term>true,false</term>
+    <term>false</term>
+    <term>Set to "true" to require a user be authenticated before accessing
+    service</term>
+    </item>
+    <item>
+    <term>allowobjectlock</term>
+    <term>true,false</term>
+    <term>false</term>
+    <term>If "true" allow users to request object locks. requirevaliduser must
+    also be "true"</term>
+    </item>
+    </list>
+    
+    <para>
+    The security policy is passed as a parameter to RobotRaconteurNode.RegisterService().
+    </para>
+    <para>See security for more information.
+    </para>
+    </remarks>
+    */
     public class ServiceSecurityPolicy
     {
         public UserAuthenticator Authenticator;
@@ -34,7 +74,12 @@ namespace RobotRaconteurWeb
             Authenticator = null;
             Policies = null;
         }
-
+        /**
+        <summary>Construct a new security policy</summary>
+        <remarks>None</remarks>
+        <param name="Authenticator">The user authenticator</param>
+        <param name="Policies">The security policies</param>
+        */
         public ServiceSecurityPolicy(UserAuthenticator Authenticator, Dictionary<string, string> Policies)
         {
             this.Authenticator = Authenticator;
@@ -44,20 +89,52 @@ namespace RobotRaconteurWeb
     }
 
 
-
+    /**
+    <summary>
+    Class representing an authenticated user
+    </summary>
+    <remarks>
+    <para>
+    Use ServerEndpoint.GetCurrentAuthenticatedUser() to retrieve the
+    authenticated user making a request
+    </para>
+    <para>See security for more information.
+    </para>
+    </remarks>
+    */
     public class AuthenticatedUser
     {
         private string m_Username;
         private string[] m_Privileges;
         private DateTime m_LoginTime;
         private DateTime m_LastAccessTime;
-
+        /**
+        <summary>
+        The authenticated username
+        </summary>
+        <remarks>None</remarks>
+        */
         public string Username { get { return m_Username; } }
-
+        /**
+        <summary>
+        The user privileges
+        </summary>
+        <remarks>None</remarks>
+        */
         public string[] Privileges { get { return m_Privileges; } }
-
+        /**
+        <summary>
+        The user login time
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime LoginTime { get { return m_LoginTime; } }
-
+        /**
+        <summary>
+        The user last access time
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime LastAccessTime { get { return m_LastAccessTime; } }
 
         public AuthenticatedUser(string username, string[] privileges)
@@ -84,6 +161,55 @@ namespace RobotRaconteurWeb
     }
 
 #if !ROBOTRACONTEUR_BRIDGE
+    /**
+    <summary>
+    
+    Simple authenticator using a list of username, password hash, and privileges stored in a
+    file or string
+    </summary>
+    <remarks>
+    <para>
+    The password user authenticator expects a string containing a list of users,
+    one per line. Each line contains the username, password as md5 hash, and privileges,
+    separated by white spaces.
+    An example of authentication string contents:
+    </para>
+    <code>
+    user1 79e262a81dd19d40ae008f74eb59edce objectlock
+    user2 309825a0951b3cf1f25e27b61cee8243 objectlock
+    superuser1 11e5dfc68422e697563a4253ba360615 objectlock,objectlockoverride
+    </code>
+    
+    
+    <para>
+    The password is md5 hashed. This hash can be generated using the ``--md5passwordhash``
+    command in the "RobotRaconteurGen" utility.
+    The privileges are comma separated. Valid privileges are as follows:
+    </para>
+    <list type="table">
+    <listheader>
+    <term>Policy name</term>
+    <term>Possible Values</term>
+    <term>Default</term>
+    <term>Description</term>
+    </listheader>
+    <item>
+    <term>requirevaliduser</term>
+    <term>true,false</term>
+    <term>false</term>
+    <term>Set to "true" to require a user be authenticated before accessing
+    service</term>
+    </item>
+    <item>
+    <term>allowobjectlock</term>
+    <term>true,false</term>
+    <term>false</term>
+    <term>If "true" allow users to request object locks. requirevaliduser must
+    also be "true"</term>
+    </item>
+    </list>
+    </remarks>
+    */
     public class PasswordFileUserAuthenticator : UserAuthenticator
     {
 
@@ -97,12 +223,27 @@ namespace RobotRaconteurWeb
 
         private Dictionary<string, User> validusers = new Dictionary<string, User>();
 
+
+        /**
+        <summary>
+        Construct a new PasswordFileUserAuthenticator
+        </summary>
+        <summary name="data">A file stream</summary>
+        <remarks>None</remarks>
+        */
         public PasswordFileUserAuthenticator(StreamReader file)
         {
             string d = file.ReadToEnd();
             load(d);
         }
 
+        /**
+        <summary>
+        Construct a new PasswordFileUserAuthenticator
+        </summary>
+        <summary name="data">The file text</summary>
+        <remarks>None</remarks>
+        */
         public PasswordFileUserAuthenticator(string data)
         {
             load(data);

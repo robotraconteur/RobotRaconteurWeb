@@ -1154,13 +1154,36 @@ namespace RobotRaconteurWeb
     }
 
 
+    /// <summary>
+    /// Enum of client listener events
+    /// </summary>
     public enum ClientServiceListenerEventType
     {
+        /// <summary>
+        /// client has been closed
+        /// </summary>
         ClientClosed = 1,
+
+        /// <summary>
+        /// client connection has timed out
+        /// </summary>
         ClientConnectionTimeout,
+
+        /// <summary>
+        /// client transport has been connected
+        /// </summary>
         TransportConnectionConnected,
+
+        /// <summary>
+        /// client transport connection has been closed or lost
+        /// </summary>
         TransportConnectionClosed,
+
+        /// <summary>
+        /// client has received notification that service path was released
+        /// </summary>
         ServicePathReleased
     }
+
 
 }

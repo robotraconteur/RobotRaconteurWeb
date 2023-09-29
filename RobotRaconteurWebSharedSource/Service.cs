@@ -219,9 +219,78 @@ namespace RobotRaconteurWeb
         string GetObjectType();
         
     }
-        
+    /**
+    <summary>
+    Context for services registered in a node for use by clients
+    </summary>
+    <remarks>
+    <para>
+    Services are registered using the RobotRaconteurNode.RegisterService() family of
+    functions.
+    The ServerContext manages the services, and dispatches requests and packets to the
+    appropriate
+    service object members. Services may expose more than one object. The root object is
+    specified
+    when the service is registered. Other objects are specified through ObjRef members. A name
+    for the service is also specified when the service is registered. This name forms the root
+    of the service path namespace. Other objects in the service have a unique service path
+    based on the ObjRef used to access the object.
+    </para>
+    <para>
+    Services may handle multiple connected clients concurrently. Each client is assigned
+    a ServerEndpoint. The ServerEndpoint is unique to the client connection,
+    and interacts with ServerContext to complete requests and dispatch packets. When
+    the service needs to address a specific client, the ServerEndpoint or the
+    ServerEndpoint.GetCurrentEndpoint() is used. (ServerEndpoint.GetCurrentEndpoint() returns
+    the
+    int local client ID.)
+    </para>
+    <para>
+    Service attributes are a varvalue{string} types dictionary that is made available to
+    clients during service discovery. These attributes are used to help clients determine
+    which service should be selected for use. Because the attributes are passed to the clients
+    as part of the discovery process, they should be as concise as possible, and should
+    not use user defined types. Use ServerContext.SetAttributes() to set the service
+    attributes
+    after registering the service.
+    </para>
+    <para>
+    Security for the service is specified using a ServiceSecurityPolicy instance. This policy
+    is specified by passing as a parameter to RobotRaconteurNode.RegisterService(), or passing
+    the policy to the constructor.
+    </para>
+    <para>
+    ServerContext implements authentication and object locking.
+    Server side functions are exposed by ServerContext for authentication, object locking,
+    and client management.
+    </para>
+    <para> Clients using dynamic typing such as Python and MATLAB will only pull service types
+    explicitly imported by the root object and objref objects that have been requested.
+    Clients
+    will not pull service types of user-defined named types if that service type is not
+    explicitly
+    imported. This can be problematic if new `struct`, `pod`, and/or `namedarray` types are
+    introduced
+    that do not have corresponding objects. Extra imports is used to specify extra service
+    definitions
+    the client should pull. Use ServerContext.AddExtraImport(),
+    ServerContext.RemoveExtraImport(),
+    and ServerContext.GetExtraImports() to manage the extra imports passed to the client.
+    </para>
+    </remarks>
+    */
     public class ServerContext 
    {
+        /**
+        <summary>
+        Get/Set the service attributes
+        </summary>
+        <remarks>
+        Sets the service attributes. Attributes are made available to clients during
+        service discovery. Attributes should be concise and not use any user defined
+        types.
+        </remarks>
+        */
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
@@ -500,11 +569,31 @@ namespace RobotRaconteurWeb
 
             
         }
-
+        /**
+        <summary>
+        Get the current ServerContext
+        </summary>
+        <remarks>
+        Returns the current server context during a request or packet event.
+        This is a thread-specific value and only
+        valid during the initial request or packet event invocation.
+        </remarks>
+        */
         public static ServerContext CurrentServerContext {get {return m_CurrentServerContext;}}
         [ThreadStatic()]
         private static ServerContext m_CurrentServerContext;
-
+        /**
+        <summary>
+        Get the current object service path
+        </summary>
+        <remarks>
+        Returns the service path of the current object during a request or
+        packet event.
+        This is a thread-specific value and only
+        valid during the initial request or packet event invocation.
+        </remarks>
+        <returns>The current object service path</returns>
+        */
         public static string CurrentServicePath {get {return m_CurrentServicePath;}}
         [ThreadStatic()]
         private static string m_CurrentServicePath;
@@ -1267,10 +1356,31 @@ namespace RobotRaconteurWeb
             
         }
 
+        /// <summary>
+        ///  Server service listener event type
+        /// </summary>
+        /// <param name="service">The context that generated the event</param>
+        /// <param name="ev">The event type</param>
+        /// <param name="parameter">The event parameter</param> <summary>
         public delegate void ServerServiceListenerDelegate(ServerContext service, ServerServiceListenerEventType ev, object parameter);
 
+        /// <summary>
+        /// Server service listener event
+        /// </summary>
         public event ServerServiceListenerDelegate ServerServiceListener;
-
+        /**
+        <summary> Release the specified service path and all sub objects Services take ownership of
+        objects returned by objrefs, and will only request the object once. Subsequent requests will
+        return the cached object. If the objref has changed, the service must call
+        ReleaseServicePath() to tell the service to request the object again. Release service path
+        will release the object specified by the service path and all sub objects. This overload
+        will notify all clients that the objref has been released. If the service path contains a
+        session key, use ReleaseServicePath(string, uint[]) to only
+        notify the client that owns the session.
+        </summary>
+        <remarks>None</remarks>
+        <param name="path">The service path to release</param>
+        */
         public void ReleaseServicePath(string path)
         {            
 
@@ -1316,7 +1426,28 @@ namespace RobotRaconteurWeb
 
 
         }
-
+        /**
+        <summary>
+        Release the specified service path and all sub objects
+        </summary>
+        <remarks>
+        <para>
+        Services take ownership of objects returned by objrefs, and will only request the object
+        once. Subsequent requests will return the cached object. If the objref has changed,
+        the service must call ReleaseServicePath() to tell the service to request the object
+        again.
+        Release service path will release the object specified by the service path
+        and all sub objects.
+        </para>
+        <para> This overload will notify the specified that the objref has been released. If the
+        service
+        path contains a session key, this overload should be used so the session key is not
+        leaked.
+        </para>
+        </remarks>
+        <param name="path">The service path to release</param>
+        <param name="endpoints">The client endpoint IDs to notify of the released service path</param>
+        */
         public void ReleaseServicePath(string path, List<uint> endpoints)
         {
 
@@ -1719,27 +1850,91 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /// <summary>
+    /// Enum of service listener events
+    /// </summary>
     public enum ServerServiceListenerEventType
     {
+        /// <summary>
+        /// service has been closed
+        /// </summary>
         ServiceClosed = 1,
+        
+        /// <summary>
+        /// client has connected
+        /// </summary>
         ClientConnected,
-        ClientDisconnected
 
+        /// <summary>
+        /// client has disconnected
+        /// </summary>
+        ClientDisconnected
     }
 
 
+    /**
+    <summary>
+    Server endpoint representing a client connection
+    </summary>
+    <remarks>
+    <para>
+    Robot Raconteur creates endpoint pairs between a client and service. For clients, this
+    endpoint
+    is a ClientContext. For services, the endpoint becomes a ServerEndpoint. ServerEndpoints
+    are used
+    to address a specific client connected to a service, since services may have multiple
+    clients
+    connected concurrently. ServerEndpoints also provide client authentication information.
+    </para>
+    <para>Use ServerEndpoint.GetCurrentEndpoint() to retrieve the int32
+    current endpoint ID. Use ServerEndpoint.GetCurrentAuthenticatedUser() to retrieve
+    the current user authentication information.
+    </para>
+    </remarks>
+    */
     public class ServerEndpoint : Endpoint
     {
         protected internal readonly ServerContext service;
 
         [ThreadStatic]
         private static ServerEndpoint m_CurrentEndpoint;
-
+        /**
+        <summary>
+        Returns the current server endpoint
+        </summary>
+        <remarks>
+        <para>
+        Returns the current server endpoint during a request or packet event.
+        This is a thread-specific value and only valid during the initial
+        request or packet event invocation.
+        </para>
+        <para>Throws InvalidOperationException if not during a request or packet event
+        </para>
+        </remarks>
+        <returns>The current server endpoint id</returns>
+        */
         public static ServerEndpoint CurrentEndpoint { get { return m_CurrentEndpoint; } }
 
         [ThreadStatic]
         private static AuthenticatedUser m_CurrentAuthenticatedUser;
-
+        /**
+        <summary>
+        Returns the current authenticated user
+        </summary>
+        <remarks>
+        <para>
+        Users that have been authenticated have a corresponding
+        AuthenticatedUser object associated with the ServerEndpoint.
+        CurrentAuthenticatedUser returns the AuthenticatedUser
+        associated with the current ServerEndpoint during a request
+        or packet event. This is a thread-specific value and only valid during
+        the initial request or packet event invocation.
+        </para>
+        <para>Throws PermissionDeniedException or AuthenticationException
+        if there is no AuthenticatedUser set in the current thread.
+        </para>
+        </remarks>
+        */
         public static AuthenticatedUser CurrentAuthenticatedUser { get { return m_CurrentAuthenticatedUser; } }
 
         private AuthenticatedUser endpoint_authenticated_user = null;
@@ -1850,12 +2045,35 @@ namespace RobotRaconteurWeb
         }
 
     }
-
+    /**
+    <summary>
+    Service object monitor lock notification
+    </summary>
+    <remarks>
+    Service objects must implement IRobotRaconteurMonitorObject for
+    monitor locking to function. Services call RobotRaconteurMonitorEnter()
+    with an optional timeout to request the lock, and call RobotRaconteurMonitorExit()
+    to release the monitor lock. RobotRaconteurMonitorEnter() should block
+    until a thread-exclusive lock can be established.
+    </remarks>
+    */
     public interface IRobotRaconteurMonitorObject
     {
+        /**
+        <summary>
+        Request a thread-exclusive lock without timeout. May block until lock can be established
+        </summary>
+        <remarks>Dispose of the returned object to release</remarks>
+        */
         Task<IDisposable> RobotRaconteurMonitorEnter();
-
+                /**
+        <summary>
+        Request a thread-exclusive lock with timeout. May block until lock can be established,
+        up to the specified timeout.
+        </summary>
+        <remarks>Dispose of the returned object to release</remarks>
+        <param name="timeout">Lock request timeout in milliseconds</param>
+        */
         Task<IDisposable> RobotRaconteurMonitorEnter(int timeout);
-
     }
 }

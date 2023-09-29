@@ -10,55 +10,262 @@ using System.Runtime.CompilerServices;
 
 namespace RobotRaconteurWeb
 {
+    /// <summary>
+    /// Log level enum.
+    /// </summary>
+    /// <remarks>
+    /// Enum of possible log levels. Set log level using
+    /// RobotRaconteurNode::SetLogLevel(),
+    /// `ROBOTRACONTEUR_LOG_LEVEL` environmental variable, or
+    /// `--robotraconteur-log-level` node setup command line option
+    /// </remarks>
     public enum RobotRaconteur_LogLevel
     {
-        
-        Trace,        
-        Debug,        
-        Info,        
-        Warning,        
-        Error,        
-        Fatal,        
+        /// <summary>
+        /// Trace log level.
+        /// </summary>
+        Trace,
+
+        /// <summary>
+        /// Debug log level.
+        /// </summary>
+        Debug,
+
+        /// <summary>
+        /// Info log level.
+        /// </summary>
+        Info,
+
+        /// <summary>
+        /// Warning log level.
+        /// </summary>
+        Warning,
+
+        /// <summary>
+        /// Error log level.
+        /// </summary>
+        Error,
+
+        /// <summary>
+        /// Fatal log level.
+        /// </summary>
+        Fatal,
+
+        /// <summary>
+        /// Disabled log level.
+        /// </summary>
         Disable = 1000
-    };
+    }
 
+    /// <summary>
+    /// Log component enum.
+    /// </summary>
+    /// <remarks>
+    /// Log records contain the code of the component where
+    /// the log record was generated.
+    /// </remarks>
     public enum RobotRaconteur_LogComponent
-    {        
-        Default,        
-        Node,        
-        Transport,      
-        Message,        
-        Client,        
-        Service,        
-        Member,        
-        Pack,        
-        Unpack,        
-        ServiceDefinition,        
-        Discovery,        
-        Subscription,        
-        NodeSetup,        
-        Utility,        
-        RobDefLib,        
-        User,        
-        UserClient,        
-        UserService,        
-        ThirdParty
-    };
+    {
+        /// <summary>
+        /// Default component.
+        /// </summary>
+        Default,
 
+        /// <summary>
+        /// Robot Raconteur Node component.
+        /// </summary>
+        Node,
+
+        /// <summary>
+        /// Transport component.
+        /// </summary>
+        Transport,
+
+        /// <summary>
+        /// Message or message serialization component.
+        /// </summary>
+        Message,
+
+        /// <summary>
+        /// Client component.
+        /// </summary>
+        Client,
+
+        /// <summary>
+        /// Service component.
+        /// </summary>
+        Service,
+
+        /// <summary>
+        /// Member component.
+        /// </summary>
+        Member,
+
+        /// <summary>
+        /// Data message packing component.
+        /// </summary>
+        Pack,
+
+        /// <summary>
+        /// Data message unpacking component.
+        /// </summary>
+        Unpack,
+
+        /// <summary>
+        /// Service definition parser component.
+        /// </summary>
+        ServiceDefinition,
+
+        /// <summary>
+        /// Node or service discovery component.
+        /// </summary>
+        Discovery,
+
+        /// <summary>
+        /// Subscription component.
+        /// </summary>
+        Subscription,
+
+        /// <summary>
+        /// Node setup component.
+        /// </summary>
+        NodeSetup,
+
+        /// <summary>
+        /// Utility component.
+        /// </summary>
+        Utility,
+
+        /// <summary>
+        /// Service definition standard library component (external).
+        /// </summary>
+        RobDefLib,
+
+        /// <summary>
+        /// User component (external).
+        /// </summary>
+        User,
+
+        /// <summary>
+        /// User client component (external).
+        /// </summary>
+        UserClient,
+
+        /// <summary>
+        /// User service component (external).
+        /// </summary>
+        UserService,
+
+        /// <summary>
+        /// Third party library component (external).
+        /// </summary>
+        ThirdParty
+    }
+
+    /**
+    <summary>
+    Robot Raconteur log record
+    </summary>
+    <remarks>
+    <para>
+    Records information about a logging event
+    </para>
+    <para> See logging for more information.
+    </para>
+    </remarks>
+    */
     public class RRLogRecord
     {
+        /**
+        <summary>
+        The source node
+        </summary>
+        <remarks>None</remarks>
+        */
         public RobotRaconteurNode Node;
+        /**
+        <summary>
+        The log level
+        </summary>
+        <remarks>None</remarks>
+        */
         public RobotRaconteur_LogLevel Level = RobotRaconteur_LogLevel.Warning;
+        /**
+        <summary>
+        The source component
+        </summary>
+        <remarks>None</remarks>
+        */
         public RobotRaconteur_LogComponent Component = RobotRaconteur_LogComponent.Default;
+        /**
+        <summary>
+        The source component name
+        </summary>
+        <remarks>None</remarks>
+        */
         public string ComponentName;
+        /**
+        <summary>
+        The source component object ID
+        </summary>
+        <remarks>None</remarks>
+        */
         public string ComponentObjectID;
+        /**
+        <summary>
+        The source endpoint
+        </summary>
+        <remarks>None</remarks>
+        */
         public long Endpoint;
+        /**
+        <summary>
+        The service path of the source object
+        </summary>
+        <remarks>None</remarks>
+        */
         public string ServicePath;
+        /**
+        <summary>
+        The source member
+        </summary>
+        <remarks>None</remarks>
+        */
         public string Member;
+        /**
+        <summary>
+        Human readable log message
+        </summary>
+        <remarks>None</remarks>
+        */
         public string Message;
+        /**
+        <summary>
+        Time of logging event
+        </summary>
+        <remarks>None</remarks>
+        */
         public DateTime Time;
+        /**
+        <summary>
+        The sourcecode filename
+        </summary>
+        <remarks>None</remarks>
+        */
         public string SourceFile;
+        /**
+        <summary>
+        The line within the sourcecode file
+        </summary>
+        <remarks>None</remarks>
+        */
         public int SourceLine;
+        /**
+        <summary>
+        The source thread
+        </summary>
+        <remarks>None</remarks>
+        */
         public string ThreadID;
     }
 

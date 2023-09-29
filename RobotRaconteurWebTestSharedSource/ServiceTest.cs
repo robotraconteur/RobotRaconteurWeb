@@ -1528,8 +1528,6 @@ namespace RobotRaconteurTest
             return mymutex.LockWithTimeout(timeout);
             //if(!Monitor.TryEnter(this,timeout)) throw new TimeoutException();
         }
-
-        
     }
     
     public class sub2_impl :  sub2

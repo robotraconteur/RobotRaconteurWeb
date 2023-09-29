@@ -10,40 +10,89 @@ namespace RobotRaconteurWeb
     [Flags]
     public enum RobotRaconteurNodeSetupFlags
     {
+        /**
+        <summary>No options enabled</summary>
+        */
         None = 0x0,
+        /**
+        <summary>Enable node discovery listening on all transports</summary>
+        */
         EnableNodeDiscoveryListening = 0x1,
+        /**
+        <summary>Enable node announce on all transports</summary>
+        */
         EnableNodeAnnounce = 0x2,
+        /**
+        <summary>Enable LocalTransport</summary>
+        */        
         EnableLocalTransport = 0x4,
+        /**
+        <summary>Enable TcpTransport</summary>
+        */
         EnableTcpTransport = 0x8,
         // EnableHardwareTransport = 0x10,
+        /**
+        <summary>Start the LocalTransport server to listen for incoming clients</summary>
+        */
         LocalTransportStartServer = 0x20,
+        /**
+        <summary>Start the LocalTransport client with specified node name</summary>
+        */
         LocalTransportStartClient = 0x40,
+        /**
+        <summary>Start the TcpTransport server to listen for incoming clients on the specified port</summary>
+        */
         TcpTransportStartServer = 0x80,
         // TcpTransportStartServerPortSharer = 0x100,
         // DisableMessage4 = 0x200,
         // DisableStringTable = 0x400,
         // DisableTimeouts = 0x800,
         LoadTlsCert = 0x1000,
+        /**
+        <summary>Load the TLS certificate for TcpTransport</summary>
+        */
         RequireTls = 0x2000,
+        /**
+        <summary>Require TLS for all clients on TcpTransport</summary>
+        */
         LocalTransportServerPublic = 0x4000,
+        /**
+        <summary>Make LocalTransport server listen for incoming clients from all users</summary>
+        */
         TcpTransportListenLocalHost = 0x8000,
         NodeNameOverride = 0x10000,
         NodeIdOverride = 0x20000,
         TcpPortOverride = 0x40000,
         TcpWebSocketOriginOverride = 0x80000,
+        /**
+        <summary>Enable IntraTransport</summary>
+        */
         EnableIntraTransport = 0x100000,
+        /**
+        <summary>Start the IntraTransport server to listen for incoming clients</summary>
+        */
         IntraTransportStartServer = 0x200000,
         TcpTransportIpv4Discovery = 0x400000,
         TcpTransportIpv6Discovery = 0x800000,
+        /**
+        <summary>Enable the LocalTap debug logging system</summary>
+        */
         LocalTapEnable = 0x1000000,
+        /**
+        <summary>Allow the user to set the LocalTap name</summary>
+        */
         LocalTapName = 0x2000000,
         JumboMessage = 0x4000000,
-
+        /**
+        <summary>Convenience flag to enable all transports</summary>
+        */
         EnableAllTransports = EnableLocalTransport 
             | EnableTcpTransport 
             //| EnableHardwareTransport 
             | EnableIntraTransport,
-
+        /**
+        <summary>Default configuration for client nodes (See ClientNodeSetup)</summary>
+        */
         ClientDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -51,6 +100,9 @@ namespace RobotRaconteurWeb
         | TcpTransportIpv6Discovery
         | LocalTransportStartClient,
 
+        /**
+        <summary>Default allowed overrides for client nodes (See ClientNodeSetup)</summary>
+        */
         ClientDefaultAllowedOverride = EnableAllTransports
         | EnableNodeDiscoveryListening
         | TcpTransportIpv6Discovery
@@ -65,6 +117,9 @@ namespace RobotRaconteurWeb
         | NodeIdOverride
         | JumboMessage,
 
+        /**
+        <summary>Default configuration for server nodes</summary>
+        */
         ServerDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -76,6 +131,9 @@ namespace RobotRaconteurWeb
         // | DisableStringTable
         | TcpTransportIpv6Discovery,
 
+        /**
+        <summary>Default allowed overrides for server nodes</summary>
+        */
         ServerDefaultAllowedOverride = EnableAllTransports
         | TcpTransportIpv6Discovery
         | TcpTransportIpv4Discovery
@@ -98,6 +156,9 @@ namespace RobotRaconteurWeb
         | JumboMessage
         | TcpTransportListenLocalHost,
 
+        /**
+        <summary>Default configuration for server nodes requiring TLS network transports</summary>
+        */
         SecureServerDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -111,6 +172,9 @@ namespace RobotRaconteurWeb
         // | DisableStringTable
         | TcpTransportIpv6Discovery,
 
+        /**
+        <summary>Default allowed overrides for server nodes requiring TLS network transports</summary>
+        */
         SecureServerDefaultAllowedOverride = EnableAllTransports
         | LocalTransportStartServer
         | TcpTransportStartServer
@@ -161,6 +225,39 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /**
+    <summary>
+            Command line parser for node setup classes
+            </summary>
+            <remarks>
+            <para>
+                The CommandLineConfigParser is used to parse command line options specified
+                when a program is launched. These options allow for the node configuration to be
+                changed without recompiling the software. See command_line_options for
+                a table of the standard command line options.
+            </para>
+            <para>
+                ClientNodeSetup, ServerNodeSetup, and SecureServerNodeSetup use this class to parse
+                the `sys.argv` parameters. The RobotRaconteurNodeSetup constructors will accept
+                either `sys.argv`, or will accept an initialize CommandLineConfigParser.
+            </para>
+            <para>
+                The CommandLineConfig() constructor takes the "allowed override" flags, and the option
+                prefix.
+                The "allowed override" specifies which options can be overridden using the command line.
+                The
+                prefix option allows the command line flag prefix to be changed. By default it expects
+                all options to begin with `--robotraconteur-` followed by the name of the option. If there
+                are
+                multiple nodes, it is necessary to change the prefix to be unique for each node. For
+                instance,
+                "robotraconteur1-" for the first node and "RobotRaconteur-" for the second node.
+            </para>
+            <para> Users may add additional options to the parser. Use AddStringOption(),
+                AddBoolOption(), or AddIntOption() to add additional options.
+            </para>
+            </remarks>
+    */
     public class CommandLineConfigParser
     {
         private OptionSet desc = new OptionSet();
@@ -171,6 +268,14 @@ namespace RobotRaconteurWeb
         private ushort default_tcp_port;
         private RobotRaconteurNodeSetupFlags default_flags;
 
+        /**
+        <summary>
+        Construct a new CommandLineConfigParser
+        </summary>
+        <remarks>None</remarks>
+        <param name="allowed_overrides">The allowed overrides flags</param>
+        <param name="prefix">The prefix to use for the options</param>
+        */
         public CommandLineConfigParser(RobotRaconteurNodeSetupFlags allowed_overrides, string prefix = "robotraconteur-")
         {
             default_tcp_port = 48653;
@@ -179,6 +284,18 @@ namespace RobotRaconteurWeb
             FillOptionsDescription(desc, allowed_overrides, prefix);
         }
 
+        /**
+        <summary>
+                Set the default NodeName, TCP port, and flags
+              </summary>
+              <remarks>
+                The command line options will be allowed to override the options
+                specified in allowed_overrides passed to CommandLineConfigParser().
+              </remarks>
+              <param name="node_name">The default NodeName</param>
+              <param name="tcp_port">The default TCP port</param>
+              <param name="default_flags">The default flags</param>
+        */
         public void SetDefaults(string node_name, ushort tcp_port, RobotRaconteurNodeSetupFlags default_flags)
         {
             this.default_node_name = node_name;
@@ -186,21 +303,53 @@ namespace RobotRaconteurWeb
             this.default_flags = default_flags;
         }
 
+        /**
+        <summary>
+        Add a new string option
+        </summary>
+        <remarks>None</remarks>
+        <param name="name">The name of the option</param>
+        <param name="descr">Description of the option</param>
+        */
         public void AddStringOption(string name, string descr)
         {
             desc.Add(prefix + name + "=", descr, v => parsedOptions[name] = v);
         }
-
+        /**
+        <summary>
+        Add a new bool option
+        </summary>
+        <remarks>None</remarks>
+        <param name="name">The name of the option</param>
+        <param name="descr">Description of the option</param>
+        */
         public void AddBoolOption(string name, string descr)
         {
             desc.Add(prefix + name, descr, v => parsedOptions[name] = v != null ? "true" : "false");
         }
 
+        /**
+        <summary>
+        Add a new int option
+        </summary>
+        <remarks>None</remarks>
+        <param name="name">The name of the option</param>
+        <param name="descr">Description of the option</param>
+        */
         public void AddIntOption(string name, string descr)
         {
             desc.Add(prefix + name + "=", descr, (int v) => parsedOptions[name] = v.ToString());
         }
 
+        /**
+        <summary>
+        Parse a specified string vector containing the options
+        </summary>
+        <remarks>
+        Results are stored in the instance
+        </remarks>
+        <param name="args">The options as a string array</param>
+        */
         public void ParseCommandLine(string[] args)
         {
             if (args != null)
@@ -209,7 +358,15 @@ namespace RobotRaconteurWeb
             }
         
         }
-
+        /**
+        <summary>
+        Parse a specified string vector containing the options
+        </summary>
+        <remarks>
+        Results are stored in the instance
+        </remarks>
+        <param name="args">The options as a string list</param>
+        */
         public void ParseCommandLine(List<string> args)
         {
             if (args != null)
@@ -218,8 +375,16 @@ namespace RobotRaconteurWeb
             }
         }
 
-        // Note: There's no direct equivalent in Mono.Options to accept pre-parsed results as in boost::program_options. 
-
+        /**
+        <summary>
+        Get the option value as a string
+        </summary>
+        <remarks>
+        Returns empty string if option not specified on command line
+        </remarks>
+        <param name="option">The name of the option</param>
+        <returns>The option value, or an empty string</returns>
+        */
         public string GetOptionOrDefaultAsString(string option)
         {
             string option1 = prefix + option;
@@ -250,6 +415,17 @@ namespace RobotRaconteurWeb
             throw new ArgumentException($"Required option not provided: {option}");
         }
 
+        /**
+        <summary>
+        Get the option value as a string
+        </summary>
+        <remarks>
+        Returns default_value if option not specified on command line
+        </remarks>
+        <param name="option">The name of the option</param>
+        <param name="default_value">The default option value</param>
+        <returns>The option value, or default_value if not specified on command line</returns>
+        */
         public string GetOptionOrDefaultAsString(string option, string defaultValue)
         {
             string option1 = prefix + option;
@@ -260,7 +436,16 @@ namespace RobotRaconteurWeb
 
             return defaultValue;
         }
-
+        /**
+        <summary>
+        Get the option value as a bool
+        </summary>
+        <remarks>
+        Returns false if option not specified on command line
+        </remarks>
+        <param name="option">The name of the option</param>
+        <returns>The option value, or false</returns>
+        */
         public bool GetOptionOrDefaultAsBool(string option)
         {
             string option1 = prefix + option;
@@ -302,7 +487,17 @@ namespace RobotRaconteurWeb
 
             throw new ArgumentException($"Required option not provided: {option}");
         }
-
+        /**
+        <summary>
+        Get the option value as a bool
+        </summary>
+        <remarks>
+        Returns default_value if option not specified on command line
+        </remarks>
+        <param name="option">The name of the option</param>
+        <param name="default_value">The default option value</param>
+        <returns>The option value, or default_value if not specified on command line</returns>
+        */
         public bool GetOptionOrDefaultAsBool(string option, bool defaultValue)
         {
             string option1 = prefix + option;
@@ -313,7 +508,16 @@ namespace RobotRaconteurWeb
 
             return defaultValue;
         }
-
+        /**
+        <summary>
+        Get the option value as an int
+        </summary>
+        <remarks>
+        Returns -1 if option not specified on command line
+        </remarks>
+        <param name="option">The name of the option</param>
+        <returns>The option value, or -1</returns>
+        */
         public int GetOptionOrDefaultAsInt(string option)
         {
             string option1 = prefix + option;
@@ -330,6 +534,17 @@ namespace RobotRaconteurWeb
             throw new ArgumentException($"Required option not provided: {option}");
         }
 
+        /**
+        <summary>
+        Get the option value as an int
+        </summary>
+        <remarks>
+        Returns default_value if option not specified on command line
+        </remarks>
+        <param name="option">The name of the option</param>
+        <param name="default_value">The default option value</param>
+        <returns>The option value, or default_value if not specified on command line</returns>
+        */
         public int GetOptionOrDefaultAsInt(string option, int defaultValue)
         {
             string option1 = prefix + option;
@@ -341,7 +556,7 @@ namespace RobotRaconteurWeb
             return defaultValue;
         }
 
-        public void FillOptionsDescription(OptionSet optionSet, RobotRaconteurNodeSetupFlags allowedOverrides, string prefix)
+        internal void FillOptionsDescription(OptionSet optionSet, RobotRaconteurNodeSetupFlags allowedOverrides, string prefix)
         {
             var h = new FillOptionsDescriptionAddHelper(optionSet, prefix, allowedOverrides);
 
@@ -396,13 +611,84 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /**
+    <summary>
+    Setup a node using specified options and manage node lifecycle
+    </summary>
+    <remarks>
+    <para>
+    RobotRaconteurNodeSetup and its subclasses ClientNodeSetup, ServerNodeSetup,
+    and SecureServerNodeSetup are designed to help configure nodes and manage
+    node lifecycles. The node setup classes use Dispose() to configure the node
+    on construction, and call RobotRaconteurNode.Shutdown() when the instance
+    is destroyed.
+    </para>
+    <para>
+    The node setup classes execute the following operations to configure the node:
+    </para>
+    <para>
+    1. Set log level and tap options from flags, command line options, or environmental variables
+    </para>
+    <para>
+    2. Register specified service factory types
+    </para>
+    <para>
+    3. Initialize transports using flags specified in flags or from command line options
+    </para>
+    <para>
+    4. Configure timeouts
+    </para>
+    <para>
+    See command_line_options for more information on available command line options.
+    </para>
+    <para>
+    Logging level is configured using the environmental variable `ROBOTRACONTEUR_LOG_LEVEL`
+    or the command line option `--robotraconteur-log-level`. See logging for more information.
+    </para>
+    <para>
+    See taps for more information on using taps.
+    </para>
+    <para>
+    The node setup classes optionally initialize LocalTransport,
+    TcpTransport, HardwareTransport, and/or IntraTransport.
+    transports for more information.
+    </para>
+    <para>
+    The LocalTransport.StartServerAsNodeName() or
+    LocalTransport.StartClientAsNodeName() are used to load the NodeID.
+    See LocalTransport for more information on this procedure.
+    </para>
+    </remarks>
+    */
     public class RobotRaconteurNodeSetup : IDisposable
     {
         public RobotRaconteurNode Node => node;
-
+        /**
+        <summary>
+        Get the IntraTransport
+        </summary>
+        <remarks>
+        Will be null if IntraTransport is not specified in flags
+        </remarks>
+        */
         public IntraTransport IntraTransport => intra_transport;
+        /**
+        <summary>
+        Get the TcpTransport
+        </summary>
+        <remarks>
+        Will be null if TcpTransport is not specified in flags
+        </remarks>
+        */
         public TcpTransport TcpTransport => tcp_transport;
-
+        /**
+        <summary>
+        Get the LocalTransport
+        </summary>
+        <remarks>
+        Will be null if LocalTransport is not specified in flags
+        </remarks>
+        */
         public LocalTransport LocalTransport => local_transport;
 
         internal RobotRaconteurNode node = null;
@@ -414,6 +700,12 @@ namespace RobotRaconteurWeb
 
         private CommandLineConfigParser config;
 
+        /**
+        <summary>
+        Get the command line config parser object used to configure node
+        </summary>
+        <remarks>None</remarks>
+        */
         public CommandLineConfigParser Config => config;
 
         public void DoSetup(RobotRaconteurNode node, ServiceFactory[] serviceTypes, bool scan_assembly_types, CommandLineConfigParser config)
@@ -745,13 +1037,48 @@ namespace RobotRaconteurWeb
         }
 
         bool release_node = false;
+        /**
+        <summary>
+        Construct a new RobotRaconteurNodeSetup with default node, NodeName, TCP port, and flags
+        </summary>
+        <remarks>
+        <para>
+        Construct node setup and configure the specified node. Use this overload if no command line options
+        are provided.
+        </para>
+        </remarks>
+        <param name="node">The node to setup</param>
+        <param name="service_types">The service types to register</param>
+        <param name="scan_assembly_types">If true, scan assemblies for service types</param>
+        <param name="node_name">The NodeName</param>
+        <param name="tcp_port">The port to listen for incoming TCP clients</param>
+        <param name="flags">The configuration flags</param>
+        */        
         public RobotRaconteurNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, bool scan_assembly_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags)
         {
             var c = new CommandLineConfigParser(0);
             c.SetDefaults(nodename, tcp_port, flags);
             DoSetup(node, service_types, scan_assembly_types, c);
         }
-
+        /**
+        <summary>
+        Construct a new RobotRaconteurNodeSetup with default node, NodeName, TCP port, and flags
+        </summary>
+        <remarks>
+        <para>
+        Construct node setup and configure the specified node. Use this overload if no command line options
+        are provided.
+        </para>
+        </remarks>
+        <param name="node">The node to setup</param>
+        <param name="service_types">The service types to register</param>
+        <param name="scan_assembly_types">If true, scan assemblies for service types</param>
+        <param name="node_name">The NodeName</param>
+        <param name="tcp_port">The port to listen for incoming TCP clients</param>
+        <param name="flags">The configuration flags</param>
+        <param name="allowed_overrides">The allowed command line overrides</param>
+        <param name="args">The command line arguments</param>        
+        */ 
         public RobotRaconteurNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, bool scan_assembly_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags, RobotRaconteurNodeSetupFlags allowed_overrides, string[] args)
         {
             var c = new CommandLineConfigParser(allowed_overrides);
@@ -767,17 +1094,38 @@ namespace RobotRaconteurWeb
             }
             DoSetup(node, service_types, scan_assembly_types, c);
         }
-
+        /**
+        <summary>
+            Setup a RobotRaconteurNode using a pre-configured CommandLineConfigParser.
+        </summary>
+        <remarks>None</remarks>
+        <param name="node">The node to setup</param>
+        <param name="service_types">The service types to register</param>
+        <param name="scan_assembly_types">If true, scan assemblies for service types</param>
+        <param name="config">The CommandLineConfigParser to use</param>
+        */
         public RobotRaconteurNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, bool scan_assembly_types, CommandLineConfigParser config)
         {            
             DoSetup(node, service_types, scan_assembly_types, config);
         }
-
+        /**
+        <summary>
+        Release the node from lifecycle management
+        </summary>
+        <remarks>
+        If called, RobotRaconteurNode.Shutdown() will not be called when the node setup instance is destroyed
+        </remarks>
+        */
         public void ReleaseNode()
         {
             release_node = true;
         }
-
+        /**
+        <summary>
+        Dispose the node setup instance and shutdown the node
+        </summary>
+        <remarks>None</remarks>
+        */
         public void Dispose()
         {
             if (release_node)
@@ -817,102 +1165,358 @@ namespace RobotRaconteurWeb
     }
 
 
-
+    /**
+    <summary>
+    Initializes a RobotRaconteurNode instance to default configuration for a client only node
+    </summary>
+    <remarks>
+    <para>
+    ClientNodeSetup is a subclass of RobotRaconteurNodeSetup providing default configuration for a
+    RobotRaconteurNode instance that is used only to create outgoing client connections.
+    </para>
+    <para>
+    See command_line_options for more information on available command line options.
+    </para>
+    <para>
+    Note: String table and HardwareTransport are disabled by default. They can be enabled
+    using command line options.
+    </para>
+    <para>
+    By default, the configuration will do the following:
+    </para>
+    <para>
+    1. Configure logging level from environmental variable or command line options. Defaults to `INFO` if
+    not specified
+    </para>
+    <para>
+    2. Configure tap if specified in command line options
+    </para>
+    <para>
+    3. Register service types passed to service_types
+    </para>
+    <para>
+    4. Start LocalTransport (default enabled)
+    1. If `RobotRaconteurNodeSetupFlags_LOCAL_TRANSPORT_START_CLIENT` flag is specified, call
+    LocalTransport::StartServerAsNodeName() with the specified node_name
+    2. Start LocalTransport discovery listening if specified in flags or on command line (default enabled)
+    3. Disable Message Format Version 4 (default enabled) and/or String Table (default disabled) if
+    specified on command line
+    </para>
+    <para>
+    5. Start TcpTransport (default enabled)
+    1. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    2. Start TcpTransport discovery listening (default enabled)
+    3. Load TLS certificate and set if TLS is specified on command line (default disabled)
+    4. Process WebSocket origin command line options
+    </para>
+    <para>
+    6. Start HardwareTransport (default disabled)
+    1. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    </para>
+    <para>
+    7. Start IntraTransport (default disabled)
+    1. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    </para>
+    <para>
+    8. Disable timeouts if specified in flags or command line (default timeouts normal)
+    </para>
+    <para>
+    Most users will not need to be concerned with these details, and can simply
+    use the default configuration
+    </para>
+    </remarks>
+    */
     public class ClientNodeSetup : RobotRaconteurNodeSetup
     {
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the provided node, service types, node name, and flags.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
         public ClientNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault)
             : base(node, service_types, false, nodename, 0, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the default node, provided service types, node name, and flags.
+        /// </summary>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
         public ClientNodeSetup(ServiceFactory[] service_types, string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault)
             : base(RobotRaconteurNode.s, service_types, false, nodename, 0, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the provided node, node name, and flags.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
         public ClientNodeSetup(RobotRaconteurNode node, string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault)
             : base(node, null, true, nodename, 0, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the default node, node name, and flags.
+        /// </summary>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
         public ClientNodeSetup(string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault)
             : base(RobotRaconteurNode.s, null, true, nodename, 0, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the provided node, service types, node name, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ClientNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride, string[] args = null)
             : base(node, service_types, false, nodename, 0, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the default node, provided service types, node name, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ClientNodeSetup(ServiceFactory[] service_types, string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride, string[] args = null)
             : base(RobotRaconteurNode.s, service_types, false, nodename, 0, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the provided node, node name, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ClientNodeSetup(RobotRaconteurNode node, string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride, string[] args = null)
             : base(node, null, true, nodename, 0, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ClientNodeSetup class with the default node, node name, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="nodename">Optional node name.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ClientDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ClientNodeSetup(string nodename = null, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ClientDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ClientDefaultAllowedOverride, string[] args = null)
             : base(RobotRaconteurNode.s, null, true, nodename, 0, flags, allowed_overrides, args)
         {
 
         }
     }
-
+    /**
+    <summary>
+    Initializes a RobotRaconteurNode instance to default configuration for a server and client node
+    </summary>
+    <remarks>
+    <para>
+    ServerNodeSetup is a subclass of RobotRaconteurNodeSetup providing default configuration for a
+    RobotRaconteurNode instance that is used as a server to accept incoming client connections
+    and to initiate client connections.
+    </para>
+    <para>
+    ServerNodeSetup requires a NodeName, and a TCP port if LocalTransport and TcpTransport
+    are enabled (default behavior).
+    </para>
+    <para>
+    See command_line_options for more information on available command line options.
+    </para>
+    <para>
+    Note: String table and HardwareTransport are disabled by default. They can be enabled
+    using command line options.
+    </para>
+    <para>
+    By default, the configuration will do the following:
+    </para>
+    <para>
+    1. Configure logging level from environmental variable or command line options. Defaults to `INFO` if
+    not specified
+    </para>
+    <para>
+    2. Configure tap if specified in command line options
+    </para>
+    <para>
+    3. Register service types passed to service_types
+    </para>
+    <para>
+    4. Start LocalTransport (default enabled)
+    1. Configure the node to use the specified NodeName, and load the NodeID from the filesystem based
+    based on the NodeName. NodeID will be automatically generated if not previously used.
+    1. If "public" option is set, the transport will listen for all local users (default disabled)
+    2. Start the LocalTransport server to listen for incoming connections with the specified NodeName and NodeID
+    3. Start LocalTransport discovery announce and listening (default enabled)
+    4. Disable Message Format Version 4 (default enabled) and/or String Table (default disabled) if
+    specified on command line
+    </para>
+    <para>
+    5. Start TcpTransport (default enabled)
+    1. Start the TcpTransport server to listen for incoming connections on specified port
+    or using the port sharer (default enabled using specified port)
+    2. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    3. Start TcpTranport discovery announce and listening (default enabled)
+    4. Load TLS certificate and set if TLS is specified on command line (default disabled)
+    5. Process WebSocket origin command line options
+    </para>
+    <para>
+    6. Start HardwareTransport (default disabled)
+    1. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    </para>
+    <para>
+    7. Start IntraTransport (default enabled)
+    1. Enable IntraTransport server to listen for incoming clients (default enabled)
+    2. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    </para>
+    <para>
+    8. Disable timeouts if specified in flags or command line (default timeouts normal)
+    </para>
+    <para>
+    Most users will not need to be concerned with these details, and can simply
+    use the default configuration.
+    </para>
+    </remarks>
+    */
     public class ServerNodeSetup : RobotRaconteurNodeSetup
     {
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the provided node, service types, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
         public ServerNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault)
             : base(node, service_types, false, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the default node, provided service types, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
         public ServerNodeSetup(ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault)
             : base(RobotRaconteurNode.s, service_types, false, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the provided node, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
         public ServerNodeSetup(RobotRaconteurNode node, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault)
             : base(node, null, true, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the default node, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
         public ServerNodeSetup(string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault)
             : base(RobotRaconteurNode.s, null, true, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the provided node, service types, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ServerNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride, string[] args = null)
             : base(node, service_types, false, nodename, tcp_port, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the default node, provided service types, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ServerNodeSetup(ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride, string[] args = null)
             : base(RobotRaconteurNode.s, service_types, false, nodename, tcp_port, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the provided node, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ServerNodeSetup(RobotRaconteurNode node, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride, string[] args = null)
             : base(node, null, true, nodename, tcp_port, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the ServerNodeSetup class with the default node, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.ServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public ServerNodeSetup(string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.ServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.ServerDefaultAllowedOverride, string[] args = null)
             : base(RobotRaconteurNode.s, null, true, nodename, tcp_port, flags, allowed_overrides, args)
         {
@@ -920,50 +1524,189 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /**
+    <summary>
+    Initializes a RobotRaconteurNode instance to default configuration for a secure server and client node
+    </summary>
+    <remarks>
+    <para>
+    SecureServerNodeSetup is a subclass of RobotRaconteurNodeSetup providing default configuration for a
+    secure RobotRaconteurNode instance that is used as a server to accept incoming client connections
+    and to initiate client connections. SecureServerNodeSetup is identical to ServerNodeSetup,
+    except that it requires TLS for all network communication.
+    </para>
+    <para>
+    ServerNodeSetup requires a NodeName, and a TCP port if LocalTransport and TcpTransport
+    are enabled (default behavior).
+    </para>
+    <para>
+    See command_line_options for more information on available command line options.
+    </para>
+    <para>
+    Note: String table and HardwareTransport are disabled by default. They can be enabled
+    using command line options.
+    </para>
+    <para>
+    By default, the configuration will do the following:
+    </para>
+    <para>
+    1. Configure logging level from environmental variable or command line options. Defaults to `INFO` if
+    not specified
+    </para>
+    <para>
+    2. Configure tap if specified in command line options
+    </para>
+    <para>
+    3. Register service types passed to service_types
+    </para>
+    <para>
+    4. Start LocalTransport (default enabled)
+    1. Configure the node to use the specified NodeName, and load the NodeID from the filesystem based
+    based on the NodeName. NodeID will be automatically generated if not previously used.
+    1. If "public" option is set, the transport will listen for all local users (default disabled)
+    2. Start the LocalTransport server to listen for incoming connections with the specified NodeName and NodeID
+    3. Start LocalTransport discovery announce and listening (default enabled)
+    3. Disable Message Format Version 4 (default enabled) and/or String Table (default disabled) if
+    specified on command line
+    </para>
+    <para>
+    5. Start TcpTransport (default enabled)
+    1. Start the TcpTransport server to listen for incoming connections on specified port
+    or using the port sharer (default enabled using specified port)
+    2. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    3. Start TcpTranport discovery announce and listening (default enabled)
+    4. Load TLS certificate and set if TLS is specified on command line (default enabled, required)
+    5. Process WebSocket origin command line options
+    </para>
+    <para>
+    6. Start HardwareTransport (default disabled)
+    1. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    </para>
+    <para>
+    7. Start IntraTransport (default disabled)
+    1. Enable IntraTransport server to listen for incoming clients (default enabled)
+    2. Disable Message Format Version 4 (default enabled) and/or String Table
+    (default disabled) if specified in flags or command line
+    </para>
+    <para>
+    8. Disable timeouts if specified in flags or command line (default timeouts normal)
+    </para>
+    <para>
+    Most users will not need to be concerned with these details, and can simply
+    use the default configuration.
+    </para>
+    </remarks>
+    */
     public class SecureServerNodeSetup : RobotRaconteurNodeSetup
     {
+         /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the provided node, service types, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
         public SecureServerNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault)
             : base(node, service_types, false, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the default node, provided service types, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
         public SecureServerNodeSetup(ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault)
             : base(RobotRaconteurNode.s, service_types, false, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the provided node, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
         public SecureServerNodeSetup(RobotRaconteurNode node, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault)
             : base(node, null, true, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the default node, node name, TCP port, and flags.
+        /// </summary>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
         public SecureServerNodeSetup(string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault)
             : base(RobotRaconteurNode.s, null, true, nodename, tcp_port, flags)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the provided node, service types, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public SecureServerNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride, string[] args = null)
             : base(node, service_types, false, nodename, tcp_port, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the default node, provided service types, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="service_types">Array of ServiceFactory types to register.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public SecureServerNodeSetup(ServiceFactory[] service_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride, string[] args = null)
             : base(RobotRaconteurNode.s, service_types, false, nodename, tcp_port, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the provided node, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="node">The RobotRaconteurNode instance.</param>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public SecureServerNodeSetup(RobotRaconteurNode node, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride, string[] args = null)
             : base(node, null, true, nodename, tcp_port, flags, allowed_overrides, args)
         {
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the SecureServerNodeSetup class with the default node, node name, TCP port, flags, allowed overrides, and args.
+        /// </summary>
+        /// <param name="nodename">The node name.</param>
+        /// <param name="tcp_port">The TCP port number.</param>
+        /// <param name="flags">Optional setup flags. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefault.</param>
+        /// <param name="allowed_overrides">Optional flags for allowed overrides. Defaults to RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride.</param>
+        /// <param name="args">Optional string arguments.</param>
         public SecureServerNodeSetup(string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags = RobotRaconteurNodeSetupFlags.SecureServerDefault, RobotRaconteurNodeSetupFlags allowed_overrides = RobotRaconteurNodeSetupFlags.SecureServerDefaultAllowedOverride, string[] args = null)
             : base(RobotRaconteurNode.s, null, true, nodename, tcp_port, flags, allowed_overrides, args)
         {

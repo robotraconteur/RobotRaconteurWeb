@@ -29,31 +29,111 @@ namespace RobotRaconteurWeb
         public abstract Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken));
     }
     
+    /**
+    <summary>
+    Single dimensional numeric primitive random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The ArrayMemory class is used to represent a single dimensional numeric
+    primitive array. Multidimensional numeric primitive arrays should use
+    MultiDimArrayMemory. Valid types for T are `double`, `float`, `sbyte`,
+    `byte`, `short`, `ushort`, `uint`, `uint`, `long`,
+    `ulong`, `bool`, `CDouble`, and `CSingle`.
+    </para>
+    <para>
+    ArrayMemory instances are attached to an RRArray, either when
+    constructed or later using Attach().
+    </para>
+    <para>
+    ArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T" />
+    */
     public class ArrayMemory<T> : ArrayMemoryBase
     {
 
         private T[] memory;
-
+        /**
+        <summary>
+        Construct a new ArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
         public ArrayMemory()
         {
 
         }
-
+        /**
+        <summary>
+        Construct a new ArrayMemory instance attached to an array
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
         public ArrayMemory(T[] memory)
         {
             this.memory = memory;
         }
-
+        /**
+        <summary>
+        Attach ArrayMemory instance to an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
         public virtual void Attach(T[] memory)
         {
             this.memory = memory;
         }
-
+        /**
+        <summary>
+        Return the length of the array memory
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
         public override Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken))
         {            
                 return Task.FromResult((ulong)memory.LongLength);            
         }
-
+        /**
+        <summary>
+        Read a segment from an array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a segment of an array memory into a supplied buffer array. The start positions and length
+        of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start index in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start index in the buffer to write the data</param>
+        <param name="count">The number of array elements to read</param>
+        */
         public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
         {
             lock (this)
@@ -62,7 +142,25 @@ namespace RobotRaconteurWeb
             }
             return Task.FromResult(0);
         }
-
+        /**
+        <summary>
+        Write a segment to an array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to an array memory from a supplied buffer array. The start positions and length
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start index in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start index in the buffer to read the data</param>
+        <param name="count">The number of array elements to write</param>
+        */
         public virtual Task Write(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
             lock (this)
@@ -79,43 +177,149 @@ namespace RobotRaconteurWeb
 
         public abstract Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken));        
     }
-
+    /**
+    <summary>
+    Multidimensional numeric primitive random access memory region
+    </summary>
+    <remarks>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    
+    The MultiDimArrayMemory class is used to represent a multidimensional numeric
+    primitive array. Single dimensional numeric primitive arrays should use
+    ArrayMemory. Valid types for T are `double`, `float`, `sbyte`,
+    `byte`, `short`, `ushort`, `int`, `uint`, `long`,
+    `ulong`, `bool`, `CDouble`, and `CSingle`.
+    
+    MultiDimArrayMemory instances are attached to an MultiDimArray,
+    either when constructed or later using Attach().
+    
+    MultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </remarks>
+    <typeparam name="T">The numeric primitive type of the array</typeparam>
+    */
     public class MultiDimArrayMemory<T> : MultiDimArrayMemoryBase
     {
         private MultiDimArray multimemory;
-
+        /**
+        <summary>
+        Construct a new MultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
         public MultiDimArrayMemory()
         {
 
         }
-
+        /**
+        <summary>
+        Construct a new MultiDimArrayMemory instance attached to a MultiDimArray
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
         public MultiDimArrayMemory(MultiDimArray memory)
         {
             multimemory = memory;
         }
-
+        /**
+        <summary>
+        Attach MultiDimArrayMemory instance to a MultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
         public virtual void Attach(MultiDimArray memory)
         {
             this.multimemory = memory;
         }
-        
+        /**
+        <summary>
+        Dimensions of the memory array
+        </summary>
+        <remarks>
+        <para>
+        Returns the dimensions (shape) of the memory array
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </para>
+        </remarks>
+        */
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {            
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());            
         }
-
+        /**
+        <summary>
+        The number of dimensions in the memory array
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
         }
 
-                
+        /**
+        <summary>
+        Read a block from a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a block of a multidimensional array memory into a supplied buffer multidimensional array.
+        The start positions and count of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start position in the buffer to write the data</param>
+        <param name="count">The count of array elements to read</param>
+        */
         public virtual Task Read(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x=>(uint)x).ToArray(), buffer, bufferpos.Select(x=>(uint)x).ToArray(), count.Select(x=>(uint)x).ToArray());
             return Task.FromResult(0);            
         }
-
+        /**
+        <summary>
+        Write a segment to a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to a multidimensional array memory from a supplied buffer
+        multidimensional array. The start positions and count
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start position in the buffer to read the data</param>
+        <param name="count">The count of array elements to write</param>
+        */
         public virtual Task Write(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1011,10 +1215,49 @@ namespace RobotRaconteurWeb
 
     public class PodArrayMemory<T> : ArrayMemory<T> where T : struct
     {
+        /**
+        <summary>
+        Multidimensional pod random access memory region
+        </summary>
+        <remarks>
+        <para>
+        Memories represent random access memory regions that are typically
+        represented as arrays of various shapes and types. Memories can be
+        declared in service definition files using the `memory` member keyword
+        within service definitions. Services expose memories to clients, and
+        the nodes will proxy read, write, and parameter requests between the client
+        and service. The node will also break up large requests to avoid the
+        message size limit of the transport.
+        </para>
+        <para>
+        The PodMultiDimArrayMemory class is used to represent a multidimensional
+        pod array. Single dimensional pod arrays should use PodArrayMemory.
+        Type T must be declared in a service definition using the `pod`
+        keyword, and generated using RobotRaconteurGen.
+        </para>
+        <para>
+        PodMultiDimArrayMemory instances are attached to an MultiDimArray,
+        either when constructed or later using Attach().
+        </para>
+        <para>
+        PodMultiDimArrayMemory instances returned by clients are special implementations
+        designed to proxy requests to the service. They cannot be attached
+        to an arbitrary array.
+        </para>
+        </remarks>
+        <typeparam name="T" />
+        */
         public PodArrayMemory() : base()
         {
         }
-
+        /**
+        <summary>
+        Construct a new PodMultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
         public PodArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1085,41 +1328,151 @@ namespace RobotRaconteurWeb
             return impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
         }
     }
-
+    /**
+    <summary>
+    Multidimensional pod random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The PodMultiDimArrayMemory class is used to represent a multidimensional
+    pod array. Single dimensional pod arrays should use PodArrayMemory.
+    Type T must be declared in a service definition using the `pod`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances are attached to an MultiDimArray,
+    either when constructed or later using Attach().
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T" />
+    */
     public class PodMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private PodMultiDimArray multimemory;
-
+        /**
+        <summary>
+        Construct a new PodMultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
         public PodMultiDimArrayMemory()
         {
         }
-
+        /**
+        <summary>
+        Construct a new PodMultiDimArrayMemory instance attached to a PodMultiDimArray
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
         public PodMultiDimArrayMemory(PodMultiDimArray memory)
         {
             multimemory = memory;
         }
-
+        /**
+        <summary>
+        Attach PodMultiDimArrayMemory instance to a PodMultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
         public virtual void Attach(PodMultiDimArray memory)
         {
             this.multimemory = memory;
         }
-
+        /**
+        <summary>
+        Dimensions of the memory array
+        </summary>
+        <remarks>
+        <para>
+        Returns the dimensions (shape) of the memory array
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </para>
+        </remarks>
+        */
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
         }
-
+        /**
+        <summary>
+        The number of dimensions in the memory array
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
         }
-
+        /**
+        <summary>
+        Read a block from a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a block of a multidimensional array memory into a supplied buffer multidimensional array.
+        The start positions and count of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start position in the buffer to write the data</param>
+        <param name="count">The count of array elements to read</param>
+        */
         public virtual Task Read(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
             return Task.FromResult(0);
         }
-
+        /**
+        <summary>
+        Write a segment to a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to a multidimensional array memory from a supplied buffer
+        multidimensional array. The start positions and count
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start position in the buffer to read the data</param>
+        <param name="count">The count of array elements to write</param>
+        */
         public virtual Task Write(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1259,14 +1612,62 @@ namespace RobotRaconteurWeb
             var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
             await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
-    }
-
+}
+    /**
+    <summary>
+    Single dimensional namedarray random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The NamedArrayMemory class is used to represent a single dimensional named
+    array. Multidimensional named arrays should use NamedMultiDimArrayMemory.
+    Type T must be declared in a service definition using the `namedarray`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    NamedArrayMemory instances are attached to an array, either when
+    constructed or later using Attach().
+    </para>
+    <para>
+    NamedArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T">The namedarray type of the array</typeparam>
+    */
     public class NamedArrayMemory<T> : ArrayMemory<T> where T : struct
     {
+        /**
+        <summary>
+        Construct a new NamedArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
         public NamedArrayMemory() : base()
         {
         }
-
+        /**
+        <summary>
+        Construct a new NamedArrayMemory instance attached to an array
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        <returns />
+        */
         public NamedArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1337,41 +1738,151 @@ namespace RobotRaconteurWeb
             return impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
         }
     }
-
+    /**
+    <summary>
+    Multidimensional namedarray random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The NamedMultiDimArrayMemory class is used to represent a multidimensional
+    named array. Single dimensional named arrays should use NamedArrayMemory.
+    Type T must be declared in a service definition using the `namedarray`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    NamedMultiDimArrayMemory instances are attached to an NamedMultiDimArray,
+    either when constructed or later using Attach().
+    </para>
+    <para>
+    NamedMultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T">The namedarray type of the array</typeparam>
+    */
     public class NamedMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private NamedMultiDimArray multimemory;
-
+        /**
+        <summary>
+        Construct a new NamedMultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
         public NamedMultiDimArrayMemory()
         {
         }
-
+        /**
+        <summary>
+        Construct a new NamedMultiDimArrayMemory instance attached to an NamedMultiDimArray
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
         public NamedMultiDimArrayMemory(NamedMultiDimArray memory)
         {
             multimemory = memory;
         }
-
+        /**
+        <summary>
+        Attach PodMultiDimArrayMemory instance to a PodMultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
         public virtual void Attach(NamedMultiDimArray memory)
         {
             this.multimemory = memory;
         }
-
+        /**
+        <summary>
+        Dimensions of the memory array
+        </summary>
+        <remarks>
+        <para>
+        Returns the dimensions (shape) of the memory array
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </para>
+        </remarks>
+        */
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
         }
-
+        /**
+        <summary>
+        The number of dimensions in the memory array
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
         }
-
+        /**
+        <summary>
+        Read a block from a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a block of a multidimensional array memory into a supplied buffer multidimensional array.
+        The start positions and count of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start position in the buffer to write the data</param>
+        <param name="count">The count of array elements to read</param>
+        */
         public virtual Task Read(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
             return Task.FromResult(0);
         }
-
+        /**
+        <summary>
+        Write a segment to a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to a multidimensional array memory from a supplied buffer
+        multidimensional array. The start positions and count
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start position in the buffer to read the data</param>
+        <param name="count">The count of array elements to write</param>
+        */
         public virtual Task Write(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
