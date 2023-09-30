@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <title>Bridge RobotRaconteurBridgeTest</title>
     <script src="../../bin/Debug/netstandard2.0/h5/h5.js"></script>
-    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridge.js"></script>
-    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridge.meta.js"></script>
+    <script src="../../../RobotRaconteurBridge/bin/Debug/netstandard2.0/h5/RobotRaconteurBridge.js"></script>
+    <script src="../../../RobotRaconteurBridge/bin/Debug/netstandard2.0/h5/RobotRaconteurBridge.meta.js"></script>
     <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridgeTest.js"></script>
     <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridgeTest.meta.js"></script>
 
@@ -15,10 +15,8 @@
             const logElem = document.getElementById("log");
             logElem.innerHTML += "Starting...<br/>";
             
-            RobotRaconteurBridgeTest.RegisterServiceTypes.DoRegisterServiceTypes();
-            var c = new RobotRaconteurTest.ServiceTestClient();
-            c.RunFullTest("rr+tcp://localhost:22222/?service=RobotRaconteurTestService", "rr+tcp://localhost:22222/?service=RobotRaconteurTestService_auth")
-                .continueWith(function(res) {
+            RobotRaconteurBridgeTest.RegisterServiceTypes.SubscriberTest()
+                .continueWith(function (res) {
                     try {
                         res.getResult();
                         logElem.innerHTML += "Done!";

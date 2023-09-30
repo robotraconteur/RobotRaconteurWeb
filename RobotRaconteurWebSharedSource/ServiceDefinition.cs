@@ -2717,11 +2717,19 @@ namespace RobotRaconteurWeb
                 long val2;
                 if (val.StartsWith("-0x"))
                 {
-                    val2 = -Convert.ToInt64(val.Substring(1), b);
+                    val2 = -Convert.ToInt64(val.Substring(3).TrimStart('0'), b);
                 }
                 else
                 {
-                    val2 = Convert.ToInt64(val, b);
+                    if (val.StartsWith("+0x"))
+                    {
+                        val = val.Substring(3);
+                    }
+                    else if (val.StartsWith("0x"))
+                    {
+                        val = val.Substring(2);
+                    }
+                    val2 = Convert.ToInt64(val.TrimStart('0'), b);
                 }
 
                 if (val2 < min_value && val2 > max_value)

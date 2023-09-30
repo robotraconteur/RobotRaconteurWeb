@@ -193,7 +193,7 @@ namespace RobotRaconteurWeb
             {
                 lock (parent)
                 {
-                    parent.TransportConnections.Remove(transport.LocalEndpoint);
+                    parent.RemoveTransportConnection(transport.LocalEndpoint);
                 }
             }           
         }

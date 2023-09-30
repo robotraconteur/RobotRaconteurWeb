@@ -1,23 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
-using System.Text.RegularExpressions;
-using System.Security.Principal;
-using System.Security.AccessControl;
-using System.IO.Pipes;
-using System.Security.Cryptography.X509Certificates;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
 using static RobotRaconteurWeb.RRLogFuncs;
-using Mono.Unix.Native;
 
 namespace RobotRaconteurWeb
 {
@@ -135,8 +124,6 @@ namespace RobotRaconteurWeb
 
         public override async Task<ITransportConnection> CreateTransportConnection(string url, Endpoint e, CancellationToken cancel)
         {
-            bool is_windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
             var url_res = TransportUtil.ParseConnectionUrl(url);
 
             if (string.IsNullOrEmpty(url_res.nodename) && url_res.nodeid.IsAnyNode)
@@ -313,8 +300,8 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public override bool CanConnectService(string url)
         {
-            Uri u = new Uri(url);
-            if (u.Scheme != "rr+intra") return false;
+            var u = TransportUtil.ParseConnectionUrl(url);
+            if (u.scheme != "rr+intra") return false;
 
             return true;
         }

@@ -245,7 +245,23 @@ namespace RobotRaconteurWeb.Extensions
         public static string EscapeDataString(string s)
         {
 #if ROBOTRACONTEUR_BRIDGE
-            return H5.Script.EncodeURI(s);
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in s)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    sb.Append(c);
+                }
+                else
+                {
+                    byte[] bytes = Encoding.UTF8.GetBytes(new char[] { c });
+                    foreach (byte b in bytes)
+                    {
+                        sb.AppendFormat("%{0:X2}", b);
+                    }
+                }
+            }
+            return sb.ToString();
 #else
             return Uri.EscapeDataString(s);
 #endif
@@ -471,6 +487,57 @@ namespace RobotRaconteurWeb.Extensions
                 default:
                     throw new ArgumentException("Invalid array type");
             }
+        }
+    }
+
+    class WeakReference<T>
+    {
+        T target;
+
+        public WeakReference(T target)
+        {
+            this.target = target;
+        }
+
+        public T Target
+        {
+            get { return target; }
+        }
+
+        public bool IsAlive
+        {
+            get { return target != null; }
+        }
+
+        public void SetTarget(T target)
+        {
+            this.target = target;
+        }
+
+        public void Free()
+        {
+            target = default(T);
+        }
+
+        public static implicit operator WeakReference<T>(T target)
+        {
+            return new WeakReference<T>(target);
+        }
+
+        public static implicit operator T(WeakReference<T> reference)
+        {
+            return reference.target;
+        }
+
+        public override string ToString()
+        {
+            return target.ToString();
+        }
+
+        public bool TryGetTarget(out T target)
+        {
+            target = this.target;
+            return target != null;
         }
     }
 

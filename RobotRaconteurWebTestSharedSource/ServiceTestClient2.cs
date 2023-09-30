@@ -57,7 +57,7 @@ namespace RobotRaconteurTest
         {
             await ConnectService(url);
 
-            RRAssert.AreEqual(await r.get_testenum1_prop(), testenum1.anothervalue);
+            RRAssert.AreEqual((int)await r.get_testenum1_prop(), (int)testenum1.anothervalue);
             await r.set_testenum1_prop(testenum1.hexval1);
 
             await r.get_o4();
@@ -108,7 +108,7 @@ namespace RobotRaconteurTest
 
         public async Task TestEnums()
         {
-            RRAssert.AreEqual(await r.get_testenum1_prop(), testenum1.anothervalue);
+            RRAssert.AreEqual((int)await r.get_testenum1_prop(), (int)testenum1.anothervalue);
 
             await r.set_testenum1_prop(testenum1.hexval1);
 
@@ -321,6 +321,28 @@ namespace RobotRaconteurTest
             for (int i = 0; i < count; i++)
             {
                 RRAssert.IsTrue(Object.Equals(v1[i], v2[i]));
+            }
+        }
+
+        public void ca(CDouble[] v1, CDouble[] v2, int count = -1)
+        {
+            RRAssert.AreEqual(v1.Length, v2.Length);
+            int len = v1.Length;
+            if (count > 0) len = count;
+            for (int i = 0; i < count; i++)
+            {
+                RRAssert.AreEqual(v1[i],v2[i]);
+            }
+        }
+
+        public void ca(CSingle[] v1, CSingle[] v2, int count = -1)
+        {
+            RRAssert.AreEqual(v1.Length, v2.Length);
+            int len = v1.Length;
+            if (count > 0) len = count;
+            for (int i = 0; i < count; i++)
+            {
+                RRAssert.AreEqual(v1[i], v2[i]);
             }
         }
 

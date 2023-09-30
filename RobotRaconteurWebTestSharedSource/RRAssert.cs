@@ -22,6 +22,36 @@ namespace RobotRaconteurTest
             }
         }
 
+        public static void AreEqual(string a, string b, [CallerFilePath] string sourceFilePath = "",
+                                       [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (a!=b)
+            {
+                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                throw new Exception("Unit test failure");
+            }
+        }
+
+        public static void AreEqual(CDouble a, CDouble b, [CallerFilePath] string sourceFilePath = "",
+                                       [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (a != b)
+            {
+                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                throw new Exception("Unit test failure");
+            }
+        }
+
+        public static void AreEqual(CSingle a, CSingle b, [CallerFilePath] string sourceFilePath = "",
+                                       [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (Math.Abs(a.Real - b.Real) >1e-2 || Math.Abs(a.Imag - b.Imag) >1e-2)
+            {
+                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                throw new Exception("Unit test failure");
+            }
+        }
+
         public static void AreEqual(object a, object b, [CallerFilePath] string sourceFilePath = "",
                                     [CallerLineNumber] int sourceLineNumber = 0)
         {

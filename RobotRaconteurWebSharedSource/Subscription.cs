@@ -1171,7 +1171,7 @@ namespace RobotRaconteurWeb
                     try
                     {
                         //ClientContext.ClientServiceListenerDelegate client_listener = delegate (ClientContext context, ClientServiceListenerEventType evt, object param) { };
-                        o = await node.ConnectService(client.urls, client.username, client.credentials, null, client.service_type, cancel.Token).ConfigureAwait(false);
+                        o = await node.ConnectService(client.urls, client.username, client.credentials, null, client.service_type, cancel.Token).AwaitWithTimeout(5000).ConfigureAwait(false);
                         lock (client)
                         {
                             client.client = o;
@@ -1251,7 +1251,7 @@ namespace RobotRaconteurWeb
                                 LogDebug(string.Format("Error in ServiceSubscription.ConnectClientFailed callback {0}", ex2), node, RobotRaconteur_LogComponent.Subscription);
                             }
                             client.claimed = false;
-                            wait_task.SetResult(true);
+                            wait_task.TrySetResult(true);
                         }
                     };
                     try
