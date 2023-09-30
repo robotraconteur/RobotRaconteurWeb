@@ -452,10 +452,6 @@ namespace RobotRaconteurWeb
 
 
                 }
-                else if (m.EntryType == MessageEntryType.ServiceClosed)
-                {
-                    Close().IgnoreResult();
-                }
                 else if (m.EntryType == MessageEntryType.ClientKeepAliveRet)
                 {
                 }
@@ -516,6 +512,17 @@ namespace RobotRaconteurWeb
                 else if (m.EntryType == MessageEntryType.CallbackCallReq)
                 {
                     ProcessCallbackCall(m).IgnoreResult();
+                }
+                else if (m.EntryType == MessageEntryType.ServiceClosed || m.EntryType == MessageEntryType.ServiceClosedRet)
+                {
+                    _ = Task.Run(delegate ()
+                    {
+                        try
+                        {
+                            _ = Close().IgnoreResult();
+                        }
+                        catch (Exception) { }
+                    });
                 }
                 else
                 {
