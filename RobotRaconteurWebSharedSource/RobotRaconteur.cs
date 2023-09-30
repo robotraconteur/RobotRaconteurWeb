@@ -1495,7 +1495,9 @@ namespace RobotRaconteurWeb
                             }
                         }
                         break;
-
+                    case MessageEntryType.ServiceClosed:
+                    case MessageEntryType.ServiceClosedRet:
+                        return null;
 
                     default:
 #if RR_LOG_DEBUG

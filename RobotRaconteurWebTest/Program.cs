@@ -31,6 +31,7 @@ namespace RobotRaconteurTest
             string command = args[0];
             if (command == "loopback")
             {
+                RobotRaconteurNode.s.SetLogLevelFromEnvVariable();
                 var t = new TcpTransport();
                 t.StartServer(22332);
                 RobotRaconteurNode.s.RegisterTransport(t);
