@@ -966,16 +966,22 @@ namespace RobotRaconteurWeb
 
         void DoSubscribe(string[] service_types, ServiceSubscriptionFilter filter, IServiceSubscription s)
         {
+
+            lock (subscriptions)
+            {
+                subscriptions.Add(s);
+                s.Init(service_types, filter);
+            }
+
+            DoUpdateAllDetectedServices(s);
+        }
+
+        internal void DoUpdateAllDetectedServices(IServiceSubscription s)
+        {
             Discovery_nodestorage[] d;
             lock(m_DiscoveredNodes)
             {
                 d = m_DiscoveredNodes.Values.ToArray();
-            }
-
-            lock(subscriptions)
-            {
-                subscriptions.Add(s);
-                s.Init(service_types, filter);
             }
 
             foreach(Discovery_nodestorage n in d)
@@ -988,8 +994,5 @@ namespace RobotRaconteurWeb
                 s.NodeUpdated(n);
             }
         }
-
-
     }
-
 }

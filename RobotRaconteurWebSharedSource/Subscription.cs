@@ -990,6 +990,7 @@ namespace RobotRaconteurWeb
         internal Dictionary<string, object> credentials;
         internal bool claimed;
         internal CancellationTokenSource cancel = new CancellationTokenSource();
+        internal bool erase = false;
     }
 
     /**
@@ -1163,6 +1164,10 @@ namespace RobotRaconteurWeb
                     client.connecting = true;
                     object o;
                     TaskCompletionSource<bool> wait_task;
+                    if (client.erase)
+                    {
+                        return;
+                    }
                     try
                     {
                         //ClientContext.ClientServiceListenerDelegate client_listener = delegate (ClientContext context, ClientServiceListenerEventType evt, object param) { };
@@ -1221,6 +1226,15 @@ namespace RobotRaconteurWeb
                             
                             try
                             {
+
+                                if(client.erase)
+                                {
+                                    lock(this)
+                                    {
+                                        clients.Remove(new ServiceSubscriptionClientID(client.nodeid, client.service_name));
+                                    }
+                                }
+
                                 bool send_closed = false;
                                 lock (this)
                                 {
@@ -1788,6 +1802,89 @@ namespace RobotRaconteurWeb
                     Task.Run(() => node.DisconnectService(c.client).IgnoreResult());
                 }
             }
+        }
+        /// <summary>
+        /// Update the service type and filter for the subscription
+        /// </summary>
+        /// <remarks>None</remarks>
+        /// <param name="service_types">n arrayof service types to listen for, ie
+        /// `com.robotraconteur.robotics.robot.Robot`</param>
+        /// <param name="filter">A filter to select individual services based on specified criteria</param>
+        [PublicApi]
+        public void UpdateServiceByType(string[] service_types, ServiceSubscriptionFilter filter = null)
+        {
+            if (!active)
+            {
+                return;
+            }
+
+            if (use_service_url)
+            {
+                throw new InvalidOperationException("Subscription not using service by type");
+            }
+
+            if (service_types.Length == 0)
+            {
+                throw new ArgumentException("service_types must not be empty");
+            }
+
+            lock (this)
+            {
+                this.service_types = service_types;
+                this.filter = filter;
+
+                foreach (var c in clients.Values)
+                {
+                    try
+                    {
+                        ServiceInfo2 info = new ServiceInfo2();
+                        info.NodeID = c.nodeid;
+                        info.NodeName = c.nodename;
+                        info.Name = c.service_name;
+                        info.RootObjectType = c.service_type;
+                        info.ConnectionURL = c.urls;
+                        info.Attributes = node.GetServiceAttributes(c);
+
+                        c.erase = true;
+
+                        
+                        Discovery_nodestorage node_storage = new Discovery_nodestorage();
+
+                        bool connect = SubscriptionFilterUtil.FilterService(service_types, this.filter, node_storage, info, out var filter_res_urls, out var filter_res, out var filter_node);
+
+                        if (!connect)
+                        {
+                            try
+                            {
+                                _ = Task.Run(delegate ()
+                                {
+                                    try
+                                    {
+                                        node.DisconnectService(c).IgnoreResult();
+                                    }
+                                    catch { }
+                                });
+                            }
+                            catch { }
+                            
+                        }
+
+                    }
+                    catch (Exception exp)
+                    {
+                        LogDebug(string.Format("Error updating service by type {0}", exp), node, RobotRaconteur_LogComponent.Subscription);
+                    }
+
+                    _ = Task.Run(async delegate ()
+                    {
+                        await Task.Delay(250);
+                        var cancel = new CancellationTokenSource();
+                        parent.DoUpdateAllDetectedServices(this);
+                    }).IgnoreResult();
+                }
+            }
+
+
         }
 
         private ServiceSubscription_client FindClient(object client)
