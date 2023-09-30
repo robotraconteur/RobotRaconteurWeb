@@ -228,4 +228,4 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
-/RobotRaconteurBridgeTest/Bridge/output
+/RobotRaconteurH5Test/H5/output

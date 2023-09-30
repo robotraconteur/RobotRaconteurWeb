@@ -1,11 +1,14 @@
-﻿using Mono.Unix;
+﻿
+#if !ROBOTRACONTEUR_H5
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using Mono.Unix;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using static RobotRaconteurWeb.RRLogFuncs;
@@ -13,6 +16,21 @@ using static RobotRaconteurWeb.RRLogFuncs;
 namespace RobotRaconteurWeb
 {
 
+    public class NodeDirectories
+    {
+        public string system_data_dir;
+        public string system_config_dir;
+        public string system_state_dir;
+        public string system_cache_dir;
+        public string system_run_dir;
+        public string user_data_dir;
+        public string user_config_dir;
+        public string user_state_dir;
+        public string user_cache_dir;
+        public string user_run_dir;
+    }
+
+#if !ROBOTRACONTEUR_H5
     static class NodeDirectoriesUtil
     {
         internal static string replace_default_val_with_env(string default_val, string rr_env_var)
@@ -698,20 +716,6 @@ namespace RobotRaconteurWeb
         }
     }
 
-    public class NodeDirectories
-    {
-        public string system_data_dir;
-        public string system_config_dir;
-        public string system_state_dir;
-        public string system_cache_dir;
-        public string system_run_dir;
-        public string user_data_dir;
-        public string user_config_dir;
-        public string user_state_dir;
-        public string user_cache_dir;
-        public string user_run_dir;
-    }
-
     public class NodeDirectoriesFD : IDisposable
     {
         FileStream f;
@@ -892,7 +896,15 @@ namespace RobotRaconteurWeb
             fd?.Dispose();
         }
     }
-
+#else
+    public static class NodeDirectoriesUtil
+    {
+        public static NodeDirectories GetDefaultNodeDirectories(RobotRaconteurNode node)
+        {
+            return new NodeDirectories();
+        }
+    }
+#endif
     public class NodeDirectoriesResourceAlreadyInUse : IOException
     {
         public NodeDirectoriesResourceAlreadyInUse() : base("Identifier UUID or Name already in use") { }

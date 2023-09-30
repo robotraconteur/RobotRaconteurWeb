@@ -13,14 +13,14 @@
 
   <PropertyGroup>
    
-    <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_BRIDGE</DefineConstants>
+    <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_H5</DefineConstants>
   </PropertyGroup>
 
   <Import Project="..\RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="h5" Version="23.1.35432" />
-    <PackageReference Include="h5.Core" Version="23.1.35431" />
+    <PackageReference Include="h5" Version="23.7.39854" />
+    <PackageReference Include="h5.Core" Version="23.7.39858" />
   </ItemGroup>
 
 </Project>

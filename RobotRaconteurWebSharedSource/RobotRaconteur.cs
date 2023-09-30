@@ -278,7 +278,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public uint MemoryMaxTransferSize = 102400;
 
-#if ROBOTRACONTEUR_BRIDGE
+#if ROBOTRACONTEUR_H5
         public readonly BrowserWebSocketTransport browser_transport;
 #endif
 
@@ -287,7 +287,7 @@ namespace RobotRaconteurWeb
             serviceindexer = new ServiceIndexer(this);
             RegisterServiceType(new RobotRaconteurServiceIndex.RobotRaconteurServiceIndexFactory(this));
             RegisterService("RobotRaconteurServiceIndex", "RobotRaconteurServiceIndex", serviceindexer);
-#if ROBOTRACONTEUR_BRIDGE
+#if ROBOTRACONTEUR_H5
             browser_transport = new BrowserWebSocketTransport(this);
             RegisterTransport(browser_transport);
 #endif
@@ -2557,7 +2557,7 @@ namespace RobotRaconteurWeb
                 return;
             }
 
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
             RRLogFuncs.WriteLogRecord(Console.Error, record);
             Console.Error.WriteLine();
 #else

@@ -152,7 +152,7 @@ namespace RobotRaconteurWeb
             if (!started)
             {
 
-    #if !ROBOTRACONTEUR_BRIDGE
+    #if !ROBOTRACONTEUR_H5
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.WinCE)
                 {
                     iswindows = true;

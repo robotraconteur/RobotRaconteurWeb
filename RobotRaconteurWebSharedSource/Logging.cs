@@ -429,7 +429,7 @@ namespace RobotRaconteurWeb
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "", 
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
         {
-            if (time == default) time = DateTime.UtcNow;
+            if (time == DateTime.MinValue) time = DateTime.UtcNow;
             var r = new RRLogRecord()
             {
                 Node = node,

@@ -52,7 +52,7 @@ namespace RobotRaconteurTest
         public async Task RunFullTest(string url, string authurl)
         {
             Console.WriteLine("Test Members");
-            await ConnectService(url);
+            await ConnectService(url);      
             await TestProperties();
             await TestFunctions();
             await TestEvents();
@@ -504,7 +504,7 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(err2);
 
             //Test nulltest
-            RRAssert.AreEqual(await r.get_nulltest(), null);
+            RRAssert.AreEqual((object)await r.get_nulltest(), (object)null);
             await r.set_nulltest(null);
 
             
@@ -938,7 +938,7 @@ namespace RobotRaconteurTest
             ca<double>(m1_3, m1_4);
 
         }
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
         private async Task test_m2()
         {           
             RRAssert.AreEqual(await r.m2.GetDimCount(), 5);

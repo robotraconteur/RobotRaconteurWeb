@@ -4,6 +4,7 @@ using RobotRaconteurWeb;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using RobotRaconteurWeb.Extensions;
 namespace RobotRaconteurServiceIndex{
 
 public class NodeInfo_stub : IStructureStub {

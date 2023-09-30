@@ -13,24 +13,19 @@
 
   <PropertyGroup>
 
-    <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_BRIDGE</DefineConstants>
+    <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_H5</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
-    <None Include="Scripts\jquery-3.4.1.min.map" />
-    <None Include="Scripts\jquery-3.4.1.slim.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RobotRaconteurBridge\RobotRaconteurBridge.csproj">
+    <ProjectReference Include="..\RobotRaconteurH5\RobotRaconteurH5.csproj">
       <Project>{88a2b69f-af86-4dda-a0a3-9a3c45d27bed}</Project>
-      <Name>RobotRaconteurBridge</Name>
+      <Name>RobotRaconteurH5</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="h5" Version="23.1.35432" />
-    <PackageReference Include="h5.Core" Version="23.1.35431" />
+    <PackageReference Include="h5" Version="23.7.39854" />
+    <PackageReference Include="h5.Core" Version="23.7.39858" />
   </ItemGroup>
 </Project>
  

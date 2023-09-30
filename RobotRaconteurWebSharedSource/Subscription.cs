@@ -1251,7 +1251,7 @@ namespace RobotRaconteurWeb
                                 LogDebug(string.Format("Error in ServiceSubscription.ConnectClientFailed callback {0}", ex2), node, RobotRaconteur_LogComponent.Subscription);
                             }
                             client.claimed = false;
-                            wait_task.SetResult(true);
+                            wait_task.TrySetResult(true);
                         }
                     };
                     try
@@ -1284,38 +1284,38 @@ namespace RobotRaconteurWeb
                     {
                         await wait_task.Task.ConfigureAwait(false);
                     }
-                    finally
+                    catch { }
+                   
+
+                    client.client = null;
+
+                    try
+                    {                        
+                        _ = Task.Run(delegate ()
+                        {
+                            try
+                            {
+                                _ = node.DisconnectService(o).IgnoreResult();
+                            }
+                            catch { }
+                        }).IgnoreResult();
+                    }
+                    catch { }
+
+                    
+                    lock (this)
                     {
-
-
-                        client.client = null;
-
-                        try
+                        foreach (var p in pipe_subscriptions)
                         {
-                            _ = Task.Run(delegate ()
-                            {
-                                try
-                                {
-                                    _ = node.DisconnectService(o).IgnoreResult();
-                                }
-                                catch { }
-                            }).IgnoreResult();
+                            p.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                         }
-                        catch { }
 
-                        lock (this)
+                        foreach (var w in wire_subscriptions)
                         {
-                            foreach (var p in pipe_subscriptions)
-                            {
-                                p.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
-                            }
-
-                            foreach (var w in wire_subscriptions)
-                            {
-                                w.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
-                            }
+                            w.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                         }
                     }
+                    
 
                     await Task.Delay((int)ConnectRetryDelay, cancel.Token).IgnoreResult().ConfigureAwait(false);
                 }

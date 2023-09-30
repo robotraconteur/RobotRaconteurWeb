@@ -22,7 +22,7 @@ using System.IO;
 namespace RobotRaconteurTest
 {
 	
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
     class MultiDimArrayTest
     {
 
