@@ -1369,7 +1369,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="service">The context that generated the event</param>
         /// <param name="ev">The event type</param>
-        /// <param name="parameter">The event parameter</param> <summary>
+        /// <param name="parameter">The event parameter</param>
         [PublicApi]
         public delegate void ServerServiceListenerDelegate(ServerContext service, ServerServiceListenerEventType ev, object parameter);
 
