@@ -684,35 +684,44 @@ namespace RobotRaconteurWeb
         public override async Task<PipeEndpoint> Connect(int index, CancellationToken cancel = default(CancellationToken))
         {
             object connecting_key = new object();
-            connecting.Add(Tuple.Create(index,connecting_key));
+            lock (this)
+            {
+                connecting.Add(Tuple.Create(index, connecting_key));
+            }
             int rindex=-1;
             try
             {
                 MessageEntry m = new MessageEntry(MessageEntryType.PipeConnectReq, MemberName);
                 m.AddElement("index", index);
                 MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
-
-                rindex = (ret.FindElement("index").CastData<int[]>())[0];
-
-                PipeEndpoint e;
-                if (early_endpoints.ContainsKey(rindex))
+                lock (this)
                 {
-                    e = early_endpoints[rindex];
-                    early_endpoints.Remove(rindex);
+
+                    rindex = (ret.FindElement("index").CastData<int[]>())[0];
+
+                    PipeEndpoint e;
+                    if (early_endpoints.ContainsKey(rindex))
+                    {
+                        e = early_endpoints[rindex];
+                        early_endpoints.Remove(rindex);
+                    }
+                    else
+                    {
+                        e = new PipeEndpoint(this, rindex);
+                    }
+                    pipeendpoints.Add(rindex, e);
+                    return e;
                 }
-                else
-                {
-                    e= new PipeEndpoint(this, rindex);
-                }
-                pipeendpoints.Add(rindex, e);
-                return e;
             }
             finally
             {
-                connecting.RemoveAll(x => Object.ReferenceEquals(x.Item2, connecting_key));
-                if (connecting.Count == 0)
+                lock (this)
                 {
-                    early_endpoints.Clear();
+                    connecting.RemoveAll(x => Object.ReferenceEquals(x.Item2, connecting_key));
+                    if (connecting.Count == 0)
+                    {
+                        early_endpoints.Clear();
+                    }
                 }
             }
         }
@@ -736,9 +745,13 @@ namespace RobotRaconteurWeb
             {
                 try
                 {
-
-                    int index = (m.FindElement("index").CastData<int[]>())[0];
-                    pipeendpoints[index].RemoteClose();
+                    PipeEndpoint ep;
+                    lock (this)
+                    {
+                        int index = (m.FindElement("index").CastData<int[]>())[0];
+                        ep = pipeendpoints[index];
+                    }
+                    ep.RemoteClose();
                 }
                 catch { };
             }
@@ -754,23 +767,26 @@ namespace RobotRaconteurWeb
                         uint pnum;
 
                         PipeEndpoint p=null;
-                        if (pipeendpoints.ContainsKey(index))
+                        lock (this)
                         {
-                            p = pipeendpoints[index];
-                        }
-                        else
-                        {
-                            if (early_endpoints.ContainsKey(index))
+                            if (pipeendpoints.ContainsKey(index))
                             {
-                                p = early_endpoints[index];
+                                p = pipeendpoints[index];
                             }
                             else
-                            if (connecting.Count > 0)
                             {
-                                if (connecting.Any(x => x.Item1 == -1 || x.Item1 == index))
+                                if (early_endpoints.ContainsKey(index))
                                 {
-                                    p = new PipeEndpoint(this, index);
-                                    early_endpoints.Add(index, p);
+                                    p = early_endpoints[index];
+                                }
+                                else
+                                if (connecting.Count > 0)
+                                {
+                                    if (connecting.Any(x => x.Item1 == -1 || x.Item1 == index))
+                                    {
+                                        p = new PipeEndpoint(this, index);
+                                        early_endpoints.Add(index, p);
+                                    }
                                 }
                             }
                         }
@@ -826,7 +842,10 @@ namespace RobotRaconteurWeb
         
         protected override void DeleteEndpoint(PipeEndpoint e)
         {
-            pipeendpoints.Remove(e.Index);
+            lock (this)
+            {
+                pipeendpoints.Remove(e.Index);
+            }
         }
 
         internal void ClientContextListener(ClientContext context, ClientServiceListenerEventType event_, object param)
@@ -869,12 +888,17 @@ namespace RobotRaconteurWeb
         
         protected override async Task SendPipePacket(T data, int index, uint packetnumber, bool requestack, Endpoint e = null, CancellationToken cancel = default(CancellationToken))
         {
-            if (!pipeendpoints.ContainsKey(e.LocalEndpoint)) throw new Exception("Pipe has been disconnect");
-            if (!pipeendpoints[e.LocalEndpoint].ContainsKey(index)) throw new Exception("Pipe has been disconnected");
+            MessageElement me;
+            MessageEntry m;
+            lock (pipeendpointlock)
+            {
+                if (!pipeendpoints.ContainsKey(e.LocalEndpoint)) throw new Exception("Pipe has been disconnect");
+                if (!pipeendpoints[e.LocalEndpoint].ContainsKey(index)) throw new Exception("Pipe has been disconnected");
 
-            MessageElement me = PackPacket(data, index, packetnumber, requestack);
-            MessageEntry m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
-            m.AddElement(me);
+                me = PackPacket(data, index, packetnumber, requestack);
+                m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
+                m.AddElement(me);
+            }
 
             await skel.SendPipeMessage(m, e, cancel).ConfigureAwait(false);
         }
@@ -910,8 +934,13 @@ namespace RobotRaconteurWeb
                     try
                     {
                         int index = Int32.Parse(me.ElementName);
+                        PipeEndpoint pe1;
+                        lock (pipeendpointlock)
+                        {
+                            pe1 = pipeendpoints[e.LocalEndpoint][index];
+                        }
                         uint pnum;
-                        if (DispatchPacket(me, pipeendpoints[e.LocalEndpoint][index], out pnum))
+                        if (DispatchPacket(me, pe1, out pnum))
                         {
                             ack.Add(new MessageElement(me.ElementName, new uint[] { pnum }));
                         }
@@ -942,6 +971,11 @@ namespace RobotRaconteurWeb
                     foreach (MessageElement me in m.elements)
                     {
                         int index = Int32.Parse(me.ElementName);
+                        PipeEndpoint pe1;
+                        lock (pipeendpointlock)
+                        {
+                            pe1 = pipeendpoints[e.LocalEndpoint][index];
+                        }
                         DispatchPacketAck(me, pipeendpoints[e.LocalEndpoint][index]);
                     }
                 }
