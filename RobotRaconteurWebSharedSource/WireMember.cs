@@ -1112,10 +1112,15 @@ namespace RobotRaconteurWeb
         public override void WirePacketReceived(MessageEntry m, Endpoint e = null)
         {
             if (m.EntryType == MessageEntryType.WirePacket)
-            {
+            {                
                 try
                 {
-                    DispatchPacket(m.elements, connections[e.LocalEndpoint]);
+                    WireConnection c1;
+                    lock (connectionslock)
+                    {
+                        c1 = connections[e.LocalEndpoint];
+                    }
+                    DispatchPacket(m.elements, c1); 
                 }
                 catch { }
 
@@ -1202,7 +1207,10 @@ namespace RobotRaconteurWeb
 
         public override Task SendWirePacket(T packet, TimeSpec time, Endpoint e = null)
         {
-            if (!connections.ContainsKey(e.LocalEndpoint)) throw new Exception("Wire has been disconnected");
+            lock (connectionslock)
+            {
+                if (!connections.ContainsKey(e.LocalEndpoint)) throw new Exception("Wire has been disconnected");
+            }
             List<MessageElement> el = PackPacket(packet, time);
             MessageEntry m = new MessageEntry(MessageEntryType.WirePacket, MemberName);
             m.elements = el;
@@ -1212,7 +1220,13 @@ namespace RobotRaconteurWeb
 
         public override void Shutdown()
         {
-            Wire<T>.WireConnection[] cons = connections.Values.ToArray();
+            Wire<T>.WireConnection[] cons;
+            lock (connectionslock)
+            {
+                cons = connections.Values.ToArray();
+                connections.Clear();
+            }
+            cons = connections.Values.ToArray();
             foreach (Wire<T>.WireConnection con in cons)
             {
                 try
