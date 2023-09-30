@@ -279,6 +279,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+
+        [PublicApi]
     public class ServerContext 
    {
         /**
@@ -291,6 +293,8 @@ namespace RobotRaconteurWeb
         types.
         </remarks>
         */
+
+        [PublicApi]
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
@@ -579,6 +583,8 @@ namespace RobotRaconteurWeb
         valid during the initial request or packet event invocation.
         </remarks>
         */
+
+        [PublicApi]
         public static ServerContext CurrentServerContext {get {return m_CurrentServerContext;}}
         [ThreadStatic()]
         private static ServerContext m_CurrentServerContext;
@@ -594,6 +600,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The current object service path</returns>
         */
+
+        [PublicApi]
         public static string CurrentServicePath {get {return m_CurrentServicePath;}}
         [ThreadStatic()]
         private static string m_CurrentServicePath;
@@ -1362,11 +1370,13 @@ namespace RobotRaconteurWeb
         /// <param name="service">The context that generated the event</param>
         /// <param name="ev">The event type</param>
         /// <param name="parameter">The event parameter</param> <summary>
+        [PublicApi]
         public delegate void ServerServiceListenerDelegate(ServerContext service, ServerServiceListenerEventType ev, object parameter);
 
         /// <summary>
         /// Server service listener event
         /// </summary>
+        [PublicApi]
         public event ServerServiceListenerDelegate ServerServiceListener;
         /**
         <summary> Release the specified service path and all sub objects Services take ownership of
@@ -1381,6 +1391,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="path">The service path to release</param>
         */
+
+        [PublicApi]
         public void ReleaseServicePath(string path)
         {            
 
@@ -1448,6 +1460,8 @@ namespace RobotRaconteurWeb
         <param name="path">The service path to release</param>
         <param name="endpoints">The client endpoint IDs to notify of the released service path</param>
         */
+
+        [PublicApi]
         public void ReleaseServicePath(string path, List<uint> endpoints)
         {
 
@@ -1853,6 +1867,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Enum of service listener events
     /// </summary>
+        [PublicApi]
     public enum ServerServiceListenerEventType
     {
         /// <summary>
@@ -1892,6 +1907,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+
+        [PublicApi]
     public class ServerEndpoint : Endpoint
     {
         protected internal readonly ServerContext service;
@@ -1913,6 +1930,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The current server endpoint id</returns>
         */
+
+        [PublicApi]
         public static ServerEndpoint CurrentEndpoint { get { return m_CurrentEndpoint; } }
 
         [ThreadStatic]
@@ -1935,6 +1954,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public static AuthenticatedUser CurrentAuthenticatedUser { get { return m_CurrentAuthenticatedUser; } }
 
         private AuthenticatedUser endpoint_authenticated_user = null;
@@ -2057,6 +2078,8 @@ namespace RobotRaconteurWeb
     until a thread-exclusive lock can be established.
     </remarks>
     */
+
+        [PublicApi]
     public interface IRobotRaconteurMonitorObject
     {
         /**
@@ -2065,6 +2088,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>Dispose of the returned object to release</remarks>
         */
+
+        [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter();
                 /**
         <summary>
@@ -2074,6 +2099,8 @@ namespace RobotRaconteurWeb
         <remarks>Dispose of the returned object to release</remarks>
         <param name="timeout">Lock request timeout in milliseconds</param>
         */
+
+        [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter(int timeout);
     }
 }

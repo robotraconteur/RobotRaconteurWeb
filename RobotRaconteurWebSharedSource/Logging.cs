@@ -19,6 +19,7 @@ namespace RobotRaconteurWeb
     /// `ROBOTRACONTEUR_LOG_LEVEL` environmental variable, or
     /// `--robotraconteur-log-level` node setup command line option
     /// </remarks>
+    [PublicApi]
     public enum RobotRaconteur_LogLevel
     {
         /// <summary>
@@ -174,6 +175,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+        [PublicApi]
     public class RRLogRecord
     {
         /**
@@ -182,6 +184,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public RobotRaconteurNode Node;
         /**
         <summary>
@@ -189,6 +192,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public RobotRaconteur_LogLevel Level = RobotRaconteur_LogLevel.Warning;
         /**
         <summary>
@@ -196,6 +200,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public RobotRaconteur_LogComponent Component = RobotRaconteur_LogComponent.Default;
         /**
         <summary>
@@ -203,6 +208,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string ComponentName;
         /**
         <summary>
@@ -210,6 +216,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string ComponentObjectID;
         /**
         <summary>
@@ -217,6 +224,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public long Endpoint;
         /**
         <summary>
@@ -224,6 +232,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string ServicePath;
         /**
         <summary>
@@ -231,6 +240,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string Member;
         /**
         <summary>
@@ -238,6 +248,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string Message;
         /**
         <summary>
@@ -245,6 +256,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public DateTime Time;
         /**
         <summary>
@@ -252,6 +264,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string SourceFile;
         /**
         <summary>
@@ -259,6 +272,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public int SourceLine;
         /**
         <summary>
@@ -266,6 +280,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string ThreadID;
     }
 
