@@ -1,0 +1,41 @@
+{
+  "sourceMap": {
+    "enabled": false
+  },
+  "resources": [
+    {
+      "name": "RobotRaconteurBridge.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurBridge.js" ]
+    },
+    {
+      "name": "RobotRaconteurBridge.min.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurBridge.min.js" ]
+    },
+    {
+      "name": "RobotRaconteurBridge.meta.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurBridge.meta.js" ]
+    },
+    {
+      "name": "RobotRaconteurBridge.meta.min.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurBridge.meta.min.js" ]
+    }
+  ],
+  // Always build both minified and non-minified versions of the code so that resource for both versions are always included
+  // in the binary and so referencing projects can decide whether to use the minified versions or the non-minified versions
+  "outputFormatting": "Both",
+  "cleanOutputFolderBeforeBuildPattern": "*.*",
+  "loader": {
+    "type": "Global"
+  },
+  "rules": {
+    "anonymousType": "Plain",
+    "arrayIndex": "Managed",
+    "autoProperty": "Plain",
+    "boxing": "Managed",
+    "externalCast": "Plain",
+    "inlineComment": "Plain",
+    "integer": "Managed",
+    "lambda": "Plain",
+    "useShortForms": true
+  }
+}
