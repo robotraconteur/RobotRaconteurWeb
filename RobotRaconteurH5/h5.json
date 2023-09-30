@@ -4,20 +4,20 @@
   },
   "resources": [
     {
-      "name": "RobotRaconteurBridge.js",
-      "files": [ "$(OutDir)h5/RobotRaconteurBridge.js" ]
+      "name": "RobotRaconteurH5.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.js" ]
     },
     {
-      "name": "RobotRaconteurBridge.min.js",
-      "files": [ "$(OutDir)h5/RobotRaconteurBridge.min.js" ]
+      "name": "RobotRaconteurH5.min.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.min.js" ]
     },
     {
-      "name": "RobotRaconteurBridge.meta.js",
-      "files": [ "$(OutDir)h5/RobotRaconteurBridge.meta.js" ]
+      "name": "RobotRaconteurH5.meta.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.meta.js" ]
     },
     {
-      "name": "RobotRaconteurBridge.meta.min.js",
-      "files": [ "$(OutDir)h5/RobotRaconteurBridge.meta.min.js" ]
+      "name": "RobotRaconteurH5.meta.min.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.meta.min.js" ]
     }
   ],
   // Always build both minified and non-minified versions of the code so that resource for both versions are always included

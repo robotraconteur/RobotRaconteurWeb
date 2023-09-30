@@ -12,20 +12,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-
-    <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_BRIDGE</DefineConstants>
+   
+    <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_H5</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RobotRaconteurBridge\RobotRaconteurBridge.csproj">
-      <Project>{88a2b69f-af86-4dda-a0a3-9a3c45d27bed}</Project>
-      <Name>RobotRaconteurBridge</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="..\RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems" Label="Shared" />
+
+  <Import Project="..\RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems" Label="Shared" />
 
   <ItemGroup>
     <PackageReference Include="h5" Version="23.7.39854" />
     <PackageReference Include="h5.Core" Version="23.7.39858" />
   </ItemGroup>
+
 </Project>
- 

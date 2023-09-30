@@ -21,7 +21,7 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
@@ -123,7 +123,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         {
                 if (starttls)
                 {
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
                 await DoClientTlsHandshake(cancel).ConfigureAwait(false);
 #else
                     throw new NotImplementedException("TLS support not implemented");
@@ -266,7 +266,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
                         if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                         {
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
                             if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                             {
                                 //TODO: enforce direction of handshake
@@ -436,7 +436,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
             if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
             {
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
                 if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                 {
                     await DoServerTlsHandshake(mes).ConfigureAwait(false);
@@ -889,7 +889,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             //CheckStreamCapability_ret.TrySetException(new ConnectionException("Transport connection closed"));
             r2 = CheckStreamCapability_ret;
             CheckStreamCapability_ret = null;
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
             h1 = clienthandshake_recv_task;
             h2 = clienthandshake_recv_done_task;
 #endif
@@ -1277,7 +1277,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
     {
         return 0;
     }
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
     protected async Task DoServerTlsHandshake(Message m)
     {
         Message mret = new Message();
@@ -1669,7 +1669,7 @@ public interface AsyncStreamTransportParent
 
     void RemoveTransportConnection(AsyncStreamTransport transport);
 
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
     Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate();
 #endif
 }

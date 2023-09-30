@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteurBridgeTest", "RobotRaconteurBridgeTest\RobotRaconteurBridgeTest.csproj", "{58D9802B-F3A9-4ABB-A35C-0BD5B3CAB9E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteurH5Test", "RobotRaconteurH5Test\RobotRaconteurH5Test.csproj", "{58D9802B-F3A9-4ABB-A35C-0BD5B3CAB9E7}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "RobotRaconteurWebSharedSource", "RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.shproj", "{9648C599-747E-4BEA-8AF3-D24A07DF8E22}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "RobotRaconteurWebTestSharedSource", "RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.shproj", "{06048487-1017-44A9-9C2A-49E45EB070A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteurBridge", "RobotRaconteurBridge\RobotRaconteurBridge.csproj", "{88A2B69F-AF86-4DDA-A0A3-9A3C45D27BED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteurH5", "RobotRaconteurH5\RobotRaconteurH5.csproj", "{88A2B69F-AF86-4DDA-A0A3-9A3C45D27BED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobotRaconteurWeb", "RobotRaconteurWeb\RobotRaconteurWeb.csproj", "{36885650-CEE6-417D-871B-489B7F2493CA}"
 EndProject

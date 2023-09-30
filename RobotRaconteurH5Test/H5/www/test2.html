@@ -3,21 +3,21 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Bridge RobotRaconteurBridgeTest</title>
+    <title>H5 RobotRaconteurH5Test</title>
     <script src="../../bin/Debug/netstandard2.0/h5/h5.js"></script>
-    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridge.js"></script>
-    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridge.meta.js"></script>
-    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridgeTest.js"></script>
-    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurBridgeTest.meta.js"></script>
+    <script src="../../../RobotRaconteurH5/bin/Debug/netstandard2.0/h5/RobotRaconteurH5.js"></script>
+    <script src="../../../RobotRaconteurH5/bin/Debug/netstandard2.0/h5/RobotRaconteurH5.meta.js"></script>
+    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurH5Test.js"></script>
+    <script src="../../bin/Debug/netstandard2.0/h5/RobotRaconteurH5Test.meta.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const logElem = document.getElementById("log");
             logElem.innerHTML += "Starting...<br/>";
             
-            RobotRaconteurBridgeTest.RegisterServiceTypes.DoRegisterServiceTypes();
-            var c = new RobotRaconteurTest.ServiceTestClient();
-            c.RunFullTest("rr+tcp://localhost:22222/?service=RobotRaconteurTestService", "rr+tcp://localhost:22222/?service=RobotRaconteurTestService_auth")
+            RobotRaconteurH5Test.RegisterServiceTypes.DoRegisterServiceTypes();
+            var c = new RobotRaconteurTest.ServiceTestClient2();
+            c.RunFullTest("rr+tcp://localhost:22222/?service=RobotRaconteurTestService2")
                 .continueWith(function(res) {
                     try {
                         res.getResult();

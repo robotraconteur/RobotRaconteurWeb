@@ -938,7 +938,7 @@ namespace RobotRaconteurTest
             ca<double>(m1_3, m1_4);
 
         }
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
         private async Task test_m2()
         {           
             RRAssert.AreEqual(await r.m2.GetDimCount(), 5);

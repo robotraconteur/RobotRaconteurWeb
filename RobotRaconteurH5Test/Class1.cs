@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurWeb;
 
-namespace RobotRaconteurBridgeTest
+namespace RobotRaconteurH5Test
 {
     [RobotRaconteurWeb.RobotRaconteurServiceObjectInterface("blah")]
     public static class RegisterServiceTypes

@@ -1,5 +1,5 @@
 ﻿
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Mono.Unix;
@@ -30,7 +30,7 @@ namespace RobotRaconteurWeb
         public string user_run_dir;
     }
 
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
     static class NodeDirectoriesUtil
     {
         internal static string replace_default_val_with_env(string default_val, string rr_env_var)

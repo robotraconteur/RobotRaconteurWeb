@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RobotRaconteurBridge")]
+[assembly: AssemblyTitle("RobotRaconteurH5Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RobotRaconteurBridge")]
+[assembly: AssemblyProduct("RobotRaconteurH5Test")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("88a2b69f-af86-4dda-a0a3-9a3c45d27bed")]
+[assembly: Guid("58d9802b-f3a9-4abb-a35c-0bd5b3cab9e7")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -26,7 +26,7 @@ namespace RobotRaconteurTest
 {
 
 
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
     public class RobotRaconteurTestServiceSupport
     {
         public RobotRaconteurTest_testroot testservice;

@@ -174,7 +174,7 @@ namespace RobotRaconteurWeb
 
     }
 
-#if !ROBOTRACONTEUR_BRIDGE
+#if !ROBOTRACONTEUR_H5
     /**
     <summary>
     
