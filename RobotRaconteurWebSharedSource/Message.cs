@@ -31,6 +31,7 @@ namespace RobotRaconteurWeb
     /// <para> Data is always stored as little-endian, except for UUID which are big endian
     /// </para>
     /// </remarks>
+    [PublicApi]
     public enum DataTypes
     {
         /// <summary>void or null type</summary>
@@ -130,6 +131,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Array type enum for TypeDefinition parser class
     /// </summary>
+        [PublicApi]
     public enum DataTypes_ArrayTypes
     {
         /// <summary>type is not an array</summary>
@@ -145,6 +147,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Container type enum for TypeDefinition parser class
     /// </summary>
+        [PublicApi]
     public enum DataTypes_ContainerTypes
     {
         /// <summary>type does not have a container</summary>
@@ -183,6 +186,7 @@ namespace RobotRaconteurWeb
     /// before a session is established.
     /// </para>
     /// </remarks>
+    [PublicApi]
     public enum MessageEntryType
     {
         /// <summary>no-op</summary>
@@ -433,6 +437,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Message error type codes enum
     /// </summary>
+        [PublicApi]
     public enum MessageErrorType
     {
         /// <summary>success</summary>
@@ -572,16 +577,19 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents a complex number using double precision.
     /// </summary>
+        [PublicApi]
     public struct CDouble
     {
         /// <summary>
         /// The real component of the complex number.
         /// </summary>
+        [PublicApi]
         public double Real;
 
         /// <summary>
         /// The imaginary component of the complex number.
         /// </summary>
+        [PublicApi]
         public double Imag;
 
         /// <summary>
@@ -589,6 +597,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="real">The real component of the complex number.</param>
         /// <param name="imag">The imaginary component of the complex number.</param>
+        [PublicApi]
         public CDouble(double real, double imag)
         {
             Real = real;
@@ -598,6 +607,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Determines whether two <see cref="CDouble"/> instances are equal.
         /// </summary>
+        [PublicApi]
         public static bool operator ==(CDouble a, CDouble b)
         {
             return (a.Real == b.Real) && (a.Imag == b.Imag);
@@ -606,6 +616,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Determines whether two <see cref="CDouble"/> instances are not equal.
         /// </summary>
+        [PublicApi]
         public static bool operator !=(CDouble a, CDouble b)
         {
             return !((a.Real == b.Real) && (a.Imag == b.Imag));
@@ -614,6 +625,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Determines whether this instance is equal to the specified object.
         /// </summary>
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -624,6 +636,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Returns the hash code for this <see cref="CDouble"/> instance.
         /// </summary>
+        [PublicApi]
         public override int GetHashCode()
         {
             return (int)(Real % 1e7 + Imag % 1e7);
@@ -633,16 +646,19 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents a complex number using single precision.
     /// </summary>
+        [PublicApi]
     public struct CSingle
     {
         /// <summary>
         /// The real component of the complex number.
         /// </summary>
+        [PublicApi]
         public float Real;
 
         /// <summary>
         /// The imaginary component of the complex number.
         /// </summary>
+        [PublicApi]
         public float Imag;
 
         /// <summary>
@@ -650,6 +666,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="real">The real component of the complex number.</param>
         /// <param name="imag">The imaginary component of the complex number.</param>
+        [PublicApi]
         public CSingle(float real, float imag)
         {
             Real = real;
@@ -659,6 +676,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Determines whether two <see cref="CSingle"/> instances are equal.
         /// </summary>
+        [PublicApi]
         public static bool operator ==(CSingle a, CSingle b)
         {
             return (a.Real == b.Real) && (a.Imag == b.Imag);
@@ -667,6 +685,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Determines whether two <see cref="CSingle"/> instances are not equal.
         /// </summary>
+        [PublicApi]
         public static bool operator !=(CSingle a, CSingle b)
         {
             return !((a.Real == b.Real) && (a.Imag == b.Imag));
@@ -675,6 +694,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Determines whether this instance is equal to the specified object.
         /// </summary>
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -685,6 +705,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Returns the hash code for this <see cref="CSingle"/> instance.
         /// </summary>
+        [PublicApi]
         public override int GetHashCode()
         {
             return (int)(Real % 1e7 + Imag % 1e7);

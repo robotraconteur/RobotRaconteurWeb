@@ -87,6 +87,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The value data type</typeparam>
     */
+
+        [PublicApi]
     public abstract class Wire<T>
     {
 
@@ -125,6 +127,8 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
+
+        [PublicApi]
         public class WireConnection
         {
             protected Endpoint endpoint;
@@ -154,6 +158,8 @@ namespace RobotRaconteurWeb
             recent value lifespan has expired.
             </remarks>
             */
+
+        [PublicApi]
             public virtual T InValue
             {
                 get
@@ -177,6 +183,8 @@ namespace RobotRaconteurWeb
             <param name="value">[out] The current InValue</param>
             <returns>true if the value is valid, otherwise false</returns>
             */
+
+        [PublicApi]
             public bool TryGetInValue(out T value)
             {
                 value = default;
@@ -211,6 +219,8 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
             */
+
+        [PublicApi]
             public virtual T OutValue
             {
                 get
@@ -239,6 +249,8 @@ namespace RobotRaconteurWeb
             <param name="value">[out] The current OutValue</param>
             <returns>true if the value is valid, otherwise false</returns>
             */
+
+        [PublicApi]
             public bool TryGetOutValue(out T value)
             {
                 value = default;
@@ -285,6 +297,8 @@ namespace RobotRaconteurWeb
             Returns the timestamp of the value in the///senders* clock
             </remarks>
             */
+
+        [PublicApi]
             public virtual TimeSpec LastValueReceivedTime
             {
                 get
@@ -301,6 +315,8 @@ namespace RobotRaconteurWeb
             Returns the timestamp of the last sent value in the///local* clock
             </remarks>
             */
+
+        [PublicApi]
             public virtual TimeSpec LastValueSentTime
             {
                 get
@@ -319,6 +335,8 @@ namespace RobotRaconteurWeb
             is destroyed automatically.
             </remarks>
             */
+
+        [PublicApi]
             public virtual Task Close()
             {
                 lock(sendlock)
@@ -337,6 +355,8 @@ namespace RobotRaconteurWeb
             received a packet, the new value, and the value's TimeSpec timestamp
             </remarks>
             */
+
+        [PublicApi]
             public event WireValueChangedFunction WireValueChanged;
 
             private object recv_lock = new object();
@@ -388,6 +408,8 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
             */
+
+        [PublicApi]
             public WireDisconnectCallbackFunction WireCloseCallback
             {
                 get { return close_callback; }
@@ -418,6 +440,8 @@ namespace RobotRaconteurWeb
             true, incoming values will be discarded.
             </remarks>
             */
+
+        [PublicApi]
             public bool IgnoreInValue { get; set; } = false;
             /**
             <summary>
@@ -439,6 +463,8 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
             */
+
+        [PublicApi]
             public int InValueLifespan { get; set; } = -1;
             /**
             <summary>
@@ -460,6 +486,8 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
             */
+
+        [PublicApi]
             public int OutValueLifespan { get; set; } = -1;
 
             public const int RR_VALUE_LIFESPAN_INFINITE = -1;
@@ -493,6 +521,8 @@ namespace RobotRaconteurWeb
             <param name="timeout">Timeout in milliseconds, or RR_TIMEOUT_INFINITE for no timeout</param>
             <returns>true if InValue is valid, otherwise false</returns>
             */
+
+        [PublicApi]
             public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
             {
                 var waiter = inval_waiter.CreateWaiterTask(timeout, token);
@@ -515,6 +545,8 @@ namespace RobotRaconteurWeb
             <param name="timeout">Timeout in milliseconds, or RR_TIMEOUT_INFINITE for no timeout</param>
             <returns>true if InValue is valid, otherwise false</returns>
             */
+
+        [PublicApi]
             public async Task<bool> WaitOutValueValid(int timeout = -1, CancellationToken token = default)
             {
                 var waiter = outval_waiter.CreateWaiterTask(timeout, token);
@@ -534,6 +566,8 @@ namespace RobotRaconteurWeb
             the value has not expired
             </remarks>
             */
+
+        [PublicApi]
             public bool InValueValid {  get { return inval_valid && !IsValueExpired(lasttime_recv_local, InValueLifespan); } }
             /**
             <summary>
@@ -544,6 +578,8 @@ namespace RobotRaconteurWeb
             set using OutValue
             </remarks>
             */
+
+        [PublicApi]
             public bool OutValueValid { get { return outval_valid && !IsValueExpired(lasttime_send_local, OutValueLifespan); } }
         }
 
@@ -567,6 +603,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The wire connection</returns>
         */
+
+        [PublicApi]
         public abstract Task<WireConnection> Connect(CancellationToken cancel = default(CancellationToken));
 
         public delegate void WireConnectCallbackFunction(Wire<T> wire, WireConnection connection);
@@ -596,6 +634,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public abstract WireConnectCallbackFunction WireConnectCallback { get; set; }
 
         public delegate void WireValueChangedFunction(WireConnection connection, T value, TimeSpec time);
@@ -605,6 +645,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public abstract string MemberName { get; }
 
         protected MemberDefinition_Direction direction = MemberDefinition_Direction.both;
@@ -618,6 +660,8 @@ namespace RobotRaconteurWeb
         service to client.*writeonly* wires may only send out values from client to service.
         </remarks>
         */
+
+        [PublicApi]
         public MemberDefinition_Direction Direction
         {
             get { return direction; }
@@ -712,6 +756,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The current InValue and timestamp</returns>
         */
+
+        [PublicApi]
         public abstract Task<Tuple<T, TimeSpec>> PeekInValue(CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -735,6 +781,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The current OutValue and timestamp</returns>
         */
+
+        [PublicApi]
         public abstract Task<Tuple<T, TimeSpec>> PeekOutValue(CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -755,6 +803,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="value">The new OutValue</param>
         */
+
+        [PublicApi]
         public abstract Task PokeOutValue(T value, CancellationToken cancel = default(CancellationToken));
 
         /**
@@ -789,6 +839,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public abstract Func<uint, T> PeekInValueCallback { get; set; }
         /**
         <summary>
@@ -822,6 +874,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public abstract Func<uint, T> PeekOutValueCallback { get; set; }
         /**
         <summary>
@@ -856,6 +910,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public abstract Action<T, TimeSpec, uint> PokeOutValueCallback { get; set; }
     }
 
@@ -1224,6 +1280,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The value data type</typeparam>
     */
+
+        [PublicApi]
     public class WireBroadcaster<T>
     {
         protected class connected_connection
@@ -1246,6 +1304,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public Wire<T> Wire { get => (Wire<T>)wire; }
 
         protected void ConnectionClosed(connected_connection ep)
@@ -1278,6 +1338,8 @@ namespace RobotRaconteurWeb
         <param name="wire">The wire to use for broadcasting. Must be a wire from a service object.
         Specifying a client wire will result in an exception.</param>
         */
+
+        [PublicApi]
         public WireBroadcaster(Wire<T> wire)
         {
             this.wire = wire;
@@ -1305,6 +1367,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public T OutValue
         {
             set
@@ -1406,6 +1470,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public Func<object, uint, bool> Predicate { get; set; }
     }
     /**
@@ -1445,6 +1511,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The value type</typeparam>
     */
+
+        [PublicApi]
     public class WireUnicastReceiver<T>
     {
         protected class connected_connection
@@ -1472,6 +1540,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public Wire<T> Wire { get => (Wire<T>)wire; }
 
         protected void ConnectionClosed(connected_connection ep)
@@ -1513,6 +1583,8 @@ namespace RobotRaconteurWeb
         <param name="wire">The wire to use for broadcasting. Must be a wire from a service object.
         Specifying a client wire will result in an exception.</param>
         */
+
+        [PublicApi]
         public WireUnicastReceiver(Wire<T> wire)
         {
             this.wire = wire;
@@ -1534,6 +1606,8 @@ namespace RobotRaconteurWeb
         <param name="ep">[out] The client endpoint ID of the InValue</param>
         <returns>The current InValue</returns>
         */
+
+        [PublicApi]
         public T GetInValue(out TimeSpec ts, out uint ep)
         {
             lock(this)
@@ -1559,6 +1633,8 @@ namespace RobotRaconteurWeb
         <param name="client">[out] The client endpoint ID of the InValue</param>
         <returns>true if value is valid, otherwise false</returns>
         */
+
+        [PublicApi]
         public bool TryGetInValue(out T val, out TimeSpec ts, out uint ep)
         {
             lock (this)
@@ -1614,6 +1690,8 @@ namespace RobotRaconteurWeb
         value's TimeSpec timestamp, and the client endpoint ID.
         </remarks>
         */
+
+        [PublicApi]
         public event Action<T, TimeSpec, uint>  InValueChanged;
         /// <summary>
         /// Wait for the InValue to be valid
@@ -1651,6 +1729,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public int InValueLifespan { get; set; } = -1;
 
         AsyncValueWaiter<bool> inval_waiter = new AsyncValueWaiter<bool>();

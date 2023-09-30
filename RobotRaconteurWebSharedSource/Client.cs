@@ -1157,6 +1157,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Enum of client listener events
     /// </summary>
+    [PublicApi]
     public enum ClientServiceListenerEventType
     {
         /// <summary>

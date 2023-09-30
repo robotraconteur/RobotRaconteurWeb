@@ -35,6 +35,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+
+        [PublicApi]
     public interface ITimer
     {
         /**
@@ -78,6 +80,8 @@ namespace RobotRaconteurWeb
     RobotRaconteur.CreateRate() to create rates.
     </remarks>
     */
+
+        [PublicApi]
     public interface IRate
     {
         /**
@@ -86,6 +90,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         Task Sleep();
     }
     /**
@@ -97,6 +103,8 @@ namespace RobotRaconteurWeb
     callback on invocation.
     </remarks>
     */
+
+        [PublicApi]
     public struct TimerEvent
     {
         /**
@@ -105,6 +113,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public bool stopped;
         /**
         <summary>
@@ -112,6 +122,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public DateTime last_expected;
         /**
         <summary>
@@ -119,6 +131,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public DateTime last_real;
         /**
         <summary>
@@ -126,6 +140,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public DateTime current_expected;
         /**
         <summary>
@@ -133,6 +149,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public DateTime current_real;
     }
 

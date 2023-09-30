@@ -1186,15 +1186,19 @@ namespace RobotRaconteurWeb
     /// <remarks>
     /// Use member modifiers to declare member direction (readonly, writeonly).
     /// </remarks>
+    [PublicApi]
     public enum MemberDefinition_Direction
     {
         /// <summary>Member is readonly</summary>
+        [PublicApi]
         readonly_ = 0,
 
         /// <summary>Member is writeonly</summary>
+        [PublicApi]
         writeonly,
 
         /// <summary>Member supports both read and write</summary>
+        [PublicApi] 
         both
     }
 
@@ -1204,21 +1208,25 @@ namespace RobotRaconteurWeb
     /// <remarks>
     /// Use member modifiers to declare lock options.
     /// </remarks>
+    [PublicApi]
     public enum MemberDefinition_NoLock
     {
         /// <summary>
         /// Member cannot be accessed by other users/sessions when object is locked.
         /// </summary>
+        [PublicApi]
         none = 0,
 
         /// <summary>
         /// Member can be accessed by other users/sessions when object is locked.
         /// </summary>
+        [PublicApi]
         all,
 
         /// <summary>
         /// Member can be read by other users/sessions when object is locked.
         /// </summary>
+        [PublicApi]
         read
     }
 
@@ -3264,6 +3272,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Utility functions for service definitions
     /// </summary>
+        [PublicApi]
     public static class ServiceDefinitionUtil
     {
         /**
@@ -3272,8 +3281,10 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         <param name="name">Name to split</param>
-        <returns>Tulpe containing service definition name and unqualified name</returns>
+        <returns>Tuple containing service definition name and unqualified name</returns>
         */
+
+        [PublicApi]
         public static Tuple<string, string> SplitQualifiedName(string name)
         {
             int pos = name.LastIndexOf('.');

@@ -69,6 +69,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The packet data type</typeparam>
     */
+
+        [PublicApi]
     public abstract class Pipe<T>
     {        
         /**
@@ -77,6 +79,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public const int ANY_INDEX = -1;
         /**
         <summary>
@@ -112,6 +116,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public class PipeEndpoint
         {
             private uint send_packet_number = 0;
@@ -126,6 +132,8 @@ namespace RobotRaconteurWeb
             </summary>
             <remarks>None</remarks>
             */
+
+        [PublicApi]
             public int Index { get { return index; } }
             /**
             <summary>
@@ -137,6 +145,8 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
+
+        [PublicApi]
             public uint Endpoint { get { return endpoint.LocalEndpoint; } }
             /**
             <summary>
@@ -148,6 +158,8 @@ namespace RobotRaconteurWeb
             of the packet. Packet acks are used for flow control by PipeBroadcaster.
             </remarks>
             */
+
+        [PublicApi]
             public bool RequestPacketAck = false;
 
             public PipeEndpoint(Pipe<T> parent, int index, Endpoint endpoint = null)
@@ -199,6 +211,8 @@ namespace RobotRaconteurWeb
             automatically.
             </remarks>
             */
+
+        [PublicApi]
             public async Task Close()
             {
                 await parent.Close(this).ConfigureAwait(false);
@@ -221,6 +235,8 @@ namespace RobotRaconteurWeb
             received a packet
             </remarks>
             */
+
+        [PublicApi]
             public event PipePacketReceivedCallbackFunction PacketReceivedEvent;
 
             AsyncValueWaiter<bool> recv_waiter = new AsyncValueWaiter<bool>();
@@ -277,6 +293,8 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
             */
+
+        [PublicApi]
             public event PipePacketAckReceivedCallbackFunction PacketAckReceivedEvent;
 
             internal void PipePacketAckReceived(uint packetnum)
@@ -293,6 +311,8 @@ namespace RobotRaconteurWeb
             Invalid for writeonly pipes.
             </remarks>
             */
+
+        [PublicApi]
             public int Available
             {
                 get
@@ -314,6 +334,8 @@ namespace RobotRaconteurWeb
             </remarks>
             <returns>The next packet in the receive queue</returns>
             */
+
+        [PublicApi]
             public T PeekNextPacket()
             {
                 lock (recv_lock)
@@ -332,6 +354,8 @@ namespace RobotRaconteurWeb
             </remarks>
             <returns>The received packet</returns>
             */
+
+        [PublicApi]
             public T ReceivePacket()
             {
                 lock (recv_lock)
@@ -350,6 +374,8 @@ namespace RobotRaconteurWeb
             timeout</param>
             <returns>The received packet</returns>
             */
+
+        [PublicApi]
             public async Task<T> ReceivePacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
                 var ret = await TryReceivePacketWait(timeout, false, cancel).ConfigureAwait(false);
@@ -370,6 +396,8 @@ namespace RobotRaconteurWeb
             timeout</param>
             <returns>The received packet</returns>
             */
+
+        [PublicApi]
             public async Task<T> PeekNextPacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
                 var ret = await TryReceivePacketWait(timeout, true, cancel).ConfigureAwait(false);
@@ -398,6 +426,8 @@ namespace RobotRaconteurWeb
             <param name="peek">If true, the packet is not removed from the receive queue</param>
             <returns>true if packet was received, otherwise false</returns>
             */
+
+        [PublicApi]
             public async Task<Tuple<bool, T>> TryReceivePacketWait(int timeout = -1, bool peek = false, CancellationToken cancel = default)
             {
                 AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter;
@@ -461,6 +491,8 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
             */
+
+        [PublicApi]
             public PipeDisconnectCallbackFunction PipeCloseCallback
             {
                 get { return close_callback; }
@@ -496,6 +528,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public abstract string MemberName { get; }
 
         public delegate void PipeConnectCallbackFunction(PipeEndpoint newpipe);
@@ -524,8 +558,9 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="index">The index of the pipe endpoint, or (-1) to automatically select an index</param>
-        <returns />
+        <returns>The connected pipe endpoint</returns>
         */
+        [PublicApi]
         public abstract Task<PipeEndpoint> Connect(int index, CancellationToken cancel = default(CancellationToken));
 
         /**
@@ -548,8 +583,9 @@ namespace RobotRaconteurWeb
         <para>
         Only valid for services. Will throw InvalidOperationException on the client side.
         </para>
-        <value />
+        
         */
+        [PublicApi]
         public abstract PipeConnectCallbackFunction PipeConnectCallback { get; set; }
 
         public abstract void PipePacketReceived(MessageEntry m, Endpoint e = null);
@@ -1052,6 +1088,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The packet data type</typeparam>
     */
+
+        [PublicApi]
     public class PipeBroadcaster<T>
     {
         protected Pipe<T> pipe;
@@ -1077,6 +1115,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public Pipe<T> Pipe { get => (Pipe<T>)pipe; }
         /**
         <summary>
@@ -1087,6 +1127,8 @@ namespace RobotRaconteurWeb
         Specifying a client pipe will result in an exception.</param>
         <param name="maximum_backlog">The maximum number of packets in flight, or -1 for unlimited</param>
         */
+
+        [PublicApi]
         public PipeBroadcaster(Pipe<T> pipe, int maximum_backlog = -1)
         {
             this.pipe = pipe;
@@ -1160,6 +1202,8 @@ namespace RobotRaconteurWeb
         </summary>
         <param name="packet">The packet to send</param>
         */
+
+        [PublicApi]
         public async Task SendPacket(T packet, CancellationToken cancel=default(CancellationToken))
         {
             List<connected_endpoint> endpoints1 = new List<connected_endpoint>();
@@ -1266,6 +1310,8 @@ namespace RobotRaconteurWeb
         Use -1 for infinite packets in flight.
         </remarks>
         */
+
+        [PublicApi]
         public int MaximumBacklog
         {
             get => maximum_backlog;

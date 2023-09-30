@@ -163,6 +163,8 @@ namespace RobotRaconteurWeb
     or `CSingle`. Attempts to use any other types will result in a compiler error.
     </remarks>
     */
+
+        [PublicApi]
     public class MultiDimArray
     {
         /**
@@ -171,6 +173,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public MultiDimArray() { }
         /**
         <summary>
@@ -180,6 +184,8 @@ namespace RobotRaconteurWeb
         <param name="Dims">The dimensions of the array</param>
         <param name="Array_">The array data in fortran order</param>
         */
+
+        [PublicApi]
         public MultiDimArray(uint[] Dims, Array Array_)
         {
 
@@ -192,6 +198,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public uint[] Dims;
         /**
         <summary>
@@ -199,6 +207,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public Array Array_;
         /**
         <summary>
@@ -210,6 +220,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">Position within buffer to store data</param>
         <param name="count">Count of data to retrieve</param>
         */
+
+        [PublicApi]
         public virtual void RetrieveSubArray(uint[] memorypos, MultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -238,6 +250,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">Position within buffer to assign from</param>
         <param name="count">Count of data to assign</param>
         */
+
+        [PublicApi]
         public virtual void AssignSubArray(uint[] memorypos, MultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -273,6 +287,8 @@ namespace RobotRaconteurWeb
     of the thunk source.
     </remarks>
     */
+
+        [PublicApi]
     public class PodMultiDimArray
     {
         /**
@@ -281,6 +297,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public PodMultiDimArray()
         {
             Dims = new uint[] { 0 };
@@ -293,6 +311,8 @@ namespace RobotRaconteurWeb
         <param name="dims">The dimensions of the array</param>
         <param name="array">The array data in fortran order</param>
         */
+
+        [PublicApi]
         public PodMultiDimArray(uint[] dims, Array array)
         {
             Dims = dims;
@@ -304,6 +324,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public uint[] Dims;
         /**
         <summary>
@@ -311,6 +333,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public Array pod_array;
         /**
         <summary>
@@ -323,6 +347,8 @@ namespace RobotRaconteurWeb
         <param name="count">Count of data to retrieve</param>
         */
 
+
+        [PublicApi]
         public virtual void RetrieveSubArray(uint[] memorypos, PodMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -351,6 +377,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">Position within buffer to assign from</param>
         <param name="count">Count of data to assign</param>
         */
+
+        [PublicApi]
         public virtual void AssignSubArray(uint[] memorypos, PodMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
             PodMultiDimArray mema = this;
@@ -380,6 +408,8 @@ namespace RobotRaconteurWeb
     Arrays are stored in column major, or "Fortran" order.
     </remarks>
     */
+
+        [PublicApi]
     public class NamedMultiDimArray
     {
         /**
@@ -388,6 +418,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public NamedMultiDimArray()
         {
             Dims = new uint[] { 0 };
@@ -400,6 +432,8 @@ namespace RobotRaconteurWeb
         <param name="dims">The dimensions of the array</param>
         <param name="array">The array data in fortran order</param>
         */
+
+        [PublicApi]
         public NamedMultiDimArray(uint[] dims, Array array)
         {
             Dims = dims;
@@ -411,6 +445,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public uint[] Dims;
         /**
         <summary>
@@ -418,6 +454,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public Array namedarray_array;
         /**
         <summary>
@@ -430,6 +468,8 @@ namespace RobotRaconteurWeb
         <param name="count">Count of data to retrieve</param>
         */
 
+
+        [PublicApi]
         public virtual void RetrieveSubArray(uint[] memorypos, NamedMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -459,6 +499,8 @@ namespace RobotRaconteurWeb
         <param name="count">Count of data to assign</param>
         */
 
+
+        [PublicApi]
         public virtual void AssignSubArray(uint[] memorypos, NamedMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
             NamedMultiDimArray mema = this;

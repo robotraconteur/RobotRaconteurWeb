@@ -92,6 +92,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+    [PublicApi]
     public sealed class LocalTransport : Transport
     {
 
@@ -108,15 +109,21 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// The default time to wait for a message before closing the connection. Units in ms
         /// </summary>
+        /// <remarks>None</remarks>
+        [PublicApi]
         public int DefaultReceiveTimeout { get; set; }
         /// <summary>
         /// The default time to wait for a connection to be made before timing out. Units in ms
         /// </summary>
+        /// <remarks>None</remarks>
+        [PublicApi]
         public int DefaultConnectTimeout { get; set; }
 
         /// <summary>
         /// The "scheme" portion of the url that this transport corresponds to ("local" in this case)
         /// </summary>
+        /// <remarks>None</remarks>
+        [PublicApi]
         public override string[] UrlSchemeString { get { return new string[] { "rr+local" }; } }
 
         private int m_HeartbeatPeriod = 5000;
@@ -142,6 +149,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
         */
+        [PublicApi]
         public LocalTransport(RobotRaconteurNode node = null)
             : base(node)
         {
@@ -281,6 +289,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="name">The node name</param>
         */
+        [PublicApi]
         public void StartClientAsNodeName(string name)
         {
             if (!Regex.IsMatch(name, "^[a-zA-Z][a-zA-Z0-9_\\.\\-]*$"))
@@ -356,6 +365,7 @@ namespace RobotRaconteurWeb
         <param name="public_">If True, other users can access the server. If False, only
         the account owner can access the server. Defaults to false.</param>
         */
+        [PublicApi]
         public void StartServerAsNodeName(string name, bool public_= false)
         {
             lock (this)
@@ -543,6 +553,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="name">The NodeName</param>
         */
+        [PublicApi]
         public void StartServerAsNodeID(NodeID nodeid)
         {
             lock (this)
@@ -624,8 +635,10 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Returns true if url has scheme "local"
         /// </summary>
+        /// <remarks>None</remarks>
         /// <param name="url">The url to check</param>
         /// <returns>True if url has scheme "local"</returns>
+        [PublicApi]
         public override bool CanConnectService(string url)
         {
             Uri u = new Uri(url);
@@ -634,7 +647,6 @@ namespace RobotRaconteurWeb
             return true;
         }
 
-        /// <inheretdoc/>
         public override async Task SendMessage(Message m, CancellationToken cancel)
         {
             if (m.header.SenderNodeID != node.NodeID)
@@ -652,7 +664,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        /// <inheretdoc/>
+        
         protected internal override void MessageReceived(Message m)
         {
             node.MessageReceived(m);
@@ -666,6 +678,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public override Task Close()
         {
             lock (this)
@@ -702,7 +715,7 @@ namespace RobotRaconteurWeb
             return Task.FromResult(0);
         }
 
-        /// <inheretdoc/>
+        
         public override void CheckConnection(uint endpoint)
         {
             try
@@ -724,7 +737,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        /// <inheretdoc/>
+        
         public override uint TransportCapability(string name)
         {
             return base.TransportCapability(name);
@@ -835,10 +848,7 @@ namespace RobotRaconteurWeb
     }
 
 
-    /// <summary>
-    /// Implementation of a Local client transport connection.  This class should not be referenced directly,
-    /// but should instead by used with LocalTransport.
-    /// </summary>
+      
     sealed class LocalClientTransport : AsyncStreamTransport
     {
 
@@ -854,7 +864,9 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Creates a LocalClientTransport with parent LocalTransport
         /// </summary>
+        /// <remarks>None</remarks>
         /// <param name="c">Parent transport</param>
+        [PublicApi]
         public LocalClientTransport(LocalTransport c)
             : base(c.node, c.parent_adapter)
         {
@@ -864,10 +876,7 @@ namespace RobotRaconteurWeb
 
         string connecturl;
 
-        /// <summary>
-        /// Connects this transport connection to a LocalClient socket that connected to the listening server socket
-        /// </summary>
-        /// <param name="s"></param>
+        
         public async Task Connect(Stream s, string connecturl, Endpoint e, CancellationToken cancel = default(CancellationToken))
         {
             //LocalEndpoint = e.LocalEndpoint;
@@ -890,10 +899,7 @@ namespace RobotRaconteurWeb
     }
 
 
-    /// <summary>
-    /// Implementation of a Local server transport connection.  This class should not be referenced directly,
-    /// but should instead by used with LocalTransport.
-    /// </summary>
+  
     sealed class LocalServerTransport : AsyncStreamTransport
     {
 
@@ -903,10 +909,7 @@ namespace RobotRaconteurWeb
         private DateTime LastMessageReceivedTime = DateTime.UtcNow;
 
 
-        /// <summary>
-        /// Creates a LocalClientTransport with parent LocalTransport
-        /// </summary>
-        /// <param name="c">Parent transport</param>
+   
         public LocalServerTransport(LocalTransport c)
             : base(c.node, c.parent_adapter)
         {
@@ -914,10 +917,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        /// <summary>
-        /// Connects this transport connection to a LocalClient socket that connected to the listening server socket
-        /// </summary>
-        /// <param name="s"></param>
+
         public async Task Connect(Stream s, CancellationToken cancel = default(CancellationToken))
         {
             //LocalEndpoint = e.LocalEndpoint;

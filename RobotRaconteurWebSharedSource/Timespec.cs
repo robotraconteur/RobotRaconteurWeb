@@ -15,6 +15,8 @@ namespace RobotRaconteurWeb
         "1970-01-01T00:00:00Z"</para>
     </remarks>
     */
+        [PublicApi]
+
 
     public class TimeSpec
     {
@@ -35,6 +37,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public long seconds;
         /**
         <summary>
@@ -42,6 +46,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public int nanoseconds;
 
         private static object start_lock = new object();
@@ -53,6 +59,8 @@ namespace RobotRaconteurWeb
               <param name="seconds">Seconds since epoch</param>
               <param name="nanoseconds">Nanoseconds since epoch</param>
         */
+
+        [PublicApi]
         public TimeSpec(long seconds, int nanoseconds)
         {
             this.seconds = seconds;
@@ -71,6 +79,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public TimeSpec()
         {
             if (!started) start();
@@ -218,6 +228,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if the two TimeSpec objects are equal; otherwise, false.</returns>
+        [PublicApi] 
         public static bool operator ==(TimeSpec t1, TimeSpec t2)
         {
             if (((object)t1) == null && ((object)t2) == null) return true;
@@ -232,6 +243,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if the two TimeSpec objects are not equal; otherwise, false.</returns>
+        [PublicApi]
         public static bool operator !=(TimeSpec t1, TimeSpec t2)
         {
             return !(t1 == t2);
@@ -243,6 +255,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object.</param>
         /// <param name="t2">The second TimeSpec object.</param>
         /// <returns>A new TimeSpec object that represents the difference between t1 and t2.</returns>
+        [PublicApi]
         public static TimeSpec operator -(TimeSpec t1, TimeSpec t2)
         {
             return new TimeSpec(t1.seconds - t2.seconds, t1.nanoseconds - t2.nanoseconds);
@@ -254,6 +267,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object.</param>
         /// <param name="t2">The second TimeSpec object.</param>
         /// <returns>A new TimeSpec object that represents the sum of t1 and t2.</returns>
+        [PublicApi]
         public static TimeSpec operator +(TimeSpec t1, TimeSpec t2)
         {
             return new TimeSpec(t1.seconds + t2.seconds, t1.nanoseconds + t2.nanoseconds);
@@ -265,6 +279,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if t1 is greater than t2; otherwise, false.</returns>
+        [PublicApi]
         public static bool operator >(TimeSpec t1, TimeSpec t2)
         {
             TimeSpec diff = t1 - t2;
@@ -278,6 +293,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if t1 is greater than or equal to t2; otherwise, false.</returns>
+        [PublicApi]
         public static bool operator >=(TimeSpec t1, TimeSpec t2)
         {
             if (t1 == t2) return true;
@@ -290,6 +306,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if t1 is less than t2; otherwise, false.</returns>
+        [PublicApi]
         public static bool operator <(TimeSpec t1, TimeSpec t2)
         {
             return t2 >= t1;
@@ -301,6 +318,7 @@ namespace RobotRaconteurWeb
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if t1 is less than or equal to t2; otherwise, false.</returns>
+        [PublicApi]
         public static bool operator <=(TimeSpec t1, TimeSpec t2)
         {
             return t2 > t1;

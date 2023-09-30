@@ -24,6 +24,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+    [PublicApi]
     public class ServiceInfo2
     {
         /**
@@ -32,6 +33,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string Name;
         /**
         <summary>
@@ -39,6 +41,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string RootObjectType;
         /**
         <summary>
@@ -46,6 +49,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string[] RootObjectImplements;
         /**
         <summary>
@@ -53,6 +57,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string[] ConnectionURL;
         /**
         <summary>
@@ -60,6 +65,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public Dictionary<string, object> Attributes;
         /**
         <summary>
@@ -67,6 +73,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public NodeID NodeID;
         /**
         <summary>
@@ -74,6 +81,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string NodeName;
 
         public ServiceInfo2() { }
@@ -107,6 +115,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+    [PublicApi]
     public class NodeInfo2
     {
         /**
@@ -115,6 +124,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public NodeID NodeID;
         /**
         <summary>
@@ -122,6 +132,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public string NodeName;
         /**
         <summary>
@@ -133,6 +144,7 @@ namespace RobotRaconteurWeb
         to connect to a service.
         </remarks>
         */
+        [PublicApi]
         public string[] ConnectionURL;
     }
 

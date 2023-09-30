@@ -24,6 +24,8 @@ namespace RobotRaconteurWeb
     NodeID could result in credentials being leaked.
     </remarks>
     */
+        [PublicApi]
+
     public class ServiceSubscriptionFilterNode
     {
         /**
@@ -32,6 +34,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public NodeID NodeID;
         /**
         <summary>
@@ -39,6 +43,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public string NodeName;
         /**
         <summary>
@@ -46,6 +52,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public string Username;
         /**
         <summary>
@@ -53,6 +61,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public Dictionary<string, object> Credentials;
     }
 
@@ -67,6 +77,8 @@ namespace RobotRaconteurWeb
     the filter before connecting.
     </remarks>
     */
+        [PublicApi]
+
     public class ServiceSubscriptionFilter
     {
         /**
@@ -75,6 +87,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public ServiceSubscriptionFilterNode[] Nodes;
         /**
         <summary>
@@ -82,6 +96,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public string[] ServiceNames;
         /**
         <summary>
@@ -89,6 +105,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public string[] TransportSchemes;
         /**
         <summary>
@@ -96,12 +114,16 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public Dictionary<string, ServiceSubscriptionFilterAttributeGroup> Attributes;
         /**
         <summary>
         Operation to use to match attributes. Defaults to AND
         </summary>
         */
+        [PublicApi]
+
         public ServiceSubscriptionFilterAttributeGroupOperation AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.AND;
         /**
         <summary>
@@ -109,6 +131,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public Func<ServiceInfo2, bool> Predicate;
         /**
         <summary>
@@ -116,6 +140,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public uint MaxConnection;
     }
 
@@ -460,6 +486,8 @@ namespace RobotRaconteurWeb
     and ServiceName of a connected service.
     </remarks>
     */
+        [PublicApi]
+
     public struct ServiceSubscriptionClientID
     {
         /**
@@ -468,6 +496,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public NodeID NodeID;
         /**
         <summary>
@@ -475,6 +505,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public string ServiceName;
         /**
         <summary>
@@ -484,6 +516,8 @@ namespace RobotRaconteurWeb
         <param name="node_id">The NodeID</param>
         <param name="service_name">The Service Name</param>
         */
+        [PublicApi]
+
         public ServiceSubscriptionClientID(NodeID NodeID, string ServiceName)
         {
             this.NodeID = NodeID;
@@ -729,6 +763,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+        [PublicApi]
+
     public class ServiceInfo2Subscription : IServiceSubscription
     {
         bool active;
@@ -752,6 +788,8 @@ namespace RobotRaconteurWeb
         Closes the subscription. Subscriptions are automatically closed when the node is shut down.
         </remarks>
         */
+        [PublicApi]
+
         public void Close()
         {
             lock (this)
@@ -897,6 +935,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public event Action<ServiceInfo2Subscription, ServiceSubscriptionClientID, ServiceInfo2> ServiceDetected;
         /**
         <summary>
@@ -904,6 +944,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public event Action<ServiceInfo2Subscription, ServiceSubscriptionClientID, ServiceInfo2> ServiceLost;
 
         /**
@@ -918,6 +960,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The detected services</returns>
         */
+        [PublicApi]
+
         public Dictionary<ServiceSubscriptionClientID, ServiceInfo2> GetDetectedServiceInfo2()
         {
             lock (this)
@@ -975,7 +1019,9 @@ namespace RobotRaconteurWeb
     send packets and values to all services that are actively connected. See PipeSubscription and WireSubscription.
     </para>
     </remarks>
-    */    
+    */
+        [PublicApi]
+    
     public class ServiceSubscription : IServiceSubscription
     {
 
@@ -1003,6 +1049,8 @@ namespace RobotRaconteurWeb
         Close the subscription. Subscriptions are automatically closed when the node is shut down.
         </remarks>
         */
+        [PublicApi]
+
         public void Close()
         {
             lock (this)
@@ -1364,6 +1412,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The detected services.</returns>
         */
+        [PublicApi]
+
         public Dictionary<ServiceSubscriptionClientID, object> GetConnectedClients()
         {
             var o = new Dictionary<ServiceSubscriptionClientID, object>();
@@ -1386,6 +1436,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public event Action<ServiceSubscription, ServiceSubscriptionClientID, object> ClientConnected;
         /**
         <summary>
@@ -1393,6 +1445,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public event Action<ServiceSubscription, ServiceSubscriptionClientID, object> ClientDisconnected;
         /**
         <summary>
@@ -1400,6 +1454,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public event Action<ServiceSubscription, ServiceSubscriptionClientID, string[], Exception> ClientConnectFailed;
         /**
         <summary>
@@ -1412,6 +1468,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="client">The client to be claimed</param>
         */
+        [PublicApi]
+
         public void ClaimClient(object client)
         {
             lock (this)
@@ -1439,6 +1497,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="client">The client to release claim</param>
         */
+        [PublicApi]
+
         public void ReleaseClient(object client)
         {
             lock (this)
@@ -1467,6 +1527,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <value />
         */
+        [PublicApi]
         public uint ConnectRetryDelay { get; set; } = 2500;
 
         /**
@@ -1488,6 +1549,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The client connection. Cast to expected object type</returns>
         */
+        [PublicApi]
+
         public T GetDefaultClient<T>()
         {
             lock (this)
@@ -1512,6 +1575,8 @@ namespace RobotRaconteurWeb
         <param name="obj">[out] The client connection</param>
         <returns>true if client object is valid, false otherwise</returns>
         */
+        [PublicApi]
+
         public bool TryGetDefaultClient<T>(out T client)
         {
             lock (this)
@@ -1554,6 +1619,8 @@ namespace RobotRaconteurWeb
         <param name="cancel">Cancellation token</param>
         <returns>The client connection. Cast to expected object type</returns>
         */
+        [PublicApi]
+
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel = default)
         {
             var waiter = connect_waiter.CreateWaiterTask(-1, cancel);
@@ -1579,6 +1646,8 @@ namespace RobotRaconteurWeb
         <param name="cancel">Cancellation token</param>
         <returns>true if client object is valid, false otherwise</returns>
         */
+        [PublicApi]
+
         public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel = default)
         {
             var waiter = connect_waiter.CreateWaiterTask(-1, cancel);
@@ -1605,6 +1674,8 @@ namespace RobotRaconteurWeb
         was opened using RobotRaconteurNode.SubscribeServiceByType()
         </remarks>
         */
+        [PublicApi]
+
         public string[] GetServiceURL()
         {
             if (!use_service_url)
@@ -1629,6 +1700,8 @@ namespace RobotRaconteurWeb
         <param name="objecttype">(Optional) The desired root object proxy type. Optional but highly recommended.</param>
         <param name="close_connected">(Optional, default false) Close existing connections</param>
         */
+        [PublicApi]
+
         public void UpdateServiceURL(string url, string username = null, Dictionary<string, object> credentials = null, string object_type = null, bool close_connected = false)
         {
             UpdateServiceURL(new string[] { url }, username, credentials, object_type, close_connected);
@@ -1648,6 +1721,8 @@ namespace RobotRaconteurWeb
         <param name="objecttype">(Optional) The desired root object proxy type. Optional but highly recommended.</param>
         <param name="close_connected">(Optional, default false) Close existing connections</param>
         */
+        [PublicApi]
+
         public void UpdateServiceURL(string[] url, string username = null, Dictionary<string, object> credentials = null, string object_type = null, bool close_connected = false)
         {
             if (!active)
@@ -1768,6 +1843,8 @@ namespace RobotRaconteurWeb
         know the wire value type</typeparam>
         <returns>The wire subscription</returns>
         */
+        [PublicApi]
+
         public WireSubscription<T> SubscribeWire<T>(string membername, string servicepath = null)
         {
             var o = new WireSubscription<T>(this, membername, servicepath);
@@ -1811,6 +1888,8 @@ namespace RobotRaconteurWeb
         know the pipe packet type</typeparam>
         <returns>The pipe subscription</returns>
         */
+        [PublicApi]
+
         public PipeSubscription<T> SubscribePipe<T>(string membername, string servicepath = null)
         {
             var o = new PipeSubscription<T>(this, membername, servicepath);
@@ -1887,6 +1966,8 @@ namespace RobotRaconteurWeb
         or when the node is shut down.
         </remarks>
         */
+        [PublicApi]
+
         public void Close()
         {
             this.cancel.Cancel();
@@ -1969,6 +2050,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public uint ActiveWireConnectionCount { get { return 0; } }
         /**
         <summary>
@@ -1977,6 +2060,7 @@ namespace RobotRaconteurWeb
         <remarks />
         <value />
         */
+        [PublicApi]
         public bool IgnoreInValue { get; set; }
         /**
         <summary>
@@ -1987,6 +2071,8 @@ namespace RobotRaconteurWeb
         lifespan, becoming invalid. Use -1 for infinite lifespan.
         </remarks>
         */
+        [PublicApi]
+
         public int InValueLifespan { get; set; } = -1;
 
         internal WireSubscriptionBase(ServiceSubscription parent, string membernname, string servicepath)
@@ -2046,6 +2132,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The value type used by the wire</typeparam>
     */
+        [PublicApi]
+
     public class WireSubscription<T> : WireSubscriptionBase
     {
         public WireSubscription(ServiceSubscription parent, string membernname, string servicepath) 
@@ -2183,6 +2271,8 @@ namespace RobotRaconteurWeb
         Throws ValueNotSetException if no valid value is available
         </remarks>
         */
+        [PublicApi]
+
         public T InValue
         {
             get
@@ -2209,6 +2299,8 @@ namespace RobotRaconteurWeb
         <param name="connection">[out] the WireConnection of the InValue</param>
         <returns>The current InValue</returns>
         */
+        [PublicApi]
+
         public T GetInValue(out TimeSpec ts, out Wire<T>.WireConnection connection)
         {
             lock(this)
@@ -2235,6 +2327,8 @@ namespace RobotRaconteurWeb
         <param name="connection">[out] the WireConnection of the InValue</param>
         <returns>true if value is valid, otherwise false</returns>
         */
+        [PublicApi]
+
         public bool TryGetInValue(out T val, out TimeSpec ts, out Wire<T>.WireConnection connection)
         {
             lock (this)
@@ -2264,6 +2358,8 @@ namespace RobotRaconteurWeb
         <param name="val">[out] the current InValue</param>
         <returns>true if value is valid, otherwise false</returns>
         */
+        [PublicApi]
+
         public bool TryGetInValue(out T val)
         {
             lock (this)
@@ -2287,6 +2383,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="value">The new OutValue</param>
         */
+        [PublicApi]
+
         public void SetOutValueAll(T value)
         {
             lock(this)
@@ -2311,6 +2409,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Event for wire value changed
         /// </summary>
+        [PublicApi]
         public event Action<WireSubscription<T>, T, TimeSpec> WireValueChanged;
     }
 
@@ -2339,6 +2438,8 @@ namespace RobotRaconteurWeb
         or when the node is shut down.
         </remarks>
         */
+        [PublicApi]
+
         public void Close()
         {
             this.cancel.Cancel();
@@ -2417,6 +2518,8 @@ namespace RobotRaconteurWeb
         Use ReceivePacket(), TryReceivePacket(), or TryReceivePacketWait() to receive the packet
         </remarks>
         */
+        [PublicApi]
+
         public uint Available { get { return 0; } }
         /**
         <summary>
@@ -2424,6 +2527,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public uint ActivePipeEndpointCount { get { return 0; } }
         /**
         <summary>
@@ -2431,6 +2536,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public bool IgnoreReceived { get; set; }
 
         internal protected PipeSubscriptionBase(ServiceSubscription parent, string membername, string servicepath="", int max_recv_packets = -1, int max_send_backlog = 5)
@@ -2510,6 +2617,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The type of the pipe packets</typeparam>
     */
+        [PublicApi]
+
     public class PipeSubscription<T> : PipeSubscriptionBase
     {
         protected internal PipeSubscription(ServiceSubscription parent, string membername, string servicepath = "", int max_recv_packets = -1, int max_send_backlog = 5) 
@@ -2526,6 +2635,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The dequeued packet</returns>
         */
+        [PublicApi]
+
         public T ReceivePacket()
         {
             return (T)ReceivePacketBase();
@@ -2542,6 +2653,8 @@ namespace RobotRaconteurWeb
         <param name="packet">[out] the dequeued packet</param>
         <returns>true if packet dequeued successfully, otherwise false if queue is empty</returns>
         */
+        [PublicApi]
+
         public bool TryReceivePacket(out T packet)
         {
             if (!TryReceivedPacketBase(out object packet1))
@@ -2563,6 +2676,8 @@ namespace RobotRaconteurWeb
         <param name="peek">If true, the packet is returned, but not dequeued. If false, the packet is dequeued</param>
         <returns>Returns success, the packet value, and the pipe connection</returns>
         */
+        [PublicApi]
+
         public async Task<Tuple<bool,T, Pipe<T>.PipeEndpoint>> TryReceivePacketWait(int timeout= -1, bool peek=false)
         {
             var r = await TryReceivedPacketWaitBase(timeout, peek).ConfigureAwait(false);
@@ -2583,6 +2698,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="value">The packet to send</param>
         */
+        [PublicApi]
+
         public void AsyncSendPacketAll(T packet)
         {
             
@@ -2758,6 +2875,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
+
         public event Action<PipeSubscription<T>> PipePacketReceived;
     }
 }

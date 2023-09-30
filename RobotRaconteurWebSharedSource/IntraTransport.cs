@@ -51,6 +51,7 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
     */
+        [PublicApi]
     public sealed class IntraTransport : Transport
     {
 
@@ -69,15 +70,18 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// The default time to wait for a message before closing the connection. Units in ms
         /// </summary>
+        [PublicApi]
         public int DefaultReceiveTimeout { get; set; }
         /// <summary>
         /// The default time to wait for a connection to be made before timing out. Units in ms
         /// </summary>
+        [PublicApi]
         public int DefaultConnectTimeout { get; set; }
 
         /// <summary>
         /// The "scheme" portion of the url that this transport corresponds to ("intra" in this case)
         /// </summary>
+        [PublicApi]
         public override string[] UrlSchemeString { get { return new string[] { "rr+intra" }; } }
 
         private int m_HeartbeatPeriod = 5000;
@@ -119,6 +123,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
         */
+        [PublicApi]
         public IntraTransport(RobotRaconteurNode node = null)
             : base(node)
         {
@@ -248,6 +253,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public void StartServer()
         {
             _ = node.NodeID;
@@ -264,6 +270,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public void StartClient()
         {
             serverstarted = false;
@@ -303,6 +310,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="url">The url to check</param>
         /// <returns>True if url has scheme "rr+intra"</returns>
+        [PublicApi]
         public override bool CanConnectService(string url)
         {
             Uri u = new Uri(url);
@@ -342,6 +350,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public override Task Close()
         {
             lock (this)
@@ -533,10 +542,7 @@ namespace RobotRaconteurWeb
     }
 
 
-    /// <summary>
-    /// Implementation of a IntraTransportConnection.  This class should not be referenced directly,
-    /// but should instead by used with IntraTransport.
-    /// </summary>
+   
     sealed class IntraTransportConnection : ITransportConnection
     {
         private WeakReference<IntraTransportConnection> peer_connection;
@@ -557,6 +563,7 @@ namespace RobotRaconteurWeb
         /// Creates a IntraClientTransport with parent IntraTransport
         /// </summary>
         /// <param name="c">Parent transport</param>
+        [PublicApi]
         public IntraTransportConnection(IntraTransport parent, bool server, uint local_endpoint)
         {
             node = parent.node;

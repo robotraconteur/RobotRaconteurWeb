@@ -62,6 +62,8 @@ namespace RobotRaconteurWeb
     <typeparam name="ReturnType">The type of value returned by Next() </typeparam>
     <typeparam name="ParamType">The type of the parameter passed to Next() </typeparam>
     */
+
+        [PublicApi]
     public interface Generator1<ReturnType, ParamType>
     {
         /**
@@ -75,6 +77,8 @@ namespace RobotRaconteurWeb
         <param name="param">Parameter to pass to generator</param>
         <returns>Return value from generator</returns>
         */
+
+        [PublicApi]
         Task<ReturnType> Next(ParamType param, CancellationToken cancel=default(CancellationToken));        
         /**
         <summary>
@@ -87,6 +91,8 @@ namespace RobotRaconteurWeb
         </remarks>
         */
 
+
+        [PublicApi]
         Task Abort(CancellationToken cancel = default(CancellationToken));  
         /**
         <summary>
@@ -97,7 +103,9 @@ namespace RobotRaconteurWeb
         This operation cleanly closes the generator, and is not considered to be an error condition. Next()
         should throw StopIterationException if called after Close().
         </remarks>
-        */      
+        */
+        [PublicApi]
+      
         Task Close(CancellationToken cancel = default(CancellationToken));        
     }
         /**
@@ -137,6 +145,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <typeparam name="ReturnType">Return The type of value returned by Next()</typeparam>
         */
+
+        [PublicApi]
     public interface Generator2<ReturnType>
     {
         /**
@@ -149,6 +159,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>Return Return value from generator</returns>
         */
+
+        [PublicApi]
         Task<ReturnType> Next(CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -160,6 +172,8 @@ namespace RobotRaconteurWeb
         condition, for example a moving robot should be immediately halted.
         </remarks>
         */
+
+        [PublicApi]
         Task Abort(CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -171,6 +185,8 @@ namespace RobotRaconteurWeb
         should throw StopIterationException if called after Close().
         </remarks>
         */
+
+        [PublicApi]
         Task Close(CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -178,6 +194,8 @@ namespace RobotRaconteurWeb
         </summary>
         <returns>All values returned by generator Next()</returns>
         */
+
+        [PublicApi]
         Task<ReturnType[]> NextAll(CancellationToken cancel = default(CancellationToken));
     }
     /**
@@ -217,6 +235,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="ParamType">The type of the parameter passed to Next()</typeparam>
     */
+
+        [PublicApi]
     public interface Generator3<ParamType>
     {
         /**
@@ -229,6 +249,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="param">Parameter to pass to generator</param>
         */
+
+        [PublicApi]
         Task Next(ParamType param, CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -240,6 +262,8 @@ namespace RobotRaconteurWeb
         condition, for example a moving robot should be immediately halted.
         </remarks>
         */
+
+        [PublicApi]
         Task Abort(CancellationToken cancel = default(CancellationToken));
         /**
         <summary>
@@ -251,6 +275,8 @@ namespace RobotRaconteurWeb
         should throw StopIterationException if called after Close().
         </remarks>
         */
+
+        [PublicApi]
         Task Close(CancellationToken cancel = default(CancellationToken));
     }
 
@@ -495,6 +521,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The enumerator value type</typeparam>
     */
+
+        [PublicApi]
     public class EnumeratorGenerator<T> : Generator2<T>
     {
         bool aborted = false;
@@ -508,6 +536,7 @@ namespace RobotRaconteurWeb
         <param name="enumerable" />
         <returns />
         */
+        [PublicApi]
         public EnumeratorGenerator(IEnumerable<T> enumerable)
             : this(enumerable.GetEnumerator())
         { }
@@ -518,6 +547,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="enumerator" />
         */
+        [PublicApi]
         public EnumeratorGenerator(IEnumerator<T> enumerator)
         {
             this.enumerator = enumerator;

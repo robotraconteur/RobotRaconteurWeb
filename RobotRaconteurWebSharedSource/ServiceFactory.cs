@@ -34,6 +34,8 @@ namespace RobotRaconteurWeb
     Base class for service factories
     </summary>
     */
+
+        [PublicApi]
     public abstract class ServiceFactory
     {
         private ServiceDefinition sdef = null;

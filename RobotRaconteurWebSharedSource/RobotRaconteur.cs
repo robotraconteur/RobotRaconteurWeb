@@ -55,6 +55,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+    [PublicApi]
     public class RobotRaconteurNode
     {
 
@@ -69,6 +70,7 @@ namespace RobotRaconteurWeb
         The singleton must be shut down when the program exits.
         </remarks>
         */
+        [PublicApi]
         public static RobotRaconteurNode s
         {
             get
@@ -91,6 +93,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <value />
         */
+        [PublicApi]
         public NodeID NodeID
         {
             get
@@ -119,7 +122,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-
+        [PublicApi]
         public bool TryGetNodeID(out NodeID nodeid)
         {
             if (m_NodeID == null)
@@ -142,6 +145,7 @@ namespace RobotRaconteurWeb
         it will be an empty string. Cannot be set if a NodeName has been assigned.
         </remarks>
         */
+        [PublicApi]
         public string NodeName
         {
             get
@@ -190,7 +194,7 @@ namespace RobotRaconteurWeb
             }
 
         }
-
+        [PublicApi]
         public bool TryGetNodeName(out string nodename)
         {
             if (m_NodeName == null)
@@ -231,6 +235,7 @@ namespace RobotRaconteurWeb
         the endpoint is closed. Default timeout is 10 minutes.
         </remarks>
         */
+        [PublicApi]
         public uint EndpointInactivityTimeout = 600000;
         /**
         <summary>
@@ -242,6 +247,7 @@ namespace RobotRaconteurWeb
         the transport is closed. Default timeout is 10 minutes.
         </remarks>
         */
+        [PublicApi]
         public uint TransportInactivityTimeout = 600000;
         /**
         <summary>
@@ -254,6 +260,7 @@ namespace RobotRaconteurWeb
         node and expect a response are requests. Default timeout is 15 seconds.
         </remarks>
         */
+        [PublicApi]
         public uint RequestTimeout = 15000;
         private ServiceIndexer serviceindexer;
 
@@ -268,6 +275,7 @@ namespace RobotRaconteurWeb
         data chunk the memory will send, in bytes. Default is 100 kB.
         </remarks>
         */
+        [PublicApi]
         public uint MemoryMaxTransferSize = 102400;
 
 #if ROBOTRACONTEUR_BRIDGE
@@ -1059,6 +1067,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="servicetype">The service factory implementing the type to register</param>
         */
+        [PublicApi]
         public void RegisterServiceType(ServiceFactory f)
         {
             lock (service_factories)
@@ -1078,6 +1087,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="servicetype">The name of the service type to retrieve</param>
         */
+        [PublicApi]
         public ServiceFactory GetServiceType(string servicetype)
         {
             ServiceFactory f;
@@ -1106,6 +1116,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <returns>The registered service types</returns>
         */
+        [PublicApi]
         public string[] GetServiceTypes()
         {
             lock (service_factories)
@@ -1153,6 +1164,7 @@ namespace RobotRaconteurWeb
         <returns>The instantiated ServerContext. This object is owned
         by the node and the return can be safely ignored.</returns>
         */
+        [PublicApi]
         public ServerContext RegisterService(string name, string servicetype, Object obj, ServiceSecurityPolicy securitypolicy = null)
         {
             lock (services)
@@ -1177,7 +1189,12 @@ namespace RobotRaconteurWeb
             }
         }
 
-
+        /**
+        <summary>Register a service using a ServerContext instance</summary>
+        <remarks>None</remarks>
+        <param name="c">The ServerContext instance to register</param>
+        */
+        [PublicApi]
         public ServerContext RegisterService(ServerContext c)
         {
             lock (services)
@@ -1202,6 +1219,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="sname">The name of the service to close</param>
         */
+        [PublicApi]
         public void CloseService(string sname)
         {
             lock (services)
@@ -1248,6 +1266,7 @@ namespace RobotRaconteurWeb
         <param name="transport">The transport to register</param>
         <returns>The transport internal id</returns>
         */
+        [PublicApi]
         public uint RegisterTransport(Transport c)
         {
             lock (transports)
@@ -1527,6 +1546,7 @@ namespace RobotRaconteurWeb
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
         <returns>The root object reference of the connected service</returns>
         */
+        [PublicApi]
         public async Task<object> ConnectService(string url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
 
@@ -1610,6 +1630,7 @@ namespace RobotRaconteurWeb
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
         <returns>The root object reference of the connected service</returns>
         */
+        [PublicApi]
         public async Task<object> ConnectService(string[] url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
             try
@@ -1714,6 +1735,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="obj">The root object of the service to disconnect</param>
         */
+        [PublicApi]
         public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
@@ -1731,6 +1753,7 @@ namespace RobotRaconteurWeb
         <param name="obj">The root object of the client to use to retrieve service attributes</param>
         <returns>Dictionary of the service attributes</returns>
         */
+        [PublicApi]
         public Dictionary<string, object> GetServiceAttributes(object obj)
         {
             ServiceStub stub = (ServiceStub)obj;
@@ -1787,6 +1810,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="endpoint">The LocalEndpoint identifier to check</param>
         */
+        [PublicApi]
         public void CheckConnection(uint endpoint)
         {
             try
@@ -1847,6 +1871,7 @@ namespace RobotRaconteurWeb
         </list>
         </remarks>
         */
+        [PublicApi]
         public void Shutdown()
         {
 
@@ -1947,6 +1972,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="urls">The candidate URLs</param>
         */
+        [PublicApi]
         public static string SelectRemoteNodeURL(string[] urls)
         {
             var url_order = new string[] {
@@ -2037,6 +2063,7 @@ namespace RobotRaconteurWeb
         etc</param>
         <returns>The detected services</returns>
         */
+        [PublicApi]
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes)
         {
             return await m_Discovery.FindServiceByType(servicetype, transportschemes).ConfigureAwait(false);
@@ -2058,6 +2085,7 @@ namespace RobotRaconteurWeb
         etc</param>
         <returns>The detected services</returns>
         */
+        [PublicApi]
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
         {
 
@@ -2077,11 +2105,12 @@ namespace RobotRaconteurWeb
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
         etc</param> <returns>The detected nodes</returns>
         */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes)
         {
             return await m_Discovery.FindNodeByID(id, schemes).ConfigureAwait(false);
         }
-/**
+        /**
         <summary>
         Finds nodes on the network with a specified NodeID
         </summary>
@@ -2095,7 +2124,7 @@ namespace RobotRaconteurWeb
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
         etc</param> <returns>The detected nodes</returns>
         */
-
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes, CancellationToken cancel)
         {
             return await m_Discovery.FindNodeByID(id, schemes, cancel).ConfigureAwait(false);
@@ -2108,11 +2137,14 @@ namespace RobotRaconteurWeb
         <para>
         Updates the discovery cache and find nodes with the specified NodeName.
         This function returns unverified cache information.
+        </para>
         </remarks>
         <param name="name">The NodeName to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
-        etc</param> <returns>The detected nodes</returns>
+        etc</param> 
+        <returns>The detected nodes</returns>
         */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes)
         {
             return await m_Discovery.FindNodeByName(name, schemes).ConfigureAwait(false);
@@ -2125,11 +2157,14 @@ namespace RobotRaconteurWeb
         <para>
         Updates the discovery cache and find nodes with the specified NodeName.
         This function returns unverified cache information.
+        </para>
         </remarks>
         <param name="name">The NodeName to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
-        etc</param> <returns>The detected nodes</returns>
+        etc</param> 
+        <returns>The detected nodes</returns>
         */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes, CancellationToken cancel)
         {
             return await m_Discovery.FindNodeByName(name, schemes, cancel).ConfigureAwait(false);
@@ -2150,6 +2185,7 @@ namespace RobotRaconteurWeb
         <param name="flags">Select either a "User" or "Session" lock</param>
         <returns>"OK" on success</returns>
         */
+        [PublicApi]
         public async Task<string> RequestObjectLock(object obj, RobotRaconteurObjectLockFlags flags, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only lock object opened through Robot Raconteur");
@@ -2172,6 +2208,7 @@ namespace RobotRaconteurWeb
         <param name="obj">The object previously locked</param>
         <returns>"OK" on success</returns>
         */
+        [PublicApi]
         public async Task<string> ReleaseObjectLock(object obj, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only unlock object opened through Robot Raconteur");
@@ -2202,6 +2239,7 @@ namespace RobotRaconteurWeb
         <param name="obj">The object to lock</param>
         <param name="timeout">The timeout in milliseconds to acquire the monitor lock, or RR_TIMEOUT_INFINITE</param>
         */
+        [PublicApi]
         public async Task<MonitorLock> MonitorEnter(object obj, int timeout = -1, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can be monitored by RobotRaconteurNode");
@@ -2217,6 +2255,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="obj">The object previously locked by MonitorEnter()</param>
         */
+        [PublicApi]
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
         {
 
@@ -2243,6 +2282,7 @@ namespace RobotRaconteurWeb
         <param name="objecttype">The desired service object type</param>
         <returns>The object with the specified interface type. Must be cast to the desired type</returns>
         */
+        [PublicApi]
         public async Task<object> FindObjRefTyped(object obj, string objref, string objecttype, CancellationToken cancel)
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
@@ -2265,6 +2305,7 @@ namespace RobotRaconteurWeb
         <param name="objecttype">The desired service object type</param>
         <returns>The object with the specified interface type. Must be cast to the desired type</returns>
         */
+        [PublicApi]
         public async Task<object> FindObjRefTyped(object obj, string objref, string index, string objecttype, CancellationToken cancel)
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
@@ -2283,6 +2324,7 @@ namespace RobotRaconteurWeb
         use simulation time in certain circumstances
         </remarks>
         */
+        [PublicApi]
         public DateTime UtcNow
         {
             get
@@ -2307,6 +2349,7 @@ namespace RobotRaconteurWeb
         <param name="oneshot">True if timer is a one-shot timer, false for repeated timer</param>
         <returns>The new Timer object. Must call Start()</returns>
         */
+        [PublicApi]
         public ITimer CreateTimer(int period, Action<TimerEvent> handler, bool oneshot = false)
         {
             var t = new WallTimer(period, handler, oneshot, this);
@@ -2325,7 +2368,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="frequency">Frequency of loop in Hz</param>
         <returns>The new Rate object</returns>
-        */        
+        */    
+        [PublicApi]
         public IRate CreateRate(double frequency)
         {
             return new WallRate(frequency, this);
@@ -2394,6 +2438,7 @@ namespace RobotRaconteurWeb
         <param name="filter">A filter to select individual services based on specified criteria</param>
         <returns>The active subscription</returns>
         */
+        [PublicApi]
         public ServiceInfo2Subscription SubscribeServiceInfo2(string[] service_types, ServiceSubscriptionFilter filter = null)
         {
             return m_Discovery.SubscribeServiceInfo2(service_types, filter);
@@ -2411,6 +2456,7 @@ namespace RobotRaconteurWeb
         <param name="filter">A filter to select individual services based on specified criteria</param>
         <returns>The active subscription</returns>
         */
+        [PublicApi]
         public ServiceSubscription SubscribeServiceByType(string[] service_types, ServiceSubscriptionFilter filter = null)
         {
             return m_Discovery.SubscribeServiceByType(service_types, filter);
@@ -2428,7 +2474,9 @@ namespace RobotRaconteurWeb
         <param name="credentials">Optional credentials for authentication</param>
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
         <returns>The active subscription</returns>
-        */        public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
+        */        
+        [PublicApi]
+        public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
         {
             return m_Discovery.SubscribeService(url, username, credentials, objecttype);
         }
@@ -2442,6 +2490,7 @@ namespace RobotRaconteurWeb
             Default level is "warning". Set RobotRaconteur.RobotRaconteur_LogLevel_Disable to disable logging
         </remarks>
         */
+        [PublicApi]
         public RobotRaconteur_LogLevel LogLevel 
         {
             get; set;
@@ -2454,6 +2503,7 @@ namespace RobotRaconteurWeb
         <param name="level">Log level to test</param>
         <returns>true if the log would be accepted</returns>
         */
+        [PublicApi]
         public bool CompareLogLevel(RobotRaconteur_LogLevel level)
         {
             return (int)level >= (int)LogLevel;
@@ -2474,6 +2524,7 @@ namespace RobotRaconteurWeb
         <param name="level">The level for the log message</param>
         <param name="message">The log message</param>
         */
+        [PublicApi]
         public void LogMessage(RobotRaconteur_LogLevel level, string message)
         {
             LogRecord(new RRLogRecord() { Node = this, Level = level, Message = message });
@@ -2493,6 +2544,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="record">The record to log</param>
         */
+        [PublicApi]
         public void LogRecord(RRLogRecord record)
         {
             if ((int)record.Level < (int)LogLevel)
@@ -2522,6 +2574,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="loglevel">The desired log level</param>
         */
+        [PublicApi]
         public RobotRaconteur_LogLevel SetLogLevelFromString(string loglevel)
         {
 
@@ -2584,6 +2637,7 @@ namespace RobotRaconteurWeb
         <param name="env_variable_name">The environmental variable to use. Defaults to
             `ROBOTRACONTEUR_LOG_LEVEL`</param>
         */
+        [PublicApi]
         public RobotRaconteur_LogLevel SetLogLevelFromEnvVariable(string env_variable_name = "ROBOTRACONTEUR_LOG_LEVEL")
         {
             var loglevel = System.Environment.GetEnvironmentVariable(env_variable_name);
@@ -2604,6 +2658,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="handler">The log record handler function</param>
         */
+        [PublicApi]
         public void SetLogRecordHandler(ILogRecordHandler handler)
         {
             m_LogRecordHandler = handler;
@@ -2617,6 +2672,7 @@ namespace RobotRaconteurWeb
             If null, records are sent to stderr
         </remarks>
         */
+        [PublicApi]
         public ILogRecordHandler GetLogRecordHandler()
         {
             return m_LogRecordHandler;
@@ -2655,6 +2711,7 @@ namespace RobotRaconteurWeb
         The type of object lock
       </summary>
     */
+    [PublicApi]
     public enum RobotRaconteurObjectLockFlags
     {
         /**
@@ -2666,6 +2723,7 @@ namespace RobotRaconteurWeb
             authenticated by the current user
         </remarks>
         */
+        [PublicApi]
         USER_LOCK = 0,
         /**
         <summary>
@@ -2676,6 +2734,12 @@ namespace RobotRaconteurWeb
             to the locked object
         </remarks>  
         */
+        [PublicApi]
         CLIENT_LOCK
     }
+
+    /// <summary>
+    /// Used to mark member as part of the public API
+    /// </summary>
+    public class PublicApiAttribute : System.Attribute { };
 }

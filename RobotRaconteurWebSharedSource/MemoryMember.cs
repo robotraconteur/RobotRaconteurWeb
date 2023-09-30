@@ -62,6 +62,7 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T" />
     */
+    [PublicApi]
     public class ArrayMemory<T> : ArrayMemoryBase
     {
 
@@ -74,6 +75,8 @@ namespace RobotRaconteurWeb
         New instance will not be attached to an array.
         </remarks>
         */
+
+        [PublicApi]
         public ArrayMemory()
         {
 
@@ -87,6 +90,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public ArrayMemory(T[] memory)
         {
             this.memory = memory;
@@ -98,6 +103,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public virtual void Attach(T[] memory)
         {
             this.memory = memory;
@@ -111,6 +118,8 @@ namespace RobotRaconteurWeb
         call the service to execute the request.
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken))
         {            
                 return Task.FromResult((ulong)memory.LongLength);            
@@ -134,6 +143,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start index in the buffer to write the data</param>
         <param name="count">The number of array elements to read</param>
         */
+
+        [PublicApi]
         public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
         {
             lock (this)
@@ -161,6 +172,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start index in the buffer to read the data</param>
         <param name="count">The number of array elements to write</param>
         */
+
+        [PublicApi]
         public virtual Task Write(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
             lock (this)
@@ -205,6 +218,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The numeric primitive type of the array</typeparam>
     */
+
+        [PublicApi]
     public class MultiDimArrayMemory<T> : MultiDimArrayMemoryBase
     {
         private MultiDimArray multimemory;
@@ -216,6 +231,8 @@ namespace RobotRaconteurWeb
         New instance will not be attached to an array.
         </remarks>
         */
+
+        [PublicApi]
         public MultiDimArrayMemory()
         {
 
@@ -229,6 +246,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public MultiDimArrayMemory(MultiDimArray memory)
         {
             multimemory = memory;
@@ -240,6 +259,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public virtual void Attach(MultiDimArray memory)
         {
             this.multimemory = memory;
@@ -258,6 +279,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {            
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());            
@@ -271,6 +294,8 @@ namespace RobotRaconteurWeb
         call the service to execute the request.
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
@@ -295,6 +320,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
         */
+
+        [PublicApi]
         public virtual Task Read(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x=>(uint)x).ToArray(), buffer, bufferpos.Select(x=>(uint)x).ToArray(), count.Select(x=>(uint)x).ToArray());
@@ -320,6 +347,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
         */
+
+        [PublicApi]
         public virtual Task Write(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1247,6 +1276,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <typeparam name="T" />
         */
+        [PublicApi]
         public PodArrayMemory() : base()
         {
         }
@@ -1258,6 +1288,8 @@ namespace RobotRaconteurWeb
         New instance will not be attached to an array.
         </remarks>
         */
+
+        [PublicApi]
         public PodArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1360,6 +1392,7 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T" />
     */
+    [PublicApi]
     public class PodMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private PodMultiDimArray multimemory;
@@ -1371,6 +1404,8 @@ namespace RobotRaconteurWeb
         New instance will not be attached to an array.
         </remarks>
         */
+
+        [PublicApi]
         public PodMultiDimArrayMemory()
         {
         }
@@ -1383,6 +1418,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public PodMultiDimArrayMemory(PodMultiDimArray memory)
         {
             multimemory = memory;
@@ -1394,6 +1431,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public virtual void Attach(PodMultiDimArray memory)
         {
             this.multimemory = memory;
@@ -1412,6 +1451,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
@@ -1425,6 +1466,8 @@ namespace RobotRaconteurWeb
         call the service to execute the request.
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
@@ -1448,6 +1491,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
         */
+
+        [PublicApi]
         public virtual Task Read(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1473,6 +1518,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
         */
+
+        [PublicApi]
         public virtual Task Write(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1645,6 +1692,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The namedarray type of the array</typeparam>
     */
+
+        [PublicApi]
     public class NamedArrayMemory<T> : ArrayMemory<T> where T : struct
     {
         /**
@@ -1655,6 +1704,8 @@ namespace RobotRaconteurWeb
         New instance will not be attached to an array.
         </remarks>
         */
+
+        [PublicApi]
         public NamedArrayMemory() : base()
         {
         }
@@ -1770,6 +1821,8 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The namedarray type of the array</typeparam>
     */
+
+        [PublicApi]
     public class NamedMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private NamedMultiDimArray multimemory;
@@ -1781,6 +1834,8 @@ namespace RobotRaconteurWeb
         New instance will not be attached to an array.
         </remarks>
         */
+
+        [PublicApi]
         public NamedMultiDimArrayMemory()
         {
         }
@@ -1793,6 +1848,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public NamedMultiDimArrayMemory(NamedMultiDimArray memory)
         {
             multimemory = memory;
@@ -1804,6 +1861,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="memory">The array to attach</param>
         */
+
+        [PublicApi]
         public virtual void Attach(NamedMultiDimArray memory)
         {
             this.multimemory = memory;
@@ -1822,6 +1881,8 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
@@ -1835,6 +1896,8 @@ namespace RobotRaconteurWeb
         call the service to execute the request.
         </remarks>
         */
+
+        [PublicApi]
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
@@ -1858,6 +1921,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
         */
+
+        [PublicApi]
         public virtual Task Read(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1883,6 +1948,8 @@ namespace RobotRaconteurWeb
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
         */
+
+        [PublicApi]
         public virtual Task Write(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());

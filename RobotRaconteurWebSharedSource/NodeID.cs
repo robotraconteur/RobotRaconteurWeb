@@ -51,6 +51,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+
+        [PublicApi]
     public class NodeID
     {
         private byte[] id;
@@ -61,6 +63,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="id">The UUID bytes</param>
         */
+
+        [PublicApi]
         public NodeID(byte[] id)
         {
             if (id.Length != 16) throw new InvalidOperationException("Node ID must be 128 bits long");
@@ -73,6 +77,8 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="id">The UUID as a string</param>
         */
+
+        [PublicApi]
         public NodeID(string id)
         {
             byte[] id1 = null;
@@ -130,6 +136,8 @@ namespace RobotRaconteurWeb
         </summary>
         <returns>The UUID as bytes</returns>
         */
+
+        [PublicApi]
         public byte[] ToByteArray()
         {
             byte[] bid = new byte[16];
@@ -154,6 +162,8 @@ namespace RobotRaconteurWeb
         8-4-4-4-12 "B" format (with brackets)<br /> {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public override string ToString()
         {
             return "{" + _ToStringD() + "}";
@@ -164,6 +174,8 @@ namespace RobotRaconteurWeb
         or "D" format with no brackets </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public virtual string ToString(string format)
         {
             switch (format)
@@ -192,6 +204,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <returns>The newly generated UUID</returns>
         */
+
+        [PublicApi]
         public static NodeID NewUniqueID()
         {
             var guid = System.Guid.NewGuid().ToString("B");
@@ -223,6 +237,8 @@ namespace RobotRaconteurWeb
         <returns>true The NodeID UUID is all zeros, representing any node, false The NodeID UUID is
         not all zeros</returns>
         */
+
+        [PublicApi]
         public bool IsAnyNode
         {
             get
@@ -243,6 +259,8 @@ namespace RobotRaconteurWeb
         </summary>
         <returns>The "any" NodeID</returns>
         */
+
+        [PublicApi]
         public static NodeID Any { get { return new NodeID(new byte[16]); } }
 
         public override int GetHashCode()

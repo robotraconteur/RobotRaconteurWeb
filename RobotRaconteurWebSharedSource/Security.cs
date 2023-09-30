@@ -64,6 +64,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+
+        [PublicApi]
     public class ServiceSecurityPolicy
     {
         public UserAuthenticator Authenticator;
@@ -80,6 +82,8 @@ namespace RobotRaconteurWeb
         <param name="Authenticator">The user authenticator</param>
         <param name="Policies">The security policies</param>
         */
+
+        [PublicApi]
         public ServiceSecurityPolicy(UserAuthenticator Authenticator, Dictionary<string, string> Policies)
         {
             this.Authenticator = Authenticator;
@@ -102,6 +106,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+
+        [PublicApi]
     public class AuthenticatedUser
     {
         private string m_Username;
@@ -114,6 +120,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public string Username { get { return m_Username; } }
         /**
         <summary>
@@ -121,6 +129,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public string[] Privileges { get { return m_Privileges; } }
         /**
         <summary>
@@ -128,6 +138,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public DateTime LoginTime { get { return m_LoginTime; } }
         /**
         <summary>
@@ -135,6 +147,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public DateTime LastAccessTime { get { return m_LastAccessTime; } }
 
         public AuthenticatedUser(string username, string[] privileges)
@@ -210,6 +224,8 @@ namespace RobotRaconteurWeb
     </list>
     </remarks>
     */
+
+        [PublicApi]
     public class PasswordFileUserAuthenticator : UserAuthenticator
     {
 
@@ -231,6 +247,8 @@ namespace RobotRaconteurWeb
         <summary name="data">A file stream</summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public PasswordFileUserAuthenticator(StreamReader file)
         {
             string d = file.ReadToEnd();
@@ -244,6 +262,8 @@ namespace RobotRaconteurWeb
         <summary name="data">The file text</summary>
         <remarks>None</remarks>
         */
+
+        [PublicApi]
         public PasswordFileUserAuthenticator(string data)
         {
             load(data);

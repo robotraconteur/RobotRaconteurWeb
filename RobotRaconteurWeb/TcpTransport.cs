@@ -176,6 +176,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+    [PublicApi]
     public sealed class TcpTransport : Transport
     {
         
@@ -233,6 +234,7 @@ namespace RobotRaconteurWeb
         <remarks>None</remarks>
         <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
         */
+        [PublicApi]
         public TcpTransport(RobotRaconteurNode node=null) : base(node)
         {
             DefaultReceiveTimeout = 15000;
@@ -808,6 +810,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="flags">The flags specifying the scope</param>
         */
+        [PublicApi]
         public void EnableNodeDiscoveryListening(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LinkLocal)
         {
             if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
@@ -820,6 +823,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public void DisableNodeDiscoveryListening()
         {
             if (node_discovery == null) return;
@@ -838,6 +842,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="flags">The flags specifying the scope</param>
         */
+        [PublicApi]
         public void EnableNodeAnnounce(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LinkLocal)
         {
             if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
@@ -849,6 +854,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public void DisableNodeAnnounce()
         {
             if (node_discovery == null) return;
@@ -1689,6 +1695,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi]
         public override void Close()
         {
             base.Close();
@@ -1746,12 +1753,16 @@ namespace RobotRaconteurWeb
     }
 
 
-    [Flags]
+    [Flags, PublicApi]
     public enum  IPNodeDiscoveryFlags
     {        
+        [PublicApi]
         NodeLocal=0x1,
+        [PublicApi]
         LinkLocal=0x2,
+        [PublicApi]
         SiteLocal=0x4,
+        [PublicApi]
         IPv4Broadcast = 0x8
 
     }

@@ -43,6 +43,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
+    [PublicApi]
     public class BroadcastDownsampler
     {
         protected internal ServerContext context;
@@ -57,6 +58,7 @@ namespace RobotRaconteurWeb
         <param name="context">The service context</param>
         <param name="default_downsample">The default downsample. Usually set to 0</param>
         */
+        [PublicApi]
         public BroadcastDownsampler(ServerContext context, uint default_downsample = 0)
         {
             this.context = context;
@@ -71,6 +73,7 @@ namespace RobotRaconteurWeb
         <param name="ep">The endpoint ID of the client</param>
         <returns>The downsample</returns>
         */
+        [PublicApi]
         public uint GetClientDownsample(uint ep)
         {
             lock (this)
@@ -93,6 +96,7 @@ namespace RobotRaconteurWeb
         <param name="ep">The endpoint ID of the client</param>
         <param name="downsample">The desired downsample</param>
         */
+        [PublicApi]
         public void SetClientDownsample(uint ep, uint downsample)
             {
                 lock (this)
@@ -115,6 +119,7 @@ namespace RobotRaconteurWeb
         Use BroadcastDownsamplerStep for automatic stepping
         </remarks>
         */
+        [PublicApi]
         public void BeginStep()
         {
             lock(this)
@@ -130,6 +135,7 @@ namespace RobotRaconteurWeb
         Use BroadcastDownsamplerStep for automatic stepping
         </remarks>
         */
+        [PublicApi]
         public void EndStep()
         {
 
@@ -198,6 +204,7 @@ namespace RobotRaconteurWeb
     and BroadcastDownsampler.EndStep() when disposed.
     </remarks>
     */
+    [PublicApi]
     public class BroadcasterDownsamplerStep : IDisposable
     {
         BroadcastDownsampler parent;
@@ -212,6 +219,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="downsampler">The downsampler to step</param>
         */
+        [PublicApi]
         public BroadcasterDownsamplerStep(BroadcastDownsampler parent)
         {
             this.parent = parent;
@@ -222,6 +230,7 @@ namespace RobotRaconteurWeb
         /// </summary> <remarks>
         /// None
         /// </remarks>
+        [PublicApi]
         public void Dispose()
         {
             parent?.EndStep();

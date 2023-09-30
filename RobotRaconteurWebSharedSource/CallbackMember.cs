@@ -46,6 +46,7 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The type of the callback function. This is determined by the thunk source generator.</typeparam>
     */
+    [PublicApi]
     public abstract class Callback<T>
     {
 
@@ -65,6 +66,7 @@ namespace RobotRaconteurWeb
         the service using a function proxy.
         </remarks>
         */
+        [PublicApi]
         public abstract T Function { get; set; }
         /**
         <summary>
@@ -91,6 +93,7 @@ namespace RobotRaconteurWeb
         <param name="e">The endpoint of the client connection</param>
         <returns>The callback proxy function</returns>
         */
+        [PublicApi]
         public abstract T GetClientFunction(Endpoint e);
         /**
         <summary>
@@ -117,6 +120,7 @@ namespace RobotRaconteurWeb
         <param name="e">The endpoint of the client connection</param>
         <returns>The callback proxy function</returns>
         */
+        [PublicApi]
         public abstract T GetClientFunction(uint e);
 
 
