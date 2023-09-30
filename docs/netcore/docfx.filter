@@ -1,0 +1,6 @@
+apiRules:
+  - exclude:
+      isUndocumented: true
+  - exclude:
+      uidRegex: ^NamespaceToExclude\.
+      isUndocumented: true
