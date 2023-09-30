@@ -21,16 +21,64 @@ using System.Threading.Tasks;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    NodeID UUID storage and generation
+    </summary>
+    <remarks>
+    <para>
+    Robot Raconteur uses NodeID and NodeName to uniquely identify a node.
+    NodeID is a UUID (Universally Unique ID), while NodeName is a string. The
+    NodeID is expected to be unique, while the NodeName is set by the user
+    and may not be unique. The NodeID class represents the UUID NodeID.
+    </para>
+    <para>
+    A UUID is a 128-bit randomly generated number that is statistically guaranteed
+    to be unique to a very high probability. NodeID uses the Boost.UUID library
+    to generate, manage, and store the UUID.
+    </para>
+    <para>
+    The UUID can be loaded from a string, bytes, or generated randomly at runtime.
+    It can be converted to a string.
+    </para>
+    <para>
+    The LocalTransport and ServerNodeSetup classes will automatically assign
+    a NodeID to a node when the local transport is started with a specified node name.
+    The generated NodeID is stored on the local system, and is associated with the node name.
+    It will be loaded when a node is started with the same NodeName.
+    </para>
+    <para> NodeID with all zeros is considered "any" node.
+    </para>
+    </remarks>
+    */
+
+        [PublicApi]
     public class NodeID
     {
         private byte[] id;
+        /**
+        <summary>
+        Construct a new NodeID with the specified UUID bytes
+        </summary>
+        <remarks>None</remarks>
+        <param name="id">The UUID bytes</param>
+        */
 
+        [PublicApi]
         public NodeID(byte[] id)
         {
             if (id.Length != 16) throw new InvalidOperationException("Node ID must be 128 bits long");
             this.id = id;
         }
+        /**
+        <summary>
+        Construct a new NodeID parsing a string UUID
+        </summary>
+        <remarks>None</remarks>
+        <param name="id">The UUID as a string</param>
+        */
 
+        [PublicApi]
         public NodeID(string id)
         {
             byte[] id1 = null;
@@ -82,6 +130,14 @@ namespace RobotRaconteurWeb
             return true;
         }
 
+        /**
+        <summary>
+        Convert the NodeID UUID to bytes
+        </summary>
+        <returns>The UUID as bytes</returns>
+        */
+
+        [PublicApi]
         public byte[] ToByteArray()
         {
             byte[] bid = new byte[16];
@@ -101,11 +157,25 @@ namespace RobotRaconteurWeb
             return String.Join("-", new string[] { g1, g2, g3, g4, g5 });
         }
 
+        /**
+        <summary> Convert the NodeID UUID to string with "B" format<br /> Convert the UUID string to
+        8-4-4-4-12 "B" format (with brackets)<br /> {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} </summary>
+        <remarks>None</remarks>
+        */
+
+        [PublicApi]
         public override string ToString()
         {
             return "{" + _ToStringD() + "}";
         }
+        /**
+        <summary> Convert the NodeID UUID to string with "B" format<br /> Convert the UUID string to
+        8-4-4-4-12 "B" format (with brackets)<br /> {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+        or "D" format with no brackets </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public virtual string ToString(string format)
         {
             switch (format)
@@ -125,7 +195,17 @@ namespace RobotRaconteurWeb
         {
             return i.ToByteArray();
         }
+        /**
+        <summary>
+        Generate a new random NodeID UUID
+        </summary>
+        <remarks>
+        Returned UUID is statistically guaranteed to be unique
+        </remarks>
+        <returns>The newly generated UUID</returns>
+        */
 
+        [PublicApi]
         public static NodeID NewUniqueID()
         {
             var guid = System.Guid.NewGuid().ToString("B");
@@ -147,7 +227,18 @@ namespace RobotRaconteurWeb
 
             return !id1.id.SequenceEqual(id2.id);
         }
+        /**
+        <summary>
+        Is the NodeID UUID all zeros
+        </summary>
+        <remarks>
+        The all zero UUID respresents "any" node, or an unset NodeID
+        </remarks>
+        <returns>true The NodeID UUID is all zeros, representing any node, false The NodeID UUID is
+        not all zeros</returns>
+        */
 
+        [PublicApi]
         public bool IsAnyNode
         {
             get
@@ -162,7 +253,14 @@ namespace RobotRaconteurWeb
             if (!(obj is NodeID)) return false;
             return this == ((NodeID)obj);
         }
+        /**
+        <summary>
+        Get the "any" NodeId
+        </summary>
+        <returns>The "any" NodeID</returns>
+        */
 
+        [PublicApi]
         public static NodeID Any { get { return new NodeID(new byte[16]); } }
 
         public override int GetHashCode()

@@ -21,213 +21,611 @@ using System.Text;
 namespace RobotRaconteurWeb
 {
 
+    /// <summary>
+    /// Type codes for types supported by Robot Raconteur
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Data type codes are used in messages and service definition parsers.
+    /// </para>
+    /// <para> Data is always stored as little-endian, except for UUID which are big endian
+    /// </para>
+    /// </remarks>
+    [PublicApi]
     public enum DataTypes
     {
+        /// <summary>void or null type</summary>
         void_t = 0,
+        
+        /// <summary>IEEE-754 64-bit floating point number</summary>
         double_t,
+        
+        /// <summary>IEEE-754 32-bit floating point number</summary>
         single_t,
+        
+        /// <summary>8-bit signed integer</summary>
         int8_t,
+        
+        /// <summary>8-bit unsigned integer</summary>
         uint8_t,
+        
+        /// <summary>16-bit signed integer</summary>
         int16_t,
+        
+        /// <summary>16-bit unsigned integer</summary>
         uint16_t,
+        
+        /// <summary>32-bit signed integer</summary>
         int32_t,
+        
+        /// <summary>32-bit unsigned integer</summary>
         uint32_t,
+        
+        /// <summary>64-bit signed integer</summary>
         int64_t,
+        
+        /// <summary>64-bit unsigned integer</summary>
         uint64_t,
+        
+        /// <summary>UTF-8 string</summary>
         string_t,
+        
+        /// <summary>128-bit complex double (real,imag)</summary>
         cdouble_t,
+        
+        /// <summary>64-bit complex float (real,imag)</summary>
         csingle_t,
+        
+        /// <summary>8-bit boolean</summary>
         bool_t,
+        
+        /// <summary>structure (nested message type)</summary>
         structure_t = 101,
+        
+        /// <summary>map with int32 key (nested message type)</summary>
         vector_t,
+        
+        /// <summary>map with string key (nested message type)</summary>
         dictionary_t,
+        
+        /// <summary>object type (not serializable)</summary>
         object_t,
+        
+        /// <summary>varvalue type (not serializable)</summary>
         varvalue_t,
+        
+        /// <summary>varobject type (not serializable)</summary>
         varobject_t,
+        
+        /// <summary>list type (nested message type)</summary>
         list_t = 108,
+        
+        /// <summary>pod type (nested message type)</summary>
         pod_t,
+        
+        /// <summary>pod array type (nested message type)</summary>
         pod_array_t,
+        
+        /// <summary>pod multidimarray type (nested message type)</summary>
         pod_multidimarray_t,
+        
+        /// <summary>enum type (not serializable uses int32 for messages)</summary>
         enum_t,
+        
+        /// <summary>namedtype definition (not serializable)</summary>
         namedtype_t,
+        
+        /// <summary>namedarray type (not serializable)</summary>
         namedarray_t,
+        
+        /// <summary>namedarray array type (nested message type)</summary>
         namedarray_array_t,
+        
+        /// <summary>namedarray multidimarray type (nested message type)</summary>
         namedarray_multidimarray_t,
+        
+        /// <summary>multi-dimensional numeric array (nested message type)</summary>
         multidimarray_t
     }
 
+    /// <summary>
+    /// Array type enum for TypeDefinition parser class
+    /// </summary>
+        [PublicApi]
     public enum DataTypes_ArrayTypes
     {
+        /// <summary>type is not an array</summary>
         none = 0,
+
+        /// <summary>type is a single dimensional array</summary>
         array,
+
+        /// <summary>type is a multidimensional array</summary>
         multidimarray
     }
 
+    /// <summary>
+    /// Container type enum for TypeDefinition parser class
+    /// </summary>
+        [PublicApi]
     public enum DataTypes_ContainerTypes
     {
+        /// <summary>type does not have a container</summary>
         none = 0,
+
+        /// <summary>type has a list container</summary>
         list,
+
+        /// <summary>type has a map with int32 keys container</summary>
         map_int32,
+
+        /// <summary>type has a map with string keys container</summary>
         map_string,
+
+        /// <summary>type has a generator container. Only valid for use with function generator members</summary>
         generator
     }
 
+
+    /// <summary>
+    /// Message entry type codes
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Message entries are sent between nodes stored in messages, and represent
+    /// requests, responses, or packets. The type of the entry is specified through
+    /// the message entry type code. These type codes are similar to op-codes. This
+    /// enum contains the defined entry type codes.
+    /// </para>
+    /// <para>
+    /// Odd codes represent requests or packets, even codes
+    /// represent responses.
+    /// </para>
+    /// <para>
+    /// Entry types less than 500 are considered "special requests" that can be used
+    /// before a session is established.
+    /// </para>
+    /// </remarks>
+    [PublicApi]
     public enum MessageEntryType
     {
+        /// <summary>no-op</summary>
         Null = 0,
+
+        /// <summary>Stream operation request (transport only)</summary>
         StreamOp = 1,
+
+        /// <summary>Stream operation response (transport only)</summary>
         StreamOpRet,
+
+        /// <summary>Stream check capability request (transport only)</summary>
         StreamCheckCapability,
+
+        /// <summary>Stream check capability response (transport only)</summary>
         StreamCheckCapabilityRet,
-        StringTableOp,
-        StringTableOpRet,
+
+        /// <summary>Get service definition request</summary>
         GetServiceDesc = 101,
+
+        /// <summary>Get service definition response</summary>
         GetServiceDescRet,
+
+        /// <summary>Get object qualified type name request</summary>
         ObjectTypeName,
+
+        /// <summary>Get object qualified type name response</summary>
         ObjectTypeNameRet,
+
+        /// <summary>Service closed notification packet</summary>
         ServiceClosed,
+
+        /// <summary>(reserved)</summary>
         ServiceClosedRet,
+
+        /// <summary>Connect client request</summary>
         ConnectClient,
+
+        /// <summary>Connect client response</summary>
         ConnectClientRet,
+
+        /// <summary>Disconnect client request</summary>
         DisconnectClient,
+
+        /// <summary>Disconnect client response</summary>
         DisconnectClientRet,
+
+        /// <summary>Ping request</summary>
         ConnectionTest,
+
+        /// <summary>Pong response</summary>
         ConnectionTestRet,
+
+        /// <summary>Get node information request (NodeID and NodeName)</summary>
         GetNodeInfo,
+
+        /// <summary>Get node information response</summary>
         GetNodeInfoRet,
+
+        /// <summary>(reserved)</summary>
         ReconnectClient,
+
+        /// <summary>(reserved)</summary>
         ReconnectClientRet,
+
+        /// <summary>Get node capability request</summary>
         NodeCheckCapability,
+
+        /// <summary>Get node capability response</summary>
         NodeCheckCapabilityRet,
+
+        /// <summary>Get service attributes request</summary>
         GetServiceAttributes,
+
+        /// <summary>Get service attributes response</summary>
         GetServiceAttributesRet,
+
+        /// <summary>Connect client combined operation request</summary>
         ConnectClientCombined,
+
+        /// <summary>Connect client combined operation response</summary>
         ConnectClientCombinedRet,
+
+        /// <summary>Get endpoint capability request</summary>
         EndpointCheckCapability = 501,
+
+        /// <summary>Get endpoint capability response</summary>
         EndpointCheckCapabilityRet,
+
+        /// <summary>Get service capability request</summary>
         ServiceCheckCapabilityReq = 1101,
+
+        /// <summary>Get service capability response</summary>
         ServiceCheckCapabilityRet,
+
+        /// <summary>Client keep alive request</summary>
         ClientKeepAliveReq = 1105,
+
+        /// <summary>Client keep alive response</summary>
         ClientKeepAliveRet,
+
+        /// <summary>Client session management operation request</summary>
         ClientSessionOpReq = 1107,
+
+        /// <summary>Client session management operation response</summary>
         ClientSessionOpRet,
+
+        /// <summary>Service path released event notification packet</summary>
         ServicePathReleasedReq,
+
+        /// <summary>(reserved)</summary>
         ServicePathReleasedRet,
+
+        /// <summary>Property member get request</summary>
         PropertyGetReq = 1111,
+
+        /// <summary>Property member get response</summary>
         PropertyGetRes,
+
+        /// <summary>Property member set request</summary>
         PropertySetReq,
+
+        /// <summary>Property member set response</summary>
         PropertySetRes,
+
+        /// <summary>Function member call request</summary>
         FunctionCallReq = 1121,
+
+        /// <summary>Function member call response</summary>
         FunctionCallRes,
+
+        /// <summary>Generator next call request</summary>
         GeneratorNextReq,
+
+        /// <summary>Generator next call response</summary>
         GeneratorNextRes,
+
+        /// <summary>Event member notification</summary>
         EventReq = 1131,
+
+        /// <summary>(reserved)</summary>
         EventRes,
+
+        /// <summary>Pipe member packet</summary>
         PipePacket = 1141,
+
+        /// <summary>Pipe member packet ack</summary>
         PipePacketRet,
+
+        /// <summary>Pipe member connect request</summary>
         PipeConnectReq,
+
+        /// <summary>Pipe member connect response</summary>
         PipeConnectRet,
+
+        /// <summary>Pipe member close request</summary>
         PipeDisconnectReq,
+
+        /// <summary>Pipe member close response</summary>
         PipeDisconnectRet,
+
+        /// <summary>Pipe member closed event notification packet</summary>
         PipeClosed,
+
+        /// <summary>(reserved)</summary>
         PipeClosedRet,
+
+        /// <summary>Callback member call request</summary>
         CallbackCallReq = 1151,
+
+        /// <summary>Callback member call response</summary>
         CallbackCallRet,
+
+        /// <summary>Wire member value packet</summary>
         WirePacket = 1161,
+
+        /// <summary>(reserved)</summary>
         WirePacketRet,
+
+        /// <summary>Wire member connect request</summary>
         WireConnectReq,
+
+        /// <summary>Wire member connect response</summary>
         WireConnectRet,
+
+        /// <summary>Wire member close request</summary>
         WireDisconnectReq,
+
+        /// <summary>Wire member close response</summary>
         WireDisconnectRet,
+
+        /// <summary>Wire member closed event notification packet</summary>
         WireClosed,
+
+        /// <summary>(reserved)</summary>
         WireClosedRet,
+
+        /// <summary>Memory member read request</summary>
         MemoryRead = 1171,
+
+        /// <summary>Memory member read response</summary>
         MemoryReadRet,
+
+        /// <summary>Memory member write request</summary>
         MemoryWrite,
+
+        /// <summary>Memory member write response</summary>
         MemoryWriteRet,
+
+        /// <summary>Memory member get param request</summary>
         MemoryGetParam,
+
+        /// <summary>Memory member get param response</summary>
         MemoryGetParamRet,
+
+        /// <summary>Wire member peek InValue request</summary>
         WirePeekInValueReq = 1181,
+
+        /// <summary>Wire member peek InValue response</summary>
         WirePeekInValueRet,
+
+        /// <summary>Wire member peek OutValue request</summary>
         WirePeekOutValueReq,
+
+        /// <summary>Wire member peek OutValue response</summary>
         WirePeekOutValueRet,
+
+        /// <summary>Wire member poke OutValue request</summary>
         WirePokeOutValueReq,
+
+        /// <summary>Wire member poke OutValue response</summary>
         WirePokeOutValueRet,
+
+        /// <summary>Wire transport operation request</summary>
         WireTransportOpReq = 11161,
+
+        /// <summary>Wire transport operation response</summary>
         WireTransportOpRet,
+
+        /// <summary>Wire transport event</summary>
         WireTransportEvent,
+
+        /// <summary>Wire transport event response</summary>
         WireTransportEventRet
     }
 
+
+    /// <summary>
+    /// Message error type codes enum
+    /// </summary>
+        [PublicApi]
     public enum MessageErrorType
     {
+        /// <summary>success</summary>
         None = 0,
+        
+        /// <summary>connection error</summary>
         ConnectionError = 1,
+        
+        /// <summary>protocol error serializing messages</summary>
         ProtocolError,
+        
+        /// <summary>specified service not found</summary>
         ServiceNotFound,
+        
+        /// <summary>specified object not found</summary>
         ObjectNotFound,
+        
+        /// <summary>specified endpoint not found</summary>
         InvalidEndpoint,
+        
+        /// <summary>communication with specified endpoint failed</summary>
         EndpointCommunicationFatalError,
+        
+        /// <summary>specified node not found</summary>
         NodeNotFound,
+        
+        /// <summary>service error</summary>
         ServiceError,
+        
+        /// <summary>specified member not found</summary>
         MemberNotFound,
+        
+        /// <summary>message format incompatible with specified member</summary>
         MemberFormatMismatch,
+        
+        /// <summary>data type did not match expected type</summary>
         DataTypeMismatch,
+        
+        /// <summary>data type failure</summary>
         DataTypeError,
+        
+        /// <summary>failure serializing data type</summary>
         DataSerializationError,
+        
+        /// <summary>specified message entry not found</summary>
         MessageEntryNotFound,
+        
+        /// <summary>specified message element not found</summary>
         MessageElementNotFound,
+        
+        /// <summary>unknown exception occurred check `error name`</summary>
         UnknownError,
+        
+        /// <summary>invalid operation attempted</summary>
         InvalidOperation,
+        
+        /// <summary>argument is invalid</summary>
         InvalidArgument,
+        
+        /// <summary>the requested operation failed</summary>
         OperationFailed,
+        
+        /// <summary>invalid null value</summary>
         NullValue,
+        
+        /// <summary>internal error</summary>
         InternalError,
+        
+        /// <summary>permission denied to a system resource</summary>
         SystemResourcePermissionDenied,
+        
+        /// <summary>system resource has been exhausted</summary>
         OutOfSystemResource,
+        
+        /// <summary>system resource error</summary>
         SystemResourceError,
+        
+        /// <summary>a required resource was not found</summary>
         ResourceNotFound,
+        
+        /// <summary>input/output error</summary>
         IOError,
+        
+        /// <summary>a buffer underrun/overrun has occurred</summary>
         BufferLimitViolation,
+        
+        /// <summary>service definition parse or validation error</summary>
         ServiceDefinitionError,
+        
+        /// <summary>attempt to access an out of range element</summary>
         OutOfRange,
+        
+        /// <summary>key not found</summary>
         KeyNotFound,
+        
+        /// <summary>error occurred on remote node</summary>
         RemoteError = 100,
+        
+        /// <summary>request timed out</summary>
         RequestTimeout,
+        
+        /// <summary>attempt to write to a read only member</summary>
         ReadOnlyMember,
+        
+        /// <summary>attempt to read a write only member</summary>
         WriteOnlyMember,
+        
+        /// <summary>member not implemented</summary>
         NotImplementedError,
+        
+        /// <summary>member is busy try again</summary>
         MemberBusy,
+        
+        /// <summary>value has not been set</summary>
         ValueNotSet,
+        
+        /// <summary>abort operation (generator only)</summary>
         AbortOperation,
+        
+        /// <summary>the operation has been aborted</summary>
         OperationAborted,
+        
+        /// <summary>stop generator iteration (generator only)</summary>
         StopIteration,
+        
+        /// <summary>authentication has failed</summary>
         AuthenticationError = 150,
+        
+        /// <summary>the object is locked by another user or session</summary>
         ObjectLockedError,
+        
+        /// <summary>permission to service object or resource denied</summary>
         PermissionDenied      
     }
 
+
+    /// <summary>
+    /// Represents a complex number using double precision.
+    /// </summary>
+        [PublicApi]
     public struct CDouble
     {
+        /// <summary>
+        /// The real component of the complex number.
+        /// </summary>
+        [PublicApi]
         public double Real;
+
+        /// <summary>
+        /// The imaginary component of the complex number.
+        /// </summary>
+        [PublicApi]
         public double Imag;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CDouble"/> struct.
+        /// </summary>
+        /// <param name="real">The real component of the complex number.</param>
+        /// <param name="imag">The imaginary component of the complex number.</param>
+        [PublicApi]
         public CDouble(double real, double imag)
         {
             Real = real;
             Imag = imag;
         }
 
+        /// <summary>
+        /// Determines whether two <see cref="CDouble"/> instances are equal.
+        /// </summary>
+        [PublicApi]
         public static bool operator ==(CDouble a, CDouble b)
         {
             return (a.Real == b.Real) && (a.Imag == b.Imag);
         }
 
+        /// <summary>
+        /// Determines whether two <see cref="CDouble"/> instances are not equal.
+        /// </summary>
+        [PublicApi]
         public static bool operator !=(CDouble a, CDouble b)
         {
             return !((a.Real == b.Real) && (a.Imag == b.Imag));
         }
 
+        /// <summary>
+        /// Determines whether this instance is equal to the specified object.
+        /// </summary>
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -235,33 +633,68 @@ namespace RobotRaconteurWeb
             return ((CDouble)obj) == this;
         }
 
+        /// <summary>
+        /// Returns the hash code for this <see cref="CDouble"/> instance.
+        /// </summary>
+        [PublicApi]
         public override int GetHashCode()
         {
             return (int)(Real % 1e7 + Imag % 1e7);
         }
     }
 
+    /// <summary>
+    /// Represents a complex number using single precision.
+    /// </summary>
+        [PublicApi]
     public struct CSingle
     {
+        /// <summary>
+        /// The real component of the complex number.
+        /// </summary>
+        [PublicApi]
         public float Real;
+
+        /// <summary>
+        /// The imaginary component of the complex number.
+        /// </summary>
+        [PublicApi]
         public float Imag;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CSingle"/> struct.
+        /// </summary>
+        /// <param name="real">The real component of the complex number.</param>
+        /// <param name="imag">The imaginary component of the complex number.</param>
+        [PublicApi]
         public CSingle(float real, float imag)
         {
             Real = real;
             Imag = imag;
         }
 
+        /// <summary>
+        /// Determines whether two <see cref="CSingle"/> instances are equal.
+        /// </summary>
+        [PublicApi]
         public static bool operator ==(CSingle a, CSingle b)
         {
             return (a.Real == b.Real) && (a.Imag == b.Imag);
         }
 
+        /// <summary>
+        /// Determines whether two <see cref="CSingle"/> instances are not equal.
+        /// </summary>
+        [PublicApi]
         public static bool operator !=(CSingle a, CSingle b)
         {
             return !((a.Real == b.Real) && (a.Imag == b.Imag));
         }
 
+        /// <summary>
+        /// Determines whether this instance is equal to the specified object.
+        /// </summary>
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -269,11 +702,14 @@ namespace RobotRaconteurWeb
             return ((CSingle)obj) == this;
         }
 
+        /// <summary>
+        /// Returns the hash code for this <see cref="CSingle"/> instance.
+        /// </summary>
+        [PublicApi]
         public override int GetHashCode()
         {
             return (int)(Real % 1e7 + Imag % 1e7);
         }
-
     }
 
 

@@ -31,6 +31,152 @@ using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    Transport for Transport Control Protocol Internet Protocol (TCP/IP) networks
+    </summary>
+    <remarks>
+    <para>
+    It is recommended that ClientNodeSetup, ServerNodeSetup, or SecureServerNodeSetup
+    be used to construct this class.
+    </para>
+    <para>
+    See robotraconteur_url for more information on URLs.
+    </para>
+    <para>
+    The TcpTransport implements transport connections over TCP/IP networks. TCP/IP is the
+    most common protocol used for Internet and Local Area Network (LAN) communication,
+    including
+    Ethernet and WiFi connections. The Transport Control Protocol (TCP) is a reliable stream
+    protocol that establishes connections between devices using IP address and port pairs.
+    Each adapter has an assigned address, and applications create connections on different
+    ports.
+    TcpTransport listens to the port specified in StartServer(), and the client uses
+    a URL containing the IP address and port of the listening transport. The TcpTransport
+    uses the established connection to pass messages between nodes.
+    </para>
+    <para>
+    The IP protocol is available in two major versions, IPv4 and IPv6. The most common
+    is IPv4, and its 32 bit address is typically written as four numbers,
+    ie 172.17.12.174. IPv4 has a number of critical limitations, the greatest being
+    its 2^32 address limit (approximately 4 billion). This is a problem when there are
+    tens of billions of internet connected devices already present. IPv6 introduces a 128
+    bit address space, which allows for approximately 3.4x10^38 possible addresses. The major
+    advantage for Robot Raconteur is the introduction of "link-local" addresses. These
+    addresses
+    begin with "FE80::" and finish with an "EUI-64" address, which is tied to the MAC
+    address
+    of the adaptor. IPv4 addresses need to be assigned to devices locally, and have a tendency
+    to change. IPv6 addresses are permanently assigned to the adapter itself, meaning that
+    network configuration for LAN communication is essentially automatic. Robot Raconteur
+    will prefer IPv6 connections when possible for this reason.
+    </para>
+    <para>
+    The TcpTransport is capable of using "raw" streams that implement the Robot Raconteur
+    message protocols, or to use HTTP WebSockets. HTTP WebSockets allow Robot Raconteur
+    to communicate seamlessly with browsers and HTTP servers without requiring
+    additional plugins. WebSockets provide additional security using "origins". See
+    AddWebSocketAllowedOrigin() for more information.
+    </para>
+    <para>
+    The TcpTransport supports TLS encryption using certificates. See tls_security for
+    more information on TLS. The TcpTransport supports four modes of TLS encryption:
+    </para>
+    <list type="table">
+    <listheader>
+    <term>Scheme</term>
+    <term>Description</term>
+    <term>Direction</term>
+    </listheader>
+    <item>
+    <term>rrs+tcp</term>
+    <term>"Raw" protocol with TLS</term>
+    <term>Both</term>
+    </item>
+    <item>
+    <term>rr+wss</term>
+    <term>Websocket over HTTPS</term>
+    <term>Client Only</term>
+    </item>
+    <item>
+    <term>rrs+ws</term>
+    <term>Websocket with RobotRaconteur TLS over HTTP</term>
+    <term>Both</term>
+    </item>
+    <item>
+    <term>rrs+wss</term>
+    <term>Websocket with RobotRaconteur TLS over HTTPS</term>
+    <term>Client Only</term>
+    </item>
+    </list>
+    
+    <para>
+    The different combinations of TLS and HTTPS for websockets are used for different
+    scenarios.
+    Robot Raconteur Core can initiate HTTPS connections, but cannot accept them. Accepting
+    HTTPS connections requires a certificate issued by an authority like GoDaddy or Digicert,
+    and is typically used with an HTTP server running RobotRaconteurWeb.
+    </para>
+    <para>
+    TLS certificates for Robot Raconteur nodes are issued by Wason Technology, LLC using
+    a root certificate that is "burned in" to Robot Raconteur Core. All devices running
+    Robot Raconteur will support this certificate chain.
+    </para>
+    <para>
+    Discovery for the TcpTransport is accomplished using User Defined Protocol (UDP) multicast
+    and/or broadcast packets. Broadcast packets are sent to all connected devices, while
+    multicast is sent to devices that have registered to receive them. Unlike TCP, the packets
+    sent to broadcast or multicast are sent to the entire network. This allows for devices
+    to find each other on the network.
+    </para>
+    <para>
+    For IPv4, the broadcast address 255.255.255.255 on port 48653
+    is used for discovery. By default, IPv4 is disabled in favor of IPv6. IPv6 uses the
+    multicast
+    following multicast addresses:
+    </para>
+    <list type="table">
+    <listheader>
+    <term>Address</term>
+    <term>Scope</term>
+    <term>Port</term>
+    <term>Default?</term>
+    </listheader>
+    <item>
+    <term>FF01::BA86</term>
+    <term>Node-Local</term>
+    <term>48653</term>
+    <term>Disabled</term>
+    </item>
+    <item>
+    <term>FF02::BA86</term>
+    <term>Link-Local</term>
+    <term>48653</term>
+    <term>Enabled</term>
+    </item>
+    <item>
+    <term>FF05::BA86</term>
+    <term>Site-Local</term>
+    <term>48653</term>
+    <term>Disabled</term>
+    </item>
+    </list>
+    
+    <para>
+    By default, discovery will only occur on the link-local IPv6 scope. This will
+    find nodes on the local subnet, but will not attempt to pass through any routers.
+    </para>
+    <para>
+    The use of RobotRaconteurNodeSetup and subclasses is recommended to construct
+    transports.
+    </para>
+    <para> The transport must be registered with the node using
+    RobotRaconteurNode.RegisterTransport() after construction if node
+    setup is not used.
+    </para>
+    </remarks>
+    */
+    [PublicApi]
     public sealed class TcpTransport : Transport
     {
         
@@ -80,7 +226,15 @@ namespace RobotRaconteurWeb
             }
         }
 
-        
+        /**
+        <summary>
+        Construct a new LocalTransport for a non-default node. Must be registered with node using
+        node.RegisterTransport()
+        </summary>
+        <remarks>None</remarks>
+        <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
+        */
+        [PublicApi]
         public TcpTransport(RobotRaconteurNode node=null) : base(node)
         {
             DefaultReceiveTimeout = 15000;
@@ -643,26 +797,64 @@ namespace RobotRaconteurWeb
         }
 
         private IPNodeDiscovery node_discovery;
-
+        /**
+        <summary>
+        Enable node discovery listening
+        </summary>
+        <remarks>
+        <para>
+        By default enables listening on IPv6 link-local scope
+        </para>
+        <para> See IPNodeDiscoveryFlags constants
+        </para>
+        </remarks>
+        <param name="flags">The flags specifying the scope</param>
+        */
+        [PublicApi]
         public void EnableNodeDiscoveryListening(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LinkLocal)
         {
             if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
             node_discovery.StartListeningForNodes(flags);
 
         }
-
+        /**
+        <summary>
+        Disable node discovery listening
+        </summary>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public void DisableNodeDiscoveryListening()
         {
             if (node_discovery == null) return;
             node_discovery.StopListeningForNodes();
         }
-
+        /**
+        <summary>
+        Enable node discovery announce
+        </summary>
+        <remarks>
+        <para>
+        By default enables announce on IPv6 link-local scope
+        </para>
+        <para> See IPNodeDiscoveryFlags constants
+        </para>
+        </remarks>
+        <param name="flags">The flags specifying the scope</param>
+        */
+        [PublicApi]
         public void EnableNodeAnnounce(IPNodeDiscoveryFlags flags=IPNodeDiscoveryFlags.LinkLocal)
         {
             if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
             node_discovery.StartAnnouncingNode(flags);
         }
-
+        /**
+        <summary>
+        Disable node discovery announce
+        </summary>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public void DisableNodeAnnounce()
         {
             if (node_discovery == null) return;
@@ -1497,7 +1689,13 @@ namespace RobotRaconteurWeb
             await on_close_task.Task.ConfigureAwait(false);
         }
         
-
+        /**
+        <summary>
+        Close the transport. Done automatically by node shutdown.
+        </summary>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public override void Close()
         {
             base.Close();
@@ -1555,12 +1753,16 @@ namespace RobotRaconteurWeb
     }
 
 
-    [Flags]
+    [Flags, PublicApi]
     public enum  IPNodeDiscoveryFlags
     {        
+        [PublicApi]
         NodeLocal=0x1,
+        [PublicApi]
         LinkLocal=0x2,
+        [PublicApi]
         SiteLocal=0x4,
+        [PublicApi]
         IPv4Broadcast = 0x8
 
     }

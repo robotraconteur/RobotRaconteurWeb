@@ -29,7 +29,13 @@ namespace RobotRaconteurWeb
         ServiceFactory CreateServiceFactory(string def, ClientContext context);
         ServiceFactory[] CreateServiceFactories(string[] def, ClientContext context);
     }
+    /**
+    <summary>
+    Base class for service factories
+    </summary>
+    */
 
+        [PublicApi]
     public abstract class ServiceFactory
     {
         private ServiceDefinition sdef = null;
