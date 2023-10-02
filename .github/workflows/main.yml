@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,6 +29,7 @@ jobs:
       - name: Run
         working-directory: ./RobotRaconteurWebTest/bin/Release/netcoreapp3.1
         run: RobotRaconteurWebTest citests
+        shell: cmd
       - name: Upload nuget packages
         uses: actions/upload-artifact@v2
         with:
