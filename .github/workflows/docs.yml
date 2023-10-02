@@ -25,12 +25,6 @@ jobs:
 
       - name: tree
         run: tree  /a /f
-      - name: Upload docs
-        uses: actions/upload-artifact@v2
-        with:
-          name: robotraconteurweb-docfx
-          path: |
-            ./docs/netcore/_site/
       - name: archive docs
         uses: actions/upload-pages-artifact@v1
         with:
