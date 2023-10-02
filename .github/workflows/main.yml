@@ -23,9 +23,11 @@ jobs:
       - name: Install H5
         run: dotnet tool update --global h5-compiler
       - name: Build
-        run: dotnet build
+        run: dotnet build --configuration Release
+      - name: tree
+        run: tree
       - name: Run
-        working-directory: ./RobotRaconteurWebTest/bin/Debug/netcoreapp3.1
+        working-directory: ./RobotRaconteurWebTest/bin/Release/netcoreapp3.1
         run: RobotRaconteurWebTest citests
       - name: Upload nuget packages
         uses: actions/upload-artifact@v2
