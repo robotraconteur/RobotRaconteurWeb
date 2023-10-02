@@ -31,10 +31,10 @@ jobs:
           name: robotraconteurweb-docfx
           path: |
             ./docs/netcore/_site/
-            - name: archive docs
-            uses: actions/upload-pages-artifact@v1
-            with:
-              path: doc
+      - name: archive docs
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: doc
      # Deploy job
   deploy:
     # Add a dependency to the build job
