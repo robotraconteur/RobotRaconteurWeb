@@ -845,6 +845,18 @@ namespace RobotRaconteurWeb
         }
 
         internal readonly AsyncStreamTransportParent parent_adapter;
+
+        public override string[] ServerListenUrls
+        {
+            get
+            {
+                if (!serverstarted)
+                {
+                    return new string[0];
+                }
+                return new string[] { string.Format("rr+local:///?nodeid={0}", node.NodeID.ToString("D")) };
+            }
+        }
     }
 
 

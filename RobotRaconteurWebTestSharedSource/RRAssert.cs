@@ -17,7 +17,7 @@ namespace RobotRaconteurTest
         {
             if (a.CompareTo(b) != 0)
             {
-                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -27,7 +27,17 @@ namespace RobotRaconteurTest
         {
             if (a!=b)
             {
-                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                throw new Exception("Unit test failure");
+            }
+        }
+
+        public static void AreEqual(NodeID a, NodeID b, [CallerFilePath] string sourceFilePath = "",
+                                       [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (a != b)
+            {
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -37,7 +47,7 @@ namespace RobotRaconteurTest
         {
             if (a != b)
             {
-                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -47,7 +57,7 @@ namespace RobotRaconteurTest
         {
             if (Math.Abs(a.Real - b.Real) >1e-2 || Math.Abs(a.Imag - b.Imag) >1e-2)
             {
-                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -57,7 +67,7 @@ namespace RobotRaconteurTest
         {
             if (!object.Equals(a, b))
             {
-                Console.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -67,14 +77,14 @@ namespace RobotRaconteurTest
         {
             if (object.Equals(a, b))
             {
-                Console.WriteLine("Failure: {0} equals {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} equals {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
 
         public static void Fail([CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
-            Console.WriteLine("Failure: at {0}:{1}", sourceFilePath, sourceLineNumber);
+            RRWebTest.WriteLine("Failure: at {0}:{1}", sourceFilePath, sourceLineNumber);
             throw new Exception("Unit test failure");
         }
 
@@ -83,7 +93,7 @@ namespace RobotRaconteurTest
         {
             if (!val)
             {
-                Console.WriteLine("Failure: {0} is not true {1}:{2}", val, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} is not true {1}:{2}", val, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -93,7 +103,7 @@ namespace RobotRaconteurTest
         {
             if (val)
             {
-                Console.WriteLine("Failure: {0} is not false {1}:{2}", val, sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: {0} is not false {1}:{2}", val, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -113,7 +123,7 @@ namespace RobotRaconteurTest
             }
             if (!thrown)
             {
-                Console.WriteLine("Failure: does not throw at {0}:{1}", sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: does not throw at {0}:{1}", sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }
@@ -133,7 +143,7 @@ namespace RobotRaconteurTest
             }
             if (!thrown)
             {
-                Console.WriteLine("Failure: does not throw at {0}:{1}", sourceFilePath, sourceLineNumber);
+                RRWebTest.WriteLine("Failure: does not throw at {0}:{1}", sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
             }
         }

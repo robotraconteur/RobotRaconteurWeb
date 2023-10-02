@@ -51,7 +51,7 @@ namespace RobotRaconteurTest
 
         public async Task RunFullTest(string url, string authurl)
         {
-            Console.WriteLine("Test Members");
+            RRWebTest.WriteLine("Test Members");
             await ConnectService(url);      
             await TestProperties();
             await TestFunctions();
@@ -63,13 +63,13 @@ namespace RobotRaconteurTest
             await TestMemories();
             await DisconnectService();
 
-            Console.WriteLine("Test Authentication");
+            RRWebTest.WriteLine("Test Authentication");
             await TestAuthentication(authurl);
-            Console.WriteLine("Test Object Locks");
+            RRWebTest.WriteLine("Test Object Locks");
             await TestObjectLock(authurl);
-            Console.WriteLine("Test Monitor Locks");
+            RRWebTest.WriteLine("Test Monitor Locks");
             await TestMonitorLock(url);
-            Console.WriteLine("Done!");
+            RRWebTest.WriteLine("Done!");
         }
 
         testroot r;

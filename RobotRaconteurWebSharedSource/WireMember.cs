@@ -164,10 +164,10 @@ namespace RobotRaconteurWeb
             {
                 get
                 {
-                    if (!inval_valid) throw new Exception("Value not set");
+                    if (!inval_valid) throw new ValueNotSetException("Value not set");
                     if (IsValueExpired(lasttime_recv_local, InValueLifespan))
                     {
-                        throw new Exception("Value not set");
+                        throw new ValueNotSetException("Value not set");
                     }
                     return inval;
                 }               
@@ -225,10 +225,10 @@ namespace RobotRaconteurWeb
             {
                 get
                 {
-                    if (!outval_valid) throw new Exception("Value not set");
+                    if (!outval_valid) throw new ValueNotSetException("Value not set");
                     if (IsValueExpired(lasttime_send_local, OutValueLifespan))
                     {
-                        throw new Exception("Value not set");
+                        throw new ValueNotSetException("Value not set");
                     }
                     return outval;
                 }
@@ -498,8 +498,10 @@ namespace RobotRaconteurWeb
                 {
                     return false;
                 }
+                var expire_time = recv_time.AddMilliseconds(lifespan);
+                var now_time = DateTime.UtcNow;
                  
-                if (recv_time + TimeSpan.FromMilliseconds(lifespan) < DateTime.UtcNow)
+                if ( expire_time < now_time)
                 {
                     return true;
                 }

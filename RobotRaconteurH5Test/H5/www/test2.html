@@ -14,7 +14,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             const logElem = document.getElementById("log");
             logElem.innerHTML += "Starting...<br/>";
-            
+
+            RobotRaconteurH5Test.RegisterServiceTypes.SetWriteLine();
             RobotRaconteurH5Test.RegisterServiceTypes.DoRegisterServiceTypes();
             var c = new RobotRaconteurTest.ServiceTestClient2();
             c.RunFullTest("rr+tcp://localhost:22222/?service=RobotRaconteurTestService2")

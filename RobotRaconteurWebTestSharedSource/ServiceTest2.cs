@@ -25,21 +25,31 @@ using System.Threading.Tasks;
 namespace RobotRaconteurTest
 {
 
-#if !ROBOTRACONTEUR_H5
+
     public class RobotRaconteurTestServiceSupport2
     {
 
         public testroot3_impl testservice2;
 
-        public void RegisterServices(TcpTransport t)
+        public RobotRaconteurNode node;
+        public RobotRaconteurTestServiceSupport2(RobotRaconteurNode node = null)
+        {
+            this.node = node;
+            if (node == null)
+            {
+                this.node = RobotRaconteurNode.s;
+            }
+        }
+
+        public void RegisterServices()
         {
             testservice2 = new testroot3_impl();
-            RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
+            node.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
         }
 
         public void UnregisterServices()
         {
-            RobotRaconteurNode.s.Shutdown();
+            node.Shutdown();
         }
     }
 
@@ -388,10 +398,12 @@ namespace RobotRaconteurTest
             ca((CSingle[])value.Array_, ComplexFromScalars(c9_2_2));
             return Task.FromResult(0);
         }
-                
-        public override ArrayMemory<CDouble> c_m1 { get; } = new ArrayMemory<CDouble>(new CDouble[512]);
 
-        public override MultiDimArrayMemory<CDouble> c_m2 { get; } = new MultiDimArrayMemory<CDouble>(new MultiDimArray(new uint[] { 10, 10 }, new CDouble[100]));
+        ArrayMemory<CDouble> c_m1_v = new ArrayMemory<CDouble>(new CDouble[512]);
+        public override ArrayMemory<CDouble> c_m1 => c_m1_v; 
+
+        MultiDimArrayMemory<CDouble> c_m2_v = new MultiDimArrayMemory<CDouble>(new MultiDimArray(new uint[] { 10, 10 }, new CDouble[100]));
+        public override MultiDimArrayMemory<CDouble> c_m2 => c_m2_v; 
 
     }
 
@@ -478,7 +490,6 @@ namespace RobotRaconteurTest
             return Task.FromResult(0);
         }
     }
-#endif
     class ServiceTest2_test_sequence_gen
     {
         private uint counter;

@@ -40,7 +40,7 @@ namespace RobotRaconteurWebTestNETStandard
             s.RegisterServices(t);
 
             var s2 = new RobotRaconteurTestServiceSupport2();
-            s2.RegisterServices(t);
+            s2.RegisterServices();
 
 
             var listener = new HttpListener();

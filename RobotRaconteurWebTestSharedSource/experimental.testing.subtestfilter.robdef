@@ -1,0 +1,9 @@
+service experimental.testing.subtestfilter
+
+object sub_testroot
+    property double d1
+end
+
+object sub_testroot2
+    property double d1
+end

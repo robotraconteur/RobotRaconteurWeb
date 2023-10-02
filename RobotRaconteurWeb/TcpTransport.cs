@@ -1184,6 +1184,92 @@ namespace RobotRaconteurWeb
             return new List<NodeDiscoveryInfo>();
         }
 
+        public IPEndPoint[] ResolvedListenerEndpoints
+        {
+            get
+            {
+                var socket_listen_endpoints = ListeningEndpoints;
+
+                if (socket_listen_endpoints.Count == 0)
+                {
+                    return new IPEndPoint[] { };
+                }
+                         
+                HashSet<IPEndPoint> listener_endpoints = new HashSet<IPEndPoint>();
+                foreach (var s in socket_listen_endpoints)
+                {
+                    listener_endpoints.Add(s);
+                }
+
+                bool ipv4_any = false;
+                bool ipv6_any = false;
+                int ipv4_any_port = 0;
+                int ipv6_any_port = 0;
+
+                var erase = new HashSet<IPEndPoint>();
+
+                foreach (var it in listener_endpoints)
+                {
+                    if (IPAddress.Any.Equals(it.Address))
+                    {
+                        ipv4_any_port = it.Port;
+                        ipv4_any = true;
+                        erase.Add(it);                    
+                    }
+                    if (IPAddress.IPv6Any.Equals(it.Address))
+                    {
+                        ipv6_any_port = it.Port;
+                        ipv6_any = true;
+                        erase.Add(it);
+                    }
+                }
+
+                foreach (var it in erase)
+                {
+                    listener_endpoints.Remove(it);
+                }
+
+                if (ipv4_any || ipv6_any)
+                {
+                    NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (NetworkInterface adapter in adapters)
+                    {
+                        if (adapter.OperationalStatus == OperationalStatus.Up || adapter.OperationalStatus == OperationalStatus.Unknown)
+                        {
+                            IPInterfaceProperties properties = adapter.GetIPProperties();
+                            foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
+                            {
+                                if (ipv4_any && uniCast.Address.AddressFamily == AddressFamily.InterNetwork)
+                                {
+                                    listener_endpoints.Add(new IPEndPoint(uniCast.Address, (int)ipv4_any_port));
+                                }
+
+                                if (ipv6_any && uniCast.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                                {
+                                    listener_endpoints.Add(new IPEndPoint(uniCast.Address, (int)ipv6_any_port));
+                                }
+                            }
+                        }
+                    }
+                }
+                return listener_endpoints.ToArray();                
+            }
+        }
+
+        public override string[] ServerListenUrls
+        {
+            get
+            {
+                var o = new List<string>();
+                var endpoints = this.ResolvedListenerEndpoints;
+                foreach (var ep in endpoints)
+                {
+                    o.Add(string.Format("rr+tcp://{0}/?nodeid={1}", ep.ToString(), node.NodeID.ToString("D")));
+                }
+                return o.ToArray();
+            }
+        }
+
     }   
 
 
@@ -2057,7 +2143,7 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                recvsock.Close();
+                recvsock?.Close();
             }
             catch (Exception) { };
 
@@ -2070,7 +2156,7 @@ namespace RobotRaconteurWeb
             listening = false;
             var t = discovery_request_timer;
             discovery_request_timer = null;
-            t.Dispose();
+            t?.Dispose();
             
         }
 

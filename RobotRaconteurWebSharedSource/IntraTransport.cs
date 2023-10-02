@@ -526,6 +526,18 @@ namespace RobotRaconteurWeb
                 });
             }
         }
+
+        public override string[] ServerListenUrls
+        {
+            get
+            {
+                if (!serverstarted)
+                {
+                    return new string[0];
+                }
+                return new string[] { string.Format("rr+intra:///?nodeid={0}", node.NodeID.ToString("D")) };
+            }
+        }
     }
 
 
@@ -557,6 +569,10 @@ namespace RobotRaconteurWeb
             parenttransport = parent;
             this.local_endpoint = local_endpoint;
             this.server = server;
+            if (server)
+            {
+                this.connecturl = "rr+intra:///";
+            }
         }
 
         void AcceptMessage(Message m)

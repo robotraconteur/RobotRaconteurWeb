@@ -161,6 +161,8 @@ namespace RobotRaconteurWeb
 
         }
 
+        public abstract string[] ServerListenUrls { get; }
+
     }
 
     public enum TransportListenerEventType

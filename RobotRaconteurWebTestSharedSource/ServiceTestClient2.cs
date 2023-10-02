@@ -150,7 +150,7 @@ namespace RobotRaconteurTest
         {
             var g = await r.gen_func1();
             var res = await g.NextAll();
-            Console.WriteLine(res);
+            RRWebTest.WriteLine(string.Join(", ", res.Select(x=>x.ToString())));
 
             var g2 = await r.gen_func1();
             await g2.Next();
@@ -161,7 +161,7 @@ namespace RobotRaconteurTest
             }
             catch (OperationAbortedException)
             {
-                Console.WriteLine("Operation aborted caught");
+                RRWebTest.WriteLine("Operation aborted caught");
             }
 
             var g3 = await r.gen_func1();
@@ -173,7 +173,7 @@ namespace RobotRaconteurTest
             }
             catch (StopIterationException)
             {
-                Console.WriteLine("Stop iteration caught");
+                RRWebTest.WriteLine("Stop iteration caught");
             }
 
             var gen2 =await r.gen_func4();
@@ -185,7 +185,7 @@ namespace RobotRaconteurTest
             }
             catch (StopIterationException)
             {
-                Console.WriteLine("Stop iteration caught");
+                RRWebTest.WriteLine("Stop iteration caught");
             }
         }
 

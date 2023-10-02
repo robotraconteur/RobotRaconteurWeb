@@ -80,7 +80,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public const string Version = "0.9.2";
+        public const string Version = "0.18.0";
 
         private NodeID m_NodeID;
         /**

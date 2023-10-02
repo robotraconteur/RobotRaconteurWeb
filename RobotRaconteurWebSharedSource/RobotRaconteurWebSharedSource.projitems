@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NodeDirectories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NodeID.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NodeSetup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PeriodicTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobotRaconteur.cs" />
