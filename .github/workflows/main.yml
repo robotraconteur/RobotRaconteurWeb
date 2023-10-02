@@ -24,7 +24,7 @@ jobs:
         run: dotnet tool update --global h5-compiler
       - name: Build
         run: dotnet build --configuration Release
-      - name: tree
+      - name: tree /a /f
         run: tree
       - name: Run
         working-directory: ./RobotRaconteurWebTest/bin/Release/netcoreapp3.1
