@@ -20,6 +20,8 @@ jobs:
           dotnet-version: 3.1.x
       - name: Install dependencies
         run: dotnet restore
+      - name: Install H5
+        run: dotnet tool update --global h5-compiler
       - name: Build
         run: dotnet build
       - name: Run
