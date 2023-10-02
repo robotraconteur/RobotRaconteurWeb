@@ -13,10 +13,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 3.1.x
-      - name: Install dependencies
-        run: dotnet restore
-      - name: Install H5
-        run: dotnet tool update --global h5-compiler
       - name: Install docfx
         run: dotnet tool update -g docfx
       - name: Build docs 
