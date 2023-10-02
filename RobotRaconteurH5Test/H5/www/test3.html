@@ -14,7 +14,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             const logElem = document.getElementById("log");
             logElem.innerHTML += "Starting...<br/>";
-            
+            RobotRaconteurH5Test.RegisterServiceTypes.SetWriteLine();
             RobotRaconteurH5Test.RegisterServiceTypes.SubscriberTest()
                 .continueWith(function (res) {
                     try {

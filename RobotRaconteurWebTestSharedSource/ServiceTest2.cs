@@ -31,15 +31,25 @@ namespace RobotRaconteurTest
 
         public testroot3_impl testservice2;
 
+        public RobotRaconteurNode node;
+        public RobotRaconteurTestServiceSupport2(RobotRaconteurNode node = null)
+        {
+            this.node = node;
+            if (node == null)
+            {
+                this.node = RobotRaconteurNode.s;
+            }
+        }
+
         public void RegisterServices()
         {
             testservice2 = new testroot3_impl();
-            RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
+            node.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
         }
 
         public void UnregisterServices()
         {
-            RobotRaconteurNode.s.Shutdown();
+            node.Shutdown();
         }
     }
 
@@ -68,9 +78,9 @@ namespace RobotRaconteurTest
         }
 
 
-        // public override Pipe<int> unreliable1 { get; set; }
+        public override Pipe<int> unreliable1 { get; set; }
         
-        // public override ArrayMemory<double> readmem { get; }
+        public override ArrayMemory<double> readmem { get; }
 
         public override Task<testenum1> get_testenum1_prop(CancellationToken cancel = default(CancellationToken))
         {
@@ -178,12 +188,12 @@ namespace RobotRaconteurTest
             }
         }
 
-        // public override Wire<int[]> w1 { get; set; }
-        // public override Wire<int[]> w2 { get; set; }
-        // public override Wire<MultiDimArray> w3 { get; set; }
-        // public override Pipe<int[]> p1 { get; set; }
-        // public override Pipe<int[]> p2 { get; set; }
-        // public override Pipe<MultiDimArray> p3 { get; set; }
+        public override Wire<int[]> w1 { get; set; }
+        public override Wire<int[]> w2 { get; set; }
+        public override Wire<MultiDimArray> w3 { get; set; }
+        public override Pipe<int[]> p1 { get; set; }
+        public override Pipe<int[]> p2 { get; set; }
+        public override Pipe<MultiDimArray> p3 { get; set; }
 
         public override Task<vector3> get_testnamedarray1(CancellationToken cancel = default(CancellationToken))
         {

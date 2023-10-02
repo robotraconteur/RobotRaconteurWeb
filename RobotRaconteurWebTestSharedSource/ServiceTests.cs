@@ -34,13 +34,13 @@ namespace RobotRaconteurWebTest
         public async Task LoopbackTest()
         {
             ServiceTestClient serviceTestClient = new ServiceTestClient(node);
-            await serviceTestClient.RunFullTest(urls.ToString(), auth_urls?.ToString());
+            await serviceTestClient.RunFullTest(urls[0], auth_urls?[0]);
         }
 
         public async Task LoopbackTest2()
         {
             ServiceTestClient2 serviceTestClient = new ServiceTestClient2(node);
-            await serviceTestClient.RunFullTest(urls2.ToString());
+            await serviceTestClient.RunFullTest(urls2[0]);
         }
 
         static public async Task RunTcpLoopback()
@@ -134,7 +134,7 @@ namespace RobotRaconteurWebTest
     public class TestServer : IDisposable
     {
         public TestNodeConfig node_config { get; set; }
-        public TestServer(string nodename = "testprog", bool enable_tcp_transport=true, bool enable_local_transport=true, bool enable_intra_transport=true, uint tcp_port=0) {
+        public TestServer(string nodename = "testprog", bool enable_tcp_transport=true, bool enable_local_transport=true, bool enable_intra_transport=true, int tcp_port=0) {
             node_config = new TestNodeConfig(nodename, enable_tcp_transport, enable_local_transport, enable_intra_transport, true, tcp_port);
         }
         public void Dispose()
@@ -142,7 +142,7 @@ namespace RobotRaconteurWebTest
             node_config.Dispose();
         }
 
-        public static async Task RunServer(string nodename = "testprog", uint tcp_port = 0)
+        public static async Task RunServer(string nodename = "testprog", int tcp_port = 0)
         {
             using (var server = new TestServer(nodename, tcp_port: tcp_port))
             {

@@ -1,6 +1,7 @@
 ﻿using RobotRaconteurWeb;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -22,7 +23,7 @@ namespace RobotRaconteurTest
         public Transport client_local_transport;
         public Transport client_intra_transport;
 
-        public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server=true, uint tcp_port=0)
+        public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server=true, int tcp_port=0)
         {
             if (start_server)
             {
@@ -37,9 +38,9 @@ namespace RobotRaconteurTest
                     node = new RobotRaconteurNode();
                     node.SetLogLevelFromEnvVariable();
 
-                    node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
-                    node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
-                    node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory());
+                    node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory(node));
+                    node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory(node));
+                    node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory(node));
 
 #if !ROBOTRACONTEUR_H5
                 // Create TcpTransport using reflection and create dynamic reference
@@ -48,72 +49,99 @@ namespace RobotRaconteurTest
                 
                 if (enable_local_transport)
                 {
-                    local_transport = CreateTransport("LocalTransport", node);
-                    InvokeMethod(local_transport, "StartServerAsNodeName", "nodename");
-                    node.RegisterTransport(local_transport);
+                    var t1 = new LocalTransport(node);                    
+                    t1.StartServerAsNodeName(nodename);
+                    node.RegisterTransport(t1);
+                    local_transport = t1;
                 }
 
                 if (enable_tcp_transport)
                 {
-                    tcp_transport = CreateTransport("TcpTransport", node);
-                    InvokeMethod(tcp_transport, "StartServer", tcp_port);
-                    InvokeMethod(tcp_transport, "EnableNodeAnnounce");
-                    InvokeMethod(tcp_transport, "EnableNodeDiscoveryListening");
-                    node.RegisterTransport(tcp_transport);
+                    var t2 = new TcpTransport(node);
+                    
+                    t2.StartServer(tcp_port);
+                    t2.EnableNodeAnnounce();
+                    t2.EnableNodeDiscoveryListening();
+                    node.RegisterTransport(t2);
+                    tcp_transport = t2;
                 }
 
+                
 
 #endif
-
-                    var s1 = new RobotRaconteurTestServiceSupport();
+                    var s1 = new RobotRaconteurTestServiceSupport(node);
                     s1.RegisterServices(tcp_transport);
 
-                    var s2 = new RobotRaconteurTestServiceSupport2();
+                    var s2 = new RobotRaconteurTestServiceSupport2(node);
                     s2.RegisterServices();
 
-                    var t1 = new IntraTransport(node);
-                    node.RegisterTransport(t1);
+                    if (enable_intra_transport)
+                    {
+                        var t1 = new IntraTransport(node);
+                        node.RegisterTransport(t1);
 
-                    t1.StartServer();
-                    intra_transport = t1;
+                        t1.StartServer();
+                        intra_transport = t1;
+                    }
                 }
             }
 
             client_node = new RobotRaconteurNode();
             client_node.SetLogLevelFromEnvVariable();
 
-            client_node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
-            client_node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
-            client_node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory());
+            client_node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory(client_node));
+            client_node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory(client_node));
+            client_node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory(client_node));
 
+#if !ROBOTRACONTEUR_H5
             if (enable_local_transport)
             {
-                client_local_transport = CreateTransport("LocalTransport", client_node);
+                client_local_transport = new LocalTransport(client_node);               
                 
                 client_node.RegisterTransport(client_local_transport);
             }
 
             if (enable_tcp_transport)
             {
-                client_tcp_transport = CreateTransport("TcpTransport", node);
-                InvokeMethod(client_tcp_transport, "EnableNodeDiscoveryListening");
-                client_node.RegisterTransport(client_tcp_transport);
+                var t2 = new TcpTransport(client_node);
+                t2.EnableNodeDiscoveryListening();
+                client_node.RegisterTransport(t2);
+                client_tcp_transport = t2;
+            }
+#endif
+
+            if (enable_intra_transport)
+            {
+                var t3 = new IntraTransport(client_node);
+                t3.StartClient();
+                client_intra_transport = t3;
+                client_node.RegisterTransport(t3);
             }
 
         }
 
-        public string[] GetServiceUrl(string service_name, string scheme = null)
+        string[] append_service(string[] eps, string service_name)
         {
-            if (node == null)
+            List<string> o = new List<string>();
+            foreach (var ep in eps)
             {
-                if (node_endpoint_url.Contains("?"))
+                if (ep.Contains("?"))
                 {
-                    return new string[] { node_endpoint_url + "&service=" + service_name };
+                    o.Add( ep + "&service=" + service_name );
                 }
                 else
                 {
-                    return new string[] { node_endpoint_url + "?service=" + service_name };
+                    o.Add(ep + "?service=" + service_name);
                 }
+            }
+            return o.ToArray();
+        }
+
+        public string[] GetServiceUrl(string service_name, string scheme = null)
+        {            
+            if (node == null)
+            {
+                return append_service(new[] { node_endpoint_url }, service_name);                
             }
             else
             {
@@ -122,23 +150,23 @@ namespace RobotRaconteurTest
                     case null:
                         if (intra_transport != null)
                         {
-                            return intra_transport.ServerListenUrls;
+                            return append_service(intra_transport.ServerListenUrls, service_name);
                         }
                         if (tcp_transport != null)
                         {
-                            return tcp_transport.ServerListenUrls;
+                            return append_service(tcp_transport.ServerListenUrls, service_name);
                         }
                         if (local_transport != null)
                         {
-                            return local_transport.ServerListenUrls;
+                            return append_service(local_transport.ServerListenUrls, service_name);
                         }
                         throw new ArgumentException("Could not find service url for testing");
                     case "rr+intra":
-                        return intra_transport.ServerListenUrls;
+                        return append_service(intra_transport.ServerListenUrls, service_name);
                     case "rr+tcp":
-                        return tcp_transport.ServerListenUrls;
+                        return append_service(tcp_transport.ServerListenUrls, service_name);
                     case "rr+local":
-                        return local_transport.ServerListenUrls;
+                        return append_service(local_transport.ServerListenUrls, service_name);
                     default:
                         throw new ArgumentException("Invalid transport type for service URL");
                 }
@@ -149,7 +177,10 @@ namespace RobotRaconteurTest
         {
             // Get the assembly and type using reflection
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Type type = assembly.GetType("RobotRaconteurWeb." + typeName);
+            //Type type = assembly.GetType("RobotRaconteurWeb." + typeName);
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .FirstOrDefault(t => t.FullName.Equals("RobotRaconteurWeb." + typeName));
 
             // Create an instance of the type
             return (Transport)Activator.CreateInstance(type, new object[] { node });

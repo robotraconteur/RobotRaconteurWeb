@@ -854,7 +854,7 @@ namespace RobotRaconteurWeb
                 {
                     return new string[0];
                 }
-                return new string[] { string.Format("rr+local:///?nodeid={1}", node.NodeID.ToString("D")) };
+                return new string[] { string.Format("rr+local:///?nodeid={0}", node.NodeID.ToString("D")) };
             }
         }
     }

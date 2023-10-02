@@ -803,7 +803,7 @@ namespace RobotRaconteurWeb
             {
                 try
                 {
-                    var scanned_types = ScanAssembliesForServiceTypes();
+                    var scanned_types = ScanAssembliesForServiceTypes(node);
                     foreach (var t in scanned_types)
                     {
                         node.RegisterServiceType(t);
@@ -1186,7 +1186,7 @@ namespace RobotRaconteurWeb
             Node?.Shutdown();
         }
 
-        static List<ServiceFactory> ScanAssembliesForServiceTypes()
+        static List<ServiceFactory> ScanAssembliesForServiceTypes(RobotRaconteurNode node)
         {
             // https://stackoverflow.com/questions/13493416/scan-assembly-for-classes-that-implement-certain-interface-and-add-them-to-a-con
 
@@ -1204,7 +1204,7 @@ namespace RobotRaconteurWeb
                 {
                     continue;
                 }
-                var service_factory = Activator.CreateInstance(type) as ServiceFactory;
+                var service_factory = Activator.CreateInstance(type, node, (ClientContext)null) as ServiceFactory;
                 if (service_factory != null)
                 {
                     o.Add(service_factory);

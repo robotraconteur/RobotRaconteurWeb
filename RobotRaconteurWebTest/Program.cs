@@ -41,7 +41,7 @@ namespace RobotRaconteurTest
                     await ServiceTests.RunServiceTest(args);
                     break;
                 case "server":
-                    await TestServer.RunServer(args[2], uint.Parse(args[1]));
+                    await TestServer.RunServer(args[2], int.Parse(args[1]));
                     break;
                 case "findservicebytype":
                 case "findnodebyid":
@@ -77,10 +77,32 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
 
+                        RobDefTest.RunRobDefTest(args);
+
                         Console.WriteLine("Done!");
 
                         break;
                 }
+                case "citests":
+                    {
+                        await ServiceTests.RunIntraLoopback();
+                        await ServiceTests.RunTcpLoopback();
+                        await ServiceTests.RunLocalLoopback();
+
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeServiceInfo2();
+
+
+                        await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
+                        await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
+
+                        await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
+                        await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
+                        Console.WriteLine("Done!");
+                        break;
+                    }
                 default:
                     throw new ArgumentException("Invalid test command " + command);
             }

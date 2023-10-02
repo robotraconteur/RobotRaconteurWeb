@@ -30,13 +30,22 @@ namespace RobotRaconteurTest
     {
         public RobotRaconteurTest_testroot testservice;
         public RobotRaconteurTest_testroot testservice_auth;
+        public RobotRaconteurNode node;
+        public RobotRaconteurTestServiceSupport(RobotRaconteurNode node = null)
+        {
+            this.node = node;
+            if (node == null)
+            {
+                this.node = RobotRaconteurNode.s;
+            }
+        }
 
         public void RegisterServices(Transport t)
         {
             testservice = new RobotRaconteurTest_testroot(t);
             testservice_auth = new RobotRaconteurTest_testroot(t);
 
-            RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService", "com.robotraconteur.testing.TestService1", testservice);
+            node.RegisterService("RobotRaconteurTestService", "com.robotraconteur.testing.TestService1", testservice);
 #if !ROBOTRACONTEUR_H5
             string authdata = "testuser1 0b91dec4fe98266a03b136b59219d0d6 objectlock\ntestuser2 841c4221c2e7e0cefbc0392a35222512 objectlock\ntestsuperuser 503ed776c50169f681ad7bbc14198b68 objectlock,objectlockoverride";
             PasswordFileUserAuthenticator p = new PasswordFileUserAuthenticator(authdata);
@@ -45,15 +54,15 @@ namespace RobotRaconteurTest
             policies.Add("allowobjectlock", "true");
             ServiceSecurityPolicy s = new ServiceSecurityPolicy(p, policies);
 
-            RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService_auth", "com.robotraconteur.testing.TestService1", testservice_auth, s);
+            node.RegisterService("RobotRaconteurTestService_auth", "com.robotraconteur.testing.TestService1", testservice_auth, s);
 
 #endif
         }
 
         public void UnregisterServices()
         {
-            RobotRaconteurNode.s.CloseService("RobotRaconteurTestService");
-            RobotRaconteurNode.s.CloseService("RobotRaconteurTestService_auth");
+            node.CloseService("RobotRaconteurTestService");
+            node.CloseService("RobotRaconteurTestService_auth");
         }
 
     }

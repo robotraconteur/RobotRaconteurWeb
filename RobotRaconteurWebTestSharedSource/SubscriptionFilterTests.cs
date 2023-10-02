@@ -138,10 +138,10 @@ namespace RobotRaconteurSubTest
                         var clients = c.GetConnectedClients();
                         foreach (var client in clients.Keys)
                         {
-                            Console.WriteLine(client.NodeID.ToString());
-                            Console.WriteLine(client.ServiceName);
+                            RRWebTest.WriteLine(client.NodeID.ToString());
+                            RRWebTest.WriteLine(client.ServiceName);
                         }
-                        Console.WriteLine(clients.Count);
+                        RRWebTest.WriteLine("Clients: {0}", clients.Count);
                         throw;
                     }
 
