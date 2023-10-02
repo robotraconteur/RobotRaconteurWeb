@@ -1184,6 +1184,20 @@ namespace RobotRaconteurWeb
             return new List<NodeDiscoveryInfo>();
         }
 
+        public override string[] ServerListenUrls
+        {
+            get
+            {
+                var o = new List<string>();
+                var endpoints = this.ListeningEndpoints;
+                foreach (var ep in endpoints)
+                {
+                    o.Add(string.Format("rr+tcp://{0}/?nodeid={1}", ep.ToString(), node.NodeID.ToString("D")));
+                }
+                return o.ToArray();
+            }
+        }
+
     }   
 
 

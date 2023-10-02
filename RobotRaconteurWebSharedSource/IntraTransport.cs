@@ -526,6 +526,18 @@ namespace RobotRaconteurWeb
                 });
             }
         }
+
+        public override string[] ServerListenUrls
+        {
+            get
+            {
+                if (!serverstarted)
+                {
+                    return new string[0];
+                }
+                return new string[] { string.Format("rr+intra:///?nodeid={1}", node.NodeID.ToString("D")) };
+            }
+        }
     }
 
 

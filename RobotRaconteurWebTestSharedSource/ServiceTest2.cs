@@ -25,13 +25,13 @@ using System.Threading.Tasks;
 namespace RobotRaconteurTest
 {
 
-#if !ROBOTRACONTEUR_H5
+
     public class RobotRaconteurTestServiceSupport2
     {
 
         public testroot3_impl testservice2;
 
-        public void RegisterServices(TcpTransport t)
+        public void RegisterServices()
         {
             testservice2 = new testroot3_impl();
             RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
@@ -68,9 +68,9 @@ namespace RobotRaconteurTest
         }
 
 
-        public override Pipe<int> unreliable1 { get; set; }
+        // public override Pipe<int> unreliable1 { get; set; }
         
-        public override ArrayMemory<double> readmem { get; }
+        // public override ArrayMemory<double> readmem { get; }
 
         public override Task<testenum1> get_testenum1_prop(CancellationToken cancel = default(CancellationToken))
         {
@@ -178,12 +178,12 @@ namespace RobotRaconteurTest
             }
         }
 
-        public override Wire<int[]> w1 { get; set; }
-        public override Wire<int[]> w2 { get; set; }
-        public override Wire<MultiDimArray> w3 { get; set; }
-        public override Pipe<int[]> p1 { get; set; }
-        public override Pipe<int[]> p2 { get; set; }
-        public override Pipe<MultiDimArray> p3 { get; set; }
+        // public override Wire<int[]> w1 { get; set; }
+        // public override Wire<int[]> w2 { get; set; }
+        // public override Wire<MultiDimArray> w3 { get; set; }
+        // public override Pipe<int[]> p1 { get; set; }
+        // public override Pipe<int[]> p2 { get; set; }
+        // public override Pipe<MultiDimArray> p3 { get; set; }
 
         public override Task<vector3> get_testnamedarray1(CancellationToken cancel = default(CancellationToken))
         {
@@ -388,10 +388,12 @@ namespace RobotRaconteurTest
             ca((CSingle[])value.Array_, ComplexFromScalars(c9_2_2));
             return Task.FromResult(0);
         }
-                
-        public override ArrayMemory<CDouble> c_m1 { get; } = new ArrayMemory<CDouble>(new CDouble[512]);
 
-        public override MultiDimArrayMemory<CDouble> c_m2 { get; } = new MultiDimArrayMemory<CDouble>(new MultiDimArray(new uint[] { 10, 10 }, new CDouble[100]));
+        ArrayMemory<CDouble> c_m1_v = new ArrayMemory<CDouble>(new CDouble[512]);
+        public override ArrayMemory<CDouble> c_m1 => c_m1_v; 
+
+        MultiDimArrayMemory<CDouble> c_m2_v = new MultiDimArrayMemory<CDouble>(new MultiDimArray(new uint[] { 10, 10 }, new CDouble[100]));
+        public override MultiDimArrayMemory<CDouble> c_m2 => c_m2_v; 
 
     }
 
@@ -478,7 +480,6 @@ namespace RobotRaconteurTest
             return Task.FromResult(0);
         }
     }
-#endif
     class ServiceTest2_test_sequence_gen
     {
         private uint counter;

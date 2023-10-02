@@ -200,6 +200,14 @@ namespace RobotRaconteurWeb
 
         internal readonly AsyncStreamTransportParent parent_adapter;
 
+        public override string[] ServerListenUrls
+        {
+            get
+            {                
+               return new string[0];                
+            }
+        }
+
     }
 
 

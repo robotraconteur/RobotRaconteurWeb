@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
+using RobotRaconteurTest;
 using RobotRaconteurWeb;
+using static H5.Core.dom;
 
 namespace RobotRaconteurH5Test
 {
@@ -17,6 +19,15 @@ namespace RobotRaconteurH5Test
             RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory());
             RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory());
             RobotRaconteurNode.s.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory());
+        }
+
+        public static void SetWriteLine()
+        {
+            RRWebTest.WriteLineFunc = delegate(string format, object[] args)
+            {
+                var log_elem = document.getElementById("log");
+                log_elem.innerHTML += string.Format(format,args) + "<br>";
+            };
         }
 
         public static async Task SubscriberTest()
@@ -31,20 +42,20 @@ namespace RobotRaconteurH5Test
 
             subscription.ClientConnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
             {
-                Console.WriteLine("Client connected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                RRWebTest.WriteLine("Client connected: " + d.NodeID.ToString() + ", " + d.ServiceName);
                 //testroot e1 = (testroot)e;
                 //Console.WriteLine("d1 = " + e1.get_d1().Result);
             };
 
             subscription.ClientDisconnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
             {
-                Console.WriteLine("Client disconnected: " + d.NodeID.ToString() + ", " + d.ServiceName);
+                RRWebTest.WriteLine("Client disconnected: " + d.NodeID.ToString() + ", " + d.ServiceName);
             };
 
             subscription.ClientConnectFailed +=
                 delegate (ServiceSubscription c, ServiceSubscriptionClientID d, string[] url2, Exception err)
                 {
-                    Console.WriteLine("Client connect failed: " + d.NodeID.ToString() + " url: " + String.Join(",", url2) +
+                    RRWebTest.WriteLine("Client connect failed: " + d.NodeID.ToString() + " url: " + String.Join(",", url2) +
                                   err.ToString());
                 };
 
@@ -60,23 +71,23 @@ namespace RobotRaconteurH5Test
             cancel3.CancelAfter(6000);
             var try_res = await subscription.TryGetDefaultClientWait<object>(cancel3.Token);
 
-            Console.WriteLine($"try_res = {try_res.Item1}");
+            RRWebTest.WriteLine($"try_res = {try_res.Item1}");
 
             var connected_clients = subscription.GetConnectedClients();
 
             foreach (var c in connected_clients)
             {
-                Console.WriteLine("Client: " + c.Key.NodeID + ", " + c.Key.ServiceName);
+                RRWebTest.WriteLine("Client: " + c.Key.NodeID + ", " + c.Key.ServiceName);
             }
 
             try
             {
-                Console.WriteLine(await subscription.GetDefaultClient<testroot>().get_d1());
+                RRWebTest.WriteLine("{0}", await subscription.GetDefaultClient<testroot>().get_d1());
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.WriteLine("Client not connected");
+                RRWebTest.WriteLine("{0}", e);
+                RRWebTest.WriteLine("Client not connected");
             }
 
             object client1;
