@@ -32,6 +32,16 @@ namespace RobotRaconteurTest
             }
         }
 
+        public static void AreEqual(NodeID a, NodeID b, [CallerFilePath] string sourceFilePath = "",
+                                       [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (a != b)
+            {
+                RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
+                throw new Exception("Unit test failure");
+            }
+        }
+
         public static void AreEqual(CDouble a, CDouble b, [CallerFilePath] string sourceFilePath = "",
                                        [CallerLineNumber] int sourceLineNumber = 0)
         {

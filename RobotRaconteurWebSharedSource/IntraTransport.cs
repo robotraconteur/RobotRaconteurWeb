@@ -569,6 +569,10 @@ namespace RobotRaconteurWeb
             parenttransport = parent;
             this.local_endpoint = local_endpoint;
             this.server = server;
+            if (server)
+            {
+                this.connecturl = "rr+intra:///";
+            }
         }
 
         void AcceptMessage(Message m)

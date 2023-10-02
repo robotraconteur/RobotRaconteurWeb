@@ -1877,7 +1877,7 @@ namespace RobotRaconteurWeb
 
                     _ = Task.Run(async delegate ()
                     {
-                        await Task.Delay(250);
+                        await Task.Delay(250).ConfigureAwait(false);
                         var cancel = new CancellationTokenSource();
                         parent.DoUpdateAllDetectedServices(this);
                     }).IgnoreResult();
@@ -1957,7 +1957,10 @@ namespace RobotRaconteurWeb
 
                 foreach (var c in clients.Values)
                 {
-                    o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c);
+                    if (clients != null)
+                    {
+                        o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c.client);
+                    }
                 }
             }
             return o;
@@ -2002,7 +2005,10 @@ namespace RobotRaconteurWeb
 
                 foreach (var c in clients.Values)
                 {
-                    o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c);
+                    if (c.client != null)
+                    {
+                        o.ClientConnected(new ServiceSubscriptionClientID(c.nodeid, c.service_name), c.client);
+                    }
                 }
             }
             return o;
@@ -2149,7 +2155,15 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public uint ActiveWireConnectionCount { get { return 0; } }
+        public uint ActiveWireConnectionCount {
+            get
+            {
+                lock(this)
+                {
+                    return (uint)connections.Count(x => x.Value.connection != null);
+                }
+            }
+        }
         /**
         <summary>
         Get or Set if InValue is ignored
@@ -2346,7 +2360,7 @@ namespace RobotRaconteurWeb
                     }
                     try
                     {
-                        await Task.Delay(2500, c.cancel.Token);
+                        await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false);
                     }
                     catch { }
                 }                
@@ -2378,7 +2392,11 @@ namespace RobotRaconteurWeb
                 {
                     if (!in_value_valid)
                     {
-                        throw new InvalidOperationException("InValue is not valid");
+                        throw new ValueNotSetException("InValue is not valid");
+                    }
+                    if (Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local,this.InValueLifespan))
+                    {
+                        throw new ValueNotSetException("InValue is expired");
                     }
                     return (T)in_value;
                 }
@@ -2404,7 +2422,11 @@ namespace RobotRaconteurWeb
             {
                 if (!in_value_valid)
                 {
-                    throw new InvalidOperationException("InValue is not valid");
+                    throw new ValueNotSetException("InValue is not valid");
+                }
+                if (Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local, this.InValueLifespan))
+                {
+                    throw new ValueNotSetException("InValue is expired");
                 }
                 ts = in_value_time;
                 connection = (Wire<T>.WireConnection)in_value_connection;
@@ -2430,7 +2452,7 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                if (!in_value_valid)
+                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local, this.InValueLifespan))
                 {
                     val = default;
                     ts = default;
@@ -2461,7 +2483,7 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                if (!in_value_valid)
+                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local, this.InValueLifespan))
                 {
                     val = default;                    
                     return false;
@@ -2576,7 +2598,15 @@ namespace RobotRaconteurWeb
             {
                 if (recv_packets.Count > 0)
                 {
-                    var q = recv_packets.Dequeue();
+                    Tuple<object,object> q;
+                    if (!peek)
+                    {
+                        q = recv_packets.Dequeue();
+                    }
+                    else
+                    {
+                        q = recv_packets.Peek();
+                    }
                     return Tuple.Create(true,q.Item1,q.Item2);
                 }
 
@@ -2617,7 +2647,14 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public uint Available { get { return 0; } }
+        public uint Available { 
+            get { 
+                lock (this)
+                {
+                    return (uint)recv_packets.Count;
+                }
+            }
+        }
         /**
         <summary>
         Get the number of pipe endpoints currently connected
@@ -2626,7 +2663,15 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public uint ActivePipeEndpointCount { get { return 0; } }
+        public uint ActivePipeEndpointCount {
+            get
+            {
+                lock (this)
+                {
+                    return (uint)connections.Count(x=>x.Value.endpoint!=null);
+                }
+            }
+        }
         /**
         <summary>
         Get or set if incoming packets are ignored
@@ -2928,7 +2973,7 @@ namespace RobotRaconteurWeb
                         cc.PacketAckReceivedEvent += pipe_ack_ev;
 
                         try
-                        {
+                        {                            
                             await wait_task.Task.ConfigureAwait(false);
                         }
                         finally

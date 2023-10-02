@@ -1,0 +1,13 @@
+service experimental.wire_sub_test
+
+stdver 0.10
+
+object testobj
+    wire double testwire1 [readonly]
+    wire double testwire2 [writeonly]
+    objref testobj2 subobj
+end
+
+object testobj2
+    wire double testwire3 [readonly]
+end

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+#if !ROBOTRACONTEUR_H5
 using Mono.Options;
+#endif
 using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
@@ -196,10 +198,12 @@ namespace RobotRaconteurWeb
         | TcpTransportListenLocalHost
     }
 
+#if !ROBOTRACONTEUR_H5
     internal class FillOptionsDescriptionAddHelper
     {
         public string Prefix { get; }
         public RobotRaconteurNodeSetupFlags AllowedOverrides { get; set; }
+
         private OptionSet optionSet;
 
         public FillOptionsDescriptionAddHelper(OptionSet optionSet, string prefix, RobotRaconteurNodeSetupFlags allowedOverrides)
@@ -224,7 +228,7 @@ namespace RobotRaconteurWeb
             optionSet.Add(combinedName + "=", descr, v => { /* You can add logic here to store/process 'v' */ });
         }
     }
-
+#endif
     /**
     <summary>
             Command line parser for node setup classes
@@ -261,7 +265,9 @@ namespace RobotRaconteurWeb
     [PublicApi]
     public class CommandLineConfigParser
     {
+#if !ROBOTRACONTEUR_H5
         private OptionSet desc = new OptionSet();
+#endif
         private Dictionary<string, string> parsedOptions = new Dictionary<string, string>();
         private string prefix;
 
@@ -283,7 +289,9 @@ namespace RobotRaconteurWeb
             default_tcp_port = 48653;
             default_flags = 0;
             this.prefix = prefix;
+#if !ROBOTRACONTEUR_H5
             FillOptionsDescription(desc, allowed_overrides, prefix);
+#endif
         }
 
         /**
@@ -317,7 +325,9 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void AddStringOption(string name, string descr)
         {
+#if !ROBOTRACONTEUR_H5
             desc.Add(prefix + name + "=", descr, v => parsedOptions[name] = v);
+#endif
         }
         /**
         <summary>
@@ -330,7 +340,9 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void AddBoolOption(string name, string descr)
         {
+#if !ROBOTRACONTEUR_H5
             desc.Add(prefix + name, descr, v => parsedOptions[name] = v != null ? "true" : "false");
+#endif
         }
 
         /**
@@ -344,7 +356,9 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void AddIntOption(string name, string descr)
         {
+#if !ROBOTRACONTEUR_H5
             desc.Add(prefix + name + "=", descr, (int v) => parsedOptions[name] = v.ToString());
+#endif
         }
 
         /**
@@ -359,10 +373,12 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void ParseCommandLine(string[] args)
         {
+#if !ROBOTRACONTEUR_H5
             if (args != null)
             {
                 desc.Parse(args);
             }
+#endif
         
         }
         /**
@@ -377,10 +393,12 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void ParseCommandLine(List<string> args)
         {
+#if !ROBOTRACONTEUR_H5
             if (args != null)
             {
                 desc.Parse(args);
             }
+#endif
         }
 
         /**
@@ -569,7 +587,7 @@ namespace RobotRaconteurWeb
 
             return defaultValue;
         }
-
+#if !ROBOTRACONTEUR_H5
         internal void FillOptionsDescription(OptionSet optionSet, RobotRaconteurNodeSetupFlags allowedOverrides, string prefix)
         {
             var h = new FillOptionsDescriptionAddHelper(optionSet, prefix, allowedOverrides);
@@ -623,7 +641,8 @@ namespace RobotRaconteurWeb
 
             h.Add<bool>("jumbo-message", "enable jumbo messages (up to 100 MB)", RobotRaconteurNodeSetupFlags.JumboMessage);
         }
-    }
+#endif
+}
 
     /**
     <summary>
@@ -688,6 +707,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public IntraTransport IntraTransport => intra_transport;
+#if !ROBOTRACONTEUR_H5
         /**
         <summary>
         Get the TcpTransport
@@ -708,10 +728,11 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public LocalTransport LocalTransport => local_transport;
-
+#endif
         internal RobotRaconteurNode node = null;
 
         internal IntraTransport intra_transport = null;
+#if !ROBOTRACONTEUR_H5
         internal TcpTransport tcp_transport = null;
 
         public LocalTransport local_transport = null;
@@ -726,6 +747,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public CommandLineConfigParser Config => config;
+#endif
 
         public void DoSetup(RobotRaconteurNode node, ServiceFactory[] serviceTypes, bool scan_assembly_types, CommandLineConfigParser config)
         {
@@ -789,13 +811,17 @@ namespace RobotRaconteurWeb
                 }
                 catch (Exception e)
                 {
+#if !ROBOTRACONTEUR_H5
                     Console.Error.WriteLine("warning: assembly scanning failed: " + e.Message);
+#else
+                    Console.WriteLine("warning: assembly scanning failed: " + e.Message);
+#endif
                 }
             }
 
             bool nodeNameSet = false;
             bool nodeIdSet = false;
-
+#if !ROBOTRACONTEUR_H5
             if (config.GetOptionOrDefaultAsBool("local-enable"))
             {
                 local_transport = new LocalTransport(node);
@@ -857,7 +883,7 @@ namespace RobotRaconteurWeb
 
                 node.RegisterTransport(local_transport);
             }
-
+#endif
             if (!string.IsNullOrEmpty(nodeId))
             {
                 if (!nodeIdSet)
@@ -887,7 +913,7 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
-
+#if !ROBOTRACONTEUR_H5
             if (config.GetOptionOrDefaultAsBool("tcp-enable"))
             {
                 tcp_transport = new TcpTransport(node);
@@ -1025,7 +1051,7 @@ namespace RobotRaconteurWeb
 
                 node.RegisterTransport(hardwareTransport);
             }*/
-
+#endif
             if (config.GetOptionOrDefaultAsBool("intra-enable"))
             {
                 intra_transport = new IntraTransport(node);
@@ -1041,16 +1067,17 @@ namespace RobotRaconteurWeb
                 node.RegisterTransport(intra_transport);
             }
 
-            if (config.GetOptionOrDefaultAsBool("disable-timeouts"))
+            /*if (config.GetOptionOrDefaultAsBool("disable-timeouts"))
             {
                 node.RequestTimeout=(uint.MaxValue);
                 node.TransportInactivityTimeout=(uint.MaxValue);
                 node.EndpointInactivityTimeout=(uint.MaxValue);
 
                 LogDebug("Timeouts disabled");
-            }
-
+            }*/
+#if !ROBOTRACONTEUR_H5
             this.config = config;
+#endif
 
             LogTrace("Node setup complete");
         }

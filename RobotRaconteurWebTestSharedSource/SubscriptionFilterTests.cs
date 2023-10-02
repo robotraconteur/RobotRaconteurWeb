@@ -37,7 +37,7 @@ namespace RobotRaconteurSubTest
 
     public class SubscriberFilterTests
     {
-        private static RobotRaconteurNode InitNode(string nodeName, string serviceName, Dictionary<string, object> attributes, uint service_type = 0)
+        private static RobotRaconteurNode InitNode(string nodeName, string serviceName, Dictionary<string, object> attributes, uint service_type = 1)
         {
             var node = new RobotRaconteurNode();
             node.NodeName = nodeName;
@@ -46,7 +46,7 @@ namespace RobotRaconteurSubTest
             node.RegisterTransport(intraTransport);
             intraTransport.StartServer();
 
-            // Assuming you have a method or mechanism to load the service definition similar to _robdef
+            
             node.RegisterServiceType(new experimental__testing__subtestfilterFactory());
 
             object serviceInstance;
@@ -58,7 +58,7 @@ namespace RobotRaconteurSubTest
             {
                 serviceInstance = new sub_testroot1_impl2(); 
             }
-            var serviceContext = node.RegisterService(serviceName, "com.robotraconteur.testing.subtestfilter", serviceInstance);
+            var serviceContext = node.RegisterService(serviceName, "experimental.testing.subtestfilter", serviceInstance);
             serviceContext.Attributes = (attributes);
 
             return node;
@@ -88,7 +88,7 @@ namespace RobotRaconteurSubTest
                 serviceInstance = new sub_testroot1_impl2();
             }
 
-            node.RegisterService(serviceName, "com.robotraconteur.testing.subtestfilter", serviceInstance, securityPolicy);
+            node.RegisterService(serviceName, "experimental.testing.subtestfilter", serviceInstance, securityPolicy);
         }
 #endif
 
@@ -100,12 +100,14 @@ namespace RobotRaconteurSubTest
             node1.RegisterTransport(t1);
             t1.StartClient();
 
+            node1.RegisterServiceType(new experimental__testing__subtestfilterFactory());
+
             node1.SetLogLevelFromString("WARNING");
 
             return node1;
         }
 
-        private async Task AssertConnectedClients(ServiceSubscription c, int count)
+        private static async Task AssertConnectedClients(ServiceSubscription c, int count)
         {
             int tryCount = 0;
 
@@ -123,6 +125,10 @@ namespace RobotRaconteurSubTest
                     if (c.GetConnectedClients().Count == count)
                     {
                         break;
+                    }
+                    else
+                    {
+                        throw new Exception("No clients connected");
                     }
                 }
                 catch (Exception)
@@ -144,9 +150,11 @@ namespace RobotRaconteurSubTest
             }
         }
 
-        public async Task RunAttributesFilterTest(RobotRaconteurNode clientNode, Dictionary<string, ServiceSubscriptionFilterAttributeGroup> attributesGroups, int expectedCount)
+        public static async Task RunAttributesFilterTest(RobotRaconteurNode clientNode, Dictionary<string, ServiceSubscriptionFilterAttributeGroup> attributesGroups, int expectedCount)
         {
             var filter1 = new ServiceSubscriptionFilter();
+
+            filter1.Attributes = new Dictionary<string, ServiceSubscriptionFilterAttributeGroup>();
 
             foreach (var kvp in attributesGroups)
             {
@@ -154,22 +162,22 @@ namespace RobotRaconteurSubTest
             }
 
             var sub2 = clientNode.SubscribeServiceByType(
-                new string[] { "com.robotraconteur.testing.subtestfilter.sub_testroot" }, filter1);
+                new string[] { "experimental.testing.subtestfilter.sub_testroot" }, filter1);
 
             await AssertConnectedClients(sub2, expectedCount);
             sub2.Close();
         }
 
-        public async Task RunFilterTest(RobotRaconteurNode clientNode, ServiceSubscriptionFilter filter, int expectedCount, string servicetypeSuffix = "")
+        public static async Task RunFilterTest(RobotRaconteurNode clientNode, ServiceSubscriptionFilter filter, int expectedCount, string servicetypeSuffix = "")
         {
             var sub2 = clientNode.SubscribeServiceByType(
-                new string[] { $"com.robotraconteur.testing.subtestfilter.sub_testroot{servicetypeSuffix}" }, filter);
+                new string[] { $"experimental.testing.subtestfilter.sub_testroot{servicetypeSuffix}" }, filter);
 
             await AssertConnectedClients(sub2, expectedCount);
             sub2.Close();
         }
 
-        public async Task TestSubscriberAttributeFilter()
+        public static async Task RunSubscriberAttributeFilter()
         {
             // Use IntraTransport for tests so everything is local to the test
 
@@ -212,7 +220,7 @@ namespace RobotRaconteurSubTest
             await clientNode.DisconnectService(c2);
             await clientNode.DisconnectService(c3);
 
-            var sub1 = clientNode.SubscribeServiceByType(new[] { "com.robotraconteur.testing.subtestfilter.sub_testroot" });
+            var sub1 = clientNode.SubscribeServiceByType(new[] { "experimental.testing.subtestfilter.sub_testroot" });
             await AssertConnectedClients(sub1, 3);
             sub1.Close();
 
@@ -256,7 +264,7 @@ namespace RobotRaconteurSubTest
             node3.Shutdown();
         }
 
-        public async Task TestSubscriberFilter()
+        public static async Task TestSubscriberFilter()
         {
             var node1 = InitNode("test_node3", "service1", new Dictionary<string, object>(), 2);
             var node2 = InitNode("test_node4", "service1", new Dictionary<string, object>(), 2);
@@ -283,7 +291,7 @@ namespace RobotRaconteurSubTest
             await clientNode.DisconnectService(c3);
             await clientNode.DisconnectService(c4);
 
-            var sub1 = clientNode.SubscribeServiceByType(new[] { "com.robotraconteur.testing.subtestfilter.sub_testroot2" });
+            var sub1 = clientNode.SubscribeServiceByType(new[] { "experimental.testing.subtestfilter.sub_testroot2" });
             await AssertConnectedClients(sub1, 5);
             sub1.Close();
 

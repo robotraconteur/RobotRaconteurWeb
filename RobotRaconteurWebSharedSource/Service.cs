@@ -41,7 +41,13 @@ namespace RobotRaconteurWeb
             
             RegisterEvents(o);
             InitPipeServers(o);
-            InitCallbackServers(o);            
+            InitCallbackServers(o);
+            
+            var init_obj = o as IRRServiceObject;
+            if (init_obj != null)
+            {
+                init_obj.RRServiceObjectInit(c, s);
+            }
         }
 
         protected internal RobotRaconteurNode rr_node;
@@ -2102,5 +2108,29 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter(int timeout);
+    }
+
+    /// <summary>
+    /// Interface for service objects to receive service notifications.
+    /// Service objects are passed to the service, either when the service is registered
+    /// or using objrefs. The service initializes the object by configuring events,
+    /// pipes, callbacks, and wires for use. The object may implement IRRServiceObject
+    /// to receive notification of when this process is complete, and to receive
+    /// a ServerContextPtr and the service path of the object.
+    /// IRRServiceObject.RRServiceObjectInit() is called after the object has been
+    /// initialized to provide this information.
+    /// </summary>
+    [PublicApi]
+    public interface IRRServiceObject
+    {
+        /// <summary>
+        /// Function called after service object has been initialized.
+        /// Override in the service object to receive notification the service object has
+        /// been initialized, a ServerContextPtr, and the service path.
+        /// </summary>
+        /// <param name="context">The ServerContextPtr owning the object.</param>
+        /// <param name="servicePath">The object service path.</param>
+        [PublicApi]
+        void RRServiceObjectInit(ServerContext context, string servicePath);
     }
 }

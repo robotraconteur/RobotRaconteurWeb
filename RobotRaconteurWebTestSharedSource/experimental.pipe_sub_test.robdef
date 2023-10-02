@@ -1,0 +1,13 @@
+service experimental.pipe_sub_test
+
+stdver 0.10
+
+object testobj
+    pipe double testpipe1 [readonly]
+    pipe double testpipe2
+    objref testobj2 subobj
+end
+
+object testobj2
+    pipe double testpipe3 [readonly]
+end

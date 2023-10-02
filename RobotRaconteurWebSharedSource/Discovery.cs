@@ -865,7 +865,7 @@ namespace RobotRaconteurWeb
             // TODO: log
 
             var cancel = new CancellationTokenSource();
-            cancel.CancelAfter(backoff + 1000);
+            cancel.CancelAfter(backoff + 10000);
 
             var ret = await DoUpdateServiceInfo(storage, storage.info.ServiceStateNonce, backoff, cancel.Token).ConfigureAwait(false);
             if (!ret.Item1)

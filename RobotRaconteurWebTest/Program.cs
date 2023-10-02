@@ -63,6 +63,24 @@ namespace RobotRaconteurTest
                         await ServiceInfo2SubscriberTestProgram.RunServiceInfo2SubscriberTest(args);
                         break;
                     }
+                case "subscriptioncitests":
+                {
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeServiceInfo2();
+
+
+                        await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
+                        await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
+
+                        await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
+                        await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
+
+                        Console.WriteLine("Done!");
+
+                        break;
+                }
                 default:
                     throw new ArgumentException("Invalid test command " + command);
             }
