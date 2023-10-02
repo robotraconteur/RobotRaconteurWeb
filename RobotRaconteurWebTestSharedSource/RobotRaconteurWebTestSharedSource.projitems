@@ -10,6 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.sub_test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.sub_test_stubskel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter_stubskel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.cs" />
@@ -26,11 +30,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriberTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriptionFilterTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestServerNodeConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.robdef" />
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService2.robdef" />
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.testing.sub_test" />
   </ItemGroup>
 </Project>

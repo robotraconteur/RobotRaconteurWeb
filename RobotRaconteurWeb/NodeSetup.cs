@@ -1375,6 +1375,15 @@ namespace RobotRaconteurWeb
         {
 
         }
+
+        /// <summary>
+        /// Initialize client node with default options
+        /// </summary>
+        public ClientNodeSetup()
+            :base(RobotRaconteurNode.s, null, true, null, 0, RobotRaconteurNodeSetupFlags.ClientDefault)
+        {
+
+        }
     }
     /**
     <summary>
