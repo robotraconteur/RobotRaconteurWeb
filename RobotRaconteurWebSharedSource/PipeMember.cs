@@ -26,10 +26,98 @@ namespace RobotRaconteurWeb
 {
     //TODO: Add threading locks
 
+    /**
+    <summary>
+    `pipe` member type interface
+    </summary>
+    <remarks>
+    <para>
+    The Pipe class implements the `pipe` member type. Pipes are declared in service definition files
+    using the `pipe` keyword within object declarations. Pipes provide reliable packet streaming between
+    clients and services. They work by creating pipe endpoint pairs (peers), with one endpoint in the client,
+    and one in the service. Packets are transmitted between endpoint pairs. Packets sent by one endpoint are received
+    by the other, where they are placed in a receive queue. Received packets can then be retrieved from the receive
+    queue.
+    </para>
+    <para>
+    Pipe endpoints are created by the client using the Connect() functions. Services receive
+    incoming connection requests through a callback function. This callback is configured using the
+    PipeConnectCallback property. Services may also use the PipeBroadcaster class to automate managing pipe
+    endpoint lifecycles and sending packets to all connected client endpoints. If the PipeConnectCallback property
+    is used, the service is responsible for keeping track of endpoints as the connect and disconnect. See PipeEndpoint
+    for details on sending and receiving packets.
+    </para>
+    <para>
+    Pipe endpoints are *indexed*, meaning that more than one endpoint pair can be created between the client and the
+    service.
+    </para>
+    <para>
+    Pipes may be *unreliable*, meaning that packets may arrive out of order or be dropped. Use IsUnreliable to check
+    for unreliable pipes. The member modifier `unreliable` is used to specify that a pipe should be unreliable.
+    </para>
+    <para>
+    Pipes may be declared *readonly* or *writeonly*. If neither is specified, the pipe is assumed to be full duplex.
+    *readonly* pipes may only send packets from service to client. *writeonly* pipes may only send packets from client
+    to service. Use Direction to determine the direction of the pipe.
+    </para>
+    <para>
+    The PipeBroadcaster is often used to simplify the use of Pipes. See PipeBroadcaster for more information.
+    </para>
+    <para>
+    This class is instantiated by the node. It should not be instantiated by the user.
+    </para>
+    </remarks>
+    <typeparam name="T">The packet data type</typeparam>
+    */
+
+        [PublicApi]
     public abstract class Pipe<T>
     {        
-        public const int ANY_INDEX = -1;
+        /**
+        <summary>
+        Connect to any pipe index
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
+        public const int ANY_INDEX = -1;
+        /**
+        <summary>
+        Pipe endpoint used to transmit reliable or unreliable data streams
+        </summary>
+        <remarks>
+        <para>
+        Pipe endpoints are used to communicate data between connected pipe members.
+        See Pipe for more information on pipe members.
+        </para>
+        <para>
+        Pipe endpoints are created by clients using the Pipe.Connect() or Pipe.AsyncConnect()
+        functions. Services receive incoming pipe endpoint connection requests through a
+        callback function specified using the Pipe.PipeConnectCallback property. Services
+        may also use the PipeBroadcaster class to automate managing pipe endpoint lifecycles and
+        sending packets to all connected client endpoints.
+        </para>
+        <para>
+        Pipe endpoints are///indexed*, meaning that more than one pipe endpoint pair can be created
+        using the same member. This means that multiple data streams can be created independent of
+        each other between the client and service using the same member.
+        </para>
+        <para>
+        Pipes send reliable packet streams between connected client/service endpoint pairs.
+        Packets are sent using the SendPacket() or functions. Packets
+        are read from the receive queue using the ReceivePacket(), ReceivePacketWait(),
+        TryReceivePacketWait(), TryReceivePacketWait(), or PeekNextPacket(). The endpoint is closed
+        using the Close()  function.
+        </para>
+        <para>
+        This class is instantiated by the Pipe class. It should not be instantiated
+        by the user.
+        </para>
+        </remarks>
+        */
+
+        [PublicApi]
         public class PipeEndpoint
         {
             private uint send_packet_number = 0;
@@ -38,11 +126,40 @@ namespace RobotRaconteurWeb
             private Pipe<T> parent;
             private int index;
             private Endpoint endpoint;
-                        
+            /**
+            <summary>
+            Get the pipe endpoint index used when endpoint connected
+            </summary>
+            <remarks>None</remarks>
+            */
+
+        [PublicApi]
             public int Index { get { return index; } }
+            /**
+            <summary>
+            Get the Robot Raconteur node Endpoint ID
+            </summary>
+            <remarks>
+            Get the endpoint associated with the ClientContext or ServerEndpoint
+            associated with the pipe endpoint.
+            </remarks>
+            */
 
+
+        [PublicApi]
             public uint Endpoint { get { return endpoint.LocalEndpoint; } }
+            /**
+            <summary>
+            Get or set if pipe endpoint should request packet acks
+            </summary>
+            <remarks>
+            Packet acks are generated by receiving endpoints to inform the sender that
+            a packet has been received. The ack contains the packet index, the sequence number
+            of the packet. Packet acks are used for flow control by PipeBroadcaster.
+            </remarks>
+            */
 
+        [PublicApi]
             public bool RequestPacketAck = false;
 
             public PipeEndpoint(Pipe<T> parent, int index, Endpoint endpoint = null)
@@ -54,16 +171,29 @@ namespace RobotRaconteurWeb
 
             private AsyncMutex send_mutex = new AsyncMutex();
 
+            /**
+            <summary>
+            Sends a packet to the peer endpoint
+            </summary>
+            <remarks>
+            Sends a packet to the peer endpoint. If the pipe is reliable, the packetsare  guaranteed to arrive
+            in order. If the pipe is set to unreliable, "best effort" is made to deliver packets, and they are not
+            guaranteed to arrive in order. This function will block until the packet has been transmitted by the
+            transport. It will return before the peer endpoint has received the packet.
+            </remarks>
+            <param name="packet">The packet to send</param>
+            <returns />
+            */
             public async Task<uint> SendPacket(T packet, CancellationToken cancel = default(CancellationToken))
             {
                 Task mutex = send_mutex.Enter();
                 try
                 {
-                    await mutex;
+                    await mutex.ConfigureAwait(false);
                     send_packet_number = (send_packet_number < UInt32.MaxValue)
                         ? send_packet_number + 1 : 0;
 
-                    await parent.SendPipePacket(packet, index, send_packet_number, RequestPacketAck, endpoint, cancel);
+                    await parent.SendPipePacket(packet, index, send_packet_number, RequestPacketAck, endpoint, cancel).ConfigureAwait(false);
                     return send_packet_number;
                 }
                 finally
@@ -72,10 +202,20 @@ namespace RobotRaconteurWeb
                 }
 
             }
-            
+            /**
+            <summary>
+            Close the pipe endpoint
+            </summary>
+            <remarks>
+            Close the pipe endpoint. Blocks until close complete. The peer endpoint is destroyed
+            automatically.
+            </remarks>
+            */
+
+        [PublicApi]
             public async Task Close()
             {
-                await parent.Close(this);
+                await parent.Close(this).ConfigureAwait(false);
             }
 
             private uint increment_packet_number(uint packetnum)
@@ -86,11 +226,24 @@ namespace RobotRaconteurWeb
 
             private Dictionary<uint, T> out_of_order_packets = new Dictionary<uint, T>();
             private object recv_lock = new object();
+            /**
+            <summary>
+            Signal called when a packet has been received
+            </summary>
+            <remarks>
+            Function must accept one argument, receiving the PipeEndpoint that
+            received a packet
+            </remarks>
+            */
 
+        [PublicApi]
             public event PipePacketReceivedCallbackFunction PacketReceivedEvent;
+
+            AsyncValueWaiter<bool> recv_waiter = new AsyncValueWaiter<bool>();
 
             internal protected void PipePacketReceived(T packet, uint packetnum)
             {
+                if (IgnoreInValue) return;
                 lock (recv_lock)
                 {
                     if (packetnum == increment_packet_number(recv_packet_number))
@@ -108,6 +261,8 @@ namespace RobotRaconteurWeb
                             }
                         }
 
+                        recv_waiter.NotifyAll(true);
+
                         if (PacketReceivedEvent != null)
                         {
                             try
@@ -123,7 +278,23 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
+            /**
+            <summary>
+            Signal called when a packet ack has been received
+            </summary>
+            <remarks>
+            <para>
+            Packet acks are generated if SetRequestPacketAck() is set to true. The receiving
+            endpoint generates acks to inform the sender that the packet has been received.
+            </para>
+            <para>
+            Function must accept two arguments, receiving the PipeEndpoint
+            that received the packet ack and the packet number that is being acked.
+            </para>
+            </remarks>
+            */
 
+        [PublicApi]
             public event PipePacketAckReceivedCallbackFunction PacketAckReceivedEvent;
 
             internal void PipePacketAckReceived(uint packetnum)
@@ -132,7 +303,16 @@ namespace RobotRaconteurWeb
             }
 
             private Queue<T> recv_packets = new Queue<T>();
+            /**
+            <summary>
+            Return number of packets in the receive queue
+            </summary>
+            <remarks>
+            Invalid for writeonly pipes.
+            </remarks>
+            */
 
+        [PublicApi]
             public int Available
             {
                 get
@@ -143,7 +323,19 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
+            /**
+            <summary>
+            Peeks the next packet in the receive queue
+            </summary>
+            <remarks>
+            Returns the first packet in the receive queue, but does not remove it from
+            the queue. Throws an InvalidOperationException if there are no packets in the
+            receive queue.
+            </remarks>
+            <returns>The next packet in the receive queue</returns>
+            */
 
+        [PublicApi]
             public T PeekNextPacket()
             {
                 lock (recv_lock)
@@ -151,7 +343,19 @@ namespace RobotRaconteurWeb
                     return recv_packets.Peek();
                 }
             }
+            /**
+            <summary>
+            Receive the next packet in the receive queue
+            </summary>
+            <remarks>
+            Receive the next packet from the receive queue. This function will throw an
+            InvalidOperationException if there are no packets in the receive queue. Use
+            ReceivePacketWait() to block until a packet has been received.
+            </remarks>
+            <returns>The received packet</returns>
+            */
 
+        [PublicApi]
             public T ReceivePacket()
             {
                 lock (recv_lock)
@@ -159,9 +363,136 @@ namespace RobotRaconteurWeb
                     return recv_packets.Dequeue();
                 }
             }
+            /**
+            <summary>
+            Receive the next packet in the receive queue, block if queue is empty
+            </summary>
+            <remarks>
+            Same as ReceivePacket(), but blocks if queue is empty
+            </remarks>
+            <param name="timeout">Timeout in milliseconds to wait for a packet, or RR_TIMEOUT_INFINITE for no
+            timeout</param>
+            <returns>The received packet</returns>
+            */
+
+        [PublicApi]
+            public async Task<T> ReceivePacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
+            {
+                var ret = await TryReceivePacketWait(timeout, false, cancel).ConfigureAwait(false);
+                if (!ret.Item1)
+                {
+                    throw new InvalidOperationException("Receive queue empty");
+                }
+                return ret.Item2;
+            }
+            /**
+            <summary>
+            Peek the next packet in the receive queue, block if queue is empty
+            </summary>
+            <remarks>
+            Same as PeekPacket(), but blocks if queue is empty
+            </remarks>
+            <param name="timeout">Timeout in milliseconds to wait for a packet, or RR_TIMEOUT_INFINITE for no
+            timeout</param>
+            <returns>The received packet</returns>
+            */
+
+        [PublicApi]
+            public async Task<T> PeekNextPacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
+            {
+                var ret = await TryReceivePacketWait(timeout, true, cancel).ConfigureAwait(false);
+                if (!ret.Item1)
+                {
+                    throw new InvalidOperationException("Receive queue empty");
+                }
+                return ret.Item2;
+            }
+            /**
+            <summary>
+            Try receiving a packet, optionally blocking if the queue is empty
+            </summary>
+            <remarks>
+            <para>
+            Try receiving a packet with various options. Returns true if a packet has been
+            received, or false if no packet is available instead of throwing an exception on failure.
+            The timeout and peek parameters can be used to modify behavior to provide functionality
+            similar to the various Receive and Peek functions.
+            </para>
+            </remarks>
+            <param name="packet">[out] The received packet</param>
+            <param name="timeout">The timeout in milliseconds. Set to zero for non-blocking operation, an arbitrary
+            value
+            in milliseconds for a finite duration timeout, or RR_TIMEOUT_INFINITE for no timeout</param>
+            <param name="peek">If true, the packet is not removed from the receive queue</param>
+            <returns>true if packet was received, otherwise false</returns>
+            */
+
+        [PublicApi]
+            public async Task<Tuple<bool, T>> TryReceivePacketWait(int timeout = -1, bool peek = false, CancellationToken cancel = default)
+            {
+                AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter;
+                lock (recv_lock)
+                {              
+                    if (recv_packets.Count > 0)
+                    {
+                        if (!peek)
+                        {
+                            return Tuple.Create(true, recv_packets.Dequeue());
+                        }
+                        else
+                        {
+                            return Tuple.Create(true, recv_packets.Peek());
+                        }
+
+                    }
+                    else if (timeout == 0)
+                    {
+                        return Tuple.Create(false, default(T));
+                    }
+
+                    waiter = recv_waiter.CreateWaiterTask(timeout, cancel);
+                }
+
+                await waiter.Task.ConfigureAwait(false);
+
+                lock (recv_lock)
+                {
+                    if (recv_packets.Count > 0)
+                    {
+                        if (!peek)
+                        {
+                            return Tuple.Create(true, recv_packets.Dequeue());
+                        }
+                        else
+                        {
+                            return Tuple.Create(true, recv_packets.Peek());
+                        }
+
+                    }                    
+                    return Tuple.Create(false, default(T));                    
+                }
+            }
+
+            public bool IgnoreInValue { get; set; }
 
             private PipeDisconnectCallbackFunction close_callback;
 
+            /**
+            <summary>
+            Get or set the endpoint closed callback function
+            </summary>
+            <remarks>
+            <para>
+            Get or Set a function to invoke when the pipe endpoint has been closed.
+            </para>
+            <para>
+            Callback function must accept one argument, receiving the PipeEndpoint that
+            was closed.
+            </para>
+            </remarks>
+            */
+
+        [PublicApi]
             public PipeDisconnectCallbackFunction PipeCloseCallback
             {
                 get { return close_callback; }
@@ -191,7 +522,14 @@ namespace RobotRaconteurWeb
                 rawelements = true;
 
         }
+        /**
+        <summary>
+        The pipe member name
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public abstract string MemberName { get; }
 
         public delegate void PipeConnectCallbackFunction(PipeEndpoint newpipe);
@@ -204,8 +542,50 @@ namespace RobotRaconteurWeb
 
         protected abstract Task SendPipePacket(T packet, int index, uint packetnumber, bool requestack, Endpoint endpoint, CancellationToken cancel = default(CancellationToken));
         
+        /**
+        <summary>
+        Connect a pipe endpoint
+        </summary>
+        <remarks>
+        <para>
+        Creates a connected pipe endpoint pair, and returns the local endpoint. Use to create the streaming data
+        connection to the service. Pipe endpoints are indexed, meaning that Connect() may be called multiple
+        times for the same client connection to create multple pipe endpoint pairs. For most cases Pipe.ANY_INDEX
+        (-1) can be used to automatically select an available index.
+        </para>
+        <para>
+        Only valid on clients. Will throw InvalidOperationException on the service side.
+        </para>
+        </remarks>
+        <param name="index">The index of the pipe endpoint, or (-1) to automatically select an index</param>
+        <returns>The connected pipe endpoint</returns>
+        */
+        [PublicApi]
         public abstract Task<PipeEndpoint> Connect(int index, CancellationToken cancel = default(CancellationToken));
 
+        /**
+        <summary>
+        Set the pipe endpoint connected callback function
+        </summary>
+        <remarks>
+        <para>
+        Callback function invoked when a client attempts to connect a pipe endpoint. The callback
+        will receive the incoming pipe endpoint as a parameter. The service must maintain a reference to the
+        pipe endpoint, but the pipe will retain ownership of the endpoint until it is closed.
+        </para>
+        </remarks>
+        <para>
+        The callback may throw an exception to reject incoming connect request.
+        </para>
+        <para>
+        Note: Connect callback is configured automatically by PipeBroadcaster
+        </para>
+        <para>
+        Only valid for services. Will throw InvalidOperationException on the client side.
+        </para>
+        
+        */
+        [PublicApi]
         public abstract PipeConnectCallbackFunction PipeConnectCallback { get; set; }
 
         public abstract void PipePacketReceived(MessageEntry m, Endpoint e = null);
@@ -223,7 +603,7 @@ namespace RobotRaconteurWeb
         protected bool DispatchPacket(MessageElement me, PipeEndpoint e, out uint packetnumber)
         {
             int index = Int32.Parse(me.ElementName);
-            List<MessageElement> elems = ((MessageElementMap<string>)me.Data).Elements;
+            List<MessageElement> elems = (me.CastDataToNestedList()).Elements;
             packetnumber = (MessageElement.FindElement(elems, "packetnumber").CastData<uint[]>())[0];
             object data;
             if (!rawelements)
@@ -257,7 +637,7 @@ namespace RobotRaconteurWeb
                 elems.Add(new MessageElement("requestack", new int[] { 1 }));
             }
 
-            MessageElementMap<string> delems = new MessageElementMap<string>(elems);
+            var delems = new MessageElementNestedElementList(DataTypes.dictionary_t, "", elems);
             
             MessageElement me = new MessageElement(index.ToString(), delems);
 
@@ -295,7 +675,7 @@ namespace RobotRaconteurWeb
             MessageElement me = PackPacket(data, index, packetnumber, requestack);
             MessageEntry m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
             m.AddElement(me);
-            await stub.SendPipeMessage(m, cancel);
+            await stub.SendPipeMessage(m, cancel).ConfigureAwait(false);
         }
 
         List<Tuple<int,object>> connecting = new List<Tuple<int,object>>();
@@ -304,35 +684,44 @@ namespace RobotRaconteurWeb
         public override async Task<PipeEndpoint> Connect(int index, CancellationToken cancel = default(CancellationToken))
         {
             object connecting_key = new object();
-            connecting.Add(Tuple.Create(index,connecting_key));
+            lock (this)
+            {
+                connecting.Add(Tuple.Create(index, connecting_key));
+            }
             int rindex=-1;
             try
             {
                 MessageEntry m = new MessageEntry(MessageEntryType.PipeConnectReq, MemberName);
                 m.AddElement("index", index);
-                MessageEntry ret = await stub.ProcessRequest(m, cancel);
-
-                rindex = (ret.FindElement("index").CastData<int[]>())[0];
-
-                PipeEndpoint e;
-                if (early_endpoints.ContainsKey(rindex))
+                MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
+                lock (this)
                 {
-                    e = early_endpoints[rindex];
-                    early_endpoints.Remove(rindex);
+
+                    rindex = (ret.FindElement("index").CastData<int[]>())[0];
+
+                    PipeEndpoint e;
+                    if (early_endpoints.ContainsKey(rindex))
+                    {
+                        e = early_endpoints[rindex];
+                        early_endpoints.Remove(rindex);
+                    }
+                    else
+                    {
+                        e = new PipeEndpoint(this, rindex);
+                    }
+                    pipeendpoints.Add(rindex, e);
+                    return e;
                 }
-                else
-                {
-                    e= new PipeEndpoint(this, rindex);
-                }
-                pipeendpoints.Add(rindex, e);
-                return e;
             }
             finally
             {
-                connecting.RemoveAll(x => Object.ReferenceEquals(x.Item2, connecting_key));
-                if (connecting.Count == 0)
+                lock (this)
                 {
-                    early_endpoints.Clear();
+                    connecting.RemoveAll(x => Object.ReferenceEquals(x.Item2, connecting_key));
+                    if (connecting.Count == 0)
+                    {
+                        early_endpoints.Clear();
+                    }
                 }
             }
         }
@@ -341,7 +730,7 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeDisconnectReq, MemberName);
             m.AddElement("index", e.Index);
-            MessageEntry ret = await stub.ProcessRequest(m, cancel);
+            MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
         
         public override PipeConnectCallbackFunction PipeConnectCallback
@@ -356,9 +745,13 @@ namespace RobotRaconteurWeb
             {
                 try
                 {
-
-                    int index = (m.FindElement("index").CastData<int[]>())[0];
-                    pipeendpoints[index].RemoteClose();
+                    PipeEndpoint ep;
+                    lock (this)
+                    {
+                        int index = (m.FindElement("index").CastData<int[]>())[0];
+                        ep = pipeendpoints[index];
+                    }
+                    ep.RemoteClose();
                 }
                 catch { };
             }
@@ -374,23 +767,26 @@ namespace RobotRaconteurWeb
                         uint pnum;
 
                         PipeEndpoint p=null;
-                        if (pipeendpoints.ContainsKey(index))
+                        lock (this)
                         {
-                            p = pipeendpoints[index];
-                        }
-                        else
-                        {
-                            if (early_endpoints.ContainsKey(index))
+                            if (pipeendpoints.ContainsKey(index))
                             {
-                                p = early_endpoints[index];
+                                p = pipeendpoints[index];
                             }
                             else
-                            if (connecting.Count > 0)
                             {
-                                if (connecting.Any(x => x.Item1 == -1 || x.Item1 == index))
+                                if (early_endpoints.ContainsKey(index))
                                 {
-                                    p = new PipeEndpoint(this, index);
-                                    early_endpoints.Add(index, p);
+                                    p = early_endpoints[index];
+                                }
+                                else
+                                if (connecting.Count > 0)
+                                {
+                                    if (connecting.Any(x => x.Item1 == -1 || x.Item1 == index))
+                                    {
+                                        p = new PipeEndpoint(this, index);
+                                        early_endpoints.Add(index, p);
+                                    }
                                 }
                             }
                         }
@@ -446,7 +842,10 @@ namespace RobotRaconteurWeb
         
         protected override void DeleteEndpoint(PipeEndpoint e)
         {
-            pipeendpoints.Remove(e.Index);
+            lock (this)
+            {
+                pipeendpoints.Remove(e.Index);
+            }
         }
 
         internal void ClientContextListener(ClientContext context, ClientServiceListenerEventType event_, object param)
@@ -489,14 +888,19 @@ namespace RobotRaconteurWeb
         
         protected override async Task SendPipePacket(T data, int index, uint packetnumber, bool requestack, Endpoint e = null, CancellationToken cancel = default(CancellationToken))
         {
-            if (!pipeendpoints.ContainsKey(e.LocalEndpoint)) throw new Exception("Pipe has been disconnect");
-            if (!pipeendpoints[e.LocalEndpoint].ContainsKey(index)) throw new Exception("Pipe has been disconnected");
+            MessageElement me;
+            MessageEntry m;
+            lock (pipeendpointlock)
+            {
+                if (!pipeendpoints.ContainsKey(e.LocalEndpoint)) throw new Exception("Pipe has been disconnect");
+                if (!pipeendpoints[e.LocalEndpoint].ContainsKey(index)) throw new Exception("Pipe has been disconnected");
 
-            MessageElement me = PackPacket(data, index, packetnumber, requestack);
-            MessageEntry m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
-            m.AddElement(me);
+                me = PackPacket(data, index, packetnumber, requestack);
+                m = new MessageEntry(MessageEntryType.PipePacket, MemberName);
+                m.AddElement(me);
+            }
 
-            await skel.SendPipeMessage(m, e, cancel);
+            await skel.SendPipeMessage(m, e, cancel).ConfigureAwait(false);
         }
         
         public override Task<PipeEndpoint> Connect(int endpoint, CancellationToken cancel = default(CancellationToken))
@@ -508,7 +912,7 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeClosed, MemberName);
             m.AddElement("index", e.Index);
-            await skel.SendPipeMessage(m, ee, cancel);
+            await skel.SendPipeMessage(m, ee, cancel).ConfigureAwait(false);
 
             DeleteEndpoint(e);            
         }
@@ -530,8 +934,13 @@ namespace RobotRaconteurWeb
                     try
                     {
                         int index = Int32.Parse(me.ElementName);
+                        PipeEndpoint pe1;
+                        lock (pipeendpointlock)
+                        {
+                            pe1 = pipeendpoints[e.LocalEndpoint][index];
+                        }
                         uint pnum;
-                        if (DispatchPacket(me, pipeendpoints[e.LocalEndpoint][index], out pnum))
+                        if (DispatchPacket(me, pe1, out pnum))
                         {
                             ack.Add(new MessageElement(me.ElementName, new uint[] { pnum }));
                         }
@@ -562,6 +971,11 @@ namespace RobotRaconteurWeb
                     foreach (MessageElement me in m.elements)
                     {
                         int index = Int32.Parse(me.ElementName);
+                        PipeEndpoint pe1;
+                        lock (pipeendpointlock)
+                        {
+                            pe1 = pipeendpoints[e.LocalEndpoint][index];
+                        }
                         DispatchPacketAck(me, pipeendpoints[e.LocalEndpoint][index]);
                     }
                 }
@@ -669,7 +1083,47 @@ namespace RobotRaconteurWeb
             return skel.RRContext.UnpackAnyType<T>(o);
         }
     }
+    /**
+    <summary>
+    Broadcaster to send packets to all connected clients
+    </summary>
+    <remarks>
+    <para>
+    PipeBroadcaster is used by services to send packets to all connected
+    client endpoints. It attaches to the pipe on the service side, and
+    manages the lifecycle of connected endpoints. PipeBroadcaster should
+    only be used with pipes that are declared*readonly*, since it has
+    no provisions for receiving incoming packets from the client.
+    </para>
+    <para>
+    PipeBroadcaster is initialized by the user, or by default implementation
+    classes generated by RobotRaconteurGen (*_default_impl). Default
+    implementation classes will automatically instantiate broadcasters
+    for pipes marked*readonly*. If default implementation classes are
+    not used, the broadcaster must be instantiated manually. It is
+    recommended this be done using the IRRServiceObject interface in
+    the overridden IRRServiceObject.RRServiceObjectInit() function. This
+    function is called after the pipes have been instantiated by the service.
+    </para>
+    <para>
+    Use SendPacket() or AsyncSendPacket() to broadcast packets to all
+    connected clients.
+    </para>
+    <para>
+    PipeBroadcaster provides flow control by optionally tracking how many packets
+    are in flight to each client pipe endpoint. (This is accomplished using packet acks.) If a
+    maximum backlog is specified, pipe endpoints exceeding this count will stop sending packets.
+    Specify the maximum backlog using the Init() function or the SetMaxBacklog() function.
+    </para>
+    <para>
+    The rate that packets are sent can be regulated using a callback function configured
+    with the Predicate property, or using the BroadcastDownsampler class.
+    </para>
+    </remarks>
+    <typeparam name="T">The packet data type</typeparam>
+    */
 
+        [PublicApi]
     public class PipeBroadcaster<T>
     {
         protected Pipe<T> pipe;
@@ -689,9 +1143,26 @@ namespace RobotRaconteurWeb
                 this.ep = ep;
             }
         }
+        /**
+        <summary>
+        Get the associated pipe
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public Pipe<T> Pipe { get => (Pipe<T>)pipe; }
+        /**
+        <summary>
+        Construct a new PipeBroadcaster
+        </summary>
+        <remarks>None</remarks>
+        <param name="pipe">The pipe to use for broadcasting. Must be a pipe from a service object.
+        Specifying a client pipe will result in an exception.</param>
+        <param name="maximum_backlog">The maximum number of packets in flight, or -1 for unlimited</param>
+        */
 
+        [PublicApi]
         public PipeBroadcaster(Pipe<T> pipe, int maximum_backlog = -1)
         {
             this.pipe = pipe;
@@ -759,8 +1230,15 @@ namespace RobotRaconteurWeb
                 catch { }
             }
         }
+        /**
+        <summary>
+        Send packet to all connected pipe endpoint clients
+        </summary>
+        <param name="packet">The packet to send</param>
+        */
 
-        public async Task AsyncSendPacket(T packet, CancellationToken cancel=default(CancellationToken))
+        [PublicApi]
+        public async Task SendPacket(T packet, CancellationToken cancel=default(CancellationToken))
         {
             List<connected_endpoint> endpoints1 = new List<connected_endpoint>();
             lock (endpoints)
@@ -785,7 +1263,10 @@ namespace RobotRaconteurWeb
                         continue;
                     }
 
-                    
+                    if(Predicate != null && !Predicate(this, ep.Endpoint, ep.Index))
+                    {
+                        continue;
+                    }
                     lock (endpoints)
                     {
                         if (maximum_backlog != -1 && cep.backlog.Count + cep.active_sends.Count > maximum_backlog)
@@ -807,7 +1288,7 @@ namespace RobotRaconteurWeb
 
             while (eps.Count > 0)
             {
-                await Task.WhenAny(eps.Select(x => x.Item1).ToArray());
+                await Task.WhenAny(eps.Select(x => x.Item1).ToArray()).ConfigureAwait(false);
 
                 for (int i = 0; i < eps.Count; )
                 {
@@ -817,7 +1298,7 @@ namespace RobotRaconteurWeb
                     {
                         try
                         {
-                            uint pnum = await t;
+                            uint pnum = await t.ConfigureAwait(false);
                             lock (endpoints)
                             {
                                 cep1.active_sends.Remove(eps[i].Item3);
@@ -852,7 +1333,19 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+        /**
+        <summary>
+        Get or set the maximum backlog
+        </summary>
+        <remarks>
+        PipeBroadcaster provides flow control by optionally tracking how many packets
+        are in flight to each client pipe endpoint. (This is accomplished using packet acks.) If a
+        maximum backlog is specified, pipe endpoints exceeding this count will stop sending packets.
+        Use -1 for infinite packets in flight.
+        </remarks>
+        */
 
+        [PublicApi]
         public int MaximumBacklog
         {
             get => maximum_backlog;
@@ -868,5 +1361,26 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+        /**
+        <summary>
+        Set the predicate callback function
+        </summary>
+        <remarks>
+        <para>
+        A predicate is optionally used to regulate when packets are sent to clients. This is used by the
+        BroadcastDownsampler to regulate update rates of packets sent to clients.
+        </para>
+        <para>
+        The predicate callback is invoked before the broadcaster sends a packet to an endpoint. If the predicate returns
+        true, the packet will be sent. If it is false, the packet will not be sent to that endpoint.
+        </para>
+        <para>
+        It receives the broadcaster, the client endpoint ID, and the pipe endpoint index. It returns true to send the
+        packet, or false to not send the packet.
+        </para>
+        </remarks>
+        <value />
+        */
+        public Func<object, uint, int, bool> Predicate { get; set; }
     }
 }

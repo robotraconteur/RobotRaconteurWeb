@@ -49,7 +49,7 @@ end object";
     }
     throw new DataTypeException("Cannot find appropriate structure stub");
     }
-    public override MessageElementStructure PackStructure(Object s) {
+    public override MessageElementNestedElementList PackStructure(Object s) {
     if (s==null) return null;
     string objtype=ServiceDefinitionUtil.FindStructRRType(s.GetType());
     if (ServiceDefinitionUtil.SplitQualifiedName(objtype).Item1 == "RobotRaconteurServiceIndex") {
@@ -65,10 +65,10 @@ end object";
     }
     throw new Exception();
     }
-    public override T UnpackStructure<T>(MessageElementStructure l) {
+    public override T UnpackStructure<T>(MessageElementNestedElementList l) {
     if (l==null) return default(T);
-    if (ServiceDefinitionUtil.SplitQualifiedName(l.Type).Item1 == "RobotRaconteurServiceIndex") {
-    string objshort=RemovePath(l.Type);
+    if (ServiceDefinitionUtil.SplitQualifiedName(l.TypeName).Item1 == "RobotRaconteurServiceIndex") {
+    string objshort=RemovePath(l.TypeName);
     switch (objshort) {
     case "NodeInfo":
     return  NodeInfo_stubentry.UnpackStructure<T>(l);

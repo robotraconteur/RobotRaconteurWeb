@@ -26,19 +26,27 @@ namespace RobotRaconteurTest
 {
 
 
-#if !ROBOTRACONTEUR_BRIDGE
     public class RobotRaconteurTestServiceSupport
     {
         public RobotRaconteurTest_testroot testservice;
         public RobotRaconteurTest_testroot testservice_auth;
+        public RobotRaconteurNode node;
+        public RobotRaconteurTestServiceSupport(RobotRaconteurNode node = null)
+        {
+            this.node = node;
+            if (node == null)
+            {
+                this.node = RobotRaconteurNode.s;
+            }
+        }
 
-        public void RegisterServices(TcpTransport t)
+        public void RegisterServices(Transport t)
         {
             testservice = new RobotRaconteurTest_testroot(t);
             testservice_auth = new RobotRaconteurTest_testroot(t);
 
-            RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService", "com.robotraconteur.testing.TestService1", testservice);
-
+            node.RegisterService("RobotRaconteurTestService", "com.robotraconteur.testing.TestService1", testservice);
+#if !ROBOTRACONTEUR_H5
             string authdata = "testuser1 0b91dec4fe98266a03b136b59219d0d6 objectlock\ntestuser2 841c4221c2e7e0cefbc0392a35222512 objectlock\ntestsuperuser 503ed776c50169f681ad7bbc14198b68 objectlock,objectlockoverride";
             PasswordFileUserAuthenticator p = new PasswordFileUserAuthenticator(authdata);
             Dictionary<string, string> policies = new Dictionary<string, string>();
@@ -46,15 +54,15 @@ namespace RobotRaconteurTest
             policies.Add("allowobjectlock", "true");
             ServiceSecurityPolicy s = new ServiceSecurityPolicy(p, policies);
 
-            RobotRaconteurNode.s.RegisterService("RobotRaconteurTestService_auth", "com.robotraconteur.testing.TestService1", testservice_auth, s);
+            node.RegisterService("RobotRaconteurTestService_auth", "com.robotraconteur.testing.TestService1", testservice_auth, s);
 
-
+#endif
         }
 
         public void UnregisterServices()
         {
-            RobotRaconteurNode.s.CloseService("RobotRaconteurTestService");
-            RobotRaconteurNode.s.CloseService("RobotRaconteurTestService_auth");
+            node.CloseService("RobotRaconteurTestService");
+            node.CloseService("RobotRaconteurTestService_auth");
         }
 
     }
@@ -65,9 +73,9 @@ namespace RobotRaconteurTest
     public class RobotRaconteurTest_testroot : com.robotraconteur.testing.TestService1.testroot
     {
 
-        TcpTransport transport;
+        Transport transport;
 
-        public RobotRaconteurTest_testroot(TcpTransport t)
+        public RobotRaconteurTest_testroot(Transport t)
         {
             this.transport = t;
         }
@@ -960,9 +968,9 @@ namespace RobotRaconteurTest
             public Task func1(CancellationToken cancel = default(CancellationToken))
         {
 
-            Thread t = new Thread(delegate()
+            Task.Run(async delegate()
             {
-                Thread.Sleep(100);
+                await Task.Delay(100);
                 try
                 {
                     ev1();
@@ -973,15 +981,15 @@ namespace RobotRaconteurTest
                 }
             }
             );
-            t.Start();
+            
             return Task.FromResult(0);
         }
 
             public Task func2(double d1, double d2, CancellationToken cancel = default(CancellationToken))
         {
-            Thread t = new Thread(delegate()
+            Task.Run(async delegate()
             {
-                Thread.Sleep(100);
+                await Task.Delay(100);
                 teststruct2 s = new teststruct2();
                 s.mydat = new double[] { d2 };
                 try
@@ -994,18 +1002,24 @@ namespace RobotRaconteurTest
                 }
             }
            );
-            t.Start();
+            
             return Task.FromResult(0);
         }
 
             public Task<double> func3(double d1, double d2, CancellationToken cancel = default(CancellationToken))
         {
-            Console.WriteLine(transport.IsTransportConnectionSecure(ServerEndpoint.CurrentEndpoint));
-            Console.WriteLine(transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint));
+#if !ROBOTRACONTEUR_H5
+            if (this.transport != null)
+            {            
+            TcpTransport transport = (TcpTransport)this.transport;
+            RRWebTest.WriteLine("Is Connection Secure: {0}", transport.IsTransportConnectionSecure(ServerEndpoint.CurrentEndpoint));
+            RRWebTest.WriteLine("Is Secure Peer Identity Verified: {0}", transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint));
             if (transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint))
             {
-                Console.WriteLine(transport.GetSecurePeerIdentity(ServerEndpoint.CurrentEndpoint));
+                RRWebTest.WriteLine(transport.GetSecurePeerIdentity(ServerEndpoint.CurrentEndpoint));
             }
+            }
+#endif
 
 
             return Task.FromResult(d1 + d2);
@@ -1162,9 +1176,9 @@ namespace RobotRaconteurTest
         object p1_lock = new object();
         void p1_packet_received(Pipe<double[]>.PipeEndpoint p)
         {
-            Thread t = new Thread(delegate()
+            Task.Run(async delegate()
             {
-                Thread.Sleep(500);
+                await Task.Delay(500);
                 try
                 {
                     lock (p1_lock)
@@ -1180,7 +1194,7 @@ namespace RobotRaconteurTest
                 }
                 catch { }
             });
-            t.Start();
+            
         }
 
         void p1_packet_ack_received(Pipe<double[]>.PipeEndpoint p, uint packetnum)
@@ -1209,9 +1223,9 @@ namespace RobotRaconteurTest
         object p2_lock = new object();
         void p2_packet_received(Pipe<teststruct2>.PipeEndpoint p)
         {
-            Thread t = new Thread(delegate()
+            Task.Run(async delegate()
             {
-                Thread.Sleep(500);
+                await Task.Delay(500);
                 lock (p2_lock)
                 {
                     while (p.Available > 0)
@@ -1221,7 +1235,6 @@ namespace RobotRaconteurTest
                     }
                 }
             });
-            t.Start();
         }
 
         public Task pipe_check_error(CancellationToken cancel = default(CancellationToken))
@@ -1528,8 +1541,6 @@ namespace RobotRaconteurTest
             return mymutex.LockWithTimeout(timeout);
             //if(!Monitor.TryEnter(this,timeout)) throw new TimeoutException();
         }
-
-        
     }
     
     public class sub2_impl :  sub2
@@ -1644,5 +1655,4 @@ namespace RobotRaconteurTest
             return Task.FromResult(v + 1);
         }
     }
-#endif
 }

@@ -1,0 +1,52 @@
+apiRules:
+- include:
+    hasAttribute:
+        uid: RobotRaconteurWeb.PublicApiAttribute
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.RobotRaconteurNodeSetupFlags"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.IPNodeDiscoveryFlags"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.ClientServiceListenerEventType"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.RobotRaconteur_LogLevel"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.RobotRaconteur_LogComponent"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.DataTypes"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.MessageEntryType"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.MessageErrorType"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.RobotRaconteurObjectLockFlags"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.ServerServiceListenerEventType"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.MemberDefinition_Direction"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.MemberDefinition_NoLock"
+    type: Member
+- include:
+    uidRegex: "^RobotRaconteurWeb.ServiceSubscriptionFilterAttributeGroupOperation"
+    type: Member   
+- exclude:
+    type: Member
+- include:
+    hasAttribute:
+        uid: RobotRaconteurWeb.PublicApiAttribute
+    type: Type
+- exclude:
+    type: Type

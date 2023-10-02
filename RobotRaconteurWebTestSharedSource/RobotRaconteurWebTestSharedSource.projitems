@@ -9,6 +9,17 @@
     <Import_RootNamespace>RobotRaconteurWebTestSharedSource</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.pipe_sub_test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.pipe_sub_test_stubskel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.sub_test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.sub_test_stubskel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter_stubskel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.wire_sub_test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)experimental.wire_sub_test_stubskel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1_stubskel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService2.cs" />
@@ -16,14 +27,26 @@
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3_stubskel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RRAssert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RRWebTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTest2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriberTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriptionFilterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriptionPipeTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriptionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriptionWireTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestServerNodeConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.robdef" />
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService2.robdef" />
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.pipe_sub_test.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.testing.sub_test" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.wire_sub_test.robdef" />
   </ItemGroup>
 </Project>

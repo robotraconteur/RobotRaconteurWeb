@@ -21,14 +21,56 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Text.RegularExpressions;
 using RobotRaconteurWeb.Extensions;
+using System.Linq.Expressions;
+
+using static RobotRaconteurWeb.RRLogFuncs;
+using System.IO;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    The central node implementation
+    </summary>
+    <remarks>
+    <para>
+    RobotRaconteurNode implements the current Robot Raconteur instance
+    and acts as the central switchpoint for the instance. The user
+    registers types, connects clients, registers services, and
+    registers transports through this class.
+    </para>
+    <para>
+    If the current program only needs one instance of RobotRaconteurNode,
+    the singleton can be used. The singleton is accessed using:
+    </para>
+    <code>
+    RobotRaconteurNode.s
+    </code>
+    <para>
+    The node must be shut down before existing the program,
+    or a memory leak/hard crash will occur. This can either be
+    accomplished manually using the `Shutdown()` function,
+    or automatically by using the ClientNodeSetup or
+    ServerNodeSetup classes.
+    </para>
+    </remarks>
+    */
+    [PublicApi]
     public class RobotRaconteurNode
     {
 
         private static RobotRaconteurNode sp;
-
+        /**
+        <summary>
+        Singleton accessor
+        </summary>
+        <remarks>
+        The RobotRaconteurNode singleton can be used when only
+        one instance of Robot Raconteur is required in a program.
+        The singleton must be shut down when the program exits.
+        </remarks>
+        */
+        [PublicApi]
         public static RobotRaconteurNode s
         {
             get
@@ -38,15 +80,29 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public const string Version = "0.9.2";
+        public const string Version = "0.18.0";
 
         private NodeID m_NodeID;
-
+        /**
+        <summary>
+        Get or set the current NodeID
+        </summary>
+        <remarks>
+        Gets or setthe current NodeID. If one has not been set,
+        one will be automatically generated. Cannot be set if a NodeID has been assigned.
+        </remarks>
+        <value />
+        */
+        [PublicApi]
         public NodeID NodeID
         {
             get
             {
-                if (m_NodeID == null) m_NodeID = NodeID.NewUniqueID();
+                if (m_NodeID == null)
+                {
+                    m_NodeID = NodeID.NewUniqueID();
+                    LogInfo(string.Format("RobotRaconteurNode NodeID configured with random UUID {0}", m_NodeID.ToString()), this, component: RobotRaconteur_LogComponent.Node);
+                }
                 return m_NodeID;
             }
             set
@@ -54,46 +110,101 @@ namespace RobotRaconteurWeb
                 if (m_NodeID == null)
                 {
                     m_NodeID = value;
+                    LogInfo(string.Format("RobotRaconteurNode NodeID configured with UUID {0}", value.ToString()), this, component: RobotRaconteur_LogComponent.Node);
 
                 }
                 else
                 {
+#if RR_LOG_DEBUG
+                    LogDebug("RobotRaconteurNode attempt to set NodeID when already set", this, component: RobotRaconteur_LogComponent.Node);
+#endif
                     throw new InvalidOperationException("NodeID cannot be changed once it is set");
                 }
             }
         }
+        [PublicApi]
+        public bool TryGetNodeID(out NodeID nodeid)
+        {
+            if (m_NodeID == null)
+            {
+                nodeid = null;
+                return false;
+            }
+            nodeid = m_NodeID;
+            return true;
+        }
 
 
         private string m_NodeName;
+        /**
+        <summary>
+        Get or set the current NodeName
+        </summary>
+        <remarks>
+        Gets or set the current NodeName. If one has not been set using,
+        it will be an empty string. Cannot be set if a NodeName has been assigned.
+        </remarks>
+        */
+        [PublicApi]
         public string NodeName
         {
             get
             {
-                if (m_NodeName == null) m_NodeName = "";
+                if (m_NodeName == null)
+                { 
+                    m_NodeName = "";
+                    LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
+                }
                 return m_NodeName;
             }
             set
             {
                 if (m_NodeName == null)
                 {
+                    if (value.Length > 1024)
+                    {
+#if RR_LOG_DEBUG
+                        LogDebug("RobotRaconteurNode attempt to set NodeName with length > 1024", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                        throw new InvalidOperationException("Invalid node name, too long");
+                    }
+
 
                     if (!Regex.Match(value, "^[a-zA-Z][a-zA-Z0-9_\\.\\-]*$").Success)
                     {
+#if RR_LOG_DEBUG
+                        LogDebug("RobotRaconteurNode attempt to set NodeName with invalid characters", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+
                         throw new InvalidOperationException("Invalid node name");
                     }
+
+                    LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
 
                     m_NodeName = value;
 
                 }
                 else
                 {
+#if RR_LOG_DEBUG
+                    LogDebug("RobotRaconteurNode attempt to set NodeName when already set", this, component: RobotRaconteur_LogComponent.Node);
+#endif
                     throw new InvalidOperationException("NodeName cannot be changed once it is set");
                 }
             }
 
         }
-
-
+        [PublicApi]
+        public bool TryGetNodeName(out string nodename)
+        {
+            if (m_NodeName == null)
+            {
+                nodename = null;
+                return false;
+            }
+            nodename = m_NodeName;
+            return true;
+        }
 
 
 
@@ -113,30 +224,76 @@ namespace RobotRaconteurWeb
 
 
         private uint transport_count = 0;
-        
 
+        /**
+        <summary>
+        Get or set the timeout for endpoint activity in milliseconds
+        </summary>
+        <remarks>
+        Sets a timeout for endpoint inactivity. If no message
+        is sent or received by the endpoint for the specified time,
+        the endpoint is closed. Default timeout is 10 minutes.
+        </remarks>
+        */
+        [PublicApi]
         public uint EndpointInactivityTimeout = 600000;
+        /**
+        <summary>
+        Get or set the timeout for transport activity in milliseconds
+        </summary>
+        <remarks>
+        Sets a timeout for transport inactivity. If no message
+        is sent or received on the transport for the specified time,
+        the transport is closed. Default timeout is 10 minutes.
+        </remarks>
+        */
+        [PublicApi]
         public uint TransportInactivityTimeout = 600000;
+        /**
+        <summary>
+        Get or set the timeout for requests in milliseconds
+        </summary>
+        <remarks>
+        Requests are calls to a remote node that expect a response. `function`,
+        `property`, `callback`, `memory`, and setup calls in `pipe` and `wire`
+        are all requests. All other Robot Raconteur functions that call the remote
+        node and expect a response are requests. Default timeout is 15 seconds.
+        </remarks>
+        */
+        [PublicApi]
         public uint RequestTimeout = 15000;
         private ServiceIndexer serviceindexer;
 
-
+        /**
+        <summary>
+        Get or set the maximum chunk size for memory transfers in bytes
+        </summary>
+        <remarks>
+        `memory` members break up large transfers into chunks to avoid
+        sending messages larger than the transport maximum, which is normally
+        approximately 10 MB. The memory max transfer size is the largest
+        data chunk the memory will send, in bytes. Default is 100 kB.
+        </remarks>
+        */
+        [PublicApi]
         public uint MemoryMaxTransferSize = 102400;
 
-#if ROBOTRACONTEUR_BRIDGE
+#if ROBOTRACONTEUR_H5
         public readonly BrowserWebSocketTransport browser_transport;
 #endif
 
-        RobotRaconteurNode()
+        public RobotRaconteurNode()
         {
             serviceindexer = new ServiceIndexer(this);
             RegisterServiceType(new RobotRaconteurServiceIndex.RobotRaconteurServiceIndexFactory(this));
             RegisterService("RobotRaconteurServiceIndex", "RobotRaconteurServiceIndex", serviceindexer);
-            cleandiscoverednodes_task =  PeriodicTask.Run(CleanDiscoveredNodes, TimeSpan.FromSeconds(5), shutdown_token.Token);
-#if ROBOTRACONTEUR_BRIDGE
+#if ROBOTRACONTEUR_H5
             browser_transport = new BrowserWebSocketTransport(this);
             RegisterTransport(browser_transport);
 #endif
+            m_Discovery = new Discovery(this);
+            LogInfo(string.Format("RobotRaconteurNode version {0} initialized", Version), this);
+
         }
 
         private ServiceFactory GetServiceFactoryForType(string type, ClientContext context)
@@ -146,64 +303,64 @@ namespace RobotRaconteurWeb
             if (context != null)
             {
                 ServiceFactory f;
-                if(context.TryGetPulledServiceType(servicename, out f))
+                if (context.TryGetPulledServiceType(servicename, out f))
                 {
                     return f;
                 }
-            }            
-            return GetServiceType(servicename);            
+            }
+            return GetServiceType(servicename);
         }
 
         private ServiceFactory GetServiceFactoryForType(Type type, ClientContext context)
         {
-            return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);      
+            return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);
         }
 
-        public MessageElementStructure PackStructure(Object s, ClientContext context)
+        public MessageElementNestedElementList PackStructure(Object s, ClientContext context)
         {
             if (s == null) return null;
-            
+
             return GetServiceFactoryForType(s.GetType(), context).PackStructure(s);
         }
-        
-        public T UnpackStructure<T>(MessageElementStructure l, ClientContext context)
+
+        public T UnpackStructure<T>(MessageElementNestedElementList l, ClientContext context)
         {
             if (l == null) return default(T);
-            return GetServiceFactoryForType(l.Type, context).UnpackStructure<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackStructure<T>(l);
         }
 
-        public MessageElementPodArray PackPodToArray<T>(ref T s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackPodToArray<T>(ref T s, ClientContext context) where T : struct
         {
             return GetServiceFactoryForType(s.GetType(), context).PackPodToArray(ref s);
         }
 
-        public T UnpackPodFromArray<T>(MessageElementPodArray l, ClientContext context) where T : struct
+        public T UnpackPodFromArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
-            return GetServiceFactoryForType(l.Type, context).UnpackPodFromArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackPodFromArray<T>(l);
         }
 
-        public MessageElementPodArray PackPodArray<T>(T[] s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackPodArray<T>(T[] s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.GetType(), context).PackPodArray(s);
         }
 
-        public T[] UnpackPodArray<T>(MessageElementPodArray l, ClientContext context) where T : struct
+        public T[] UnpackPodArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackPodArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackPodArray<T>(l);
         }
 
-        public MessageElementPodMultiDimArray PackPodMultiDimArray<T>(PodMultiDimArray s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackPodMultiDimArray<T>(PodMultiDimArray s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.pod_array.GetType(), context).PackPodMultiDimArray<T>(s);
         }
 
-        public PodMultiDimArray UnpackPodMultiDimArray<T>(MessageElementPodMultiDimArray l, ClientContext context) where T : struct
+        public PodMultiDimArray UnpackPodMultiDimArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackPodMultiDimArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackPodMultiDimArray<T>(l);
         }
 
         public object PackPod(object s, ClientContext context)
@@ -231,41 +388,41 @@ namespace RobotRaconteurWeb
 
         public object UnpackPod(object l, ClientContext context)
         {
-            return GetServiceFactoryForType(MessageElementUtil.GetMessageElementDataTypeString(l), context).UnpackPod(l);
+            return GetServiceFactoryForType(((MessageElementNestedElementList)l).TypeName, context).UnpackPod(l);
         }
 
-        public MessageElementNamedArray PackNamedArrayToArray<T>(ref T s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackNamedArrayToArray<T>(ref T s, ClientContext context) where T : struct
         {
             return GetServiceFactoryForType(s.GetType(), context).PackNamedArrayToArray(ref s);
         }
 
-        public T UnpackNamedArrayFromArray<T>(MessageElementNamedArray l, ClientContext context) where T : struct
+        public T UnpackNamedArrayFromArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
-            return GetServiceFactoryForType(l.Type, context).UnpackNamedArrayFromArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackNamedArrayFromArray<T>(l);
         }
 
-        public MessageElementNamedArray PackNamedArray<T>(T[] s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackNamedArray<T>(T[] s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.GetType(), context).PackNamedArray(s);
         }
 
-        public T[] UnpackNamedArray<T>(MessageElementNamedArray l, ClientContext context) where T : struct
+        public T[] UnpackNamedArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackNamedArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackNamedArray<T>(l);
         }
 
-        public MessageElementNamedMultiDimArray PackNamedMultiDimArray<T>(NamedMultiDimArray s, ClientContext context) where T : struct
+        public MessageElementNestedElementList PackNamedMultiDimArray<T>(NamedMultiDimArray s, ClientContext context) where T : struct
         {
             if (s == null) return null;
             return GetServiceFactoryForType(s.namedarray_array.GetType(), context).PackNamedMultiDimArray<T>(s);
         }
 
-        public NamedMultiDimArray UnpackNamedMultiDimArray<T>(MessageElementNamedMultiDimArray l, ClientContext context) where T : struct
+        public NamedMultiDimArray UnpackNamedMultiDimArray<T>(MessageElementNestedElementList l, ClientContext context) where T : struct
         {
             if (l == null) return null;
-            return GetServiceFactoryForType(l.Type, context).UnpackNamedMultiDimArray<T>(l);
+            return GetServiceFactoryForType(l.TypeName, context).UnpackNamedMultiDimArray<T>(l);
         }
 
         public object PackNamedArray(object s, ClientContext context)
@@ -289,7 +446,7 @@ namespace RobotRaconteurWeb
 
         public object UnpackNamedArray(object l, ClientContext context)
         {
-            return GetServiceFactoryForType(MessageElementUtil.GetMessageElementDataTypeString(l), context).UnpackNamedArray(l);
+            return GetServiceFactoryForType(((MessageElementNestedElementList)l).TypeName, context).UnpackNamedArray(l);
         }
 
         public MessageElement PackAnyType<T>(string name, ref T data, ClientContext context)
@@ -312,9 +469,9 @@ namespace RobotRaconteurWeb
                 return MessageElementUtil.NewMessageElement(name, new T[] { data });
             }
 
-            if  (is_array && t.GetElementType().IsPrimitive)
+            if (is_array && t.GetElementType().IsPrimitive)
             {
-                return MessageElementUtil.NewMessageElement(name, data );
+                return MessageElementUtil.NewMessageElement(name, data);
             }
 
             if (t == typeof(string))
@@ -396,7 +553,7 @@ namespace RobotRaconteurWeb
             return PackAnyType(num.ToString(), ref data, context);
         }
 
-        public T UnpackAnyType<T>(MessageElement e, ClientContext context=null)
+        public T UnpackAnyType<T>(MessageElement e, ClientContext context = null)
         {
             switch (e.ElementType)
             {
@@ -429,12 +586,12 @@ namespace RobotRaconteurWeb
                     return (T)e.Data;
                 case DataTypes.multidimarray_t:
                     {
-                        MessageElementMultiDimArray md = (MessageElementMultiDimArray)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.multidimarray_t);
                         return (T)(object)UnpackMultiDimArray(md);
                     }
                 case DataTypes.structure_t:
                     {
-                        MessageElementStructure md = (MessageElementStructure)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.structure_t);
                         return UnpackStructure<T>(md, context);
                     }
                 /*case DataTypes.pod_t:
@@ -444,24 +601,25 @@ namespace RobotRaconteurWeb
                     }*/
                 case DataTypes.pod_array_t:
                     {
-                        MessageElementPodArray md = (MessageElementPodArray)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.pod_array_t);
                         if (typeof(T).IsValueType)
                         {
                             if (md.Elements.Count != 1) throw new DataTypeException("Invalid array size for scalar structure");
-                            return ((T[])UnpackPod(md,context))[0];
+                            return ((T[])UnpackPod(md, context))[0];
                         }
                         else
                         {
-                            return (T)UnpackPod(md,context);
+                            return (T)UnpackPod(md, context);
                         }
                     }
-                case DataTypes.pod_multidimarray_t:                    
+                case DataTypes.pod_multidimarray_t:
                     {
-                        return (T)UnpackPod(e.Data, context);
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.pod_multidimarray_t);
+                        return (T)UnpackPod(md, context);
                     }
                 case DataTypes.namedarray_array_t:
                     {
-                        MessageElementNamedArray md = (MessageElementNamedArray)e.Data;
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.namedarray_array_t);
                         if (typeof(T).IsValueType)
                         {
                             if (md.Elements.Count != 1) throw new DataTypeException("Invalid array size for scalar structure");
@@ -475,7 +633,8 @@ namespace RobotRaconteurWeb
                         }
                     }
                 case DataTypes.namedarray_multidimarray_t:
-                    {                       
+                    {
+                        MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.namedarray_multidimarray_t);
                         return (T)UnpackNamedArray(e.Data, context);
                     }
                 case DataTypes.vector_t:
@@ -485,7 +644,7 @@ namespace RobotRaconteurWeb
                         var method = typeof(RobotRaconteurNode).GetMethod("UnpackMapType");
                         var dict_params = t.GetGenericArguments();
                         var generic = method.MakeGenericMethod(dict_params);
-                        return (T) generic.Invoke(this, new object[] { e.Data, context });
+                        return (T)generic.Invoke(this, new object[] { e.Data, context });
                     }
                 case DataTypes.list_t:
                     {
@@ -493,7 +652,7 @@ namespace RobotRaconteurWeb
                         var method = typeof(RobotRaconteurNode).GetMethod("UnpackListType");
                         var list_params = t.GetGenericArguments();
                         var generic = method.MakeGenericMethod(list_params);
-                        return (T) generic.Invoke(this, new object[] { e.Data, context });
+                        return (T)generic.Invoke(this, new object[] { e.Data, context });
                     }
                 default:
                     throw new DataTypeException("Invalid container data type");
@@ -527,7 +686,7 @@ namespace RobotRaconteurWeb
                     var v = d.Value;
                     MessageElementUtil.AddMessageElement(m, PackAnyType(Convert.ToInt32(d.Key), ref v, context));
                 }
-                return new MessageElementMap<int>(m);
+                return new MessageElementNestedElementList(DataTypes.vector_t, "", m);
             }
 
             if (typeof(Tkey) == typeof(String))
@@ -540,8 +699,8 @@ namespace RobotRaconteurWeb
                     var v = d.Value;
                     MessageElementUtil.AddMessageElement(m, PackAnyType(d.Key.ToString(), ref v, context));
                 }
-                return new MessageElementMap<string>(m);
-            }            
+                return new MessageElementNestedElementList(DataTypes.dictionary_t, "", m);
+            }
 
             throw new DataTypeException("Indexed types can only be indexed by int32 and string");
         }
@@ -549,13 +708,16 @@ namespace RobotRaconteurWeb
 
         public object UnpackMapType<Tkey, Tvalue>(object data, ClientContext context)
         {
+
             if (data == null) return null;
 
-            if (data is MessageElementMap<int>)
+            var cdata = (MessageElementNestedElementList)data;
+
+            if (cdata.Type == DataTypes.vector_t)
             {
                 Dictionary<int, Tvalue> o = new Dictionary<int, Tvalue>();
 
-                MessageElementMap<int> cdata = (MessageElementMap<int>)data;
+
                 var cdataElements = cdata.Elements;
                 {
                     foreach (MessageElement e in cdataElements)
@@ -568,11 +730,11 @@ namespace RobotRaconteurWeb
                     return o;
                 }
             }
-            else if (data is MessageElementMap<string>)
+            else if (cdata.Type == DataTypes.dictionary_t)
             {
                 Dictionary<string, Tvalue> o = new Dictionary<string, Tvalue>();
 
-                MessageElementMap<string> cdata = (MessageElementMap<string>)data;
+
                 var cdataElements = cdata.Elements;
                 {
                     foreach (MessageElement e in cdataElements)
@@ -586,7 +748,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                throw new DataTypeException("Indexed types can only be indexed by int32 and string");
+                throw new DataTypeException("May types can only be keyed by int32 and string");
             }
         }
 
@@ -606,7 +768,7 @@ namespace RobotRaconteurWeb
                     count++;
                 }
 
-                return new MessageElementList(m);
+                return new MessageElementNestedElementList(DataTypes.list_t, "", m);
             }
         }
 
@@ -615,7 +777,7 @@ namespace RobotRaconteurWeb
             if (data == null) return null;
             List<Tvalue> o = new List<Tvalue>();
             int count = 0;
-            MessageElementList cdata = (MessageElementList)data;
+            MessageElementNestedElementList cdata = (MessageElementNestedElementList)data;
             var cdataElements = cdata.Elements;
             {
                 foreach (MessageElement e in cdataElements)
@@ -702,7 +864,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-                
+
         public object UnpackVarType(MessageElement me, ClientContext context)
         {
             if (me == null) return null;
@@ -725,18 +887,18 @@ namespace RobotRaconteurWeb
                     return me.Data;
                 case DataTypes.multidimarray_t:
                     {
-                        MessageElementMultiDimArray md = (MessageElementMultiDimArray)me.Data;
+                        MessageElementNestedElementList md = me.CastDataToNestedList();
                         return UnpackMultiDimArray(md);
                     }
                 case DataTypes.structure_t:
                     {
-                        MessageElementStructure md = (MessageElementStructure)me.Data;              
+                        MessageElementNestedElementList md = me.CastDataToNestedList();
                         return UnpackStructure<object>(md, context);
                     }
                 //case DataTypes.pod_t:
                 case DataTypes.pod_array_t:
                 case DataTypes.pod_multidimarray_t:
-                    {                        
+                    {
                         return UnpackPod(me.Data, context);
                     }
                 case DataTypes.namedarray_array_t:
@@ -745,14 +907,14 @@ namespace RobotRaconteurWeb
                         return UnpackNamedArray(me.Data, context);
                     }
                 case DataTypes.vector_t:
-                    { 
+                    {
                         return UnpackMapType<int, object>(me.Data, context);
                     }
                 case DataTypes.dictionary_t:
                     {
                         return UnpackMapType<string, object>(me.Data, context);
                     }
-                case DataTypes.list_t:                    
+                case DataTypes.list_t:
                     {
                         return UnpackListType<object>(me.Data, context);
                     }
@@ -760,24 +922,24 @@ namespace RobotRaconteurWeb
                     throw new DataTypeException("Invalid varvalue data type");
             }
         }
-        
-        public MessageElementMultiDimArray PackMultiDimArray(MultiDimArray array)
+
+        public MessageElementNestedElementList PackMultiDimArray(MultiDimArray array)
         {
             if (array == null) return null;
             List<MessageElement> l = new List<MessageElement>();
-            l.Add(new MessageElement("dims",array.Dims));            
-            l.Add(new MessageElement("array", array.Array_));            
-            return new MessageElementMultiDimArray(l);
+            l.Add(new MessageElement("dims", array.Dims));
+            l.Add(new MessageElement("array", array.Array_));
+            return new MessageElementNestedElementList(DataTypes.multidimarray_t, "", l);
         }
 
-        public MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray marray)
+        public MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList marray)
         {
             if (marray == null) return null;
 
             MultiDimArray m = new MultiDimArray();
-            
+
             m.Dims = (MessageElement.FindElement(marray.Elements, "dims").CastData<uint[]>());
-            m.Array_ = (MessageElement.FindElement(marray.Elements, "array").CastData<Array>());            
+            m.Array_ = (MessageElement.FindElement(marray.Elements, "array").CastData<Array>());
             return m;
         }
 
@@ -786,9 +948,11 @@ namespace RobotRaconteurWeb
 
             if (m.header.SenderNodeID != NodeID)
             {
-                
-                    throw new ConnectionException("Could not route message");
-                
+#if RR_LOG_DEBUG
+                LogDebug("Message sender node ID does not match node ID", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw new ConnectionException("Could not route message");
+
             }
 
             Endpoint e;
@@ -815,47 +979,56 @@ namespace RobotRaconteurWeb
             }
             catch (KeyNotFoundException)
             {
+#if RR_LOG_DEBUG
+                LogDebug("Could not find transport", this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 throw new ConnectionException("Could not find transport");
             }
-            
-            await c.SendMessage(m, cancel);
+
+            await c.SendMessage(m, cancel).ConfigureAwait(false);
 
         }
 
         public void MessageReceived(Message m)
         {
             if (m.header.ReceiverNodeID != NodeID)
-            {                
+            {
                 Message eret = GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");
                 if (eret.entries.Count > 0)
-                    SendMessage(eret, default(CancellationToken)).IgnoreResult();               
+                    SendMessage(eret, default(CancellationToken)).IgnoreResult();
+#if RR_LOG_DEBUG
+                LogDebug("Message receiver node ID does not match node ID", this, component: RobotRaconteur_LogComponent.Node);
+#endif
 
             }
 
             else
             {
-                
 
-                    
-                    try
+
+
+                try
+                {
+
+                    Endpoint e;
+                    lock (endpoints)
                     {
-
-                        Endpoint e;
-                        lock (endpoints)
-                        {
-                            e = endpoints[m.header.ReceiverEndpoint];
-                        }
-
-                        e.MessageReceived(m);
+                        e = endpoints[m.header.ReceiverEndpoint];
                     }
-                    catch (KeyNotFoundException)
-                    {
-                        Message eret = GenerateErrorReturnMessage(m, MessageErrorType.InvalidEndpoint, "RobotRaconteur.InvalidEndpoint", "Invalid destination endpoint");
-                        if (eret.entries.Count > 0)
-                            SendMessage(eret, default(CancellationToken)).IgnoreResult();
-                    }
+
+                    e.MessageReceived(m);
+                }
+                catch (KeyNotFoundException)
+                {
+                    Message eret = GenerateErrorReturnMessage(m, MessageErrorType.InvalidEndpoint, "RobotRaconteur.InvalidEndpoint", "Invalid destination endpoint");
+                    if (eret.entries.Count > 0)
+                        SendMessage(eret, default(CancellationToken)).IgnoreResult();
+#if RR_LOG_DEBUG
+                    LogDebug(string.Format("Received message with invalid ReceiverEndpoint: {0}", m.header.ReceiverEndpoint), this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                }
             }
-           
+
 
 
         }
@@ -874,7 +1047,7 @@ namespace RobotRaconteurWeb
             {
                 if (((int)me.EntryType) % 2 == 1)
                 {
-                    MessageEntry eret = new MessageEntry(me.EntryType+1, me.MemberName);
+                    MessageEntry eret = new MessageEntry(me.EntryType + 1, me.MemberName);
                     eret.RequestID = me.RequestID;
                     eret.ServicePath = me.ServicePath;
                     eret.AddElement("errorname", errname);
@@ -887,34 +1060,63 @@ namespace RobotRaconteurWeb
             return ret;
 
         }
-
+        /**
+        <summary>
+        Register a service type
+        </summary>
+        <remarks>None</remarks>
+        <param name="servicetype">The service factory implementing the type to register</param>
+        */
+        [PublicApi]
         public void RegisterServiceType(ServiceFactory f)
         {
             lock (service_factories)
             {
                 service_factories.Add(f.GetServiceName(), f);
             }
+#if RR_LOG_TRACE
+            LogTrace(string.Format("Service type registered {0}", f.GetServiceName()), this, component: RobotRaconteur_LogComponent.Node);
+#endif
+
         }
 
+        /**
+         <summary>
+        Returns a previously registered service type
+        </summary>
+        <remarks>None</remarks>
+        <param name="servicetype">The name of the service type to retrieve</param>
+        */
+        [PublicApi]
         public ServiceFactory GetServiceType(string servicetype)
         {
             ServiceFactory f;
             if (!TryGetServiceType(servicetype, out f))
             {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Cannot unregister nonexistant service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 throw new ServiceException("Service factory not found for " + servicetype);
             }
-            return f;            
+            return f;
         }
 
         public bool TryGetServiceType(string servicetype, out ServiceFactory f)
         {
             lock (service_factories)
-            {                
-                return service_factories.TryGetValue(servicetype,out f);
+            {
+                return service_factories.TryGetValue(servicetype, out f);
             }
         }
 
-
+        /**
+        <summary>
+            Return names of registered service types
+        </summary>
+        <remarks>None</remarks>
+        <returns>The registered service types</returns>
+        */
+        [PublicApi]
         public string[] GetServiceTypes()
         {
             lock (service_factories)
@@ -925,11 +1127,45 @@ namespace RobotRaconteurWeb
 
         public void RegisterDynamicServiceFactory(DynamicServiceFactory f)
         {
-            if (this.dynamic_factory != null) throw new InvalidOperationException("Dynamic service factory already set");
+            if (this.dynamic_factory != null)
+            {
+#if RR_LOG_DEBUG
+                LogDebug("Attempt to register dynamic service factory when already registered", this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw new InvalidOperationException("Dynamic service factory already set");
+            }
             this.dynamic_factory = f;
+#if RR_LOG_TRACE
+            LogTrace("Registered dynamic service factory", this, component: RobotRaconteur_LogComponent.Node);
+#endif
         }
-
-        public ServerContext RegisterService(string name, string servicetype, Object obj,ServiceSecurityPolicy securitypolicy=null)
+        /**
+        <summary>
+        Registers a service for clients to connect
+        </summary>
+        <remarks>
+        <para>
+        The supplied object becomes the root object in the service. Other objects may
+        be accessed by clients using `objref` members. The name of the service must conform
+        to the naming rules of Robot Raconteur member names. A service is closed using
+        either CloseService() or when Shutdown() is called.
+        </para>
+        <para>
+        Multiple services can be registered within the same node. Service names
+        within a single node must be unique.
+        </para>
+        </remarks>
+        <param name="name">The name of the service, must follow member naming rules</param>
+        <param name="servicetype">The name of the service definition containing the object type.
+        Do not include the object type.</param>
+        <param name="obj">The root object of the service</param>
+        <param name="securitypolicy">An optional security policy for the service to control authentication
+        and other security functions</param>
+        <returns>The instantiated ServerContext. This object is owned
+        by the node and the return can be safely ignored.</returns>
+        */
+        [PublicApi]
+        public ServerContext RegisterService(string name, string servicetype, Object obj, ServiceSecurityPolicy securitypolicy = null)
         {
             lock (services)
             {
@@ -939,7 +1175,7 @@ namespace RobotRaconteurWeb
                     CloseService(name);
                 }
 
-                ServerContext c = new ServerContext(GetServiceType(servicetype),this);
+                ServerContext c = new ServerContext(GetServiceType(servicetype), this);
                 c.SetBaseObject(name, obj, securitypolicy);
 
                 //RegisterEndpoint(c);
@@ -947,11 +1183,18 @@ namespace RobotRaconteurWeb
 
                 UpdateServiceStateNonce();
 
+                LogInfo(string.Format("Service {0} registered", name), this, RobotRaconteur_LogComponent.Node);
+
                 return c;
             }
         }
 
-        
+        /**
+        <summary>Register a service using a ServerContext instance</summary>
+        <remarks>None</remarks>
+        <param name="c">The ServerContext instance to register</param>
+        */
+        [PublicApi]
         public ServerContext RegisterService(ServerContext c)
         {
             lock (services)
@@ -962,10 +1205,21 @@ namespace RobotRaconteurWeb
                 }
 
                 services.Add(c.ServiceName, c);
+                LogInfo(string.Format("Service {0} registered", c.ServiceName), this, RobotRaconteur_LogComponent.Node);
                 return c;
             }
         }
-
+        /**
+        <summary>
+            Closes a previously registered service
+        </summary>
+        <remarks>
+            Services are automatically closed by Shutdown, so this function
+            is rarely used.
+        </remarks>
+        <param name="sname">The name of the service to close</param>
+        */
+        [PublicApi]
         public void CloseService(string sname)
         {
             lock (services)
@@ -979,8 +1233,8 @@ namespace RobotRaconteurWeb
 
                 services.Remove(sname);
             }
+            LogInfo(string.Format("Service {0} removed", sname), this, RobotRaconteur_LogComponent.Node);
 
-            
 
 
         }
@@ -996,12 +1250,23 @@ namespace RobotRaconteurWeb
             }
             catch (KeyNotFoundException)
             {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Service {0} not found", name), this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 throw new ServiceNotFoundException("Service " + name + " not found");
             }
 
 
         }
-
+        /**
+        <summary>
+            Register a transport for use by the node
+        </summary>
+        <remarks>None</remarks>
+        <param name="transport">The transport to register</param>
+        <returns>The transport internal id</returns>
+        */
+        [PublicApi]
         public uint RegisterTransport(Transport c)
         {
             lock (transports)
@@ -1009,19 +1274,25 @@ namespace RobotRaconteurWeb
                 transport_count++;
                 c.TransportID = transport_count;
                 transports.Add(transport_count, c);
+#if RR_LOG_TRACE
+                LogTrace(string.Format("Transport {0} registered", c.UrlSchemeString), this, component: RobotRaconteur_LogComponent.Node);
+#endif
                 return transport_count;
             }
         }
 
-       
+
         public async Task<Message> SpecialRequest(Message m, uint transportid)
         {
-           
 
-            if (!(m.header.ReceiverNodeID==NodeID.Any && (m.header.ReceiverNodeName=="" || m.header.ReceiverNodeName==NodeName))
+
+            if (!(m.header.ReceiverNodeID == NodeID.Any && (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == NodeName))
                 && !(m.header.ReceiverNodeID == NodeID))
-            {                
-                return GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");                
+            {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Received SpecialRequest with invalid ReceiverNodeID: {0}", m.header.ReceiverNodeID.ToString()), this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                return GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");
             }
 
 
@@ -1036,7 +1307,13 @@ namespace RobotRaconteurWeb
 
             foreach (MessageEntry e in m.entries)
             {
-                MessageEntry eret = ret.AddEntry(e.EntryType+1,e.MemberName);
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Special request received from {0} ep {1} to {2} ep {3} EntryType {4} Error {5}",
+                    m.header.SenderNodeID.ToString(), m.header.SenderEndpoint, m.header.ReceiverNodeID,
+                    m.header.ReceiverEndpoint, e.EntryType, e.Error), this, component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                    service_path: e.ServicePath, member: e.MemberName);
+#endif
+                MessageEntry eret = ret.AddEntry(e.EntryType + 1, e.MemberName);
                 eret.RequestID = e.RequestID;
                 eret.ServicePath = e.ServicePath;
 
@@ -1051,14 +1328,19 @@ namespace RobotRaconteurWeb
                             try
                             {
                                 ServerContext s;
-                                
-                                    s = GetService(s1[0]);
-                                
-                                string objtype = await s.GetObjectType(path);
+
+                                s = GetService(s1[0]);
+
+                                string objtype = await s.GetObjectType(path).ConfigureAwait(false);
                                 eret.AddElement("objecttype", objtype);
                             }
                             catch
                             {
+#if RR_LOG_DEBUG
+                                LogDebug("Client requested type of an invalid service path", this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ObjectNotFoundException");
                                 eret.AddElement("errorstring", "Object not found");
                                 eret.Error = MessageErrorType.ObjectNotFound;
@@ -1071,11 +1353,11 @@ namespace RobotRaconteurWeb
                             string name = e.ServicePath;
                             try
                             {
-                                string servicedef="";
-                                if (e.elements.Any(x =>x.ElementName == "ServiceType"))
+                                string servicedef = "";
+                                if (e.elements.Any(x => x.ElementName == "ServiceType"))
                                 {
                                     name = e.FindElement("ServiceType").CastData<string>();
-                                    servicedef=GetServiceType(name).DefString();
+                                    servicedef = GetServiceType(name).DefString();
                                 }
                                 else if (e.elements.Any(x => x.ElementName == "servicetype"))
                                 {
@@ -1084,13 +1366,18 @@ namespace RobotRaconteurWeb
                                 }
                                 else
                                 {
-                                 servicedef= GetService(name).ServiceDef.DefString();
-                                 eret.AddElement("attributes", PackMapType<string,object>(GetService(name).Attributes, null));
+                                    servicedef = GetService(name).ServiceDef.DefString();
+                                    eret.AddElement("attributes", PackMapType<string, object>(GetService(name).Attributes, null));
                                 }
                                 eret.AddElement("servicedef", servicedef);
                             }
                             catch
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Client requested type of an invalid service type {0}", name), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
@@ -1103,11 +1390,11 @@ namespace RobotRaconteurWeb
 
                             try
                             {
-                                
+
 
                                 ServerContext c = GetService(name);
-                                ServerEndpoint se = new ServerEndpoint(c,this);
-                                
+                                ServerEndpoint se = new ServerEndpoint(c, this);
+
                                 se.m_RemoteEndpoint = m.header.SenderEndpoint;
                                 se.m_RemoteNodeID = m.header.SenderNodeID;
                                 RegisterEndpoint(se);
@@ -1117,13 +1404,22 @@ namespace RobotRaconteurWeb
                                 c.AddClient(se);
 
                                 ret.header.SenderEndpoint = se.LocalEndpoint;
-                                
-                                
+
+                                // Info log client connected
+                                LogInfo(string.Format("Client connected to service {0} from {1} ep {2}", name, m.header.SenderNodeID.ToString(), m.header.SenderEndpoint), this,
+                                                                       component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                                                                                          service_path: e.ServicePath, member: e.MemberName);
+
                                 //services[name].AddClient(m.header.SenderEndpoint);
                                 //eret.AddElement("servicedef", servicedef);
                             }
-                            catch
+                            catch (Exception exp)
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Error connecting client: {0}",exp), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
@@ -1132,7 +1428,7 @@ namespace RobotRaconteurWeb
                         break;
                     case MessageEntryType.DisconnectClient:
                         {
-                            
+
 
                             try
                             {
@@ -1149,9 +1445,18 @@ namespace RobotRaconteurWeb
                                 }
                                 DeleteEndpoint(se);
                                 //eret.AddElement("servicedef", servicedef);
+                                // Info log client disconnected
+                                LogInfo(string.Format("Client disconnected from service {0} from {1} ep {2}", name, m.header.SenderNodeID.ToString(), m.header.SenderEndpoint), this,
+                                                                             component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                                                             service_path: e.ServicePath, member: e.MemberName);
                             }
-                            catch
+                            catch (Exception exp)
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Error disconnecting client: {0}", exp), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
@@ -1160,7 +1465,7 @@ namespace RobotRaconteurWeb
                         break;
                     case MessageEntryType.ConnectionTest:
                         break;
-                     
+
                     case MessageEntryType.NodeCheckCapability:
                         eret.AddElement("return", (uint)0);
                         break;
@@ -1174,20 +1479,32 @@ namespace RobotRaconteurWeb
 
                                 s = GetService(s1[0]);
 
-                                Dictionary<string,object> attr = s.Attributes;
-                                eret.AddElement("return", PackMapType<string,object>(attr, null));
+                                Dictionary<string, object> attr = s.Attributes;
+                                eret.AddElement("return", PackMapType<string, object>(attr, null));
                             }
-                            catch
+                            catch (Exception exp)
                             {
+#if RR_LOG_DEBUG
+                                LogDebug(string.Format("Error returning attributes: {0}", exp), this,
+                                    component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                                    service_path: e.ServicePath, member: e.MemberName);
+#endif
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceError");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceError;
                             }
                         }
                         break;
-
+                    case MessageEntryType.ServiceClosed:
+                    case MessageEntryType.ServiceClosedRet:
+                        return null;
 
                     default:
+#if RR_LOG_DEBUG
+                        LogDebug(string.Format("Invalid special request EntryType: {0}", e.EntryType), this,
+                            component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
+                            service_path: e.ServicePath, member: e.MemberName);
+#endif
                         eret.Error = MessageErrorType.ProtocolError;
                         eret.AddElement("errorname", "RobotRaconteur.ProtocolError");
                         eret.AddElement("errorstring", "Invalid Special Operation");
@@ -1196,56 +1513,249 @@ namespace RobotRaconteurWeb
             }
 
             return ret;
-            
+
 
         }
-
+        /**
+        <summary>
+        Create a client connection to a remote service using a URL
+        </summary>
+        <remarks>
+        <para>
+        Creates a connection to a remote service using a URL. URLs are either provided by
+        the service, or are determined using discovery functions such as FindServiceByType().
+        This function is the primary way to create client connections.
+        </para>
+        <para>
+        username and credentials can be used to specify authentication information. Credentials will
+        often contain a "password" or token entry.
+        </para>
+        <para>
+        The listener is a function that is called during various events. See ClientServiceListenerEventType
+        for a description of the possible events.
+        </para>
+        <para>
+        ConnectService will attempt to instantiate a client object reference (proxy) based on the type
+        information provided by the service. The type information will contain the type of the object,
+        and all the implemented types. The client will normally want a specific one of the implement types.
+        Specify this desired type in objecttype to avoid future compatibility issues.
+        </para>
+        </remarks>
+        <param name="url">The URL of the service to connect</param>
+        <param name="username">An optional username for authentication</param>
+        <param name="credentials">Optional credentials for authentication</param>
+        <param name="listener">An optional listener callback function</param>
+        <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <returns>The root object reference of the connected service</returns>
+        */
+        [PublicApi]
         public async Task<object> ConnectService(string url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
 
             //TODO: Specify target object type
-
-            ClientContext c = new ClientContext(this);
-            RegisterEndpoint(c);
-            Transport[] atransports;
-            lock (transports)
-            {
-                atransports = transports.Values.ToArray();
-            }
-            foreach (Transport end in atransports)
-            {
-                if (end == null) continue;
-                if (end.IsClient)
-                {
-                    if (end.CanConnectService(url))
-                    {
-
-                        object r = await c.ConnectService(end, url,username,credentials,objecttype,cancel);
-                        
-                        if (listener!=null)
-                        c.ClientServiceListener += listener;
-                            return r;
-                        
-                    }
-                }
-            }
-
             try
             {
-                DeleteEndpoint(c);
-            }
-            catch { };
-           
-            throw new ConnectionException("Could not connect to service");
-        }
+                ClientContext c = new ClientContext(this);
+                RegisterEndpoint(c);
+                Transport[] atransports;
+                lock (transports)
+                {
+                    atransports = transports.Values.ToArray();
+                }
+                foreach (Transport end in atransports)
+                {
+                    if (end == null) continue;
+                    if (end.IsClient)
+                    {
+                        if (end.CanConnectService(url))
+                        {
 
-        public async Task DisconnectService(object obj, CancellationToken cancel=default(CancellationToken))
+                            object r = await c.ConnectService(end, url, username, credentials, objecttype, cancel).ConfigureAwait(false);
+
+                            if (listener != null)
+                                c.ClientServiceListener += listener;
+                            return r;
+
+                        }
+                    }
+                }
+
+                try
+                {
+                    DeleteEndpoint(c);
+                }
+                catch { };
+
+                throw new ConnectionException("Could not connect to service");
+            }
+            catch (Exception exp)
+            {
+                //Debug log exception
+                #if RR_LOG_DEBUG
+                LogDebug(string.Format("Error connecting service: {0}", exp), this,
+                                       component: RobotRaconteur_LogComponent.Node);
+                #endif
+
+
+                throw;
+            }
+        }
+        /**
+        <summary>
+        Create a client connection to a remote service using a URL
+        </summary>
+        <remarks>
+        <para>
+        Creates a connection to a remote service using a URL. URLs are either provided by
+        the service, or are determined using discovery functions such as FindServiceByType().
+        This function is the primary way to create client connections.
+        </para>
+        <para>
+        username and credentials can be used to specify authentication information. Credentials will
+        often contain a "password" or token entry.
+        </para>
+        <para>
+        The listener is a function that is called during various events. See ClientServiceListenerEventType
+        for a description of the possible events.
+        </para>
+        <para>
+        ConnectService will attempt to instantiate a client object reference (proxy) based on the type
+        information provided by the service. The type information will contain the type of the object,
+        and all the implemented types. The client will normally want a specific one of the implement types.
+        Specify this desired type in objecttype to avoid future compatibility issues.
+        </para>
+        </remarks>
+        <param name="url">The candidate URLs of the service to connect</param>
+        <param name="username">An optional username for authentication</param>
+        <param name="credentials">Optional credentials for authentication</param>
+        <param name="listener">An optional listener callback function</param>
+        <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <returns>The root object reference of the connected service</returns>
+        */
+        [PublicApi]
+        public async Task<object> ConnectService(string[] url, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
+        {
+            try
+            {
+                var connecting_tasks = new List<Task<object>>();
+                Exception connecting_exp = null;
+
+                foreach (var u in url)
+                {
+                    try
+                    {
+                        connecting_tasks.Add(ConnectService(u, username, credentials, null, objecttype, cancel));
+                    }
+                    catch (Exception e)
+                    {
+                        if (connecting_exp == null)
+                        {
+                            connecting_exp = e;
+                        }
+                    }
+                }
+
+                if (connecting_tasks.Count == 0)
+                {
+                    if (connecting_exp != null)
+                    {
+                        throw connecting_exp;
+                    }
+                    throw new ConnectionException("Could not connect to service");
+                }
+
+                while (true)
+                {
+                    object r = null;
+                    if (connecting_tasks.Count == 1)
+                    {
+                        r = await connecting_tasks[0].ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await Task.WhenAny(connecting_tasks).ConfigureAwait(false);
+
+                        var completed_task = connecting_tasks.First(x => x.IsCompleted);
+                        connecting_tasks.Remove(completed_task);
+                        if (completed_task.Status == TaskStatus.RanToCompletion)
+                        {
+                            r = await completed_task.ConfigureAwait(false);
+                            foreach (var t in connecting_tasks)
+                            {
+                                try
+                                {
+                                    _ = t.ContinueWith((x) =>
+                                    {
+                                        try
+                                        {
+                                            Task.Run( delegate() {
+                                                try
+                                                {
+                                                    ((ServiceStub)x.Result).RRContext.Close().IgnoreResult();
+                                                }
+                                                catch { }
+                                            });
+                                        }
+                                        catch { }
+                                    });
+
+                                }
+                                catch { }
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (listener != null)
+                        ((ClientContext)r).ClientServiceListener += listener;
+                    return r;
+                }
+            }
+            catch (Exception exp)
+            {
+                //Debug log exception
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Error connecting service: {0}", exp), this,
+                                                          component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw;
+            }
+        }
+        /**
+        <summary>
+        Disconnects a client connection to a service
+        </summary>
+        <remarks>
+        <para>
+        Disconnects a client connection. Client connections
+        are automatically closed by Shutdown(), so this function
+        is optional.
+        </para>
+        </remarks>
+        <param name="obj">The root object of the service to disconnect</param>
+        */
+        [PublicApi]
+        public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
-            await stub.RRContext.Close(cancel);
+            await stub.RRContext.Close(cancel).ConfigureAwait(false);
 
         }
-
+        /**
+        <summary>
+        Get the service attributes of a client connection
+        </summary>
+        <remarks>
+        Returns the service attributes of a client connected using
+        ConnectService()
+        </remarks>
+        <param name="obj">The root object of the client to use to retrieve service attributes</param>
+        <returns>Dictionary of the service attributes</returns>
+        */
+        [PublicApi]
         public Dictionary<string, object> GetServiceAttributes(object obj)
         {
             ServiceStub stub = (ServiceStub)obj;
@@ -1264,7 +1774,7 @@ namespace RobotRaconteurWeb
                     r.NextBytes(b);
                     local_endpoint = BitConverter.ToUInt32(b, 0);
                 } while (endpoints.ContainsKey(local_endpoint));
-                
+
                 e.m_LocalEndpoint = local_endpoint;
                 endpoints.Add(local_endpoint, e);
                 return local_endpoint;
@@ -1273,17 +1783,17 @@ namespace RobotRaconteurWeb
 
         public void DeleteEndpoint(Endpoint e)
         {
-           
+
             try
             {
                 Transport c;
                 lock (transports)
                 {
-                    c=transports[e.transport];
+                    c = transports[e.transport];
                 }
-                c.CloseTransportConnection(e,default(CancellationToken)).IgnoreResult();
+                c.CloseTransportConnection(e, default(CancellationToken)).IgnoreResult();
             }
-            catch {}
+            catch { }
 
             try
             {
@@ -1294,7 +1804,15 @@ namespace RobotRaconteurWeb
             }
             catch { }
         }
-
+        /**
+        <summary>
+            Check that the TransportConnection associated with an endpoint
+            is connected
+        </summary>
+        <remarks>None</remarks>
+        <param name="endpoint">The LocalEndpoint identifier to check</param>
+        */
+        [PublicApi]
         public void CheckConnection(uint endpoint)
         {
             try
@@ -1334,11 +1852,33 @@ namespace RobotRaconteurWeb
         }
 
         private CancellationTokenSource shutdown_token = new CancellationTokenSource();
-
+        /**
+        <summary>
+        Shuts down the node. Called automatically by ClientNodeSetup and ServerNodeSetup
+        </summary>
+        <remarks>
+        <para>
+        Shutdown must be called before program exit to avoid segfaults and other undefined
+        behavior. The use of ClientNodeSetup and ServerNodeSetup is recommended to automate
+        the node lifecycle. Calling this function does the following:
+        </para>
+        <list type="number">
+        <item>1. Closes all services and releases all service objects</item>
+        <item>2. Closes all client connections</item>
+        <item>3. Shuts down discovery</item>
+        <item>4. Shuts down all transports</item>
+        <item>5. Notifies all shutdown listeners</item>
+        <item>6. Releases all periodic cleanup task listeners</item>
+        <item>7. Shuts down and releases the thread pool</item>
+        </list>
+        </remarks>
+        */
+        [PublicApi]
         public void Shutdown()
         {
 
             shutdown_token.Cancel();
+            m_Discovery?.Shutdown();
 
             Transport[] cc;
             lock (transports)
@@ -1350,7 +1890,7 @@ namespace RobotRaconteurWeb
             {
                 try
                 {
-                   c.Close();
+                    c.Close();
                 }
                 catch { };
             }
@@ -1369,7 +1909,7 @@ namespace RobotRaconteurWeb
                 }
                 catch { };
             }
-            
+
             lock (endpoints)
             {
                 try
@@ -1379,257 +1919,65 @@ namespace RobotRaconteurWeb
                 catch { }
             }
 
-            
+
 
             //RobotRaconteurNode.sp = null;
         }
 
 
-        
-              
 
-        private Dictionary<string, NodeDiscoveryInfo> m_DiscoveredNodes = new Dictionary<string, NodeDiscoveryInfo>();
+        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
-        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_DiscoveredNodes; } }
+        internal Discovery m_Discovery;
 
         public void NodeAnnouncePacketReceived(string packet)
         {
-            try
-            {
-                string seed = "Robot Raconteur Node Discovery Packet";
-                if (packet.Substring(0, seed.Length) == seed)
-                {
-                    lock (m_DiscoveredNodes)
-                    {
-                    string[] lines = packet.Split(new char[] { '\n' });
-                    string[] idline = lines[1].Split(new char[] { ',' });
-                       
-                        NodeID nodeid = new NodeID(idline[0]);
-                       
-                    string nodename = idline[1];
-                    string url = lines[2];
-                    //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
-
-                    
-                        if (m_DiscoveredNodes.Keys.Contains(nodeid.ToString()))
-                        {
-                            NodeDiscoveryInfo i = m_DiscoveredNodes[nodeid.ToString()];
-                            i.NodeName = nodename;
-                            if (!i.URLs.Any(x => x.URL == url))
-                            {
-                                NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                                u.URL = url;
-                                u.LastAnnounceTime = DateTime.UtcNow;
-                                i.URLs.Add(u);
-                                //Console.WriteLine(url);
-                            }
-                            else
-                            {
-                                i.URLs.First(x => x.URL == url).LastAnnounceTime = DateTime.UtcNow;
-                            }
-                        }
-                        else
-                        {
-                            NodeDiscoveryInfo i = new NodeDiscoveryInfo();
-                            i.NodeID = nodeid;
-                            i.NodeName = nodename;
-                            NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                            u.URL = url;
-                            u.LastAnnounceTime = DateTime.UtcNow;
-                            i.URLs.Add(u);
-                            m_DiscoveredNodes.Add(nodeid.ToString(),i);
-                        }
-                    }
-
-                    //RobotRaconteurNode.s.NodeAnnouncePacketReceived(packet);
-                }
-
-            }
-            catch { };
-
-            //Console.WriteLine(packet);
-
+            m_Discovery.NodeAnnouncePacketReceived(packet);
         }
 
         internal void NodeDetected(NodeDiscoveryInfo n)
-        {            
-            try
-            {
-                lock (m_DiscoveredNodes)
-                {
-                    if (m_DiscoveredNodes.Keys.Contains(n.NodeID.ToString()))
-                    {
-                        NodeDiscoveryInfo i = m_DiscoveredNodes[n.NodeID.ToString()];
-                        i.NodeName = n.NodeName;
-                        foreach (var url in n.URLs)
-                        {
-                            if (!i.URLs.Any(x => x.URL == url.URL))
-                            {
-                                NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
-                                u.URL = url.URL;
-                                u.LastAnnounceTime = DateTime.UtcNow;
-                                i.URLs.Add(u);
-                                //Console.WriteLine(url);
-                            }
-                            else
-                            {
-                                i.URLs.First(x => x.URL == url.URL).LastAnnounceTime = DateTime.UtcNow;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (var u in n.URLs)
-                        {
-                            u.LastAnnounceTime = DateTime.UtcNow;
-                        }
-                        m_DiscoveredNodes.Add(n.NodeID.ToString(), n);
-                    }
-                }
-            }
-            catch (Exception) { }
-
+        {
+            m_Discovery.NodeDetected(n);
         }
 
-        private Task cleandiscoverednodes_task;
 
         protected void CleanDiscoveredNodes()
         {
-            try
-            {
-                lock (m_DiscoveredNodes)
-                {
-                    DateTime now = DateTime.UtcNow;
-
-                    string[] keys = m_DiscoveredNodes.Keys.ToArray();
-                    foreach (string key in keys)
-                    {
-                        List<NodeDiscoveryInfoURL> newurls = new List<NodeDiscoveryInfoURL>();
-                        NodeDiscoveryInfoURL[] urls = m_DiscoveredNodes[key].URLs.ToArray();
-                        foreach (NodeDiscoveryInfoURL u in urls)
-                        {
-
-                            double time = (now - u.LastAnnounceTime).TotalMilliseconds;
-                            if (time < 60000)
-                            {
-                                newurls.Add(u);
-                            }
-                        }
-
-                        m_DiscoveredNodes[key].URLs = newurls;
-
-                        if (newurls.Count == 0)
-                        {
-                            m_DiscoveredNodes.Remove(key);
-                        }
-
-                    }
-
-
-                }
-            }
-            catch (Exception) { }
-
+            m_Discovery.CleanDiscoveredNodes();
         }
-
-        private class ServiceIndexer : RobotRaconteurServiceIndex.ServiceIndex
-        {
-
-            protected readonly  RobotRaconteurNode node;
-
-            public ServiceIndexer(RobotRaconteurNode node)
-            {
-                this.node = node;
-            }
-
-            public Task<Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>> GetLocalNodeServices(CancellationToken cancel=default(CancellationToken))
-            {
-                if (Transport.CurrentThreadTransportConnectionURL == null)
-                    throw new ServiceException("GetLocalNodeServices must be called through a transport that supports node discovery");
-
-                Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo> o = new Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>();
-                int count = 0;
-
-                ServerContext[] sc;
-                lock (node.services)
-                {
-                    sc = node.services.Values.ToArray();
-                }
-
-                foreach (ServerContext c in sc)
-                {
-                    RobotRaconteurServiceIndex.ServiceInfo s = new RobotRaconteurServiceIndex.ServiceInfo();
-                    s.Attributes = c.Attributes;
-                    s.Name = c.ServiceName;
-                    s.RootObjectType = c.RootObjectType;
-                    s.ConnectionURL = new Dictionary<int, string>();
-                    s.ConnectionURL.Add(1,Transport.CurrentThreadTransportConnectionURL + "?" + ("nodeid=" + node.NodeID.ToString().Trim(new char[] {'{','}'}) + "&service=" + RRUriExtensions.EscapeDataString(s.Name)));
-                    s.RootObjectImplements = new Dictionary<int, string>();
-                    
-                    List<string> implements=c.ServiceDef.ServiceDef().Objects[ServiceDefinitionUtil.SplitQualifiedName(c.RootObjectType).Item2].Implements;
-                    for (int i = 0; i < implements.Count; i++)
-                    {
-                        s.RootObjectImplements.Add(i, implements[i]);
-                    }
-
-                    
-                    o.Add(count, s);
-                    count++;
-                }
-
-                return Task.FromResult(o);
-            }
-
-            public Task<Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>> GetRoutedNodes(CancellationToken cancel = default(CancellationToken))
-            {
-                
-
-                Dictionary<int, RobotRaconteurServiceIndex.NodeInfo> ret = new Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>();
-
-               
-                return Task.FromResult(ret);
-
-            }
-
-            public Task<Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>> GetDetectedNodes(CancellationToken cancel = default(CancellationToken))
-            {
-                lock (node.m_DiscoveredNodes)
-                {
-                string[] nodeids = node.m_DiscoveredNodes.Keys.ToArray();
-                int len = nodeids.Length;
-
-                Dictionary<int, RobotRaconteurServiceIndex.NodeInfo> ret = new Dictionary<int, RobotRaconteurServiceIndex.NodeInfo>();
-
-                for (int i = 0; i < len; i++)
-                {
-                    NodeDiscoveryInfo info = node.m_DiscoveredNodes[nodeids[i]];
-
-                    RobotRaconteurServiceIndex.NodeInfo ii = new RobotRaconteurServiceIndex.NodeInfo();
-                    ii.NodeID = info.NodeID.ToByteArray();
-                    ii.NodeName = info.NodeName;
-
-                    Dictionary<int,string> curl=new Dictionary<int,string>();
-                    for (int j = 0; j < info.URLs.Count; j++ )
-                    {
-                        curl.Add(j, info.URLs[j].URL);
-                    }
-
-                    ii.ServiceIndexConnectionURL=curl;
-                    ret.Add(i, ii);
-
-                }
-                return Task.FromResult(ret);
-
-                }
-            }
-
-            public event Action LocalNodeServicesChanged;
-
-        }
-
+        /**
+        <summary>
+            Select the "best" URL from a std::vector of candidates
+        </summary>
+        <remarks>
+            <para>
+            Service discovery will often return a list of candidate URLs to
+            use to connect to a node. This function uses hueristics to select
+            the "best" URL to use. The selection criteria ranks URLs in roughly
+            the following order, lower number being better:
+            </para>
+            <list type="number">
+            <term>"rr+intra" for IntraTransport</term>
+            <term>"rr+local" for LocalTransport</term>
+            <term>"rr+pci" or "rr+usb" for HardwareTransport</term>
+            <term>"rrs+tcp://127.0.0.1" for secure TcpTransport loopback</term>
+            <term>"rrs+tcp://[::1]" for secure TcpTransport IPv6 loopback</term>
+            <term>"rrs+tcp://localhost" for secure TcpTransport loopback</term>
+            <term>"rrs+tcp://[fe80" for secure TcpTransport link-local IPv6</term>
+            <term>"rrs+tcp://" for any secure TcpTransport</term>
+            <term>"rr+tcp://127.0.0.1" for TcpTransport loopback</term>
+            <term>"rr+tcp://[::1]" for TcpTransport IPv6 loopback</term>
+            <term>"rr+tcp://localhost" for TcpTransport loopback</term>
+            <term>"rr+tcp://[fe80" for TcpTransport link-local IPv6</term>
+            <term>"rr+tcp://" for any TcpTransport</term>
+            </list>
+        </remarks>
+        <param name="urls">The candidate URLs</param>
+        */
+        [PublicApi]
         public static string SelectRemoteNodeURL(string[] urls)
         {
-            var url_order = new string[] { 
+            var url_order = new string[] {
                 "rr+local://",
                 "rr+pci://",
                 "rr+usb://",
@@ -1642,14 +1990,14 @@ namespace RobotRaconteurWeb
                 "rrs+tcp://[fe80",
                 "rrs+wss://[fe80",
                 "rrs+ws://[fe80",
-                "rrs+tcp://",                
-                "rrs+wss://",                
+                "rrs+tcp://",
+                "rrs+wss://",
                 "rrs+ws://",
                 "rr+tcp://[fe80",
                 "rr+wss://[fe80",
                 "rr+ws://[fe80",
-                "rr+tcp://",                
-                "rr+wss://",                
+                "rr+tcp://",
+                "rr+wss://",
                 "rr+ws://",
             };
 
@@ -1659,11 +2007,11 @@ namespace RobotRaconteurWeb
                 if (u1 != null) return u1;
             }
 
-            return urls.First() ;
+            return urls.First();
         }
 
 
-        public async Task<object> ConnectService(string[] urls, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
+        /*public async Task<object> ConnectService(string[] urls, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
             List<string> urlsl = urls.ToList();
 
@@ -1692,326 +2040,183 @@ namespace RobotRaconteurWeb
             }
             throw new ConnectionException("Could not connect to service");
 
-        }
+        }*/
 
 
 
         private async Task UpdateDetectedNodes(CancellationToken cancel)
         {
-            var tasks = new List<Task<List<NodeDiscoveryInfo>>>();
-            var t=new List<Transport>();
-            lock(transports)
-            {
-                foreach (var t2 in transports.Values) t.Add(t2);
-            }
-
-            foreach (var t2 in t)
-            {
-                var task1 = t2.GetDetectedNodes(cancel);
-                tasks.Add(task1);
-            }
-
-            await Task.WhenAll(tasks);
-
-            foreach (var t2 in tasks)
-            {
-                try
-                {
-                    var info=await t2;
-                    foreach (var i in info)
-                    {
-                        NodeDetected(i);
-                    }
-                }
-                catch (Exception) { }
-            }
-
+            await m_Discovery.UpdateDetectedNodes(cancel).ConfigureAwait(false);
         }
-
-        private async Task<Tuple<byte[],string,Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>> DoFindServiceByType(string[] urls, CancellationToken cancel)
-        {
-            RobotRaconteurServiceIndex.ServiceIndex ind = (RobotRaconteurServiceIndex.ServiceIndex)await this.ConnectService(urls.ToArray(),cancel: cancel);
-            var NodeID = ((ServiceStub)ind).RRContext.RemoteNodeID.ToByteArray();
-            var NodeName = ((ServiceStub)ind).RRContext.RemoteNodeName;
-            var inf = await ind.GetLocalNodeServices(cancel);
-            return Tuple.Create(NodeID, NodeName, inf);
-
-        }
-
-
+        /**
+        <summary>
+        Use discovery to find available services by service type
+        </summary>
+        <remarks>
+        <para>
+        Uses discovery to find available services based on a service type. This
+        service type is the type of the root object, ie
+        `com.robotraconteur.robotics.robot.Robot`. This process will update the detected
+        node cache.
+        </para>
+        </remarks>
+        <param name="servicetype">The service type to find, ie `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="transportschemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param>
+        <returns>The detected services</returns>
+        */
+        [PublicApi]
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes)
         {
-            var cancel=new CancellationTokenSource();
-            cancel.CancelAfter(5000);
-            return await FindServiceByType(servicetype, transportschemes, cancel.Token);
+            return await m_Discovery.FindServiceByType(servicetype, transportschemes).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Use discovery to find available services by service type
+        </summary>
+        <remarks>
+        <para>
+        Uses discovery to find available services based on a service type. This
+        service type is the type of the root object, ie
+        `com.robotraconteur.robotics.robot.Robot`. This process will update the detected
+        node cache.
+        </para>
+        </remarks>
+        <param name="servicetype">The service type to find, ie `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="transportschemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param>
+        <returns>The detected services</returns>
+        */
+        [PublicApi]
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes, CancellationToken cancel)
         {
 
-            try
-            {
-                await UpdateDetectedNodes(cancel);
-            }
-            catch { };
-
-            List<ServiceInfo2> services = new List<ServiceInfo2>();
-            List<string> nodeids;
-            lock (m_DiscoveredNodes)
-            {
-
-                 nodeids= DiscoveredNodes.Keys.ToList();
-
-            }
-
-			var info_wait = new List<Task<Tuple<byte[],string,Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>>>();
-
-            for (int i=0; i<nodeids.Count; i++)
-            {
-
-                try
-                {
-                    List<string> urls = new List<string>();
-                    lock (m_DiscoveredNodes)
-                    {
-                        foreach (NodeDiscoveryInfoURL url in m_DiscoveredNodes[nodeids[i]].URLs)
-                        {
-                            foreach (var s in transportschemes)
-                            {
-                                if (url.URL.StartsWith(s + "://"))
-                                {
-                                    urls.Add(url.URL);
-                                    break;
-                                }
-
-                            }
-                        }
-                    }
-					if (urls.Count > 0)
-					{
-						info_wait.Add(DoFindServiceByType(urls.ToArray(), cancel));
-					}
-                }
-                catch (Exception)
-                {
-                    try
-                    {
-                        lock (m_DiscoveredNodes)
-                        {
-                            m_DiscoveredNodes.Remove(nodeids[i]);
-                        }
-                    }
-                    catch { }
-                }
-
-            }
-
-			if (info_wait.Count == 0) 
-			{
-                return new ServiceInfo2[0];
-			}
-
-            try
-            {
-                Task waittask = Task.WhenAll(info_wait);
-
-                await waittask;
-            }
-            catch (Exception) { }
-
-            for (int i=0; i<nodeids.Count; i++)
-            {
-
-                try
-                {
-
-                    if (!info_wait[i].IsCompleted)
-                    {
-                        throw new TimeoutException("Timeout");
-                    }
-
-                    var inf = await info_wait[i];
-                    
-
-                    RobotRaconteurServiceIndex.NodeInfo n = new RobotRaconteurServiceIndex.NodeInfo();
-                    n.NodeID = inf.Item1;
-                    n.NodeName = inf.Item2;
-
-
-                    foreach (RobotRaconteurServiceIndex.ServiceInfo ii in inf.Item3.Values)
-                    {
-                        if (ii.RootObjectType == servicetype)
-                        {
-                            services.Add(new ServiceInfo2(ii, n));
-                        }
-                        else
-                        {
-                            foreach (string impl in ii.RootObjectImplements.Values)
-                            {
-                                if (impl == servicetype)
-                                    services.Add(new ServiceInfo2(ii, n));
-                            }
-
-                        }
-                    }
-                }                
-                catch
-                {
-                    try
-                    {
-                        lock (m_DiscoveredNodes)
-                        {
-                            m_DiscoveredNodes.Remove(nodeids[i]);
-                        }
-                    }
-                    catch { }
-                }
-                
-            }
-
-
-            return services.ToArray() ;
+            return await m_Discovery.FindServiceByType(servicetype, transportschemes, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeID
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeID.
+        This function returns unverified cache information.
+        </para>
+        </remarks>
+        <param name="id">The NodeID to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> <returns>The detected nodes</returns>
+        */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes)
         {
-            var cancel = new CancellationTokenSource();
-            cancel.CancelAfter(5000);
-            return await FindNodeByID(id, schemes, cancel.Token);
+            return await m_Discovery.FindNodeByID(id, schemes).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeID
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeID.
+        This function returns unverified cache information.
+        </para>
+        </remarks>
+        <param name="id">The NodeID to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> <returns>The detected nodes</returns>
+        */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByID(NodeID id, string[] schemes, CancellationToken cancel)
         {
-            try
-            {
-                await UpdateDetectedNodes(cancel);
-            }
-            catch { };
-
-            var o = new List<NodeInfo2>();
-
-            lock (m_DiscoveredNodes)
-            {
-                string nodeid_str=id.ToString();
-                if (m_DiscoveredNodes.ContainsKey(nodeid_str))
-                {
-                    var ni=m_DiscoveredNodes[nodeid_str];
-                    var n=new NodeInfo2();
-                    n.NodeID=new NodeID(nodeid_str);
-                    n.NodeName = ni.NodeName;
-
-                    var c=new List<string>();
-
-                    foreach (var url in ni.URLs)
-                    {
-                        var u = TransportUtil.ParseConnectionUrl(url.URL);
-                        if (schemes.Any(x=> x==u.scheme))
-                        {
-                            string short_url;
-                            if (u.port == -1)
-                            {
-                                short_url = u.scheme + "//" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                            }
-                            else
-                            {
-                                short_url = u.scheme + "//" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                            }
-
-                            c.Add(short_url);
-                        }
-
-                    }
-
-                    if (c.Count != 0)
-                    {
-                        n.ConnectionURL = c.ToArray();
-                        o.Add(n);
-                    }
-                }
-            }
-
-            return o.ToArray();
+            return await m_Discovery.FindNodeByID(id, schemes, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeName
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeName.
+        This function returns unverified cache information.
+        </para>
+        </remarks>
+        <param name="name">The NodeName to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> 
+        <returns>The detected nodes</returns>
+        */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes)
         {
-            var cancel = new CancellationTokenSource();
-            cancel.CancelAfter(5000);
-            return await FindNodeByName(name, schemes, cancel.Token);
+            return await m_Discovery.FindNodeByName(name, schemes).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Finds nodes on the network with a specified NodeName
+        </summary>
+        <remarks>
+        <para>
+        Updates the discovery cache and find nodes with the specified NodeName.
+        This function returns unverified cache information.
+        </para>
+        </remarks>
+        <param name="name">The NodeName to find</param>
+        <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        etc</param> 
+        <returns>The detected nodes</returns>
+        */
+        [PublicApi]
         public async Task<NodeInfo2[]> FindNodeByName(string name, string[] schemes, CancellationToken cancel)
         {
-            try
-            {
-                await UpdateDetectedNodes(cancel);
-            }
-            catch { };
-
-            var o = new List<NodeInfo2>();
-
-            lock (m_DiscoveredNodes)
-            {
-                foreach (var e in m_DiscoveredNodes)
-                {
-                    if (e.Value.NodeName == name)
-                    {                        
-                        var n = new NodeInfo2();
-                        var nodeid_str = e.Value.NodeID.ToString();
-                        n.NodeID = new NodeID(nodeid_str);
-                        n.NodeName = e.Value.NodeName;
-
-                        var c = new List<string>();
-
-                        foreach (var url in e.Value.URLs)
-                        {
-                            var u = TransportUtil.ParseConnectionUrl(url.URL);
-                            if (schemes.Any(x => x == u.scheme))
-                            {
-                                string short_url;
-                                if (u.port == -1)
-                                {
-                                    short_url = u.scheme + "//" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                                }
-                                else
-                                {
-                                    short_url = u.scheme + "//" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
-                                }
-
-                                c.Add(short_url);
-                            }
-
-                        }
-
-                        if (c.Count != 0)
-                        {
-                            n.ConnectionURL = c.ToArray();
-                            o.Add(n);
-                        }
-                    }
-                }
-            }
-
-            return o.ToArray();
+            return await m_Discovery.FindNodeByName(name, schemes, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Request an exclusive access lock to a service object
+        </summary>
+        <remarks>
+        <para>
+        Called by clients to request an exclusive lock on a service object and
+        all subobjects (`objrefs`) in the service. The exclusive access lock will
+        prevent other users ("User" lock) or client connections  ("Session" lock)
+        from interacting with the objects.
+        </para>
+        </remarks>
+        <param name="obj">The object to lock. Must be returned by ConnectService or returned by an `objref`</param>
+        <param name="flags">Select either a "User" or "Session" lock</param>
+        <returns>"OK" on success</returns>
+        */
+        [PublicApi]
         public async Task<string> RequestObjectLock(object obj, RobotRaconteurObjectLockFlags flags, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only lock object opened through Robot Raconteur");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.RequestObjectLock(obj,flags, cancel);
+            return await s.RRContext.RequestObjectLock(obj, flags, cancel).ConfigureAwait(false);
 
-            
+
         }
 
-
+        /**
+        <summary>
+        Release an excluse access lock previously locked with RequestObjectLock()
+        </summary>
+        <remarks>
+        <para>
+        Object must have previously been locked using RequestObjectLock()
+        </para>
+        </remarks>
+        <param name="obj">The object previously locked</param>
+        <returns>"OK" on success</returns>
+        */
+        [PublicApi]
         public async Task<string> ReleaseObjectLock(object obj, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Can only unlock object opened through Robot Raconteur");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.ReleaseObjectLock(obj, cancel);
+            return await s.RRContext.ReleaseObjectLock(obj, cancel).ConfigureAwait(false);
         }
 
         public class MonitorLock
@@ -2019,37 +2224,109 @@ namespace RobotRaconteurWeb
             internal IDisposable lock_;
             internal ServiceStub stub;
         }
-
+        /**
+        <summary>
+        Creates a monitor lock on a specified object
+        </summary>
+        <remarks>
+        <para>
+        Monitor locks are intendended for short operations that require
+        guarding to prevent races, corruption, or other concurrency problems.
+        Monitors emulate a single thread locking the service object.
+        </para>
+        <para>
+        Monitor locks do not lock any sub-objects (objref)
+        </para>
+        </remarks>
+        <param name="obj">The object to lock</param>
+        <param name="timeout">The timeout in milliseconds to acquire the monitor lock, or RR_TIMEOUT_INFINITE</param>
+        */
+        [PublicApi]
         public async Task<MonitorLock> MonitorEnter(object obj, int timeout = -1, CancellationToken cancel = default(CancellationToken))
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can be monitored by RobotRaconteurNode");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.RRContext.MonitorEnter(obj,timeout, cancel);
+            return await s.RRContext.MonitorEnter(obj, timeout, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Releases a monitor lock
+        </summary>
+        <remarks>None
+        </remarks>
+        <param name="obj">The object previously locked by MonitorEnter()</param>
+        */
+        [PublicApi]
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
         {
-            
-            await lock_.stub.RRContext.MonitorExit(lock_, cancel);
-        }
 
+            await lock_.stub.RRContext.MonitorExit(lock_, cancel).ConfigureAwait(false);
+        }
+        /**
+        <summary>
+        Returns an objref as a specific type
+        </summary>
+        <remarks>
+        <para>
+        Robot Raconteur service object types are polymorphic using inheritence,
+        meaning that an object may be represented using multiple object types.
+        `objref` will attempt to return the relevant type, but it is sometimes
+        necessary to request a specific type for an objref.
+        </para>
+        <para>
+        This function will return the object from an `objref` as the specified type,
+        or throw an error if the type is invalid.
+        </para>
+        </remarks>
+        <param name="obj">The object with the desired `objref`</param>
+        <param name="objref">The name of the `objref` member</param>
+        <param name="objecttype">The desired service object type</param>
+        <returns>The object with the specified interface type. Must be cast to the desired type</returns>
+        */
+        [PublicApi]
         public async Task<object> FindObjRefTyped(object obj, string objref, string objecttype, CancellationToken cancel)
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.FindObjRefTyped(objref, objecttype, cancel);
+            return await s.FindObjRefTyped(objref, objecttype, cancel).ConfigureAwait(false);
         }
-
+        /**
+        <summary>
+        Returns an indexed objref as a specified type
+        </summary>
+        <remarks>
+        <para>
+        Same as FindObjRefTyped() but includes an `objref` index
+        </para>
+        </remarks>
+        <param name="obj">The object with the desired `objref`</param>
+        <param name="objref">The name of the `objref` member</param>
+        <param name="index">The index for the `objref`, convert int to string for int32 index type</param>
+        <param name="objecttype">The desired service object type</param>
+        <returns>The object with the specified interface type. Must be cast to the desired type</returns>
+        */
+        [PublicApi]
         public async Task<object> FindObjRefTyped(object obj, string objref, string index, string objecttype, CancellationToken cancel)
         {
             if (!(obj is ServiceStub)) throw new InvalidOperationException("Only service stubs can have objrefs");
             ServiceStub s = (ServiceStub)obj;
 
-            return await s.FindObjRefTyped(objref, index, objecttype, cancel);
+            return await s.FindObjRefTyped(objref, index, objecttype, cancel).ConfigureAwait(false);
         }
 
+        /**
+        <summary>
+        The current time in UTC time zone
+        </summary>
+        <remarks>
+        Uses the internal node clock to get the current time in UTC.
+        While this will normally use the system clock, this may
+        use simulation time in certain circumstances
+        </remarks>
+        */
+        [PublicApi]
         public DateTime UtcNow
         {
             get
@@ -2057,24 +2334,55 @@ namespace RobotRaconteurWeb
                 return DateTime.UtcNow;
             }
         }
-
+        /**
+        <summary>
+        Create a Timer object
+        </summary>
+        <remarks>
+        <para>
+        This function will normally return a WallTimer instance
+        </para>
+        <para>
+        Start() must be called after timer creation
+        </para>
+        </remarks>
+        <param name="period">The period of the timer in milliseconds</param>
+        <param name="handler">The handler function to call when timer times out</param>
+        <param name="oneshot">True if timer is a one-shot timer, false for repeated timer</param>
+        <returns>The new Timer object. Must call Start()</returns>
+        */
+        [PublicApi]
         public ITimer CreateTimer(int period, Action<TimerEvent> handler, bool oneshot = false)
         {
             var t = new WallTimer(period, handler, oneshot, this);
             return t;
         }
-
-        public IRate CreateRate(double period)
+        /**
+        <summary>
+            Create a Rate object
+        </summary>
+        <remarks>
+            <para>
+            Rate is used to stabilize periodic loops to a specified frequency
+            </para>
+            <para> This function will normally return a WallRate instance
+            </para>
+        </remarks>
+        <param name="frequency">Frequency of loop in Hz</param>
+        <returns>The new Rate object</returns>
+        */    
+        [PublicApi]
+        public IRate CreateRate(double frequency)
         {
-            return new WallRate(period, this);
+            return new WallRate(frequency, this);
         }
 
         public string GetRandomString(int count)
         {
-            string o="";
+            string o = "";
             Random r = new Random();
             string strvals = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            
+
             for (int i = 0; i < count; i++)
             {
                 o += strvals[r.Next(0, (strvals.Length - 1))];
@@ -2088,7 +2396,7 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                lock(this)
+                lock (this)
                 {
                     return service_state_nonce;
                 }
@@ -2118,291 +2426,322 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-    }
-        
-
-    public class ServiceInfo2
-    {
-        public string Name;
-        public string RootObjectType;
-        public string[] RootObjectImplements;
-        public string[] ConnectionURL;
-        public Dictionary<string, object> Attributes;
-        public NodeID NodeID;
-        public string NodeName;
-
-        public ServiceInfo2() { }
-
-        public ServiceInfo2(RobotRaconteurServiceIndex.ServiceInfo info,RobotRaconteurServiceIndex.NodeInfo ninfo)
+        /**
+        <summary>
+        Subscribe to listen for available services information
+        </summary>
+        <remarks>
+        A ServiceInfo2Subscription will track the availability of service types and
+        inform when services become available or are lost. If connections to
+        available services are also required, ServiceSubscription should be used.
+        </remarks>
+        <param name="service_types">An array of service types to listen for, ie
+        `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="filter">A filter to select individual services based on specified criteria</param>
+        <returns>The active subscription</returns>
+        */
+        [PublicApi]
+        public ServiceInfo2Subscription SubscribeServiceInfo2(string[] service_types, ServiceSubscriptionFilter filter = null)
         {
-            Name = info.Name;
-            RootObjectType = info.RootObjectType;
-            RootObjectImplements = info.RootObjectImplements.Values.ToArray();
-            ConnectionURL = info.ConnectionURL.Values.ToArray();
-            Attributes = info.Attributes;
-            NodeID = new NodeID(ninfo.NodeID);
-            NodeName = ninfo.NodeName;
-
+            return m_Discovery.SubscribeServiceInfo2(service_types, filter);
+        }
+        /**
+        <summary>
+        Subscribe to listen for available services and automatically connect
+        </summary>
+        <remarks>
+        A ServiceSubscription will track the availability of service types and
+        create connections when available.
+        </remarks>
+        <param name="service_types">An arrayof service types to listen for, ie
+        `com.robotraconteur.robotics.robot.Robot`</param>
+        <param name="filter">A filter to select individual services based on specified criteria</param>
+        <returns>The active subscription</returns>
+        */
+        [PublicApi]
+        public ServiceSubscription SubscribeServiceByType(string[] service_types, ServiceSubscriptionFilter filter = null)
+        {
+            return m_Discovery.SubscribeServiceByType(service_types, filter);
+        }
+        /**
+        <summary>
+        Subscribe to a service using one or more URL. Used to create robust connections to services
+        </summary>
+        <remarks>
+        Creates a ServiceSubscription assigned to a service with one or more candidate connection URLs. The
+        subscription will attempt to maintain a persistent connection, reconnecting if the connection is lost.
+        </remarks>
+        <param name="url">One or more candidate connection urls</param>
+        <param name="username">An optional username for authentication</param>
+        <param name="credentials">Optional credentials for authentication</param>
+        <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <returns>The active subscription</returns>
+        */        
+        [PublicApi]
+        public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
+        {
+            return m_Discovery.SubscribeService(url, username, credentials, objecttype);
         }
 
-    }
-
-    public class NodeInfo2
-    {
-        public NodeID NodeID;
-        public string NodeName;
-        public string[] ConnectionURL;
-    }
-
-    public class TimeSpec
-    {
-        
-        private static long start_ticks;
-        private static long ticks_per_second;
-
-        private static long start_seconds;
-        private static int start_nanoseconds;
-        
-        private static DateTime start_time;
-        private static bool started = false;
-
-        private static bool iswindows = false;
-        
-        public long seconds;
-        public int nanoseconds;
-
-        private static object start_lock=new object();
-
-        public TimeSpec(long seconds, int nanoseconds)
+        ILogRecordHandler m_LogRecordHandler;
+        /**
+        <summary>
+            The current log level for the node
+        </summary>
+        <remarks>
+            Default level is "warning". Set RobotRaconteur.RobotRaconteur_LogLevel_Disable to disable logging
+        </remarks>
+        */
+        [PublicApi]
+        public RobotRaconteur_LogLevel LogLevel 
         {
-            this.seconds = seconds;
-            this.nanoseconds = nanoseconds;
-
-            lock(start_lock)
+            get; set;
+        } = RobotRaconteur_LogLevel.Warning;
+        /**
+        <summary>
+            Test if the specified log level would be accepted
+        </summary>
+        <remarks>None</remarks>
+        <param name="level">Log level to test</param>
+        <returns>true if the log would be accepted</returns>
+        */
+        [PublicApi]
+        public bool CompareLogLevel(RobotRaconteur_LogLevel level)
+        {
+            return (int)level >= (int)LogLevel;
+        }
+        /**
+        <summary>
+            Log a simple message using the current node
+        </summary>
+        <remarks>
+            <para>
+            The record will be sent to the configured log handler,
+            or sent to cerr if none is configured
+            </para>
+            <para> If the level of the message is below the current log level
+            for the node, the record will be ignored
+            </para>
+        </remarks>
+        <param name="level">The level for the log message</param>
+        <param name="message">The log message</param>
+        */
+        [PublicApi]
+        public void LogMessage(RobotRaconteur_LogLevel level, string message)
+        {
+            LogRecord(new RRLogRecord() { Node = this, Level = level, Message = message });
+        }
+        /**
+        <summary>
+            Log a record to the node.
+        </summary>
+        <remarks>
+            <para>
+            The record will be sent to the configured log handler,
+            or sent to stderr if none is configured
+            </para>
+            <para> If the level of the message is below the current log level
+            for the node, it will be ignored
+            </para>
+        </remarks>
+        <param name="record">The record to log</param>
+        */
+        [PublicApi]
+        public void LogRecord(RRLogRecord record)
+        {
+            if ((int)record.Level < (int)LogLevel)
+                return;
+            if (m_LogRecordHandler != null)
             {
-            if (!started) start();
+                m_LogRecordHandler.Log(record);
+                return;
             }
 
-            cleanup_nanosecs();
+#if !ROBOTRACONTEUR_H5
+            RRLogFuncs.WriteLogRecord(Console.Error, record);
+            Console.Error.WriteLine();
+#else
+            var t = new StringWriter();
+            RRLogFuncs.WriteLogRecord(t, record);
+            Console.WriteLine(t.ToString());
+#endif
         }
-
-        public TimeSpec()
+        /**
+        <summary>
+            Set the log level for the node from a string
+        </summary>
+        <remarks>
+            Must be one of the following values: DISABLE, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE
+            Defaults to WARNING
+        </remarks>
+        <param name="loglevel">The desired log level</param>
+        */
+        [PublicApi]
+        public RobotRaconteur_LogLevel SetLogLevelFromString(string loglevel)
         {
-            if (!started) start();
-            this.seconds = 0;
-            this.nanoseconds = 0;
+
+            if (loglevel == "DISABLE")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Disable;
+                return RobotRaconteur_LogLevel.Disable;
+            }
+
+            if (loglevel == "FATAL")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Fatal;
+                return RobotRaconteur_LogLevel.Fatal;
+            }
+
+            if (loglevel == "ERROR")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Error;
+                return RobotRaconteur_LogLevel.Error;
+            }
+
+            if (loglevel == "WARNING")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Warning;
+                return RobotRaconteur_LogLevel.Warning;
+            }
+
+            if (loglevel == "INFO")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Info;
+                return RobotRaconteur_LogLevel.Info;
+            }
+
+            if (loglevel == "DEBUG")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Debug;
+                return RobotRaconteur_LogLevel.Debug;
+            }
+
+            if (loglevel == "TRACE")
+            {
+                LogLevel = RobotRaconteur_LogLevel.Trace;
+                return RobotRaconteur_LogLevel.Trace;
+            }
+
+            return LogLevel;
+        }
+        /**
+        <summary>
+            Set the log level for the node from specified environmental variable
+        </summary>
+        <remarks>
+            <para>
+            Retrieves the specified environmental variable and sets the log level based
+            on one of the following values: DISABLE, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE
+            </para>
+            <para> If an invalid value or the variable does not exist, the log level is left unchanged.
+            </para>
+        </remarks>
+        <param name="env_variable_name">The environmental variable to use. Defaults to
+            `ROBOTRACONTEUR_LOG_LEVEL`</param>
+        */
+        [PublicApi]
+        public RobotRaconteur_LogLevel SetLogLevelFromEnvVariable(string env_variable_name = "ROBOTRACONTEUR_LOG_LEVEL")
+        {
+            var loglevel = System.Environment.GetEnvironmentVariable(env_variable_name);
+            if (loglevel != null)
+            {
+                SetLogLevelFromString(loglevel);
+            }
+            return LogLevel;
         }
 
-        public static TimeSpec Now
+
+        /**
+        <summary>
+            Set the handler for log records
+        </summary>
+        <remarks>
+            If handler is NULL, records are sent to stderr
+        </remarks>
+        <param name="handler">The log record handler function</param>
+        */
+        [PublicApi]
+        public void SetLogRecordHandler(ILogRecordHandler handler)
+        {
+            m_LogRecordHandler = handler;
+        }
+
+        /**
+        <summary>
+            Get the currently configured log record handler
+        </summary>
+        <remarks>
+            If null, records are sent to stderr
+        </remarks>
+        */
+        [PublicApi]
+        public ILogRecordHandler GetLogRecordHandler()
+        {
+            return m_LogRecordHandler;
+        }
+
+        internal NodeDirectories node_dirs;
+
+        public NodeDirectories NodeDirectories
         {
             get
             {
-                TimeSpec t = new TimeSpec();
-                t.timespec_now();
-                return t;
-            }
-
-        }
-
-        private void timespec_now()
-        {
-            this.seconds = 0;
-            this.nanoseconds = 0;
-
-            lock (start_lock)
-            {
-                if (!started)
+                lock (this)
                 {
-                    start();
-                    this.seconds = start_seconds;
-                    this.nanoseconds = start_nanoseconds;
-                }
-                else
-                {
-                    if (iswindows)
+                    if (node_dirs == null)
                     {
-                        long ticks;
-                        QueryPerformanceCounter(out ticks);
-
-                        long diff_ticks = ticks - start_ticks;
-                        long diff_secs = diff_ticks / ticks_per_second;
-                       
-                        long diff_nanosecs = ((diff_ticks * (long)1e9) / ticks_per_second) % (long)1e9;
-
-                        
-
-                        this.seconds = diff_secs + start_seconds;
-                        this.nanoseconds = (int)diff_nanosecs + start_nanoseconds;
+                        node_dirs = NodeDirectoriesUtil.GetDefaultNodeDirectories(this);
                     }
-                    else
-                    {
-                        TimeSpan t = DateTime.UtcNow.ToUniversalTime() - (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-						this.seconds = (long)Math.Round(t.TotalSeconds);
-						this.nanoseconds = (int)Math.IEEERemainder(t.TotalMilliseconds * 1e6, 1e9) ;
-
-                        
-                    }
-
+                    return node_dirs;
                 }
             }
-
-            cleanup_nanosecs();
-
-
-        }
-
-
-        private void start()
-        {
-            if (!started)
+            set
             {
-
-#if !ROBOTRACONTEUR_BRIDGE
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.WinCE)
+                if (node_dirs != null)
                 {
-                    iswindows = true;
-                    QueryPerformanceCounter(out start_ticks);
-                    QueryPerformanceFrequency(out ticks_per_second);
-                    
-                    
+                    throw new InvalidOperationException("Node directories already set");
                 }
-#endif
-
-                start_time = DateTime.UtcNow.ToUniversalTime();
-                TimeSpan t = start_time - (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-                start_seconds = (long)Math.Round(t.TotalSeconds);
-                start_nanoseconds = (int)Math.IEEERemainder(t.TotalMilliseconds * 1e6, 1e9);
-
-                started = true;
+                node_dirs = value;
             }
-
         }
 
-        
 
-
-        /*[DllImport("Kernel32.dll")]
-        private static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
-
-        [DllImport("Kernel32.dll")]
-        private static extern bool QueryPerformanceFrequency(out long lpFrequency);*/
-
-        private static  bool QueryPerformanceCounter(out long lpPerformanceCount)
-        {
-            lpPerformanceCount=System.Diagnostics.Stopwatch.GetTimestamp();
-            return true;
-        }
-
-        private static  bool QueryPerformanceFrequency(out long lpFrequency)
-        {
-            lpFrequency = System.Diagnostics.Stopwatch.Frequency;
-            return true;
-        }
-
-        
-
-        private void cleanup_nanosecs()
-        {
-            int nanoseconds1 = nanoseconds;
-
-            int nano_div = nanoseconds / (int)(1e9);
-            nanoseconds = nanoseconds % (int)(1e9);
-            seconds += nano_div;
-
-            
-
-            if (seconds > 0 && nanoseconds < 0)
-            {
-                seconds = seconds - 1;
-                nanoseconds = (int)1e9 + nanoseconds;
-            }
-
-            if (seconds < 0 && nanoseconds > 0)
-            {
-                seconds = seconds + 1;
-                nanoseconds = nanoseconds - (int)1e9;
-            }
-
-            
-
-        }
-
-        public static bool operator ==(TimeSpec t1, TimeSpec t2)
-        {
-            if (((object)t1) == null && ((object)t2) == null) return true;
-            if (((object)t1) == null || ((object)t2) == null) return false;
-
-            return (t1.seconds == t2.seconds && t1.nanoseconds == t2.nanoseconds);
-        }
-
-        public static bool operator !=(TimeSpec t1, TimeSpec t2)
-        {
-            return !(t1 == t2);
-        }
-
-        public static TimeSpec operator -(TimeSpec t1, TimeSpec t2)
-        {
-            return new TimeSpec(t1.seconds - t2.seconds, t1.nanoseconds - t2.nanoseconds);
-        }
-
-        public static TimeSpec operator +(TimeSpec t1, TimeSpec t2)
-        {
-            return new TimeSpec(t1.seconds + t2.seconds, t1.nanoseconds + t2.nanoseconds);
-        }
-
-        public static bool operator >(TimeSpec t1, TimeSpec t2)
-        {
-            TimeSpec diff = t1 - t2;
-            if (diff.seconds == 0) return diff.nanoseconds > 0;
-            return diff.seconds > 0;
-        }
-
-        public static bool operator >=(TimeSpec t1, TimeSpec t2)
-        {
-            if (t1 == t2) return true;
-            return t1 > t2;
-        }
-
-        public static bool operator <(TimeSpec t1, TimeSpec t2)
-        {
-            return t2>= t1;
-        }
-
-        public static bool operator <=(TimeSpec t1, TimeSpec t2)
-        {
-            return t2 > t1;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (!(obj is TimeSpec)) return false;
-            return this == (TimeSpec)obj;
-        }
-
-        public override int GetHashCode()
-        {
-            return nanoseconds+(int)seconds;
-        }
     }
 
+    /**
+    <summary>
+        The type of object lock
+      </summary>
+    */
+    [PublicApi]
     public enum RobotRaconteurObjectLockFlags
     {
-        USER_LOCK=0,
+        /**
+        <summary>
+            User level lock
+        </summary>
+        <remarks>
+            The object will be accesible for all client connections
+            authenticated by the current user
+        </remarks>
+        */
+        [PublicApi]
+        USER_LOCK = 0,
+        /**
+        <summary>
+            Client level lock
+        </summary>
+        <remarks>
+            Only the current client connection will have access
+            to the locked object
+        </remarks>  
+        */
+        [PublicApi]
         CLIENT_LOCK
     }
 
-    public class NodeDiscoveryInfo
-    {
-        public NodeID NodeID;
-        public string NodeName = "";
-        public List<NodeDiscoveryInfoURL> URLs = new List<NodeDiscoveryInfoURL>();
-        public string ServiceStateNonce;
-    }
-
-    public class NodeDiscoveryInfoURL
-    {
-        public string URL;
-        public DateTime LastAnnounceTime;
-    }
+    /// <summary>
+    /// Used to mark member as part of the public API
+    /// </summary>
+    public class PublicApiAttribute : System.Attribute { };
 }

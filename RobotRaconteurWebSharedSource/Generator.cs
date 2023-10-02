@@ -24,25 +24,259 @@ using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
+    /**
+    <summary>
+    Generator type for use with generator functions, with parameter and return
+    </summary>
+    <remarks>
+    <para>
+    Generators are used with generator functions to implement simple coroutines. They are
+    returned by function members with a parameter and/or return marked with the
+    generator container type. Robot Raconteur generators are modeled on Python generators,
+    and are intended to be used in two scenarios:
+    1. Transferring large parameter values or return values that would be over the message
+    transfer limit (typically around 10 MB).
+    2. Long running operations that return updates or require periodic input. Generators
+    are used to implement functionality similar to "actions" in ROS.
+    </para>
+    <para>
+    Generators are a generalization of iterators, where a value is returned every time
+    the iterator is advanced until there are no more values. Python and Robot Raconteur iterators
+    add the option of passing a parameter every advance, allowing for simple coroutines. The
+    generator is advanced by calling the Next() function. These functions
+    will either return a value or throw StopIterationException if there are no more values. Next()
+    may also throw any valid Robot Raconteur exception.
+    </para>
+    <para>
+    Generators can be terminated with either the Close() or Abort() functions. Close() should be
+    used to cleanly close the generator, and is not considered an error condition. Next(), if called
+    after close, should throw StopIterationException. Abort() is considered an error condition, and
+    will cause any action associated with the generator to be aborted as quickly as possible (ie faulting
+    a robot). If Next() is called after Abort(), OperationAbortedException should be thrown.
+    </para>
+    <para>
+    Robot Raconteur clients will return a populated stub generator that calls the service. Services
+    are expected to return a subclass of Generator.
+    </para>
+    </remarks>
+    <typeparam name="ReturnType">The type of value returned by Next() </typeparam>
+    <typeparam name="ParamType">The type of the parameter passed to Next() </typeparam>
+    */
+
+        [PublicApi]
     public interface Generator1<ReturnType, ParamType>
     {
+        /**
+        <summary>
+        Advance the generator
+        </summary>
+        <remarks>
+        Next() advances the generator to retrieve the next value. This version of
+        Generator includes passing a parameter v to the generator.
+        </remarks>
+        <param name="param">Parameter to pass to generator</param>
+        <returns>Return value from generator</returns>
+        */
+
+        [PublicApi]
         Task<ReturnType> Next(ParamType param, CancellationToken cancel=default(CancellationToken));        
-        Task Abort(CancellationToken cancel = default(CancellationToken));        
+        /**
+        <summary>
+        Abort the generator
+        </summary>
+        <remarks>
+        Aborts and destroys the generator. This is assumed to be an error condition. Next() should throw
+        OperationAbortedException if called after Abort(). Any ongoing operations should be terminated with an error
+        condition, for example a moving robot should be immediately halted.
+        </remarks>
+        */
+
+
+        [PublicApi]
+        Task Abort(CancellationToken cancel = default(CancellationToken));  
+        /**
+        <summary>
+        Close the generator
+        </summary>
+        <remarks>
+        Closes the generator. Closing the generator terminates iteration and destroys the generator.
+        This operation cleanly closes the generator, and is not considered to be an error condition. Next()
+        should throw StopIterationException if called after Close().
+        </remarks>
+        */
+        [PublicApi]
+      
         Task Close(CancellationToken cancel = default(CancellationToken));        
     }
+        /**
+        <summary>
+        Generator type for use with generator functions, with return
+        </summary>
+        <remarks>
+        <para>
+        Generators are used with generator functions to implement simple coroutines. They are
+        returned by function members with a parameter and/or return marked with the
+        generator container type. Robot Raconteur generators are modeled on Python generators,
+        and are intended to be used in two scenarios:
+        1. Transferring large parameter values or return values that would be over the message
+        transfer limit (typically around 10 MB).
+        2. Long running operations that return updates or require periodic input. Generators
+        are used to implement functionality similar to "actions" in ROS.
+        </para>
+        <para>
+        Generators are a generalization of iterators, where a value is returned every time
+        the iterator is advanced until there are no more values. Python and Robot Raconteur iterators
+        add the option of passing a parameter every advance, allowing for simple coroutines. The
+        generator is advanced by calling the Next() function. These functions
+        will either return a value or throw StopIterationException if there are no more values. Next()
+        may also throw any valid Robot Raconteur exception.
+        </para>
+        <para>
+        Generators can be terminated with either the Close() or Abort() functions. Close() should be
+        used to cleanly close the generator, and is not considered an error condition. Next(), if called
+        after close, should throw StopIterationException. Abort() is considered an error condition, and
+        will cause any action associated with the generator to be aborted as quickly as possible (ie faulting
+        a robot). If Next() is called after Abort(), OperationAbortedException should be thrown.
+        </para>
+        <para>
+        Robot Raconteur clients will return a populated stub generator that calls the service. Services
+        are expected to return a subclass of Generator.
+        </para>
+        </remarks>
+        <typeparam name="ReturnType">Return The type of value returned by Next()</typeparam>
+        */
 
+        [PublicApi]
     public interface Generator2<ReturnType>
     {
+        /**
+        <summary>
+        Advance the generator
+        </summary>
+        <remarks>
+        Next() advances the generator to retrieve the next value. This version of
+        Generator does not include passing a parameter to the generator.
+        </remarks>
+        <returns>Return Return value from generator</returns>
+        */
+
+        [PublicApi]
         Task<ReturnType> Next(CancellationToken cancel = default(CancellationToken));
+        /**
+        <summary>
+        Abort the generator
+        </summary>
+        <remarks>
+        Aborts and destroys the generator. This is assumed to be an error condition. Next() should throw
+        OperationAbortedException if called after Abort(). Any ongoing operations should be terminated with an error
+        condition, for example a moving robot should be immediately halted.
+        </remarks>
+        */
+
+        [PublicApi]
         Task Abort(CancellationToken cancel = default(CancellationToken));
+        /**
+        <summary>
+        Close the generator
+        </summary>
+        <remarks>
+        Closes the generator. Closing the generator terminates iteration and destroys the generator.
+        This operation cleanly closes the generator, and is not considered to be an error condition. Next()
+        should throw StopIterationException if called after Close().
+        </remarks>
+        */
+
+        [PublicApi]
         Task Close(CancellationToken cancel = default(CancellationToken));
+        /**
+        <summary>
+        Automatically call Next() repeatedly and return array of results
+        </summary>
+        <returns>All values returned by generator Next()</returns>
+        */
+
+        [PublicApi]
         Task<ReturnType[]> NextAll(CancellationToken cancel = default(CancellationToken));
     }
+    /**
+    <summary>
+    Generator type for use with generator functions, with parameter
+    </summary>
+    <remarks>
+    <para>
+    Generators are used with generator functions to implement simple coroutines. They are
+    returned by function members with a parameter and/or return marked with the
+    generator container type. Robot Raconteur generators are modeled on Python generators,
+    and are intended to be used in two scenarios:
+    1. Transferring large parameter values or return values that would be over the message
+    transfer limit (typically around 10 MB).
+    2. Long running operations that return updates or require periodic input. Generators
+    are used to implement functionality similar to "actions" in ROS.
+    </para>
+    <para>
+    Generators are a generalization of iterators, where a value is returned every time
+    the iterator is advanced until there are no more values. Python and Robot Raconteur iterators
+    add the option of passing a parameter every advance, allowing for simple coroutines. The
+    generator is advanced by calling the Next() function. These functions
+    will either return a value or throw StopIterationException if there are no more values. Next()
+    may also throw any valid Robot Raconteur exception.
+    </para>
+    <para>
+    Generators can be terminated with either the Close() or Abort() functions. Close() should be
+    used to cleanly close the generator, and is not considered an error condition. Next(), if called
+    after close, should throw StopIterationException. Abort() is considered an error condition, and
+    will cause any action associated with the generator to be aborted as quickly as possible (ie faulting
+    a robot). If Next() is called after Abort(), OperationAbortedException should be thrown.
+    </para>
+    <para>
+    Robot Raconteur clients will return a populated stub generator that calls the service. Services
+    are expected to return a subclass of Generator.
+    </para>
+    </remarks>
+    <typeparam name="ParamType">The type of the parameter passed to Next()</typeparam>
+    */
 
+        [PublicApi]
     public interface Generator3<ParamType>
     {
+        /**
+        <summary>
+        Advance the generator
+        </summary>
+        <remarks>
+        Next() advances the generator to retrieve the next value. This version of
+        Generator includes passing a parameter to the generator but no return.
+        </remarks>
+        <param name="param">Parameter to pass to generator</param>
+        */
+
+        [PublicApi]
         Task Next(ParamType param, CancellationToken cancel = default(CancellationToken));
+        /**
+        <summary>
+        Abort the generator
+        </summary>
+        <remarks>
+        Aborts and destroys the generator. This is assumed to be an error condition. Next() should throw
+        OperationAbortedException if called after Abort(). Any ongoing operations should be terminated with an error
+        condition, for example a moving robot should be immediately halted.
+        </remarks>
+        */
+
+        [PublicApi]
         Task Abort(CancellationToken cancel = default(CancellationToken));
+        /**
+        <summary>
+        Close the generator
+        </summary>
+        <remarks>
+        Closes the generator. Closing the generator terminates iteration and destroys the generator.
+        This operation cleanly closes the generator, and is not considered to be an error condition. Next()
+        should throw StopIterationException if called after Close().
+        </remarks>
+        */
+
+        [PublicApi]
         Task Close(CancellationToken cancel = default(CancellationToken));
     }
 
@@ -67,7 +301,7 @@ namespace RobotRaconteurWeb
             var err = new AbortOperationException("Generator abort requested");
             RobotRaconteurExceptionUtil.ExceptionToMessageEntry(err, m);
             m.AddElement("index", id);
-            await stub.ProcessRequest(m, cancel);
+            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
         public async Task Close(CancellationToken cancel = default(CancellationToken))
         {
@@ -75,7 +309,7 @@ namespace RobotRaconteurWeb
             var err = new StopIterationException("Generator abort requested");
             RobotRaconteurExceptionUtil.ExceptionToMessageEntry(err, m);
             m.AddElement("index", id);
-            await stub.ProcessRequest(m, cancel);
+            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
 
         public async Task<MessageElement> NextBase(MessageElement v, CancellationToken cancel)
@@ -87,7 +321,7 @@ namespace RobotRaconteurWeb
                 v.ElementName = "parameter";
                 m.elements.Add(v);
             }
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             MessageElement mret;
             ret.TryFindElement("return", out mret);
             return mret;
@@ -103,7 +337,7 @@ namespace RobotRaconteurWeb
         public async Task<ReturnType> Next(ParamType param, CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageElement("param", stub.RRContext.PackAnyType<ParamType>(ref param));
-            var m_ret = await NextBase(m, cancel);
+            var m_ret = await NextBase(m, cancel).ConfigureAwait(false);
             var data = stub.RRContext.UnpackAnyType<ReturnType>(m_ret);
             return (ReturnType)data;
         }
@@ -117,7 +351,7 @@ namespace RobotRaconteurWeb
 
         public async Task<ReturnType> Next(CancellationToken cancel = default(CancellationToken))
         {            
-            var m_ret = await NextBase(null, cancel);
+            var m_ret = await NextBase(null, cancel).ConfigureAwait(false);
             var data = stub.RRContext.UnpackAnyType<ReturnType>(m_ret);
             return (ReturnType)data;
         }
@@ -127,7 +361,7 @@ namespace RobotRaconteurWeb
             var ret = new List<ReturnType>();
             try
             {
-                ret.Add(await Next(cancel));
+                ret.Add(await Next(cancel).ConfigureAwait(false));
             }
             catch (StopIterationException) { }
             return ret.ToArray();
@@ -143,7 +377,7 @@ namespace RobotRaconteurWeb
         public async Task Next(ParamType param, CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageElement("param", stub.RRContext.PackAnyType<ParamType>(ref param));
-            var m_ret = await NextBase(m, cancel);
+            var m_ret = await NextBase(m, cancel).ConfigureAwait(false);
             stub.RRContext.UnpackVarType(m_ret);            
         }
     }
@@ -189,18 +423,18 @@ namespace RobotRaconteurWeb
             {
                 if (m.Error == MessageErrorType.StopIteration)
                 {
-                    await generator.Close();                    
+                    await generator.Close().ConfigureAwait(false);                    
                 }
                 else
                 {
-                    await generator.Abort();
+                    await generator.Abort().ConfigureAwait(false);
                 }
                 m_ret.AddElement("return", 0);
             }
             else
             {
                 var p = (ParamType)skel.RRContext.UnpackAnyType<ParamType>(m.FindElement("parameter"));
-                var r = await generator.Next(p);
+                var r = await generator.Next(p).ConfigureAwait(false);
                 m_ret.AddElement("return", skel.RRContext.PackAnyType<ReturnType>(ref r));
             }
             return m_ret;
@@ -225,17 +459,17 @@ namespace RobotRaconteurWeb
             {
                 if (m.Error == MessageErrorType.StopIteration)
                 {
-                    await generator.Close();
+                    await generator.Close().ConfigureAwait(false);
                 }
                 else
                 {
-                    await generator.Abort();
+                    await generator.Abort().ConfigureAwait(false);
                 }
                 m_ret.AddElement("return", 0);
             }
             else
             {                
-                var r = await generator.Next();
+                var r = await generator.Next().ConfigureAwait(false);
                 m_ret.AddElement("return", skel.RRContext.PackAnyType<ReturnType>(ref r));
             }
             return m_ret;
@@ -260,34 +494,60 @@ namespace RobotRaconteurWeb
             {
                 if (m.Error == MessageErrorType.StopIteration)
                 {
-                    await generator.Close();
+                    await generator.Close().ConfigureAwait(false);
                 }
                 else
                 {
-                    await generator.Abort();
+                    await generator.Abort().ConfigureAwait(false);
                 }
                 m_ret.AddElement("return", 0);
             }
             else
             {
                 var p = (ParamType)skel.RRContext.UnpackAnyType<ParamType>(m.FindElement("parameter"));
-                await generator.Next(p);
+                await generator.Next(p).ConfigureAwait(false);
                 m_ret.AddElement("return", 0);
             }
             return m_ret;
         }
     }
 
+    /**
+    <summary>
+    Adapter class to create a generator from an enumerator
+    </summary>
+    <remarks>
+    Next calls will be mapped to the supplied enumerator
+    </remarks>
+    <typeparam name="T">The enumerator value type</typeparam>
+    */
+
+        [PublicApi]
     public class EnumeratorGenerator<T> : Generator2<T>
     {
         bool aborted = false;
         bool closed = false;
         IEnumerator<T> enumerator;
-
+        /**
+        <summary>
+        Construct a generator from an IEnumerable
+        </summary>
+        <remarks>None</remarks>
+        <param name="enumerable" />
+        <returns />
+        */
+        [PublicApi]
         public EnumeratorGenerator(IEnumerable<T> enumerable)
             : this(enumerable.GetEnumerator())
         { }
-
+        /**
+        <summary>
+        Construct a generator from an IEnumerator
+        </summary>
+        <remarks>None</remarks>
+        <param name="enumerator" />
+        */
+        [PublicApi]
         public EnumeratorGenerator(IEnumerator<T> enumerator)
         {
             this.enumerator = enumerator;
@@ -329,7 +589,7 @@ namespace RobotRaconteurWeb
             {
                 while (true)
                 {
-                    o.Add(await Next());
+                    o.Add(await Next().ConfigureAwait(false));
                 }
             }
             catch (StopIterationException) { }

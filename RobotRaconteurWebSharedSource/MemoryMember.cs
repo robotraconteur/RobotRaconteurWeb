@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
@@ -29,40 +30,157 @@ namespace RobotRaconteurWeb
         public abstract Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken));
     }
     
+    /**
+    <summary>
+    Single dimensional numeric primitive random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The ArrayMemory class is used to represent a single dimensional numeric
+    primitive array. Multidimensional numeric primitive arrays should use
+    MultiDimArrayMemory. Valid types for T are `double`, `float`, `sbyte`,
+    `byte`, `short`, `ushort`, `uint`, `uint`, `long`,
+    `ulong`, `bool`, `CDouble`, and `CSingle`.
+    </para>
+    <para>
+    ArrayMemory instances are attached to an RRArray, either when
+    constructed or later using Attach().
+    </para>
+    <para>
+    ArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T" />
+    */
+    [PublicApi]
     public class ArrayMemory<T> : ArrayMemoryBase
     {
 
         private T[] memory;
+        /**
+        <summary>
+        Construct a new ArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
 
+        [PublicApi]
         public ArrayMemory()
         {
 
         }
+        /**
+        <summary>
+        Construct a new ArrayMemory instance attached to an array
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public ArrayMemory(T[] memory)
         {
             this.memory = memory;
         }
+        /**
+        <summary>
+        Attach ArrayMemory instance to an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public virtual void Attach(T[] memory)
         {
             this.memory = memory;
         }
+        /**
+        <summary>
+        Return the length of the array memory
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
 
+        [PublicApi]
         public override Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken))
         {            
                 return Task.FromResult((ulong)memory.LongLength);            
         }
+        /**
+        <summary>
+        Read a segment from an array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a segment of an array memory into a supplied buffer array. The start positions and length
+        of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start index in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start index in the buffer to write the data</param>
+        <param name="count">The number of array elements to read</param>
+        */
 
+        [PublicApi]
         public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
         {
-            Array.Copy(memory, (long)memorypos, buffer, (long)bufferpos, (long)count);
+            lock (this)
+            {
+                Array.Copy(memory, (long)memorypos, buffer, (long)bufferpos, (long)count);
+            }
             return Task.FromResult(0);
         }
+        /**
+        <summary>
+        Write a segment to an array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to an array memory from a supplied buffer array. The start positions and length
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start index in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start index in the buffer to read the data</param>
+        <param name="count">The number of array elements to write</param>
+        */
 
+        [PublicApi]
         public virtual Task Write(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
-            Array.Copy(buffer, (long)bufferpos, memory, (long)memorypos, (long)count);
+            lock (this)
+            {
+                Array.Copy(buffer, (long)bufferpos, memory, (long)memorypos, (long)count);
+            }
             return Task.FromResult(0);
         }
     }
@@ -73,43 +191,165 @@ namespace RobotRaconteurWeb
 
         public abstract Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken));        
     }
+    /**
+    <summary>
+    Multidimensional numeric primitive random access memory region
+    </summary>
+    <remarks>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    
+    The MultiDimArrayMemory class is used to represent a multidimensional numeric
+    primitive array. Single dimensional numeric primitive arrays should use
+    ArrayMemory. Valid types for T are `double`, `float`, `sbyte`,
+    `byte`, `short`, `ushort`, `int`, `uint`, `long`,
+    `ulong`, `bool`, `CDouble`, and `CSingle`.
+    
+    MultiDimArrayMemory instances are attached to an MultiDimArray,
+    either when constructed or later using Attach().
+    
+    MultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </remarks>
+    <typeparam name="T">The numeric primitive type of the array</typeparam>
+    */
 
+        [PublicApi]
     public class MultiDimArrayMemory<T> : MultiDimArrayMemoryBase
     {
         private MultiDimArray multimemory;
+        /**
+        <summary>
+        Construct a new MultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
 
+        [PublicApi]
         public MultiDimArrayMemory()
         {
 
         }
+        /**
+        <summary>
+        Construct a new MultiDimArrayMemory instance attached to a MultiDimArray
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public MultiDimArrayMemory(MultiDimArray memory)
         {
             multimemory = memory;
         }
+        /**
+        <summary>
+        Attach MultiDimArrayMemory instance to a MultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public virtual void Attach(MultiDimArray memory)
         {
             this.multimemory = memory;
         }
-        
+        /**
+        <summary>
+        Dimensions of the memory array
+        </summary>
+        <remarks>
+        <para>
+        Returns the dimensions (shape) of the memory array
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </para>
+        </remarks>
+        */
+
+        [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {            
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());            
         }
+        /**
+        <summary>
+        The number of dimensions in the memory array
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
 
+        [PublicApi]
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
         }
 
-                
+        /**
+        <summary>
+        Read a block from a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a block of a multidimensional array memory into a supplied buffer multidimensional array.
+        The start positions and count of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start position in the buffer to write the data</param>
+        <param name="count">The count of array elements to read</param>
+        */
+
+        [PublicApi]
         public virtual Task Read(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x=>(uint)x).ToArray(), buffer, bufferpos.Select(x=>(uint)x).ToArray(), count.Select(x=>(uint)x).ToArray());
             return Task.FromResult(0);            
         }
+        /**
+        <summary>
+        Write a segment to a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to a multidimensional array memory from a supplied buffer
+        multidimensional array. The start positions and count
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start position in the buffer to read the data</param>
+        <param name="count">The count of array elements to write</param>
+        */
 
+        [PublicApi]
         public virtual Task Write(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -148,7 +388,7 @@ namespace RobotRaconteurWeb
 
                         ulong memorypos = m.FindElement("memorypos").CastData<ulong[]>()[0];
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
-                        var data = await DoRead(memorypos, 0, count, mem);
+                        var data = await DoRead(memorypos, 0, count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -166,7 +406,7 @@ namespace RobotRaconteurWeb
                         ulong memorypos = m.FindElement("memorypos").CastData<ulong[]>()[0];
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
                         var data = m.FindElement("data").Data;
-                        await DoWrite(memorypos, data, 0, count, mem);
+                        await DoWrite(memorypos, data, 0, count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -178,7 +418,7 @@ namespace RobotRaconteurWeb
                         if (param == "Length")
                         {
                             var ret = new MessageEntry(MessageEntryType.MemoryGetParamRet, MemberName);
-                            var len = await mem.GetLength();
+                            var len = await mem.GetLength().ConfigureAwait(false);
                             ret.AddElement("return", len);
                             return ret;
 
@@ -218,7 +458,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (ArrayMemory<T>)mem;
             var buf1 = (T[])DataTypeUtil.ArrayFromDataType(element_type, (uint)count);
-            await mem1.Read(memorypos, buf1, 0, count);
+            await mem1.Read(memorypos, buf1, 0, count).ConfigureAwait(false);
             return buf1;
         }
 
@@ -226,7 +466,7 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (ArrayMemory<T>)mem;
             var buf1 = (T[])buffer;
-            await mem1.Write(memorypos, buf1, 0, count);
+            await mem1.Write(memorypos, buf1, 0, count).ConfigureAwait(false);
         }
     }
 
@@ -263,7 +503,7 @@ namespace RobotRaconteurWeb
                         ulong[] memorypos = m.FindElement("memorypos").CastData<ulong[]>();
                         ulong[] count = m.FindElement("count").CastData<ulong[]>();
                         ulong elem_count = count.Aggregate((ulong)1, (x, y) => x * y);
-                        var data = await DoRead(memorypos, new ulong[count.Length], count, elem_count, mem);
+                        var data = await DoRead(memorypos, new ulong[count.Length], count, elem_count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -282,7 +522,7 @@ namespace RobotRaconteurWeb
                         ulong[] count = m.FindElement("count").CastData<ulong[]>();
                         ulong elem_count = count.Aggregate((ulong)1, (x, y) => x * y);
                         var data = m.FindElement("data").Data;
-                        await DoWrite(memorypos, data, new ulong[count.Length], count, elem_count, mem);
+                        await DoWrite(memorypos, data, new ulong[count.Length], count, elem_count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
@@ -294,7 +534,7 @@ namespace RobotRaconteurWeb
                         if (param == "Dimensions")
                         {
                             var ret = new MessageEntry(MessageEntryType.MemoryGetParamRet, MemberName);
-                            var l = await mem.GetDimensions();
+                            var l = await mem.GetDimensions().ConfigureAwait(false);
                             ret.AddElement("return", l);
                             return ret;
 
@@ -302,7 +542,7 @@ namespace RobotRaconteurWeb
                         if (param == "DimCount")
                         {
                             var ret = new MessageEntry(MessageEntryType.MemoryGetParamRet, MemberName);
-                            var l = await mem.GetDimCount();
+                            var l = await mem.GetDimCount().ConfigureAwait(false);
                             ret.AddElement("return", l);
                             return ret;
 
@@ -342,15 +582,15 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (MultiDimArrayMemory<T>)mem;
             var buf1 = new MultiDimArray(count.Select(x=>(uint)x).ToArray(), (T[])DataTypeUtil.ArrayFromDataType(element_type, (uint)elem_count));
-            await mem1.Read(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.RRContext.PackMultiDimArray(buf1);
         }
 
         protected override async Task DoWrite(ulong[] memorypos, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (MultiDimArrayMemory<T>)mem;
-            var buf1 = skel.RRContext.UnpackMultiDimArray((MessageElementMultiDimArray)buffer);
-            await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
+            var buf1 = skel.RRContext.UnpackMultiDimArray((MessageElementNestedElementList)buffer);
+            await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
     }
 
@@ -377,7 +617,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "Length");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>()[0];
         }
 
@@ -401,7 +641,7 @@ namespace RobotRaconteurWeb
 
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "MaxTransferSize");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             var remote_max_size1 = ret.FindElement("return").CastData<uint[]>()[0];
             lock (this)
             {
@@ -425,7 +665,7 @@ namespace RobotRaconteurWeb
                 throw new WriteOnlyMemberException("Write only member");
             }
 
-            uint max_transfer_size = await GetMaxTransferSize(cancel);
+            uint max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
             uint max_elems = (max_transfer_size) / element_size;
 
             if (count <= max_elems)
@@ -434,7 +674,7 @@ namespace RobotRaconteurWeb
                 var e = new MessageEntry(MessageEntryType.MemoryRead, MemberName);
                 e.AddElement("memorypos", memorypos);
                 e.AddElement("count", count);
-                var ret = await stub.ProcessRequest(e, cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
                 UnpackReadResult(ret.FindElement("data").Data, buffer, bufferpos, count);
             }
             else
@@ -447,7 +687,7 @@ namespace RobotRaconteurWeb
                     ulong bufferpos_i = bufferpos + max_elems * i;
                     ulong memorypos_i = memorypos + max_elems * i;
 
-                    await ReadImpl(memorypos_i, buffer, bufferpos_i, max_elems);
+                    await ReadImpl(memorypos_i, buffer, bufferpos_i, max_elems).ConfigureAwait(false);
 
                 }
 
@@ -456,7 +696,7 @@ namespace RobotRaconteurWeb
                     ulong bufferpos_i = bufferpos + max_elems * blocks;
                     ulong memorypos_i = memorypos + max_elems * blocks;
 
-                    await ReadImpl(memorypos_i, buffer, bufferpos_i, blockrem);
+                    await ReadImpl(memorypos_i, buffer, bufferpos_i, blockrem).ConfigureAwait(false);
                 }
             }
         }
@@ -467,7 +707,7 @@ namespace RobotRaconteurWeb
                 throw new ReadOnlyMemberException("Read only member");
             }
 
-            ulong max_transfer_size = await GetMaxTransferSize(cancel);
+            ulong max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
             ulong max_elems = max_transfer_size / element_size;
 
             if (count <= max_elems)
@@ -478,7 +718,7 @@ namespace RobotRaconteurWeb
                 e.AddElement("count", count);
                 e.AddElement("data", PackWriteRequest(buffer, bufferpos, count));
 
-                var ret = stub.ProcessRequest(e, cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
             }
             else
             {
@@ -492,14 +732,14 @@ namespace RobotRaconteurWeb
                 {
                     ulong bufferpos_i = bufferpos + max_elems * i;
                     ulong memorypos_i = memorypos + max_elems * i;
-                    await WriteImpl(memorypos_i, buffer, bufferpos_i, max_elems);
+                    await WriteImpl(memorypos_i, buffer, bufferpos_i, max_elems).ConfigureAwait(false);
                 }
 
                 if (blockrem > 0)
                 {
                     ulong bufferpos_i = bufferpos + max_elems * blocks;
                     ulong memorypos_i = memorypos + max_elems * blocks;
-                    await WriteImpl(memorypos_i, buffer, bufferpos_i, blockrem);
+                    await WriteImpl(memorypos_i, buffer, bufferpos_i, blockrem).ConfigureAwait(false);
                 }
             }
         }
@@ -612,7 +852,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "DimCount");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>()[0];
         }
 
@@ -620,7 +860,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "Dimensions");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>();
         }
         
@@ -642,7 +882,7 @@ namespace RobotRaconteurWeb
 
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "MaxTransferSize");
-            var ret = await stub.ProcessRequest(m, cancel);
+            var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             var remote_max_size1 = ret.FindElement("return").CastData<uint[]>()[0];
             lock (this)
             {
@@ -666,7 +906,7 @@ namespace RobotRaconteurWeb
                 throw new WriteOnlyMemberException("Write only member");
             }
 
-            uint max_transfer_size = await GetMaxTransferSize(cancel);
+            uint max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
 
             ulong elemcount = count.Aggregate((ulong)1,(x,y) => x*y);            
             ulong max_elems = max_transfer_size / element_size;
@@ -678,7 +918,7 @@ namespace RobotRaconteurWeb
                 var e = new MessageEntry(MessageEntryType.MemoryRead, MemberName);
                 e.AddElement("memorypos", memorypos);
                 e.AddElement("count", count);
-                var ret = await stub.ProcessRequest(e,cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
 
                 UnpackReadResult(ret.FindElement("data").Data, buffer, bufferpos, count, elemcount);
 
@@ -715,7 +955,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count);
+                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count).ConfigureAwait(false);
                     }
 
                     if (split_remainder != 0)
@@ -730,7 +970,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge);
+                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge).ConfigureAwait(false);
                     }
 
                     if (split_dim == count.Length - 1)
@@ -772,7 +1012,7 @@ namespace RobotRaconteurWeb
                 throw new ReadOnlyMemberException("Read only member");
             }
 
-             uint max_transfer_size = await GetMaxTransferSize();
+             uint max_transfer_size = await GetMaxTransferSize().ConfigureAwait(false);
 
             ulong elemcount = count.Aggregate((ulong)1, (x,y) => x*y);
             
@@ -821,7 +1061,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count);
+                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count).ConfigureAwait(false);
                     }
 
                     if (split_remainder != 0)
@@ -836,7 +1076,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge);
+                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge).ConfigureAwait(false);
                     }
 
                     if (split_dim == (count.Length - 1))
@@ -953,7 +1193,7 @@ namespace RobotRaconteurWeb
         protected override void UnpackReadResult(object res, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count)
         {
             var buffer1 = (MultiDimArray)buffer;
-            var data = stub.rr_node.UnpackMultiDimArray((MessageElementMultiDimArray)res);
+            var data = stub.rr_node.UnpackMultiDimArray((MessageElementNestedElementList)res);
 
             var data2 = new MultiDimArrayMemory<T>(data);
             data2.Read(new ulong[count.Length], buffer1, bufferpos, count);
@@ -994,21 +1234,63 @@ namespace RobotRaconteurWeb
 
         public override async Task Read(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
         
         public override async Task Write(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
     }
 
     public class PodArrayMemory<T> : ArrayMemory<T> where T : struct
     {
+        /**
+        <summary>
+        Multidimensional pod random access memory region
+        </summary>
+        <remarks>
+        <para>
+        Memories represent random access memory regions that are typically
+        represented as arrays of various shapes and types. Memories can be
+        declared in service definition files using the `memory` member keyword
+        within service definitions. Services expose memories to clients, and
+        the nodes will proxy read, write, and parameter requests between the client
+        and service. The node will also break up large requests to avoid the
+        message size limit of the transport.
+        </para>
+        <para>
+        The PodMultiDimArrayMemory class is used to represent a multidimensional
+        pod array. Single dimensional pod arrays should use PodArrayMemory.
+        Type T must be declared in a service definition using the `pod`
+        keyword, and generated using RobotRaconteurGen.
+        </para>
+        <para>
+        PodMultiDimArrayMemory instances are attached to an MultiDimArray,
+        either when constructed or later using Attach().
+        </para>
+        <para>
+        PodMultiDimArrayMemory instances returned by clients are special implementations
+        designed to proxy requests to the service. They cannot be attached
+        to an arbitrary array.
+        </para>
+        </remarks>
+        <typeparam name="T" />
+        */
+        [PublicApi]
         public PodArrayMemory() : base()
         {
         }
+        /**
+        <summary>
+        Construct a new PodMultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
 
+        [PublicApi]
         public PodArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1036,7 +1318,7 @@ namespace RobotRaconteurWeb
 
         protected override void UnpackReadResult(object res, object buffer, ulong bufferpos, ulong count)
         {            
-            var data = stub.rr_node.UnpackPodArray<T>((MessageElementPodArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackPodArray<T>((MessageElementNestedElementList)res, stub.RRContext);
             var buffer1 = (T[])buffer;
             Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
@@ -1079,41 +1361,166 @@ namespace RobotRaconteurWeb
             return impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
         }
     }
-
+    /**
+    <summary>
+    Multidimensional pod random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The PodMultiDimArrayMemory class is used to represent a multidimensional
+    pod array. Single dimensional pod arrays should use PodArrayMemory.
+    Type T must be declared in a service definition using the `pod`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances are attached to an MultiDimArray,
+    either when constructed or later using Attach().
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T" />
+    */
+    [PublicApi]
     public class PodMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private PodMultiDimArray multimemory;
+        /**
+        <summary>
+        Construct a new PodMultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
 
+        [PublicApi]
         public PodMultiDimArrayMemory()
         {
         }
+        /**
+        <summary>
+        Construct a new PodMultiDimArrayMemory instance attached to a PodMultiDimArray
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public PodMultiDimArrayMemory(PodMultiDimArray memory)
         {
             multimemory = memory;
         }
+        /**
+        <summary>
+        Attach PodMultiDimArrayMemory instance to a PodMultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public virtual void Attach(PodMultiDimArray memory)
         {
             this.multimemory = memory;
         }
+        /**
+        <summary>
+        Dimensions of the memory array
+        </summary>
+        <remarks>
+        <para>
+        Returns the dimensions (shape) of the memory array
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </para>
+        </remarks>
+        */
 
+        [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
         }
+        /**
+        <summary>
+        The number of dimensions in the memory array
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
 
+        [PublicApi]
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
         }
+        /**
+        <summary>
+        Read a block from a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a block of a multidimensional array memory into a supplied buffer multidimensional array.
+        The start positions and count of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start position in the buffer to write the data</param>
+        <param name="count">The count of array elements to read</param>
+        */
 
+        [PublicApi]
         public virtual Task Read(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
             return Task.FromResult(0);
         }
+        /**
+        <summary>
+        Write a segment to a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to a multidimensional array memory from a supplied buffer
+        multidimensional array. The start positions and count
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start position in the buffer to read the data</param>
+        <param name="count">The count of array elements to write</param>
+        */
 
+        [PublicApi]
         public virtual Task Write(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1158,7 +1565,7 @@ namespace RobotRaconteurWeb
         protected override void UnpackReadResult(object res, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count)
         {
             var buffer1 = (PodMultiDimArray)buffer;
-            var data = stub.rr_node.UnpackPodMultiDimArray<T>((MessageElementPodMultiDimArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)res, stub.RRContext);
 
             var data2 = new PodMultiDimArrayMemory<T>(data);
             data2.Read(new ulong[count.Length], buffer1, bufferpos, count);
@@ -1199,12 +1606,12 @@ namespace RobotRaconteurWeb
 
         public override async Task Read(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
 
         public override async Task Write(ulong[] memorypos, PodMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
     }
 
@@ -1220,15 +1627,15 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (PodArrayMemory<T>)mem;
             var buf1 = new T[count];
-            await mem1.Read(memorypos, buf1, 0, count);
+            await mem1.Read(memorypos, buf1, 0, count).ConfigureAwait(false);
             return skel.rr_node.PackPodArray(buf1, null);
         }
 
         protected override async Task DoWrite(ulong memorypos, object buffer, ulong bufferpos, ulong count, ArrayMemoryBase mem)
         {
             var mem1 = (PodArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackPodArray<T>((MessageElementPodArray)buffer, null);
-            await mem1.Write(memorypos, buf1, 0, count);
+            var buf1 = skel.rr_node.UnpackPodArray<T>((MessageElementNestedElementList)buffer, null);
+            await mem1.Write(memorypos, buf1, 0, count).ConfigureAwait(false);
         }
     }
 
@@ -1243,24 +1650,76 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (PodMultiDimArrayMemory<T>)mem;
             var buf1 = new PodMultiDimArray(count.Select(x => (uint)x).ToArray(), new T[elem_count]);
-            await mem1.Read(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.rr_node.PackPodMultiDimArray<T>(buf1, null);
         }
 
         protected override async Task DoWrite(ulong[] memorypos, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (PodMultiDimArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementPodMultiDimArray)buffer, null);
-            await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
+            var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
+            await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
-    }
+}
+    /**
+    <summary>
+    Single dimensional namedarray random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The NamedArrayMemory class is used to represent a single dimensional named
+    array. Multidimensional named arrays should use NamedMultiDimArrayMemory.
+    Type T must be declared in a service definition using the `namedarray`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    NamedArrayMemory instances are attached to an array, either when
+    constructed or later using Attach().
+    </para>
+    <para>
+    NamedArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T">The namedarray type of the array</typeparam>
+    */
 
+        [PublicApi]
     public class NamedArrayMemory<T> : ArrayMemory<T> where T : struct
     {
+        /**
+        <summary>
+        Construct a new NamedArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
+
+        [PublicApi]
         public NamedArrayMemory() : base()
         {
         }
-
+        /**
+        <summary>
+        Construct a new NamedArrayMemory instance attached to an array
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        <returns />
+        */
         public NamedArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1288,7 +1747,7 @@ namespace RobotRaconteurWeb
 
         protected override void UnpackReadResult(object res, object buffer, ulong bufferpos, ulong count)
         {
-            var data = stub.rr_node.UnpackNamedArray<T>((MessageElementNamedArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackNamedArray<T>((MessageElementNestedElementList)res, stub.RRContext);
             var buffer1 = (T[])buffer;
             Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
@@ -1331,41 +1790,167 @@ namespace RobotRaconteurWeb
             return impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
         }
     }
+    /**
+    <summary>
+    Multidimensional namedarray random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The NamedMultiDimArrayMemory class is used to represent a multidimensional
+    named array. Single dimensional named arrays should use NamedArrayMemory.
+    Type T must be declared in a service definition using the `namedarray`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    NamedMultiDimArrayMemory instances are attached to an NamedMultiDimArray,
+    either when constructed or later using Attach().
+    </para>
+    <para>
+    NamedMultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T">The namedarray type of the array</typeparam>
+    */
 
+        [PublicApi]
     public class NamedMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private NamedMultiDimArray multimemory;
+        /**
+        <summary>
+        Construct a new NamedMultiDimArrayMemory instance
+        </summary>
+        <remarks>
+        New instance will not be attached to an array.
+        </remarks>
+        */
 
+        [PublicApi]
         public NamedMultiDimArrayMemory()
         {
         }
+        /**
+        <summary>
+        Construct a new NamedMultiDimArrayMemory instance attached to an NamedMultiDimArray
+        </summary>
+        <remarks>
+        New instance will be constructed attached to an array.
+        </remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public NamedMultiDimArrayMemory(NamedMultiDimArray memory)
         {
             multimemory = memory;
         }
+        /**
+        <summary>
+        Attach PodMultiDimArrayMemory instance to a PodMultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        <param name="memory">The array to attach</param>
+        */
 
+        [PublicApi]
         public virtual void Attach(NamedMultiDimArray memory)
         {
             this.multimemory = memory;
         }
+        /**
+        <summary>
+        Dimensions of the memory array
+        </summary>
+        <remarks>
+        <para>
+        Returns the dimensions (shape) of the memory array
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </para>
+        </remarks>
+        */
 
+        [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
         }
+        /**
+        <summary>
+        The number of dimensions in the memory array
+        </summary>
+        <remarks>
+        When used with a memory returned by a client, this function will
+        call the service to execute the request.
+        </remarks>
+        */
 
+        [PublicApi]
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return Task.FromResult((ulong)multimemory.Dims.Length);
         }
+        /**
+        <summary>
+        Read a block from a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Read a block of a multidimensional array memory into a supplied buffer multidimensional array.
+        The start positions and count of the read are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to read</param>
+        <param name="buffer">The buffer to receive the read data</param>
+        <param name="bufferpos">The start position in the buffer to write the data</param>
+        <param name="count">The count of array elements to read</param>
+        */
 
+        [PublicApi]
         public virtual Task Read(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
             return Task.FromResult(0);
         }
+        /**
+        <summary>
+        Write a segment to a multidimensional array memory
+        </summary>
+        <remarks>
+        <para>
+        Writes a segment to a multidimensional array memory from a supplied buffer
+        multidimensional array. The start positions and count
+        of the write are specified.
+        </para>
+        <para>
+        When used with a memory returned by a client, this function will call
+        the service to execute the request.
+        </para>
+        </remarks>
+        <param name="memorypos">The start position in the memory array to write</param>
+        <param name="buffer">The buffer to write the data from</param>
+        <param name="bufferpos">The start position in the buffer to read the data</param>
+        <param name="count">The count of array elements to write</param>
+        */
 
+        [PublicApi]
         public virtual Task Write(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             multimemory.AssignSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
@@ -1410,7 +1995,7 @@ namespace RobotRaconteurWeb
         protected override void UnpackReadResult(object res, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count)
         {
             var buffer1 = (NamedMultiDimArray)buffer;
-            var data = stub.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNamedMultiDimArray)res, stub.RRContext);
+            var data = stub.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNestedElementList)res, stub.RRContext);
 
             var data2 = new NamedMultiDimArrayMemory<T>(data);
             data2.Read(new ulong[count.Length], buffer1, bufferpos, count);
@@ -1451,12 +2036,12 @@ namespace RobotRaconteurWeb
 
         public override async Task Read(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
 
         public override async Task Write(ulong[] memorypos, NamedMultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel);
+            await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
     }
 
@@ -1472,15 +2057,15 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (NamedArrayMemory<T>)mem;
             var buf1 = new T[count];
-            await mem1.Read(memorypos, buf1, 0, count);
+            await mem1.Read(memorypos, buf1, 0, count).ConfigureAwait(false);
             return skel.rr_node.PackNamedArray(buf1, null);
         }
 
         protected override async Task DoWrite(ulong memorypos, object buffer, ulong bufferpos, ulong count, ArrayMemoryBase mem)
         {
             var mem1 = (NamedArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackNamedArray<T>((MessageElementNamedArray)buffer, null);
-            await mem1.Write(memorypos, buf1, 0, count);
+            var buf1 = skel.rr_node.UnpackNamedArray<T>((MessageElementNestedElementList)buffer, null);
+            await mem1.Write(memorypos, buf1, 0, count).ConfigureAwait(false);
         }
     }
 
@@ -1495,15 +2080,15 @@ namespace RobotRaconteurWeb
         {
             var mem1 = (NamedMultiDimArrayMemory<T>)mem;
             var buf1 = new NamedMultiDimArray(count.Select(x => (uint)x).ToArray(), new T[elem_count]);
-            await mem1.Read(memorypos, buf1, new ulong[count.Length], count);
+            await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.rr_node.PackNamedMultiDimArray<T>(buf1, null);
         }
 
         protected override async Task DoWrite(ulong[] memorypos, object buffer, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (NamedMultiDimArrayMemory<T>)mem;
-            var buf1 = skel.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNamedMultiDimArray)buffer, null);
-            await mem1.Write(memorypos, buf1, new ulong[count.Length], count);
+            var buf1 = skel.rr_node.UnpackNamedMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
+            await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
     }
 

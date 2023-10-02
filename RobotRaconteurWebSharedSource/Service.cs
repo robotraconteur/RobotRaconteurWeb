@@ -21,6 +21,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -40,7 +41,13 @@ namespace RobotRaconteurWeb
             
             RegisterEvents(o);
             InitPipeServers(o);
-            InitCallbackServers(o);            
+            InitCallbackServers(o);
+            
+            var init_obj = o as IRRServiceObject;
+            if (init_obj != null)
+            {
+                init_obj.RRServiceObjectInit(c, s);
+            }
         }
 
         protected internal RobotRaconteurNode rr_node;
@@ -128,13 +135,13 @@ namespace RobotRaconteurWeb
         public async Task SendPipeMessage(MessageEntry m, Endpoint e, CancellationToken cancel)
         {
             m.ServicePath = ServicePath;
-            await RRContext.SendMessage(m, e, cancel);
+            await RRContext.SendMessage(m, e, cancel).ConfigureAwait(false);
         }
 
         public async Task SendWireMessage(MessageEntry m, Endpoint e, CancellationToken cancel)
         {
             m.ServicePath = ServicePath;
-            await RRContext.SendMessage(m, e, cancel);
+            await RRContext.SendMessage(m, e, cancel).ConfigureAwait(false);
         }
 
         public virtual void DispatchPipeMessage(MessageEntry m, Endpoint e) { }
@@ -209,7 +216,7 @@ namespace RobotRaconteurWeb
             {
                 throw new InvalidOperationException("Invalid generator");
             }
-            return await gen.CallNext(m);
+            return await gen.CallNext(m).ConfigureAwait(false);
         }
     }
 
@@ -218,9 +225,82 @@ namespace RobotRaconteurWeb
         string GetObjectType();
         
     }
-        
+    /**
+    <summary>
+    Context for services registered in a node for use by clients
+    </summary>
+    <remarks>
+    <para>
+    Services are registered using the RobotRaconteurNode.RegisterService() family of
+    functions.
+    The ServerContext manages the services, and dispatches requests and packets to the
+    appropriate
+    service object members. Services may expose more than one object. The root object is
+    specified
+    when the service is registered. Other objects are specified through ObjRef members. A name
+    for the service is also specified when the service is registered. This name forms the root
+    of the service path namespace. Other objects in the service have a unique service path
+    based on the ObjRef used to access the object.
+    </para>
+    <para>
+    Services may handle multiple connected clients concurrently. Each client is assigned
+    a ServerEndpoint. The ServerEndpoint is unique to the client connection,
+    and interacts with ServerContext to complete requests and dispatch packets. When
+    the service needs to address a specific client, the ServerEndpoint or the
+    ServerEndpoint.GetCurrentEndpoint() is used. (ServerEndpoint.GetCurrentEndpoint() returns
+    the
+    int local client ID.)
+    </para>
+    <para>
+    Service attributes are a varvalue{string} types dictionary that is made available to
+    clients during service discovery. These attributes are used to help clients determine
+    which service should be selected for use. Because the attributes are passed to the clients
+    as part of the discovery process, they should be as concise as possible, and should
+    not use user defined types. Use ServerContext.SetAttributes() to set the service
+    attributes
+    after registering the service.
+    </para>
+    <para>
+    Security for the service is specified using a ServiceSecurityPolicy instance. This policy
+    is specified by passing as a parameter to RobotRaconteurNode.RegisterService(), or passing
+    the policy to the constructor.
+    </para>
+    <para>
+    ServerContext implements authentication and object locking.
+    Server side functions are exposed by ServerContext for authentication, object locking,
+    and client management.
+    </para>
+    <para> Clients using dynamic typing such as Python and MATLAB will only pull service types
+    explicitly imported by the root object and objref objects that have been requested.
+    Clients
+    will not pull service types of user-defined named types if that service type is not
+    explicitly
+    imported. This can be problematic if new `struct`, `pod`, and/or `namedarray` types are
+    introduced
+    that do not have corresponding objects. Extra imports is used to specify extra service
+    definitions
+    the client should pull. Use ServerContext.AddExtraImport(),
+    ServerContext.RemoveExtraImport(),
+    and ServerContext.GetExtraImports() to manage the extra imports passed to the client.
+    </para>
+    </remarks>
+    */
+
+        [PublicApi]
     public class ServerContext 
    {
+        /**
+        <summary>
+        Get/Set the service attributes
+        </summary>
+        <remarks>
+        Sets the service attributes. Attributes are made available to clients during
+        service discovery. Attributes should be concise and not use any user defined
+        types.
+        </remarks>
+        */
+
+        [PublicApi]
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
@@ -333,7 +413,7 @@ namespace RobotRaconteurWeb
             //mm.header.ReceiverEndpoint = RemoteEndpoint;
             mm.entries.Add(m);
 
-            await e.SendMessage(mm, cancel);
+            await e.SendMessage(mm, cancel).ConfigureAwait(false);
 
 
         }
@@ -437,7 +517,7 @@ namespace RobotRaconteurWeb
 
                         }
 
-                        skel1 = await t;
+                        skel1 = await t.ConfigureAwait(false);
                     }
                     finally
                     {
@@ -461,7 +541,7 @@ namespace RobotRaconteurWeb
         {
             m_CurrentServicePath = ppath1;
             m_CurrentServerContext = this;
-            object obj1 = await skel.GetSubObj(objname);
+            object obj1 = await skel.GetSubObj(objname).ConfigureAwait(false);
             m_CurrentServicePath = null;
             m_CurrentServerContext = null;
 
@@ -488,7 +568,7 @@ namespace RobotRaconteurWeb
         public virtual async Task<string> GetObjectType(string servicepath)
         {
             
-            ServiceSkel s = await GetObjectSkel(servicepath);
+            ServiceSkel s = await GetObjectSkel(servicepath).ConfigureAwait(false);
 
             if (s is ServiceSkelDynamic)
             {
@@ -499,11 +579,35 @@ namespace RobotRaconteurWeb
 
             
         }
+        /**
+        <summary>
+        Get the current ServerContext
+        </summary>
+        <remarks>
+        Returns the current server context during a request or packet event.
+        This is a thread-specific value and only
+        valid during the initial request or packet event invocation.
+        </remarks>
+        */
 
+        [PublicApi]
         public static ServerContext CurrentServerContext {get {return m_CurrentServerContext;}}
         [ThreadStatic()]
         private static ServerContext m_CurrentServerContext;
+        /**
+        <summary>
+        Get the current object service path
+        </summary>
+        <remarks>
+        Returns the service path of the current object during a request or
+        packet event.
+        This is a thread-specific value and only
+        valid during the initial request or packet event invocation.
+        </remarks>
+        <returns>The current object service path</returns>
+        */
 
+        [PublicApi]
         public static string CurrentServicePath {get {return m_CurrentServicePath;}}
         [ThreadStatic()]
         private static string m_CurrentServicePath;
@@ -525,7 +629,7 @@ namespace RobotRaconteurWeb
                     //ClientSessionOp methods
                     if (m.EntryType == MessageEntryType.ClientSessionOpReq)
                     {
-                        return await ClientSessionOp(m, c);
+                        return await ClientSessionOp(m, c).ConfigureAwait(false);
 
                     }
 
@@ -552,14 +656,14 @@ namespace RobotRaconteurWeb
 
                     if (m.EntryType == MessageEntryType.PipePacket || m.EntryType == MessageEntryType.PipePacketRet)
                     {
-                        (await GetObjectSkel(m.ServicePath)).DispatchPipeMessage(m, c);
+                        (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchPipeMessage(m, c);
                         ret = null;
                         noreturn = true;
                     }
 
                     if (m.EntryType == MessageEntryType.WirePacket)
                     {
-                        (await GetObjectSkel(m.ServicePath)).DispatchWireMessage(m, c);
+                        (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchWireMessage(m, c);
                         ret = null;
                         noreturn = true;
                     }
@@ -575,46 +679,46 @@ namespace RobotRaconteurWeb
 
                     if (m.EntryType == MessageEntryType.PropertyGetReq)
                     {
-                        ServiceSkel skel=await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel=await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallGetProperty(m);
+                        ret = await skel.CallGetProperty(m).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.PropertySetReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallSetProperty(m);
+                        ret = await skel.CallSetProperty(m).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.FunctionCallReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallFunction(m);
+                        ret = await skel.CallFunction(m).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.PipeConnectReq || m.EntryType==MessageEntryType.PipeDisconnectReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallPipeFunction(m,c);
+                        ret = await skel.CallPipeFunction(m,c).ConfigureAwait(false);
                     }
 
                     if (m.EntryType == MessageEntryType.WireConnectReq || m.EntryType == MessageEntryType.WireDisconnectReq || m.EntryType == MessageEntryType.WirePeekInValueReq || m.EntryType == MessageEntryType.WirePeekOutValueReq || m.EntryType == MessageEntryType.WirePokeOutValueReq)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret = await skel.CallWireFunction(m, c);
+                        ret = await skel.CallWireFunction(m, c).ConfigureAwait(false);
                     }
 
                     
 
                     if (m.EntryType == MessageEntryType.MemoryWrite || m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)
                     {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath);
+                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                         check_lock(skel, m);
-                        ret=await skel.CallMemoryFunction(m, c);
+                        ret=await skel.CallMemoryFunction(m, c).ConfigureAwait(false);
                     }
 
                     else if (m.EntryType == MessageEntryType.CallbackCallRet)
@@ -636,16 +740,20 @@ namespace RobotRaconteurWeb
                     }
                 else if (m.EntryType == MessageEntryType.GeneratorNextReq)
                 {
-                    var skel = await GetObjectSkel(m.ServicePath);
+                    var skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
                     check_lock(skel, m);
-                    ret = await skel.CallGeneratorNext(m, c);
+                    ret = await skel.CallGeneratorNext(m, c).ConfigureAwait(false);
                     noreturn = true;
                 }
 
             }
                 catch (Exception e)
                 {
-                    ret = new MessageEntry(m.EntryType+1, m.MemberName);
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Error processing service entry: {0}", e.ToString()), node,
+                    RobotRaconteur_LogComponent.Service, service_path: m.ServicePath, member: m.MemberName, endpoint: c.LocalEndpoint);
+#endif
+                ret = new MessageEntry(m.EntryType+1, m.MemberName);
                     RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
 
                 }
@@ -738,12 +846,12 @@ namespace RobotRaconteurWeb
                     return;
                 }               
 
-                MessageEntry mmret=await ProcessMessageEntry(mm,e);
+                MessageEntry mmret=await ProcessMessageEntry(mm, e).ConfigureAwait(false);
                 if (mmret!=null)
                 mret.entries.Add(mmret);
             }
             if (mret.entries.Count > 0)
-            await e.SendMessage(mret,default(CancellationToken));
+            await e.SendMessage(mret,default(CancellationToken)).ConfigureAwait(false);
         }
 
         public virtual void AddClient(ServerEndpoint cendpoint)
@@ -819,12 +927,12 @@ namespace RobotRaconteurWeb
             catch { }
         }
 
-        public virtual MessageElementStructure PackStructure(Object s)
+        public virtual MessageElementNestedElementList PackStructure(Object s)
         {
             return ServiceDef.PackStructure(s); ;
         }
 
-        public virtual T UnpackStructure<T>(MessageElementStructure l)
+        public virtual T UnpackStructure<T>(MessageElementNestedElementList l)
         {
             return ServiceDef.UnpackStructure<T>(l);
         }
@@ -864,7 +972,7 @@ namespace RobotRaconteurWeb
             return ServiceDef.UnpackListType<T>(o);
         }
 
-        public virtual MultiDimArray UnpackMultiDimArray(MessageElementMultiDimArray o)
+        public virtual MultiDimArray UnpackMultiDimArray(MessageElementNestedElementList o)
         {
             return ServiceDef.UnpackMultiDimArray(o);
         }
@@ -920,7 +1028,7 @@ namespace RobotRaconteurWeb
                 case "MonitorExit":
                     {
 
-                        await ClientLockOp(m, ret);
+                        await ClientLockOp(m, ret).ConfigureAwait(false);
                         return ret;
                     }
 
@@ -973,7 +1081,7 @@ namespace RobotRaconteurWeb
 
             string servicepath = m.ServicePath;
 
-            ServiceSkel skel = await GetObjectSkel(servicepath);
+            ServiceSkel skel = await GetObjectSkel(servicepath).ConfigureAwait(false);
 
             switch (m.MemberName)
             {
@@ -1043,7 +1151,7 @@ namespace RobotRaconteurWeb
                             s = new MonitorObjectSkel(skel);
                             timeout = m.FindElement("timeout").CastData<int[]>()[0];
                         }
-                        string retcode = await s.MonitorEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint, timeout);
+                        string retcode = await s.MonitorEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint, timeout).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
 
                         break;
@@ -1056,7 +1164,7 @@ namespace RobotRaconteurWeb
                             if (!skel.monitorlocks.ContainsKey(ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Not acquiring monitor lock");
                             s = skel.monitorlocks[ServerEndpoint.CurrentEndpoint.LocalEndpoint];
                         }
-                        string retcode = await s.MonitorContinueEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint);
+                        string retcode = await s.MonitorContinueEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
                         break;
                     }
@@ -1067,7 +1175,7 @@ namespace RobotRaconteurWeb
                         {
                             if (skel.monitorlock.LocalEndpoint != (ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Not monitor locked");
                         }
-                        string retcode = await skel.monitorlock.MonitorExit(ServerEndpoint.CurrentEndpoint.LocalEndpoint);
+                        string retcode = await skel.monitorlock.MonitorExit(ServerEndpoint.CurrentEndpoint.LocalEndpoint).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
                         break;
 
@@ -1262,10 +1370,35 @@ namespace RobotRaconteurWeb
             
         }
 
+        /// <summary>
+        ///  Server service listener event type
+        /// </summary>
+        /// <param name="service">The context that generated the event</param>
+        /// <param name="ev">The event type</param>
+        /// <param name="parameter">The event parameter</param>
+        [PublicApi]
         public delegate void ServerServiceListenerDelegate(ServerContext service, ServerServiceListenerEventType ev, object parameter);
 
+        /// <summary>
+        /// Server service listener event
+        /// </summary>
+        [PublicApi]
         public event ServerServiceListenerDelegate ServerServiceListener;
+        /**
+        <summary> Release the specified service path and all sub objects Services take ownership of
+        objects returned by objrefs, and will only request the object once. Subsequent requests will
+        return the cached object. If the objref has changed, the service must call
+        ReleaseServicePath() to tell the service to request the object again. Release service path
+        will release the object specified by the service path and all sub objects. This overload
+        will notify all clients that the objref has been released. If the service path contains a
+        session key, use ReleaseServicePath(string, uint[]) to only
+        notify the client that owns the session.
+        </summary>
+        <remarks>None</remarks>
+        <param name="path">The service path to release</param>
+        */
 
+        [PublicApi]
         public void ReleaseServicePath(string path)
         {            
 
@@ -1311,7 +1444,30 @@ namespace RobotRaconteurWeb
 
 
         }
+        /**
+        <summary>
+        Release the specified service path and all sub objects
+        </summary>
+        <remarks>
+        <para>
+        Services take ownership of objects returned by objrefs, and will only request the object
+        once. Subsequent requests will return the cached object. If the objref has changed,
+        the service must call ReleaseServicePath() to tell the service to request the object
+        again.
+        Release service path will release the object specified by the service path
+        and all sub objects.
+        </para>
+        <para> This overload will notify the specified that the objref has been released. If the
+        service
+        path contains a session key, this overload should be used so the session key is not
+        leaked.
+        </para>
+        </remarks>
+        <param name="path">The service path to release</param>
+        <param name="endpoints">The client endpoint IDs to notify of the released service path</param>
+        */
 
+        [PublicApi]
         public void ReleaseServicePath(string path, List<uint> endpoints)
         {
 
@@ -1451,11 +1607,11 @@ namespace RobotRaconteurWeb
 
                 Func<Task> r = async delegate()
                 {
-                    await SendMessage(m, e, cancel);
-                    rec_message = await rec_source.Task;
+                    await SendMessage(m, e, cancel).ConfigureAwait(false);
+                    rec_message = await rec_source.Task.ConfigureAwait(false);
                 };
 
-                await r().AwaitWithTimeout((int)node.RequestTimeout);
+                await r().AwaitWithTimeout((int)node.RequestTimeout).ConfigureAwait(false);
             }
             finally
             {
@@ -1526,7 +1682,7 @@ namespace RobotRaconteurWeb
             }
             try
             {
-                await Task.Delay(500);
+                await Task.Delay(500).ConfigureAwait(false);
             }
             catch { }
             
@@ -1584,7 +1740,7 @@ namespace RobotRaconteurWeb
 
                 try
                 {
-                    await wait_event.Task.AwaitWithTimeout(5000);
+                    await wait_event.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
                 }
                 catch { }
 
@@ -1618,7 +1774,7 @@ namespace RobotRaconteurWeb
                 //wait_event.WaitOne(5000);
                 try
                 {
-                    await wait_event.Task.AwaitWithTimeout(5000);
+                    await wait_event.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
                 }
                 catch { }
 
@@ -1655,7 +1811,7 @@ namespace RobotRaconteurWeb
                 IDisposable l=null;
                 try
                 {
-                    l=await obj.RobotRaconteurMonitorEnter(timeout);
+                    l=await obj.RobotRaconteurMonitorEnter(timeout).ConfigureAwait(false);
                     monitor_acquired = true;
                     skel.monitorlock = this;
                 }
@@ -1680,7 +1836,7 @@ namespace RobotRaconteurWeb
                     {
                         try
                         {
-                            await monitor_thread_event.Task.AwaitWithTimeout(30000);
+                            await monitor_thread_event.Task.AwaitWithTimeout(30000).ConfigureAwait(false);
                         }
                         catch
                         {                            
@@ -1714,27 +1870,98 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /// <summary>
+    /// Enum of service listener events
+    /// </summary>
+        [PublicApi]
     public enum ServerServiceListenerEventType
     {
+        /// <summary>
+        /// service has been closed
+        /// </summary>
         ServiceClosed = 1,
+        
+        /// <summary>
+        /// client has connected
+        /// </summary>
         ClientConnected,
-        ClientDisconnected
 
+        /// <summary>
+        /// client has disconnected
+        /// </summary>
+        ClientDisconnected
     }
 
 
+    /**
+    <summary>
+    Server endpoint representing a client connection
+    </summary>
+    <remarks>
+    <para>
+    Robot Raconteur creates endpoint pairs between a client and service. For clients, this
+    endpoint
+    is a ClientContext. For services, the endpoint becomes a ServerEndpoint. ServerEndpoints
+    are used
+    to address a specific client connected to a service, since services may have multiple
+    clients
+    connected concurrently. ServerEndpoints also provide client authentication information.
+    </para>
+    <para>Use ServerEndpoint.GetCurrentEndpoint() to retrieve the int32
+    current endpoint ID. Use ServerEndpoint.GetCurrentAuthenticatedUser() to retrieve
+    the current user authentication information.
+    </para>
+    </remarks>
+    */
+
+        [PublicApi]
     public class ServerEndpoint : Endpoint
     {
         protected internal readonly ServerContext service;
 
         [ThreadStatic]
         private static ServerEndpoint m_CurrentEndpoint;
+        /**
+        <summary>
+        Returns the current server endpoint
+        </summary>
+        <remarks>
+        <para>
+        Returns the current server endpoint during a request or packet event.
+        This is a thread-specific value and only valid during the initial
+        request or packet event invocation.
+        </para>
+        <para>Throws InvalidOperationException if not during a request or packet event
+        </para>
+        </remarks>
+        <returns>The current server endpoint id</returns>
+        */
 
+        [PublicApi]
         public static ServerEndpoint CurrentEndpoint { get { return m_CurrentEndpoint; } }
 
         [ThreadStatic]
         private static AuthenticatedUser m_CurrentAuthenticatedUser;
+        /**
+        <summary>
+        Returns the current authenticated user
+        </summary>
+        <remarks>
+        <para>
+        Users that have been authenticated have a corresponding
+        AuthenticatedUser object associated with the ServerEndpoint.
+        CurrentAuthenticatedUser returns the AuthenticatedUser
+        associated with the current ServerEndpoint during a request
+        or packet event. This is a thread-specific value and only valid during
+        the initial request or packet event invocation.
+        </para>
+        <para>Throws PermissionDeniedException or AuthenticationException
+        if there is no AuthenticatedUser set in the current thread.
+        </para>
+        </remarks>
+        */
 
+        [PublicApi]
         public static AuthenticatedUser CurrentAuthenticatedUser { get { return m_CurrentAuthenticatedUser; } }
 
         private AuthenticatedUser endpoint_authenticated_user = null;
@@ -1845,12 +2072,65 @@ namespace RobotRaconteurWeb
         }
 
     }
+    /**
+    <summary>
+    Service object monitor lock notification
+    </summary>
+    <remarks>
+    Service objects must implement IRobotRaconteurMonitorObject for
+    monitor locking to function. Services call RobotRaconteurMonitorEnter()
+    with an optional timeout to request the lock, and call RobotRaconteurMonitorExit()
+    to release the monitor lock. RobotRaconteurMonitorEnter() should block
+    until a thread-exclusive lock can be established.
+    </remarks>
+    */
 
+        [PublicApi]
     public interface IRobotRaconteurMonitorObject
     {
+        /**
+        <summary>
+        Request a thread-exclusive lock without timeout. May block until lock can be established
+        </summary>
+        <remarks>Dispose of the returned object to release</remarks>
+        */
+
+        [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter();
+                /**
+        <summary>
+        Request a thread-exclusive lock with timeout. May block until lock can be established,
+        up to the specified timeout.
+        </summary>
+        <remarks>Dispose of the returned object to release</remarks>
+        <param name="timeout">Lock request timeout in milliseconds</param>
+        */
 
+        [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter(int timeout);
+    }
 
+    /// <summary>
+    /// Interface for service objects to receive service notifications.
+    /// Service objects are passed to the service, either when the service is registered
+    /// or using objrefs. The service initializes the object by configuring events,
+    /// pipes, callbacks, and wires for use. The object may implement IRRServiceObject
+    /// to receive notification of when this process is complete, and to receive
+    /// a ServerContextPtr and the service path of the object.
+    /// IRRServiceObject.RRServiceObjectInit() is called after the object has been
+    /// initialized to provide this information.
+    /// </summary>
+    [PublicApi]
+    public interface IRRServiceObject
+    {
+        /// <summary>
+        /// Function called after service object has been initialized.
+        /// Override in the service object to receive notification the service object has
+        /// been initialized, a ServerContextPtr, and the service path.
+        /// </summary>
+        /// <param name="context">The ServerContextPtr owning the object.</param>
+        /// <param name="servicePath">The object service path.</param>
+        [PublicApi]
+        void RRServiceObjectInit(ServerContext context, string servicePath);
     }
 }

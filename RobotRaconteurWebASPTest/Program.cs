@@ -40,19 +40,19 @@ namespace RobotRaconteurWebTestNETStandard
             s.RegisterServices(t);
 
             var s2 = new RobotRaconteurTestServiceSupport2();
-            s2.RegisterServices(t);
+            s2.RegisterServices();
 
 
             var listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:60080/robotraconteurtest/");
+            listener.Prefixes.Add("http://localhost:22280/robotraconteurtest/");
             listener.Start();
 
             while (true)
             {
-                var c = await listener.GetContextAsync();
+                var c = await listener.GetContextAsync().ConfigureAwait(false);
                 if (c.Request.IsWebSocketRequest)
                 {
-                    var ws_context = await c.AcceptWebSocketAsync("robotraconteur.robotraconteur.com");
+                    var ws_context = await c.AcceptWebSocketAsync("robotraconteur.robotraconteur.com").ConfigureAwait(false);
 
                     t.AcceptAndProcessServerWebSocket(ws_context.WebSocket, ws_context.RequestUri.ToString()).ContinueWith(x => { });
                 }
@@ -69,7 +69,7 @@ namespace RobotRaconteurWebTestNETStandard
         {
             var p = new Program();
             p.DoHttp();
-            Console.WriteLine("HTTP test server started on port 60080");
+            Console.WriteLine("HTTP test server started on port 22280");
             Console.ReadLine();
         }
     }

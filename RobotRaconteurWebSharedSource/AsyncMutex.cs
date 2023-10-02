@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using RobotRaconteurWeb.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RobotRaconteurWeb
@@ -46,7 +48,7 @@ namespace RobotRaconteurWeb
         public async Task<IDisposable> Lock()
         {
             var t =Enter();
-            await t;
+            await t.ConfigureAwait(false);
             return new LockHandle(this, t);
         }
 
@@ -54,10 +56,10 @@ namespace RobotRaconteurWeb
         {
             Task t = null;            
             t = Enter();
-            await Task.WhenAny(t, Task.Delay(timeout));
+            await Task.WhenAny(t, Task.Delay(timeout)).ConfigureAwait(false);
             if (t.IsCompleted || t.IsFaulted || t.IsCanceled)
             {
-                await t;
+                await t.ConfigureAwait(false);
                 return new LockHandle(this, t);
             }
 
@@ -138,5 +140,79 @@ namespace RobotRaconteurWeb
             }
         }
 
+    }
+
+    public class AsyncValueWaiter<T>
+    {
+        public class AsyncValueWaiterTask : IDisposable
+        {
+            internal TaskCompletionSource<T> tcs;
+            internal AsyncValueWaiter<T> owner;
+            internal int timeout;
+
+            public Task Task { 
+                get {
+                    if (timeout < 0)
+                    {
+                        return tcs.Task;
+                    }                    
+                    if (timeout > 0)
+                    {
+                        return Task.WhenAny(tcs.Task, Task.Delay(timeout));
+                    }                    
+                    return Task.Delay(0);                    
+                } 
+            }
+
+            public bool TaskCompleted { get { return tcs.Task.IsCompleted; } }
+
+            public bool TaskCompletedSuccessfully { get { return tcs.Task.Status == TaskStatus.RanToCompletion; } }
+
+            public void Dispose()
+            {
+                lock(owner)
+                {
+                    owner.wait_tasks.Remove(tcs);
+                }
+            }
+        }
+
+        internal List<TaskCompletionSource<T>> wait_tasks = new List<TaskCompletionSource<T>>();
+
+        public void NotifyAll(T res)
+        {
+            var wait_tasks2 = new List<TaskCompletionSource<T>>();
+            lock (this)
+            {
+                foreach (var t in wait_tasks)
+                {
+                    wait_tasks2.Add(t);
+                }
+            }
+
+            foreach (var t in wait_tasks2)
+            {
+                Task.Run(()=>t.TrySetResult(res));
+            }
+        }
+
+        public AsyncValueWaiterTask CreateWaiterTask(int timeout, CancellationToken token = default)
+        {
+            lock (this)
+            {
+                var tcs = new TaskCompletionSource<T>();
+                tcs.AttachCancellationToken(token);
+
+                var w = new AsyncValueWaiterTask()
+                {
+                    tcs = tcs,
+                    timeout = timeout,
+                    owner = this
+                };
+
+                wait_tasks.Add(tcs);
+                return w;
+            }
+        }
     }
 }

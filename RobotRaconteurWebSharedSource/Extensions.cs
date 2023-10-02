@@ -28,21 +28,21 @@ namespace RobotRaconteurWeb.Extensions
         {
             if (timeout < 0)
             {
-                await task;
+                await task.ConfigureAwait(false);
                 return;
             }
 
             var c = new CancellationTokenSource();
             Task timeout_task = Task.Delay(timeout, c.Token);
 
-            var r1 = await Task.WhenAny(task, timeout_task);
+            var r1 = await Task.WhenAny(task, timeout_task).ConfigureAwait(false);
             if (task.IsCompleted || task.IsFaulted || task.IsCanceled)
             {
 
                 var noop = timeout_task.IgnoreResult();
                 c.Cancel();
 
-                await task;
+                await task.ConfigureAwait(false);
                 return;
             }
             else
@@ -56,19 +56,19 @@ namespace RobotRaconteurWeb.Extensions
         {
             if (timeout < 0)
             {
-                return await task;
+                return await task.ConfigureAwait(false);
             }
 
             var c = new CancellationTokenSource();
             Task timeout_task = Task.Delay(timeout, c.Token);
 
-            var r1 = await Task.WhenAny(task, timeout_task);
+            var r1 = await Task.WhenAny(task, timeout_task).ConfigureAwait(false);
             if (task.IsCompleted || task.IsFaulted || task.IsCanceled)
             {
                 var noop = timeout_task.IgnoreResult();
                 c.Cancel();
 
-                return await task;
+                return await task.ConfigureAwait(false);
             }
             else
             {
@@ -172,7 +172,7 @@ namespace RobotRaconteurWeb.Extensions
             return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
         }
 
-#if ROBOTRACONTEUR_BRIDGE
+#if ROBOTRACONTEUR_H5
         public static Task<int> ReadAsync(this Stream stream,
                                    byte[] buffer, int offset,
                                    int count,
@@ -231,6 +231,11 @@ namespace RobotRaconteurWeb.Extensions
         {
             return t;
         }
+
+        public static Task ConfigureAwait(this Task t, bool v)
+        {
+            return t;
+        }
 #endif
 
     }
@@ -239,8 +244,24 @@ namespace RobotRaconteurWeb.Extensions
     {
         public static string EscapeDataString(string s)
         {
-#if ROBOTRACONTEUR_BRIDGE
-            return Bridge.Script.EncodeURI(s);
+#if ROBOTRACONTEUR_H5
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in s)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    sb.Append(c);
+                }
+                else
+                {
+                    byte[] bytes = Encoding.UTF8.GetBytes(new char[] { c });
+                    foreach (byte b in bytes)
+                    {
+                        sb.AppendFormat("%{0:X2}", b);
+                    }
+                }
+            }
+            return sb.ToString();
 #else
             return Uri.EscapeDataString(s);
 #endif
@@ -248,15 +269,15 @@ namespace RobotRaconteurWeb.Extensions
 
         public static string UnescapeDataString(string s)
         {
-#if ROBOTRACONTEUR_BRIDGE
-            return Bridge.Script.DecodeURI(s);
+#if ROBOTRACONTEUR_H5
+            return H5.Script.DecodeURI(s);
 #else
             return Uri.UnescapeDataString(s);
 #endif
         }
     }
 
-#if ROBOTRACONTEUR_BRIDGE
+#if ROBOTRACONTEUR_H5
     public static class Buffer
     {
         internal static void BlockCopy(byte[] recbuf, int v1, byte[] newbuf, int v2, int v3)
@@ -466,6 +487,57 @@ namespace RobotRaconteurWeb.Extensions
                 default:
                     throw new ArgumentException("Invalid array type");
             }
+        }
+    }
+
+    class WeakReference<T>
+    {
+        T target;
+
+        public WeakReference(T target)
+        {
+            this.target = target;
+        }
+
+        public T Target
+        {
+            get { return target; }
+        }
+
+        public bool IsAlive
+        {
+            get { return target != null; }
+        }
+
+        public void SetTarget(T target)
+        {
+            this.target = target;
+        }
+
+        public void Free()
+        {
+            target = default(T);
+        }
+
+        public static implicit operator WeakReference<T>(T target)
+        {
+            return new WeakReference<T>(target);
+        }
+
+        public static implicit operator T(WeakReference<T> reference)
+        {
+            return reference.target;
+        }
+
+        public override string ToString()
+        {
+            return target.ToString();
+        }
+
+        public bool TryGetTarget(out T target)
+        {
+            target = this.target;
+            return target != null;
         }
     }
 

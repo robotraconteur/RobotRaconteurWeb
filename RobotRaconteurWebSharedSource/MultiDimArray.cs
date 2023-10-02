@@ -148,22 +148,80 @@ namespace RobotRaconteurWeb
     }
 
 
+    /**
+    <summary>
+    Numeric primitive multidimensional array value type
+    </summary>
+    <remarks>
+    This class stores a numeric primitive multidimensional arrays.
+    Multidimensional arrays are stored as a uint array of
+    dimensions, and an array of the flattened elements.
+    Arrays are stored in column major, or "Fortran" order.
+    
+    Valid types for array are `bool`, `double`, `float`, `sbyte`, `byte`, `short`,
+    `ushort`, `int`, `uint`, `long`, `ulong`, `CDouble`,
+    or `CSingle`. Attempts to use any other types will result in a compiler error.
+    </remarks>
+    */
 
+        [PublicApi]
     public class MultiDimArray
     {
+        /**
+        <summary>
+        Construct empty MultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public MultiDimArray() { }
+        /**
+        <summary>
+        Construct MultiDimArray with dims and array
+        </summary>
+        <remarks>None</remarks>
+        <param name="Dims">The dimensions of the array</param>
+        <param name="Array_">The array data in fortran order</param>
+        */
 
+        [PublicApi]
         public MultiDimArray(uint[] Dims, Array Array_)
         {
 
             this.Dims = Dims;
             this.Array_ = Array_;
         }
+        /**
+        <summary>
+        The dimensions of the array
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public uint[] Dims;
-        public Array Array_;
+        /**
+        <summary>
+        The data of the array in flattened "Fortran" order
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
+        public Array Array_;
+        /**
+        <summary>
+        Retrieve a subset of an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memorypos">Position in array to read</param>
+        <param name="buffer">Buffer to store retrieved data</param>
+        <param name="bufferpos">Position within buffer to store data</param>
+        <param name="count">Count of data to retrieve</param>
+        */
+
+        [PublicApi]
         public virtual void RetrieveSubArray(uint[] memorypos, MultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -182,7 +240,18 @@ namespace RobotRaconteurWeb
             }
 
         }
+        /**
+        <summary>
+        Assign a subset of an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memorypos">Position within array to store data</param>
+        <param name="buffer">Buffer to assign data from</param>
+        <param name="bufferpos">Position within buffer to assign from</param>
+        <param name="count">Count of data to assign</param>
+        */
 
+        [PublicApi]
         public virtual void AssignSubArray(uint[] memorypos, MultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -204,23 +273,82 @@ namespace RobotRaconteurWeb
         }
 
     }
+    /**
+    <summary>
+    `pod` multidimensional array value type
+    </summary>
+    <remarks>
+    This class stores a pod multidimensional array.
+    Multidimensional arrays are stored as a uint32_t array of
+    dimensions, and an array of the flattened elements.
+    Arrays are stored in column major, or "Fortran" order.
+    
+    Stored type must be a od type that has been generated as part
+    of the thunk source.
+    </remarks>
+    */
 
+        [PublicApi]
     public class PodMultiDimArray
     {
+        /**
+        <summary>
+        Construct empty PodMultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        */
+
+        [PublicApi]
         public PodMultiDimArray()
         {
             Dims = new uint[] { 0 };
         }
+        /**
+        <summary>
+        Construct PodMultiDimArray with dims and array
+        </summary>
+        <remarks>None</remarks>
+        <param name="dims">The dimensions of the array</param>
+        <param name="array">The array data in fortran order</param>
+        */
 
+        [PublicApi]
         public PodMultiDimArray(uint[] dims, Array array)
         {
             Dims = dims;
             pod_array = array;
         }
+        /**
+        <summary>
+        The dimensions of the array
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public uint[] Dims;
-        public Array pod_array;
+        /**
+        <summary>
+        The data of the array in flattened "Fortran" order
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
+        public Array pod_array;
+        /**
+        <summary>
+        Retrieve a subset of an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memorypos">Position in array to read</param>
+        <param name="buffer">Buffer to store retrieved data</param>
+        <param name="bufferpos">Position within buffer to store data</param>
+        <param name="count">Count of data to retrieve</param>
+        */
+
+
+        [PublicApi]
         public virtual void RetrieveSubArray(uint[] memorypos, PodMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -239,7 +367,18 @@ namespace RobotRaconteurWeb
             }
 
         }
+        /**
+        <summary>
+        Assign a subset of an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memorypos">Position within array to store data</param>
+        <param name="buffer">Buffer to assign data from</param>
+        <param name="bufferpos">Position within buffer to assign from</param>
+        <param name="count">Count of data to assign</param>
+        */
 
+        [PublicApi]
         public virtual void AssignSubArray(uint[] memorypos, PodMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
             PodMultiDimArray mema = this;
@@ -258,23 +397,79 @@ namespace RobotRaconteurWeb
         }
 
     }
+    /**
+    <summary>
+    `namedarray` multidimensional array value type
+    </summary>
+    <remarks>
+    This class stores a namedarray multidimensional array.
+    Multidimensional arrays are stored as a uint32_t array of
+    dimensions, and an array of the flattened elements.
+    Arrays are stored in column major, or "Fortran" order.
+    </remarks>
+    */
 
+        [PublicApi]
     public class NamedMultiDimArray
     {
+        /**
+        <summary>
+        Construct empty NamedMultiDimArray
+        </summary>
+        <remarks>None</remarks>
+        */
+
+        [PublicApi]
         public NamedMultiDimArray()
         {
             Dims = new uint[] { 0 };
         }
+        /**
+        <summary>
+        Construct NamedMultiDimArray with dims and array
+        </summary>
+        <remarks>None</remarks>
+        <param name="dims">The dimensions of the array</param>
+        <param name="array">The array data in fortran order</param>
+        */
 
+        [PublicApi]
         public NamedMultiDimArray(uint[] dims, Array array)
         {
             Dims = dims;
             namedarray_array = array;
         }
+        /**
+        <summary>
+        The dimensions of the array
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
         public uint[] Dims;
-        public Array namedarray_array;
+        /**
+        <summary>
+        The data of the array in flattened "Fortran" order
+        </summary>
+        <remarks>None</remarks>
+        */
 
+        [PublicApi]
+        public Array namedarray_array;
+        /**
+        <summary>
+        Retrieve a subset of an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memorypos">Position in array to read</param>
+        <param name="buffer">Buffer to store retrieved data</param>
+        <param name="bufferpos">Position within buffer to store data</param>
+        <param name="count">Count of data to retrieve</param>
+        */
+
+
+        [PublicApi]
         public virtual void RetrieveSubArray(uint[] memorypos, NamedMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
 
@@ -293,7 +488,19 @@ namespace RobotRaconteurWeb
             }
 
         }
+        /**
+        <summary>
+        Assign a subset of an array
+        </summary>
+        <remarks>None</remarks>
+        <param name="memorypos">Position within array to store data</param>
+        <param name="buffer">Buffer to assign data from</param>
+        <param name="bufferpos">Position within buffer to assign from</param>
+        <param name="count">Count of data to assign</param>
+        */
 
+
+        [PublicApi]
         public virtual void AssignSubArray(uint[] memorypos, NamedMultiDimArray buffer, uint[] bufferpos, uint[] count)
         {
             NamedMultiDimArray mema = this;

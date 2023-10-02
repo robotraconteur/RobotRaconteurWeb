@@ -1,0 +1,41 @@
+{
+  "sourceMap": {
+    "enabled": false
+  },
+  "resources": [
+    {
+      "name": "RobotRaconteurH5.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.js" ]
+    },
+    {
+      "name": "RobotRaconteurH5.min.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.min.js" ]
+    },
+    {
+      "name": "RobotRaconteurH5.meta.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.meta.js" ]
+    },
+    {
+      "name": "RobotRaconteurH5.meta.min.js",
+      "files": [ "$(OutDir)h5/RobotRaconteurH5.meta.min.js" ]
+    }
+  ],
+  // Always build both minified and non-minified versions of the code so that resource for both versions are always included
+  // in the binary and so referencing projects can decide whether to use the minified versions or the non-minified versions
+  "outputFormatting": "Both",
+  "cleanOutputFolderBeforeBuildPattern": "*.*",
+  "loader": {
+    "type": "Global"
+  },
+  "rules": {
+    "anonymousType": "Plain",
+    "arrayIndex": "Managed",
+    "autoProperty": "Plain",
+    "boxing": "Managed",
+    "externalCast": "Plain",
+    "inlineComment": "Plain",
+    "integer": "Managed",
+    "lambda": "Plain",
+    "useShortForms": true
+  }
+}

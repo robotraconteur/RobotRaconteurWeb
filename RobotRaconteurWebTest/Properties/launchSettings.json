@@ -2,8 +2,11 @@
   "profiles": {
     "Start App": {
       "commandName": "Project",
-      "commandLineArgs": "loopback2",
-      "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\RobotRaconteurWebTestSharedSource"
+      "commandLineArgs": "citests",
+      "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\RobotRaconteurWebTestSharedSource",
+      "environmentVariables": {
+        "ROBOTRACONTEUR_LOG_LEVEL": "DEBUG"
+      }
     }
   }
 }

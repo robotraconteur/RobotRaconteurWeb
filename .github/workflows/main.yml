@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:    
+  pull_request:
+  release:
+    types:
+      - created
+
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dotnet 3.1.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 3.1.x
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Install H5
+        run: dotnet tool update --global h5-compiler
+      - name: Build
+        run: dotnet build --configuration Release
+      - name: tree
+        run: tree  /a /f
+      - name: Run
+        working-directory: ./RobotRaconteurWebTest/bin/Release/netcoreapp3.1
+        run: RobotRaconteurWebTest citests
+        shell: cmd
+      - name: Upload nuget packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget-packages
+          path: |
+            ./**/*.nupkg
