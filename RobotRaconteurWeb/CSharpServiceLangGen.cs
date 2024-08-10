@@ -1064,7 +1064,7 @@ namespace RobotRaconteurWeb
 
             foreach (var e in d.Objects)
             {
-                //GenerateDefaultImpl(e.Value, w2);
+                GenerateDefaultImpl(e.Value, w2);
             }
 
             w2.WriteLine("public static class RRExtensions");
