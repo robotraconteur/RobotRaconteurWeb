@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
+using RobotRaconteurSubTest;
 using RobotRaconteurTest;
 using RobotRaconteurWeb;
 using static H5.Core.dom;
@@ -92,6 +93,16 @@ namespace RobotRaconteurH5Test
 
             object client1;
             subscription.TryGetDefaultClient(out client1);
+
+            // Disconnect
+            subscription.Close();
         }
+
+        public static async void Main()
+        {
+            await SubscriberTest();
     }
+    }
+
+    
 }

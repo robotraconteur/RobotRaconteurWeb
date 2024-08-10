@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 namespace RobotRaconteurTest
 {
 
-
+    /*
     public class RobotRaconteurTestServiceSupport2
     {
 
@@ -489,7 +489,7 @@ namespace RobotRaconteurTest
             s_ind = value;
             return Task.FromResult(0);
         }
-    }
+    }*/
     class ServiceTest2_test_sequence_gen
     {
         private uint counter;
