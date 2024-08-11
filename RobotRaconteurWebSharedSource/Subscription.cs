@@ -3021,4 +3021,79 @@ namespace RobotRaconteurWeb
 
         public event Action<PipeSubscription<T>> PipePacketReceived;
     }
+
+    public class SubObjectSubscription
+    {
+
+        private async Task<T> GetObjFromRoot<T>(ServiceStub client, CancellationToken cancel)
+        {
+            string service_path1 = servicepath;
+            if (service_path1.StartsWith("*."))
+            {
+                service_path1 = service_path1.ReplaceFirst("*", client.RRContext.ServiceName);
+            }
+
+            return (T)await client.RRContext.FindObjRef(service_path1, objecttype, cancel);
+        }
+
+        public async  Task<T> GetDefaultClient<T>(CancellationToken cancel = default)
+        {
+            var client = (ServiceStub)parent.GetDefaultClient<object>();
+
+            return await GetObjFromRoot<T>(client, cancel);         
+        }
+
+        public async Task<Tuple<bool,T>> TryGetDefaultClient<T>(CancellationToken cancel = default)
+        {
+            try
+            {
+                T ret = await GetDefaultClient<T>(cancel);
+                return Tuple.Create(true, ret);
+            }
+            catch (Exception ex)
+            {
+                LogDebug(string.Format("TryGetDefaultClient failed {0}", ex), node, RobotRaconteur_LogComponent.Subscription);
+                return Tuple.Create(false, default(T));
+            }
+        }
+
+        public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel)
+        {
+            var client = (ServiceStub) await parent.GetDefaultClientWait<object>(cancel);
+
+            return await GetObjFromRoot<T>(client, cancel);
+        }
+
+        public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel)
+        {
+            try
+            {
+                T ret = await GetDefaultClientWait<T>(cancel);
+                return Tuple.Create(true, ret);
+            }
+            catch (Exception ex)
+            {
+                LogDebug(string.Format("TryGetDefaultClientWait failed {0}", ex), node, RobotRaconteur_LogComponent.Subscription);
+                return Tuple.Create(false, default(T));
+            }
+        }
+
+        public void Close()
+        {
+            
+        }
+
+        protected internal SubObjectSubscription(ServiceSubscription parent, string servicepath, string objecttype)
+        {
+            this.parent = parent;
+            this.node = parent.node;
+            this.servicepath = servicepath;
+            this.objecttype = objecttype;
+        }
+
+        protected ServiceSubscription parent;
+        protected RobotRaconteurNode node;
+        string servicepath;
+        string objecttype;
+    }
 }
