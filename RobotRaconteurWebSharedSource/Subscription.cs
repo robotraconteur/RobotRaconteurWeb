@@ -1030,16 +1030,16 @@ namespace RobotRaconteurWeb
         Dictionary<ServiceSubscriptionClientID, ServiceSubscription_client> clients = new Dictionary<ServiceSubscriptionClientID, ServiceSubscription_client>();
 
         internal RobotRaconteurNode node;
-        Discovery parent;
-        string[] service_types;
+        protected internal Discovery parent;
+        protected internal string[] service_types;
         ServiceSubscriptionFilter filter;
         List<WireSubscriptionBase> wire_subscriptions = new List<WireSubscriptionBase>();
         List<PipeSubscriptionBase> pipe_subscriptions = new List<PipeSubscriptionBase>();
 
-        bool use_service_url = false;
-        string[] service_url;
-        string service_url_username;
-        Dictionary<string, object> service_url_credentials;
+        protected internal bool use_service_url = false;
+        protected internal string[] service_url;
+        protected internal string service_url_username;
+        protected internal Dictionary<string, object> service_url_credentials;
 
         CancellationTokenSource cancel = new CancellationTokenSource();
         /**
@@ -3095,5 +3095,120 @@ namespace RobotRaconteurWeb
         protected RobotRaconteurNode node;
         string servicepath;
         string objecttype;
+    }
+
+    public enum ServiceSubscriptionManagerConnectionMethod
+    {
+        default_=0,
+        url,
+        type
+    }
+
+    public class ServiceSubscriptionManagerDetails
+    {
+        public string Name;
+        public ServiceSubscriptionManagerConnectionMethod ConnectionMethod;
+        public string[] Urls;
+        public string UrlUsername;
+        public Dictionary<string, object> UrlCredentials;
+        public string[] ServiceTypes;
+        public ServiceSubscriptionFilter Filter;
+        public bool Enabled;
+    }
+
+    public class ServiceSubscriptionManager
+    {
+        protected internal RobotRaconteurNode node;
+        public ServiceSubscriptionManager(RobotRaconteurNode node = null)
+        {
+            if (node == null)
+            {
+                this.node = RobotRaconteurNode.s;
+            }
+            else 
+            { 
+                this.node = node;
+            }
+        }
+        
+        protected internal ServiceSubscription CreateSubscription(ServiceSubscriptionManagerDetails details)
+        {
+            switch (details.ConnectionMethod)
+            {
+                case ServiceSubscriptionManagerConnectionMethod.default_:
+                case ServiceSubscriptionManagerConnectionMethod.url:
+                    break;
+                case ServiceSubscriptionManagerConnectionMethod.type:
+                {
+                    if (details.ServiceTypes == null || details.ServiceTypes.Length == 0)
+                    {
+                        throw new ArgumentException("ServiceTypes must be specified for ServiceSubscriptionManager connection method type");
+                    }
+                    break;
+                }
+                default:
+                    throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
+            }
+
+            var d = node.m_Discovery;
+
+            ServiceSubscription sub;
+
+            if (!(details.Urls?.Length >0) || !(details.ServiceTypes?.Length > 0) || !details.Enabled)
+            {
+                sub = new ServiceSubscription(d);
+
+                switch (details.ConnectionMethod)
+                {
+                    case ServiceSubscriptionManagerConnectionMethod.default_:
+                    {
+                        if (details.Urls?.Length>0)
+                        {
+                            sub.use_service_url = true;
+                        }
+                        break;
+                    }
+                case ServiceSubscriptionManagerConnectionMethod.url:
+                    {
+                        sub.use_service_url = true;
+                        break;
+                    }
+                default:
+                    break;
+                }
+            }
+            else
+            {
+                switch (details.ConnectionMethod)
+                {
+                    case ServiceSubscriptionManagerConnectionMethod.default_:
+                    {
+                        if (details.Urls?.Length > 0)
+                        {
+                            sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
+                        }
+                        else
+                        {
+                            sub = d.SubscribeServiceByType(details.ServiceTypes, details.Filter);
+                        }
+                        break;
+                    }
+                case ServiceSubscriptionManagerConnectionMethod.type:
+                    {
+                        sub = d.SubscribeServiceByType(details.ServiceTypes, details.Filter);
+                        break;
+                    }
+                case ServiceSubscriptionManagerConnectionMethod.url:
+                    {
+                        sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
+                        break;
+                    }
+                default:
+                    throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
+                }
+            }
+
+            return sub;          
+        }        
     }
 }
