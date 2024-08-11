@@ -1090,11 +1090,34 @@ namespace RobotRaconteurWeb
             parent.SubscriptionClosed(this);
         }
 
+        public void SoftClose()
+        {
+            lock (this)
+            {
+                //cancel.Cancel();
+
+                foreach (var c in clients.Values)
+                {
+                    c.claimed = false;
+                    if (c.client != null)
+                    {
+                        Task.Run(() => node.DisconnectService(c)).IgnoreResult();
+                    }
+                }
+
+                clients.Clear();
+
+            }
+
+            parent.SubscriptionClosed(this);
+        }
+
         void IServiceSubscription.Init(string[] service_types, ServiceSubscriptionFilter filter)
         {
             this.active = true;
             this.service_types = service_types;
             this.filter = filter;
+            this.use_service_url = false;
         }
 
         internal void InitServiceURL(string[] url, string username, Dictionary<string, object> credentials, string objecttype)
@@ -1153,6 +1176,21 @@ namespace RobotRaconteurWeb
 
         }
 
+        static string ServiceSubscription_ConnectServiceType(RobotRaconteurNode node, string service_type_in)
+        {
+            if (node == null)
+            {
+                return service_type_in;
+            }
+
+            if (node.DynamicServiceFactory != null)
+            {
+                return "";
+            }
+
+            return service_type_in;
+        }
+
         async Task RunClient(ServiceSubscription_client client)
         {
 
@@ -1171,7 +1209,7 @@ namespace RobotRaconteurWeb
                     try
                     {
                         //ClientContext.ClientServiceListenerDelegate client_listener = delegate (ClientContext context, ClientServiceListenerEventType evt, object param) { };
-                        o = await node.ConnectService(client.urls, client.username, client.credentials, null, client.service_type, cancel.Token).ConfigureAwait(false);
+                        o = await node.ConnectService(client.urls, client.username, client.credentials, null, ServiceSubscription_ConnectServiceType(node, client.service_type), cancel.Token).ConfigureAwait(false);
                         lock (client)
                         {
                             client.client = o;
