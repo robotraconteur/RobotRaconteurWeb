@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriberTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionFilterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubscriptionManagerTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionPipeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionSubObjectTests.cs" />

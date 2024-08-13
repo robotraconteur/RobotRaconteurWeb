@@ -1202,7 +1202,7 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                cancel.Cancel();
+                cancel?.Cancel();
                 cancel = null;
 
                 if (!active)
@@ -1249,7 +1249,7 @@ namespace RobotRaconteurWeb
 
             lock (this)
             {
-                cancel.Cancel();
+                cancel?.Cancel();
                 cancel = null;
 
                 foreach (var c in clients.Values)
@@ -3323,7 +3323,7 @@ namespace RobotRaconteurWeb
         public Dictionary<string, object> UrlCredentials;
         public string[] ServiceTypes;
         public ServiceSubscriptionFilter Filter;
-        public bool Enabled;
+        public bool Enabled=true;
     }
 
     public class ServiceSubscriptionManager
@@ -3365,7 +3365,7 @@ namespace RobotRaconteurWeb
 
             ServiceSubscription sub;
 
-            if (!(details.Urls?.Length >0) || !(details.ServiceTypes?.Length > 0) || !details.Enabled)
+            if ((!(details.Urls?.Length >0) && !(details.ServiceTypes?.Length > 0)) || !details.Enabled)
             {
                 sub = new ServiceSubscription(d);
 
@@ -3627,7 +3627,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public void DisableSubscription(string name)
+        public void DisableSubscription(string name, bool close=true)
         {
             lock(this)
             {
@@ -3636,17 +3636,17 @@ namespace RobotRaconteurWeb
                     return;
                 }
 
-                if (s.sub != null)
+                if (s.sub == null)
                 {
                     return;
                 }
 
                 s.details.Enabled = false;
-                UpdateSubscription(s, s.details, false);
+                UpdateSubscription(s, s.details, close);
             }
         }
 
-        ServiceSubscription GetSubscription(string name, bool force_create = false)
+        public ServiceSubscription GetSubscription(string name, bool force_create = false)
         {
             lock(this)
             {
