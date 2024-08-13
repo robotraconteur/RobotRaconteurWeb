@@ -306,6 +306,148 @@ namespace RobotRaconteurWeb
         {
             return new ServiceSubscriptionFilterAttribute(name, new Regex(regexValue));
         }
+
+        static void IdentifierToRegexCaseInsensitiveUuidMatch(string uuidSegment, TextWriter o)
+        {
+            foreach (char c in uuidSegment)
+            {
+                if (char.IsLetter(c))
+                {
+                    o.Write($"[{char.ToLower(c)}{char.ToUpper(c)}]");
+                }
+                else
+                {
+                    o.Write(c);
+                }
+            }
+        }
+
+        static bool IdentifierToRegexUuidAllZero(string uuidSegment)
+        {
+            return uuidSegment.All(c => c == '0');
+        }
+
+        static Regex IdentifierToRegex(string name, string uuidString)
+        {
+            if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(uuidString))
+            {
+                throw new ArgumentException("Name and UUID string cannot both be empty");
+            }
+
+            const string nameRegexStr = @"(?:[a-zA-Z](?:[a-zA-Z0-9_]*[a-zA-Z0-9])?)(?:\.[a-zA-Z](?:[a-zA-Z0-9_]*[a-zA-Z0-9])?)*";
+            const string uuidRegexStr = @"\{?([a-fA-F0-9]{8})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{12})\}?";
+
+            var identO = new StringWriter();
+            var nameRegex = new Regex(nameRegexStr);
+            if (!string.IsNullOrEmpty(name))
+            {
+                if (!nameRegex.IsMatch(name))
+                {
+                    throw new ArgumentException("Invalid identifier name");
+                }
+
+                identO.Write(name);
+            }
+            else
+            {
+                identO.Write($"(?:{nameRegexStr}\\|)?");
+            }
+
+            var uuidRegex = new Regex(uuidRegexStr);
+            bool zeroUuid = true;
+            if (!string.IsNullOrEmpty(uuidString))
+            {
+                var uuidMatch = uuidRegex.Match(uuidString);
+                if (!uuidMatch.Success)
+                {
+                    throw new ArgumentException("Invalid identifier UUID");
+                }
+
+                zeroUuid = IdentifierToRegexUuidAllZero(uuidMatch.Groups[1].Value) &&
+                        IdentifierToRegexUuidAllZero(uuidMatch.Groups[2].Value) &&
+                        IdentifierToRegexUuidAllZero(uuidMatch.Groups[3].Value) &&
+                        IdentifierToRegexUuidAllZero(uuidMatch.Groups[4].Value) &&
+                        IdentifierToRegexUuidAllZero(uuidMatch.Groups[5].Value);
+
+                if (!zeroUuid)
+                {
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        identO.Write("\\|");
+                    }
+                    identO.Write("\\{?");
+                    IdentifierToRegexCaseInsensitiveUuidMatch(uuidMatch.Groups[1].Value, identO);
+                    identO.Write("-?");
+                    IdentifierToRegexCaseInsensitiveUuidMatch(uuidMatch.Groups[2].Value, identO);
+                    identO.Write("-?");
+                    IdentifierToRegexCaseInsensitiveUuidMatch(uuidMatch.Groups[3].Value, identO);
+                    identO.Write("-?");
+                    IdentifierToRegexCaseInsensitiveUuidMatch(uuidMatch.Groups[4].Value, identO);
+                    identO.Write("-?");
+                    IdentifierToRegexCaseInsensitiveUuidMatch(uuidMatch.Groups[5].Value, identO);
+                    identO.Write("\\}?");
+                }
+            }
+
+            if (zeroUuid)
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    throw new ArgumentException("Name and UUID string cannot both be empty");
+                }
+                identO.Write($"(?:\\|{uuidRegexStr})?");
+            }
+
+            return new Regex(identO.ToString());
+        }
+
+
+        static Regex IdentifierToRegex(string combinedString)
+        {
+            const string nameRegexStr =
+                @"(?:[a-zA-Z](?:[a-zA-Z0-9_]*[a-zA-Z0-9])?)(?:\.[a-zA-Z](?:[a-zA-Z0-9_]*[a-zA-Z0-9])?)*";
+            const string uuidRegexStr =
+                @"\{?([a-fA-F0-9]{8})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{12})\}?";
+
+            string combinedRegexStr = $"({nameRegexStr})\\|({uuidRegexStr})";
+
+            if (string.IsNullOrEmpty(combinedString))
+            {
+                return IdentifierToRegex("", "");
+            }
+
+            var combinedRegex = new Regex(combinedRegexStr);
+            var combinedMatch = combinedRegex.Match(combinedString);
+            if (combinedMatch.Success)
+            {
+                string nameSub = combinedMatch.Groups[1].Value;
+                string uuidSub = combinedMatch.Groups[2].Value;
+                return IdentifierToRegex(nameSub, uuidSub);
+            }
+
+            var uuidRegex = new Regex(uuidRegexStr);
+            if (uuidRegex.IsMatch(combinedString))
+            {
+                return IdentifierToRegex("", combinedString);
+            }
+
+            return IdentifierToRegex(combinedString, "");
+        }
+
+        public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeCombinedIdentifier(string combinedIdentifier)
+        {
+            return new ServiceSubscriptionFilterAttribute(IdentifierToRegex(combinedIdentifier));
+        }
+
+        public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeIdentifier(string identifierName, string uuidString)
+        {
+            return new ServiceSubscriptionFilterAttribute(IdentifierToRegex(identifierName, uuidString));
+        }
+
+        public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeIdentifier(string name, string identifierName, string uuidString)
+        {
+            return new ServiceSubscriptionFilterAttribute(name, IdentifierToRegex(identifierName, uuidString));
+        }
     }
 
     public enum ServiceSubscriptionFilterAttributeGroupOperation
