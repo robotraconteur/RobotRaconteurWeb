@@ -124,7 +124,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public ServiceSubscriptionFilterAttributeGroupOperation AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.AND;
+        public ServiceSubscriptionFilterAttributeGroupOperation AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.And;
         /**
         <summary>
         A user specified predicate function. If nullptr, the predicate is not checked.
@@ -310,17 +310,17 @@ namespace RobotRaconteurWeb
 
     public enum ServiceSubscriptionFilterAttributeGroupOperation
     {
-        OR,
-        AND,
-        NOR,  // Also used for NOT
-        NAND
+        Or,
+        And,
+        Nor,  // Also used for NOT
+        Nand
     }
 
     public class ServiceSubscriptionFilterAttributeGroup
     {
         public List<ServiceSubscriptionFilterAttribute> Attributes = new List<ServiceSubscriptionFilterAttribute>();
         public List<ServiceSubscriptionFilterAttributeGroup> Groups = new List<ServiceSubscriptionFilterAttributeGroup>();
-        public ServiceSubscriptionFilterAttributeGroupOperation Operation = ServiceSubscriptionFilterAttributeGroupOperation.OR;
+        public ServiceSubscriptionFilterAttributeGroupOperation Operation = ServiceSubscriptionFilterAttributeGroupOperation.Or;
         public bool SplitStringAttribute = true;
         public char SplitStringDelimiter = ',';
 
@@ -351,7 +351,7 @@ namespace RobotRaconteurWeb
         {
             switch (operation)
             {
-                case ServiceSubscriptionFilterAttributeGroupOperation.OR:
+                case ServiceSubscriptionFilterAttributeGroupOperation.Or:
                     {
                         if (!attributes.Any() && !groups.Any())
                         {
@@ -373,7 +373,7 @@ namespace RobotRaconteurWeb
                         }
                         return false;
                     }
-                case ServiceSubscriptionFilterAttributeGroupOperation.AND:
+                case ServiceSubscriptionFilterAttributeGroupOperation.And:
                     {
                         if (!attributes.Any() && !groups.Any())
                         {
@@ -395,13 +395,13 @@ namespace RobotRaconteurWeb
                         }
                         return true;
                     }
-                case ServiceSubscriptionFilterAttributeGroupOperation.NOR:
+                case ServiceSubscriptionFilterAttributeGroupOperation.Nor:
                     {
-                        return !ServiceSubscriptionFilterAttributeGroupDoFilter<T>(ServiceSubscriptionFilterAttributeGroupOperation.OR, attributes, groups, values);
+                        return !ServiceSubscriptionFilterAttributeGroupDoFilter<T>(ServiceSubscriptionFilterAttributeGroupOperation.Or, attributes, groups, values);
                     }
-                case ServiceSubscriptionFilterAttributeGroupOperation.NAND:
+                case ServiceSubscriptionFilterAttributeGroupOperation.Nand:
                     {
-                        return !ServiceSubscriptionFilterAttributeGroupDoFilter<T>(ServiceSubscriptionFilterAttributeGroupOperation.AND, attributes, groups, values);
+                        return !ServiceSubscriptionFilterAttributeGroupDoFilter<T>(ServiceSubscriptionFilterAttributeGroupOperation.And, attributes, groups, values);
                     }
                 default:
                     {
@@ -692,22 +692,22 @@ namespace RobotRaconteurWeb
 
                     switch (filter.AttributesMatchOperation)
                     {
-                        case ServiceSubscriptionFilterAttributeGroupOperation.OR:
+                        case ServiceSubscriptionFilterAttributeGroupOperation.Or:
                             if (!attrMatches.Contains(true))
                                 return false;
                             break;
 
-                        case ServiceSubscriptionFilterAttributeGroupOperation.NOR:
+                        case ServiceSubscriptionFilterAttributeGroupOperation.Nor:
                             if (attrMatches.Contains(true))
                                 return false;
                             break;
 
-                        case ServiceSubscriptionFilterAttributeGroupOperation.NAND:
+                        case ServiceSubscriptionFilterAttributeGroupOperation.Nand:
                             if (!attrMatches.Contains(false))
                                 return false;
                             break;
 
-                        case ServiceSubscriptionFilterAttributeGroupOperation.AND:
+                        case ServiceSubscriptionFilterAttributeGroupOperation.And:
                         default:
                             if (attrMatches.Contains(false))
                                 return false;
@@ -3170,9 +3170,9 @@ namespace RobotRaconteurWeb
 
     public enum ServiceSubscriptionManagerConnectionMethod
     {
-        default_=0,
-        url,
-        type
+        Default=0,
+        Url,
+        Type
     }
 
     public class ServiceSubscriptionManagerDetails
@@ -3207,10 +3207,10 @@ namespace RobotRaconteurWeb
         {
             switch (details.ConnectionMethod)
             {
-                case ServiceSubscriptionManagerConnectionMethod.default_:
-                case ServiceSubscriptionManagerConnectionMethod.url:
+                case ServiceSubscriptionManagerConnectionMethod.Default:
+                case ServiceSubscriptionManagerConnectionMethod.Url:
                     break;
-                case ServiceSubscriptionManagerConnectionMethod.type:
+                case ServiceSubscriptionManagerConnectionMethod.Type:
                 {
                     if (details.ServiceTypes == null || details.ServiceTypes.Length == 0)
                     {
@@ -3232,7 +3232,7 @@ namespace RobotRaconteurWeb
 
                 switch (details.ConnectionMethod)
                 {
-                    case ServiceSubscriptionManagerConnectionMethod.default_:
+                    case ServiceSubscriptionManagerConnectionMethod.Default:
                     {
                         if (details.Urls?.Length>0)
                         {
@@ -3240,7 +3240,7 @@ namespace RobotRaconteurWeb
                         }
                         break;
                     }
-                case ServiceSubscriptionManagerConnectionMethod.url:
+                case ServiceSubscriptionManagerConnectionMethod.Url:
                     {
                         sub.use_service_url = true;
                         break;
@@ -3253,7 +3253,7 @@ namespace RobotRaconteurWeb
             {
                 switch (details.ConnectionMethod)
                 {
-                    case ServiceSubscriptionManagerConnectionMethod.default_:
+                    case ServiceSubscriptionManagerConnectionMethod.Default:
                     {
                         if (details.Urls?.Length > 0)
                         {
@@ -3265,12 +3265,12 @@ namespace RobotRaconteurWeb
                         }
                         break;
                     }
-                case ServiceSubscriptionManagerConnectionMethod.type:
+                case ServiceSubscriptionManagerConnectionMethod.Type:
                     {
                         sub = d.SubscribeServiceByType(details.ServiceTypes, details.Filter);
                         break;
                     }
-                case ServiceSubscriptionManagerConnectionMethod.url:
+                case ServiceSubscriptionManagerConnectionMethod.Url:
                     {
                         sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
                         break;
@@ -3294,10 +3294,10 @@ namespace RobotRaconteurWeb
 
            switch (details.ConnectionMethod)
            {
-            case ServiceSubscriptionManagerConnectionMethod.default_:
-            case ServiceSubscriptionManagerConnectionMethod.url:
+            case ServiceSubscriptionManagerConnectionMethod.Default:
+            case ServiceSubscriptionManagerConnectionMethod.Url:
             break;
-            case ServiceSubscriptionManagerConnectionMethod.type:
+            case ServiceSubscriptionManagerConnectionMethod.Type:
             {
                 if (!(details.ServiceTypes?.Length > 0))
                 {
@@ -3314,13 +3314,13 @@ namespace RobotRaconteurWeb
            var old_details = sub.details;
            sub.details = details;
 
-           if (sub.details.Enabled && sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.url && !(sub.details.Urls?.Length > 0))
+           if (sub.details.Enabled && sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Url && !(sub.details.Urls?.Length > 0))
            {
                 sub.details.Enabled = false;
            }
 
            if (sub.details.Enabled &&
-                ((sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.default_) &&
+                ((sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default) &&
                 (!(sub.details.Urls?.Length >0) && !(sub.details.ServiceTypes?.Length > 0))))
             {
                 sub.details.Enabled = false;
@@ -3341,8 +3341,8 @@ namespace RobotRaconteurWeb
                return;
            }
 
-           if (((old_details.ConnectionMethod != sub.details.ConnectionMethod) || (old_details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.default_
-           || sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.default_)) || !sub_running)
+           if (((old_details.ConnectionMethod != sub.details.ConnectionMethod) || (old_details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default
+           || sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default)) || !sub_running)
            {
             if (sub_running)
             {
@@ -3351,7 +3351,7 @@ namespace RobotRaconteurWeb
 
             switch (sub.details.ConnectionMethod)
             {
-                case ServiceSubscriptionManagerConnectionMethod.default_:
+                case ServiceSubscriptionManagerConnectionMethod.Default:
                 {
                     if (sub.details.Urls?.Length >0)
                     {
@@ -3363,12 +3363,12 @@ namespace RobotRaconteurWeb
                     }
                     break;
                 }
-                case ServiceSubscriptionManagerConnectionMethod.url:
+                case ServiceSubscriptionManagerConnectionMethod.Url:
                 {
                     sub.sub.InitServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
                     break;
                 }
-                case ServiceSubscriptionManagerConnectionMethod.type:
+                case ServiceSubscriptionManagerConnectionMethod.Type:
                 {
                     sub.sub.Init(sub.details.ServiceTypes, sub.details.Filter);
                     break;
@@ -3381,7 +3381,7 @@ namespace RobotRaconteurWeb
            {
             switch (sub.details.ConnectionMethod)
             {
-                case ServiceSubscriptionManagerConnectionMethod.default_:
+                case ServiceSubscriptionManagerConnectionMethod.Default:
                 {
                     if (sub.details.Urls?.Length >0)
                     {
@@ -3393,12 +3393,12 @@ namespace RobotRaconteurWeb
                     }
                     break;
                 }
-                case ServiceSubscriptionManagerConnectionMethod.url:
+                case ServiceSubscriptionManagerConnectionMethod.Url:
                 {
                     sub.sub.UpdateServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
                     break;
                 }
-                case ServiceSubscriptionManagerConnectionMethod.type:
+                case ServiceSubscriptionManagerConnectionMethod.Type:
                 {
                     sub.sub.UpdateServiceByType(sub.details.ServiceTypes, sub.details.Filter);
                     break;
@@ -3525,7 +3525,7 @@ namespace RobotRaconteurWeb
                 var details = new ServiceSubscriptionManagerDetails()
                 {
                     Name = name,
-                    ConnectionMethod = ServiceSubscriptionManagerConnectionMethod.url,
+                    ConnectionMethod = ServiceSubscriptionManagerConnectionMethod.Url,
                     Enabled = false
                 };
 
