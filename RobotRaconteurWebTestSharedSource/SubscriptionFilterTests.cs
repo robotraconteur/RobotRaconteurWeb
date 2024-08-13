@@ -238,7 +238,7 @@ namespace RobotRaconteurSubTest
             var attrGrp4 = new ServiceSubscriptionFilterAttributeGroup();
             attrGrp4.Attributes.Add(new ServiceSubscriptionFilterAttribute("test_attr_val4"));
             attrGrp4.Attributes.Add(new ServiceSubscriptionFilterAttribute("test_attr_val4_2"));
-            attrGrp4.Operation = ServiceSubscriptionFilterAttributeGroupOperation.AND;
+            attrGrp4.Operation = ServiceSubscriptionFilterAttributeGroupOperation.And;
             var attrGrps4 = new Dictionary<string, ServiceSubscriptionFilterAttributeGroup> { { "a4", attrGrp4 } };
             await RunAttributesFilterTest(clientNode, attrGrps4, 1);
 
@@ -256,7 +256,7 @@ namespace RobotRaconteurSubTest
 
             var filter2 = new ServiceSubscriptionFilter();
             filter2.Attributes = attrGrps5;
-            filter2.AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.OR;
+            filter2.AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.Or;
             await RunFilterTest(clientNode, filter2, 1);
 
             node1.Shutdown();
