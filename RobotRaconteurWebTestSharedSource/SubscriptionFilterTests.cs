@@ -238,7 +238,7 @@ namespace RobotRaconteurSubTest
             var attrGrp4 = new ServiceSubscriptionFilterAttributeGroup();
             attrGrp4.Attributes.Add(new ServiceSubscriptionFilterAttribute("test_attr_val4"));
             attrGrp4.Attributes.Add(new ServiceSubscriptionFilterAttribute("test_attr_val4_2"));
-            attrGrp4.Operation = ServiceSubscriptionFilterAttributeGroupOperation.AND;
+            attrGrp4.Operation = ServiceSubscriptionFilterAttributeGroupOperation.And;
             var attrGrps4 = new Dictionary<string, ServiceSubscriptionFilterAttributeGroup> { { "a4", attrGrp4 } };
             await RunAttributesFilterTest(clientNode, attrGrps4, 1);
 
@@ -256,7 +256,7 @@ namespace RobotRaconteurSubTest
 
             var filter2 = new ServiceSubscriptionFilter();
             filter2.Attributes = attrGrps5;
-            filter2.AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.OR;
+            filter2.AttributesMatchOperation = ServiceSubscriptionFilterAttributeGroupOperation.Or;
             await RunFilterTest(clientNode, filter2, 1);
 
             node1.Shutdown();
@@ -321,6 +321,45 @@ namespace RobotRaconteurSubTest
             node2.Shutdown();
             node3.Shutdown();
             node4.Shutdown();
+        }
+
+        public static void TestSubscriptionAttributeIdentifier()
+        {
+            ServiceSubscriptionFilterAttribute attr1 = ServiceSubscriptionFilterAttributeFactory.CreateServiceSubscriptionFilterAttributeIdentifier("identifier_1", "");
+            RRAssert.IsTrue(attr1.IsMatch("identifier_1"));
+            RRAssert.IsFalse(attr1.IsMatch("identifier_2"));
+            RRAssert.IsTrue(attr1.IsMatch("identifier_1|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+            RRAssert.IsFalse(attr1.IsMatch("identifier_2|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+
+            ServiceSubscriptionFilterAttribute attr2 = ServiceSubscriptionFilterAttributeFactory.CreateServiceSubscriptionFilterAttributeIdentifier("", "cbfea7a4-0361-4aad-95bb-d4dcd967047a");
+            RRAssert.IsFalse(attr2.IsMatch("identifier_1"));
+            RRAssert.IsFalse(attr2.IsMatch("identifier_2"));
+            RRAssert.IsTrue(attr2.IsMatch("identifier_1|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+            RRAssert.IsTrue(attr2.IsMatch("identifier_2|{cbfea7a4-0361-4aAD-95bb-d4dcd967047a}"));
+            RRAssert.IsTrue(attr2.IsMatch("identifier_2|cbfea7a403614aAD95bbd4dcd967047a"));
+            RRAssert.IsFalse(attr2.IsMatch("identifier_2|{cbfea7a4-0361-1aad-95bb-d4dcd967047a}"));
+
+            ServiceSubscriptionFilterAttribute attr3 = ServiceSubscriptionFilterAttributeFactory.CreateServiceSubscriptionFilterAttributeIdentifier("identifier_1", "{00000000-0000-0000-0000-000000000000}");
+            RRAssert.IsTrue(attr3.IsMatch("identifier_1"));
+            RRAssert.IsFalse(attr3.IsMatch("identifier_2"));
+            RRAssert.IsTrue(attr3.IsMatch("identifier_1|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+            RRAssert.IsFalse(attr3.IsMatch("identifier_2|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+
+            ServiceSubscriptionFilterAttribute attr4 = ServiceSubscriptionFilterAttributeFactory.CreateServiceSubscriptionFilterAttributeIdentifier("identifier_1", "cbfea7a4-0361-4aad-95bb-d4dcd967047a");
+            RRAssert.IsFalse(attr4.IsMatch("identifier_1"));
+            RRAssert.IsFalse(attr4.IsMatch("identifier_2"));
+            RRAssert.IsTrue(attr4.IsMatch("identifier_1|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+            RRAssert.IsFalse(attr4.IsMatch("identifier_2|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+
+            ServiceSubscriptionFilterAttribute attr5 = ServiceSubscriptionFilterAttributeFactory.CreateServiceSubscriptionFilterAttributeIdentifier("identifier_1.with.do_ts", "cbfea7a4-0361-4aad-95bb-d4dcd967047a");
+            RRAssert.IsFalse(attr5.IsMatch("identifier_1.with.do_ts"));
+            RRAssert.IsFalse(attr5.IsMatch("identifier_2.WIT_H.dot4s"));
+            RRAssert.IsFalse(attr5.IsMatch("identifier_1"));
+            RRAssert.IsFalse(attr5.IsMatch("identifier_2"));
+            RRAssert.IsTrue(attr5.IsMatch("identifier_1.with.do_ts|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+            RRAssert.IsTrue(attr5.IsMatch("identifier_1.with.do_ts|{cbfea7a4-0361-4AAD95bb-d4dcd967047a}"));
+            RRAssert.IsFalse(attr5.IsMatch("identifier_2.WIT_H.dot4s|cbfea7a4-0361-4aad-95bb-d4dcd967047a"));
+            RRAssert.IsFalse(attr5.IsMatch("identifier_1.with.do_ts|cbfea7a4-0361-41ad-95bb-d4dcd967047a"));
         }
 
 

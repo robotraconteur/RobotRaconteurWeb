@@ -28,8 +28,8 @@
   <Import Project="..\RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="h5" Version="23.7.39854" />
-    <PackageReference Include="h5.Core" Version="23.7.39858" />
+    <PackageReference Include="h5" Version="23.11.43678" />
+    <PackageReference Include="h5.Core" Version="23.11.43674" />
   </ItemGroup>
 
 </Project>

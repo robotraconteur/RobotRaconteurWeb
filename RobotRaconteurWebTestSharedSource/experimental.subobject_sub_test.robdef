@@ -1,0 +1,18 @@
+service experimental.subobject_sub_test
+
+object testobj
+    objref testobj2 subobj2
+    function string getf_service_path()
+end
+
+object testobj2
+    objref testobj3 subobj3_1
+    objref testobj3[] subobj3_2
+    objref testobj3{string} subobj3_3
+    function string getf_service_path()
+end
+
+object testobj3
+    function double add_two_numbers(double a, double b)
+    function string getf_service_path()
+end

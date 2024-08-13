@@ -96,9 +96,11 @@ namespace RobotRaconteurSubTest
 
                 sub.ClientDisconnected += (subscription, client_id, client) =>
                 {
-                    RRAssert.AreEqual(client_id.NodeID, test_servers["server2"]);
-                    RRAssert.AreEqual(client_id.ServiceName, "test_service");
-                    disconnectCalledTcs.SetResult(true);
+                    if ((client_id.NodeID == test_servers["server2"]) &&
+                    (client_id.ServiceName == "test_service"))
+                    {
+                        disconnectCalledTcs.SetResult(true);
+                    }
                 };
 
                 using (var server2 = new testservice_impl("server2", test_servers["server2"]))

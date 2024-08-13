@@ -37,5 +37,6 @@
     "integer": "Managed",
     "lambda": "Plain",
     "useShortForms": true
-  }
+  },
+  "generateTypeScript": true
 }
