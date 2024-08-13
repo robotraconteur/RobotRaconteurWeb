@@ -77,6 +77,8 @@ namespace RobotRaconteurTest
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
+                        await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByType();
+                        await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByUrl();
 
                         Console.WriteLine("Done!");
 
