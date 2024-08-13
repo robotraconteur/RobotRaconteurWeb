@@ -73,11 +73,10 @@ namespace RobotRaconteurTest
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
+                        RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriptionAttributeIdentifier();
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
-
-                        RobDefTest.RunRobDefTest(args);
 
                         Console.WriteLine("Done!");
 
@@ -97,6 +96,7 @@ namespace RobotRaconteurTest
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
+                        RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriptionAttributeIdentifier();
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();

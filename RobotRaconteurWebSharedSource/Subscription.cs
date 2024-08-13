@@ -1272,12 +1272,9 @@ namespace RobotRaconteurWeb
             this.service_types = service_types;
             this.filter = filter;
             this.use_service_url = false;
-            if (cancel != null)
-            {
-                cancel.Cancel();
-                cancel = null;
-            }
+            CancellationTokenSource old_cancel = cancel;
             cancel = new CancellationTokenSource();
+            old_cancel?.Cancel();
         }
 
         internal void InitServiceURL(string[] url, string username, Dictionary<string, object> credentials, string objecttype)
@@ -1296,13 +1293,9 @@ namespace RobotRaconteurWeb
             service_nodename = url_res.nodename;
             service_name = url_res.service;
 
-            if (cancel != null)
-            {
-                cancel.Cancel();
-                cancel = null;
-            }
-
+            CancellationTokenSource old_cancel = cancel;
             cancel = new CancellationTokenSource();
+            old_cancel?.Cancel();
 
             for (int i = 1; i < url.Length; i++)
             {
@@ -1361,7 +1354,11 @@ namespace RobotRaconteurWeb
 
         async Task RunClient(ServiceSubscription_client client)
         {
-
+            CancellationTokenSource cancel;
+            lock (this)
+            {
+                cancel = this.cancel;
+            }
 
             try
             {
