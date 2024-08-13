@@ -9256,3 +9256,622 @@ public static class RRExtensions
 {
 }
 }
+
+namespace experimental.subobject_sub_test
+{
+[RobotRaconteurServiceObjectInterface("experimental.subobject_sub_test.testobj")]
+public interface testobj
+{
+    Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken));
+    Task<testobj2> get_subobj2(CancellationToken rr_cancel=default(CancellationToken));
+}
+
+[RobotRaconteurServiceObjectInterface("experimental.subobject_sub_test.testobj2")]
+public interface testobj2
+{
+    Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken));
+    Task<testobj3> get_subobj3_1(CancellationToken rr_cancel=default(CancellationToken));
+    Task<testobj3> get_subobj3_2(int ind, CancellationToken rr_cancel=default(CancellationToken));
+    Task<testobj3> get_subobj3_3(string ind, CancellationToken rr_cancel=default(CancellationToken));
+}
+
+[RobotRaconteurServiceObjectInterface("experimental.subobject_sub_test.testobj3")]
+public interface testobj3
+{
+    Task<double> add_two_numbers(double a, double b,CancellationToken rr_cancel=default(CancellationToken));
+    Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken));
+}
+
+}
+
+namespace experimental.subobject_sub_test
+{
+public class experimental__subobject_sub_testFactory : ServiceFactory
+{
+    public override string DefString()
+{
+    const string s="service experimental.subobject_sub_test\n\nobject testobj\nobjref testobj2 subobj2\nfunction string getf_service_path()\nend\n\nobject testobj2\nobjref testobj3 subobj3_1\nobjref testobj3[] subobj3_2\nobjref testobj3{string} subobj3_3\nfunction string getf_service_path()\nend\n\nobject testobj3\nfunction double add_two_numbers(double a, double b)\nfunction string getf_service_path()\nend\n\n";
+    return s;
+    }
+    public override string GetServiceName() {return "experimental.subobject_sub_test";}
+    public experimental__subobject_sub_testFactory() : this(null,null) {}
+    public experimental__subobject_sub_testFactory(RobotRaconteurNode node = null, ClientContext context = null) : base(node,context)
+    {
+    }
+    public override IStructureStub FindStructureStub(string objecttype)
+    {
+    throw new DataTypeException("Cannot find appropriate structure stub");
+    }
+    public override IPodStub FindPodStub(string objecttype)
+    {
+    throw new DataTypeException("Cannot find appropriate pod stub");
+    }
+    public override INamedArrayStub FindNamedArrayStub(string objecttype)
+    {
+    throw new DataTypeException("Cannot find appropriate pod stub");
+    }
+    public override ServiceStub CreateStub(string objecttype, string path, ClientContext context) {
+    string objshort;
+    if (CompareNamespace(objecttype, out objshort)) {
+    switch (objshort) {
+    case "testobj":
+    return new testobj_stub(path, context);
+    case "testobj2":
+    return new testobj2_stub(path, context);
+    case "testobj3":
+    return new testobj3_stub(path, context);
+    default:
+    break;
+    }
+    } else {
+    return base.CreateStub(objecttype,path,context);
+    }
+    throw new ServiceException("Could not create stub");
+    }
+    public override ServiceSkel CreateSkel(string path,object obj,ServerContext context) {
+    string objtype=ServiceDefinitionUtil.FindObjectRRType(obj);
+    string objshort;
+    if (CompareNamespace(objtype, out objshort)) {
+    switch(objshort) {
+    case "testobj":
+    return new testobj_skel(path,(testobj)obj,context);
+    case "testobj2":
+    return new testobj2_skel(path,(testobj2)obj,context);
+    case "testobj3":
+    return new testobj3_skel(path,(testobj3)obj,context);
+    default:
+    break;
+    }
+    } else {
+    return base.CreateSkel(path,obj,context);
+    }
+    throw new ServiceException("Could not create skel");
+    }
+    public override RobotRaconteurException DownCastException(RobotRaconteurException rr_exp)
+    {
+    if (rr_exp==null) return rr_exp;
+    string rr_type=rr_exp.Error;
+    if (!rr_type.Contains(".")) return rr_exp;
+    string rr_stype;
+    if (CompareNamespace(rr_type, out rr_stype)) {
+    } else {
+    return base.DownCastException(rr_exp); 
+    }
+    return rr_exp;
+    }
+}
+
+public class testobj_stub : ServiceStub , testobj {
+    public testobj_stub(string path, ClientContext c) : base(path, c) {
+    }
+    public async Task<string> getf_service_path(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"getf_service_path");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
+    return MessageElementUtil.UnpackString(rr_me.FindElement("return"));
+    }
+    protected override void DispatchEvent(MessageEntry rr_m) {
+    switch (rr_m.MemberName) {
+    default:
+    break;
+    }
+    }
+    public async Task<testobj2> get_subobj2(CancellationToken cancel=default(CancellationToken)) {
+    return (testobj2)await FindObjRefTyped("subobj2","experimental.subobject_sub_test.testobj2",cancel).ConfigureAwait(false);
+    }
+    protected override void DispatchPipeMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+    protected override async Task<MessageEntry> CallbackCall(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.CallbackCallRet, rr_ename);
+    rr_mr.ServicePath=rr_m.ServicePath;
+    rr_mr.RequestID=rr_m.RequestID;
+    switch (rr_ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    protected override void DispatchWireMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+}
+public class testobj2_stub : ServiceStub , testobj2 {
+    public testobj2_stub(string path, ClientContext c) : base(path, c) {
+    }
+    public async Task<string> getf_service_path(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"getf_service_path");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
+    return MessageElementUtil.UnpackString(rr_me.FindElement("return"));
+    }
+    protected override void DispatchEvent(MessageEntry rr_m) {
+    switch (rr_m.MemberName) {
+    default:
+    break;
+    }
+    }
+    public async Task<testobj3> get_subobj3_1(CancellationToken cancel=default(CancellationToken)) {
+    return (testobj3)await FindObjRefTyped("subobj3_1","experimental.subobject_sub_test.testobj3",cancel).ConfigureAwait(false);
+    }
+    public async Task<testobj3> get_subobj3_2(int ind, CancellationToken cancel=default(CancellationToken)) {
+    return (testobj3)await FindObjRefTyped("subobj3_2",ind.ToString(),"experimental.subobject_sub_test.testobj3",cancel).ConfigureAwait(false);
+    }
+    public async Task<testobj3> get_subobj3_3(string ind, CancellationToken cancel=default(CancellationToken)) {
+    return (testobj3)await FindObjRefTyped("subobj3_3",ind.ToString(),"experimental.subobject_sub_test.testobj3",cancel).ConfigureAwait(false);
+    }
+    protected override void DispatchPipeMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+    protected override async Task<MessageEntry> CallbackCall(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.CallbackCallRet, rr_ename);
+    rr_mr.ServicePath=rr_m.ServicePath;
+    rr_mr.RequestID=rr_m.RequestID;
+    switch (rr_ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    protected override void DispatchWireMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+}
+public class testobj3_stub : ServiceStub , testobj3 {
+    public testobj3_stub(string path, ClientContext c) : base(path, c) {
+    }
+    public async Task<double> add_two_numbers(double a, double b, CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"add_two_numbers");
+    MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("a",a));
+    MessageElementUtil.AddMessageElement(rr_m,MessageElementUtil.PackScalar<double>("b",b));
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
+    return (MessageElementUtil.UnpackScalar<double>(rr_me.FindElement("return")));
+    }
+    public async Task<string> getf_service_path(CancellationToken cancel = default(CancellationToken)) {
+        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,"getf_service_path");
+        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);
+    return MessageElementUtil.UnpackString(rr_me.FindElement("return"));
+    }
+    protected override void DispatchEvent(MessageEntry rr_m) {
+    switch (rr_m.MemberName) {
+    default:
+    break;
+    }
+    }
+    protected override void DispatchPipeMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+    protected override async Task<MessageEntry> CallbackCall(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.CallbackCallRet, rr_ename);
+    rr_mr.ServicePath=rr_m.ServicePath;
+    rr_mr.RequestID=rr_m.RequestID;
+    switch (rr_ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    protected override void DispatchWireMessage(MessageEntry m)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new Exception();
+    }
+    }
+}
+public class testobj_skel : ServiceSkel {
+    protected testobj obj;
+    public testobj_skel(string p,testobj o,ServerContext c) : base(p,o,c) { obj=(testobj)o; }
+    public override void ReleaseCastObject() { 
+    }
+    public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertyGetRes, ename);
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallSetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageElement me=m.FindElement("value");
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertySetRes, ename);
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallFunction(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.FunctionCallRes, rr_ename);
+    switch (rr_ename) {
+    case "getf_service_path":
+    {
+    string rr_ret=await this.obj.getf_service_path(default(CancellationToken)).ConfigureAwait(false);
+    rr_mr.AddElement(MessageElementUtil.PackString("return",rr_ret));
+    break;
+    }
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    public override async Task<object> GetSubObj(string name, string ind) {
+    switch (name) {
+    case "subobj2": {
+    return await obj.get_subobj2().ConfigureAwait(false);
+    }
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("");
+    }
+    public override void RegisterEvents(object rrobj1) {
+    obj=(testobj)rrobj1;
+    }
+    public override void UnregisterEvents(object rrobj1) {
+    obj=(testobj)rrobj1;
+    }
+    public override object GetCallbackFunction(uint rr_endpoint, string rr_membername) {
+    switch (rr_membername) {
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("Member not found");
+    }
+    private bool rr_InitPipeServersRun=false;
+    public override void InitPipeServers(object o) {
+    if (this.rr_InitPipeServersRun) return;
+    this.rr_InitPipeServersRun=true;
+    testobj castobj=(testobj)o;
+    }
+    public override void InitCallbackServers(object rrobj1) {
+    obj=(testobj)rrobj1;
+    }
+    public override async Task<MessageEntry> CallPipeFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallWireFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchPipeMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchWireMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallMemoryFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
+}
+public class testobj2_skel : ServiceSkel {
+    protected testobj2 obj;
+    public testobj2_skel(string p,testobj2 o,ServerContext c) : base(p,o,c) { obj=(testobj2)o; }
+    public override void ReleaseCastObject() { 
+    }
+    public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertyGetRes, ename);
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallSetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageElement me=m.FindElement("value");
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertySetRes, ename);
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallFunction(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.FunctionCallRes, rr_ename);
+    switch (rr_ename) {
+    case "getf_service_path":
+    {
+    string rr_ret=await this.obj.getf_service_path(default(CancellationToken)).ConfigureAwait(false);
+    rr_mr.AddElement(MessageElementUtil.PackString("return",rr_ret));
+    break;
+    }
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    public override async Task<object> GetSubObj(string name, string ind) {
+    switch (name) {
+    case "subobj3_1": {
+    return await obj.get_subobj3_1().ConfigureAwait(false);
+    }
+    case "subobj3_2": {
+    return await obj.get_subobj3_2(Int32.Parse(ind)).ConfigureAwait(false);
+    }
+    case "subobj3_3": {
+    return await obj.get_subobj3_3(ind).ConfigureAwait(false);
+    }
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("");
+    }
+    public override void RegisterEvents(object rrobj1) {
+    obj=(testobj2)rrobj1;
+    }
+    public override void UnregisterEvents(object rrobj1) {
+    obj=(testobj2)rrobj1;
+    }
+    public override object GetCallbackFunction(uint rr_endpoint, string rr_membername) {
+    switch (rr_membername) {
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("Member not found");
+    }
+    private bool rr_InitPipeServersRun=false;
+    public override void InitPipeServers(object o) {
+    if (this.rr_InitPipeServersRun) return;
+    this.rr_InitPipeServersRun=true;
+    testobj2 castobj=(testobj2)o;
+    }
+    public override void InitCallbackServers(object rrobj1) {
+    obj=(testobj2)rrobj1;
+    }
+    public override async Task<MessageEntry> CallPipeFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallWireFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchPipeMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchWireMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallMemoryFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
+}
+public class testobj3_skel : ServiceSkel {
+    protected testobj3 obj;
+    public testobj3_skel(string p,testobj3 o,ServerContext c) : base(p,o,c) { obj=(testobj3)o; }
+    public override void ReleaseCastObject() { 
+    }
+    public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertyGetRes, ename);
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallSetProperty(MessageEntry m) {
+    string ename=m.MemberName;
+    MessageElement me=m.FindElement("value");
+    MessageEntry mr=new MessageEntry(MessageEntryType.PropertySetRes, ename);
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return mr;
+    }
+    public override async Task<MessageEntry> CallFunction(MessageEntry rr_m) {
+    string rr_ename=rr_m.MemberName;
+    MessageEntry rr_mr=new MessageEntry(MessageEntryType.FunctionCallRes, rr_ename);
+    switch (rr_ename) {
+    case "add_two_numbers":
+    {
+    double a=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"a")));
+    double b=(MessageElementUtil.UnpackScalar<double>(MessageElementUtil.FindElement(rr_m,"b")));
+    double rr_ret=await this.obj.add_two_numbers(a, b, default(CancellationToken)).ConfigureAwait(false);
+    rr_mr.AddElement(MessageElementUtil.PackScalar<double>("return",rr_ret));
+    break;
+    }
+    case "getf_service_path":
+    {
+    string rr_ret=await this.obj.getf_service_path(default(CancellationToken)).ConfigureAwait(false);
+    rr_mr.AddElement(MessageElementUtil.PackString("return",rr_ret));
+    break;
+    }
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    return rr_mr;
+    }
+    public override async Task<object> GetSubObj(string name, string ind) {
+    switch (name) {
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("");
+    }
+    public override void RegisterEvents(object rrobj1) {
+    obj=(testobj3)rrobj1;
+    }
+    public override void UnregisterEvents(object rrobj1) {
+    obj=(testobj3)rrobj1;
+    }
+    public override object GetCallbackFunction(uint rr_endpoint, string rr_membername) {
+    switch (rr_membername) {
+    default:
+    break;
+    }
+    throw new MemberNotFoundException("Member not found");
+    }
+    private bool rr_InitPipeServersRun=false;
+    public override void InitPipeServers(object o) {
+    if (this.rr_InitPipeServersRun) return;
+    this.rr_InitPipeServersRun=true;
+    testobj3 castobj=(testobj3)o;
+    }
+    public override void InitCallbackServers(object rrobj1) {
+    obj=(testobj3)rrobj1;
+    }
+    public override async Task<MessageEntry> CallPipeFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallWireFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchPipeMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override void DispatchWireMessage(MessageEntry m, Endpoint e)
+    {
+    switch (m.MemberName) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override async Task<MessageEntry> CallMemoryFunction(MessageEntry m,Endpoint e) {
+    string ename=m.MemberName;
+    switch (ename) {
+    default:
+    throw new MemberNotFoundException("Member not found");
+    }
+    }
+    public override bool IsRequestNoLock(MessageEntry m) {
+    return false;
+    }
+}
+public class testobj_default_impl : testobj{
+    public virtual Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testobj2> get_subobj2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+public class testobj2_default_impl : testobj2{
+    public virtual Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testobj3> get_subobj3_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testobj3> get_subobj3_2(int ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testobj3> get_subobj3_3(string ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+public class testobj3_default_impl : testobj3{
+    public virtual Task<double> add_two_numbers(double a, double b,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+public static class RRExtensions
+{
+}
+}

@@ -2234,7 +2234,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public SubObjectSubscription SubscribeSubObject(string service_path, string object_type)
+        public SubObjectSubscription SubscribeSubObject(string service_path, string object_type=null)
         {
             var o = new SubObjectSubscription(this, service_path, object_type);
             return o;
