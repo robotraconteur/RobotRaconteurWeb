@@ -21,13 +21,16 @@ repos:
   - id: fix-byte-order-marker
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
-  - id: check-json
   - id: check-toml
   - id: check-xml
   - id: detect-private-key
   - id: no-commit-to-branch
     args: ['--branch', 'master']
   - id: forbid-submodules
+- repo: https://gitlab.com/bmares/check-json5
+  rev: v1.0.0
+  hooks:
+  - id: check-json5
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.12.0
   hooks:
