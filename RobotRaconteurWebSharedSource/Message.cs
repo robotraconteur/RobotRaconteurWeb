@@ -1726,15 +1726,15 @@ namespace RobotRaconteurWeb
 
         public void UpdateData()
         {
-            string datatype;
-
             if (dat == null)
             {
-                datatype = "null";
+                ElementType = DataTypes.void_t;
+                DataCount = 0;
             }
             else if (dat is Array)
             {
-                datatype = dat.GetType().GetElementType().ToString();
+                string datatype = dat.GetType().GetElementType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
                 DataCount = (uint)((Array)dat).Length;
             }
             else if (dat is MessageElementNestedElementList)
@@ -1742,54 +1742,20 @@ namespace RobotRaconteurWeb
                 var dat2 = (MessageElementNestedElementList)dat;
                 DataCount = (uint)dat2.Elements.Count;
                 ElementTypeName = dat2.TypeName ?? "";
-                switch (dat2.Type)
-                {
-                    case DataTypes.vector_t:
-                        datatype = "RobotRaconteurWeb.MessageElementMap<int>";
-                        break;
-                    case DataTypes.dictionary_t:
-                        datatype = "RobotRaconteurWeb.MessageElementMap<string>";
-                        break;
-                    case DataTypes.list_t:
-                        datatype = "RobotRaconteurWeb.MessageElementList";
-                        break;
-                    case DataTypes.multidimarray_t:
-                        datatype = "RobotRaconteurWeb.MessageElementMultiDimArray";
-                        break;
-                    case DataTypes.pod_t:
-                        datatype = "RobotRaconteurWeb.MessageElementPod";
-                        break;
-                    case DataTypes.pod_array_t:
-                        datatype = "RobotRaconteurWeb.MessageElementPodArray";
-                        break;
-                    case DataTypes.pod_multidimarray_t:
-                        datatype = "RobotRaconteurWeb.MessageElementPodMultiDimArray";
-                        break;
-                    case DataTypes.namedarray_array_t:
-                        datatype = "RobotRaconteurWeb.MessageElementNamedArray";
-                        break;
-                    case DataTypes.namedarray_multidimarray_t:
-                        datatype = "RobotRaconteurWeb.MessageElementNamedMultiDimArray";
-                        break;
-                    default:
-                        datatype = "RobotRaconteurWeb.MessageElementStructure";
-                        break;
-                }
+                ElementType = dat2.Type;
             }
             else if (dat is string)
             {
-                datatype = "System.String";
+                ElementType = DataTypes.string_t;
                 DataCount = (uint)UTF8Encoding.UTF8.GetByteCount((string)dat);
 
             }
             else
             {
-
                 DataCount = 1;
-                datatype = dat.GetType().ToString();
+                string datatype = dat.GetType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
             }
-
-            ElementType = DataTypeUtil.TypeIDFromString(datatype);
 
             if (ElementType != DataTypes.void_t && ElementType < DataTypes.string_t && !(dat is Array))
             {
