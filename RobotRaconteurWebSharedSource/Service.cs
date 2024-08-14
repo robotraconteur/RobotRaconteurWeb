@@ -1881,16 +1881,19 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// service has been closed
         /// </summary>
+        [PublicApi] 
         ServiceClosed = 1,
         
         /// <summary>
         /// client has connected
         /// </summary>
+        [PublicApi] 
         ClientConnected,
 
         /// <summary>
         /// client has disconnected
         /// </summary>
+        [PublicApi] 
         ClientDisconnected
     }
 

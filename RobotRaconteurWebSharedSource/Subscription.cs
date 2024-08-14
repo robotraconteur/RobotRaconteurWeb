@@ -222,7 +222,7 @@ namespace RobotRaconteurWeb
          * This is a named attribute for use with attribute maps. The value is compared using a regex
          * </remarks>
          * <param name="name">The attribute name</param>
-         * <param name="value_regex">The attribute value regex</param>
+         * <param name="valueRegex">The attribute value regex</param>
          */
         [PublicApi]
         public ServiceSubscriptionFilterAttribute(string name, Regex valueRegex)
@@ -236,6 +236,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(string value)
         {
             if (!string.IsNullOrEmpty(Name))
@@ -258,6 +259,7 @@ namespace RobotRaconteurWeb
         /// <param name="name">The name to compare</param>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(string name, string value)
         {
             if (!string.IsNullOrEmpty(Name) && Name != name)
@@ -279,6 +281,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<string> values)
         {
             foreach (string e in values)
@@ -296,6 +299,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<object> values)
         {
             if (values == null)
@@ -331,6 +335,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(Dictionary<string, object> values)
         {
             if (values == null)
@@ -366,6 +371,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(Dictionary<string, string> values)
         {
             foreach (KeyValuePair<string, string> e in values)
@@ -581,18 +587,22 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// OR operation
         /// </summary>
+        [PublicApi] 
         Or,
         /// <summary>
         /// AND operation
         /// </summary>
+        [PublicApi] 
         And,
         /// <summary>
         /// NOR operation. Also used for NOT
         /// </summary>
+        [PublicApi] 
         Nor,
         /// <summary>
         /// NAND operation
         /// </summary>
+        [PublicApi] 
         Nand
     }
     /**
@@ -643,6 +653,7 @@ namespace RobotRaconteurWeb
          * <param name="operation">The operation to use for matching the attributes and groups</param>
          * <param name="attributes">The attributes in the group</param>
          */
+         [PublicApi] 
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttribute> attributes)
         {
             Operation = operation;
@@ -654,6 +665,7 @@ namespace RobotRaconteurWeb
          * <param name="operation">The operation to use for matching the attributes and groups</param>
          * <param name="groups">The nested groups in the group</param>
          */
+         [PublicApi] 
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttributeGroup> groups)
         {
             Operation = operation;
@@ -733,6 +745,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(string value)
         {
             if (!SplitStringAttribute)
@@ -753,6 +766,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<string> values)
         {
             return ServiceSubscriptionFilterAttributeGroupDoFilter<string>(Operation, Attributes, Groups, values.Select(x => (object)x).ToList());
@@ -763,6 +777,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<object> values)
         {
             return ServiceSubscriptionFilterAttributeGroupDoFilter<object>(Operation, Attributes, Groups, values);
@@ -785,6 +800,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(object value)
         {
             if (value == null)
@@ -850,8 +866,8 @@ namespace RobotRaconteurWeb
         Construct a ServiceSubscriptionClientID
         </summary>
         <remarks>None</remarks>
-        <param name="node_id">The NodeID</param>
-        <param name="service_name">The Service Name</param>
+        <param name="NodeID">The NodeID</param>
+        <param name="ServiceName">The Service Name</param>
         */
         [PublicApi]
 
@@ -2453,6 +2469,7 @@ namespace RobotRaconteurWeb
          * <param name="object_type"> Optional object type to use for the sub object</param>
          * <return>The sub object subscription</return>
          */
+         [PublicApi] 
         public SubObjectSubscription SubscribeSubObject(string service_path, string object_type=null)
         {
             var o = new SubObjectSubscription(this, service_path, object_type);
@@ -2566,6 +2583,7 @@ namespace RobotRaconteurWeb
          * <param name="cancel">A cancellation token for the operation</param>
          * <return>true if a value was received within the specified timeout</return>
          */
+         [PublicApi] 
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken cancel = default)
         {
             AsyncValueWaiter<object>.AsyncValueWaiterTask waiter = null;
@@ -3541,6 +3559,7 @@ namespace RobotRaconteurWeb
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>Success and the default client as tuple</returns>
          */
+         [PublicApi] 
         public async Task<Tuple<bool,T>> TryGetDefaultClient<T>(CancellationToken cancel = default)
         {
             try
@@ -3563,6 +3582,7 @@ namespace RobotRaconteurWeb
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>The default client</returns>
          */
+         [PublicApi] 
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel)
         {
             var client = (ServiceStub) await parent.GetDefaultClientWait<object>(cancel);
@@ -3578,6 +3598,7 @@ namespace RobotRaconteurWeb
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>Success and the default client as tuple</returns>
          */
+         [PublicApi] 
         public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel)
         {
             try
@@ -3595,6 +3616,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Close the sub object subscription
         /// </summary>
+        [PublicApi]
         public void Close()
         {
             
@@ -3625,10 +3647,13 @@ namespace RobotRaconteurWeb
     public enum ServiceSubscriptionManagerConnectionMethod
     {
         /** <summary>Implicitly select between URL and service types</summary> */
+        [PublicApi] 
         Default = 0,
         /** <summary>Use URLs types for subscription</summary> */
+        [PublicApi] 
         Url,
         /** <summary>Use service types for subscription</summary> */
+        [PublicApi] 
         Type
     }
 
@@ -4096,6 +4121,7 @@ namespace RobotRaconteurWeb
          * <param name="name">The local name of the subscription</param>
          * <return>True if the subscription is enabled</return>
          */
+         [PublicApi] 
         public bool IsEnabled(string name)
         {
             lock(this)

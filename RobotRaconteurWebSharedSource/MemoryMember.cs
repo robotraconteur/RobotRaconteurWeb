@@ -144,6 +144,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start index in the buffer to write the data</param>
         <param name="count">The number of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -173,6 +174,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start index in the buffer to read the data</param>
         <param name="count">The number of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -322,6 +324,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -349,6 +352,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1246,40 +1250,44 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /**
+    <summary>
+    Multidimensional pod random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The PodMultiDimArrayMemory class is used to represent a multidimensional
+    pod array. Single dimensional pod arrays should use PodArrayMemory.
+    Type T must be declared in a service definition using the `pod`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances are attached to an MultiDimArray,
+    either when constructed or later using Attach().
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T" />
+    */
+    [PublicApi] 
     public class PodArrayMemory<T> : ArrayMemory<T> where T : struct
     {
-        /**
-        <summary>
-        Multidimensional pod random access memory region
-        </summary>
-        <remarks>
-        <para>
-        Memories represent random access memory regions that are typically
-        represented as arrays of various shapes and types. Memories can be
-        declared in service definition files using the `memory` member keyword
-        within service definitions. Services expose memories to clients, and
-        the nodes will proxy read, write, and parameter requests between the client
-        and service. The node will also break up large requests to avoid the
-        message size limit of the transport.
-        </para>
-        <para>
-        The PodMultiDimArrayMemory class is used to represent a multidimensional
-        pod array. Single dimensional pod arrays should use PodArrayMemory.
-        Type T must be declared in a service definition using the `pod`
-        keyword, and generated using RobotRaconteurGen.
-        </para>
-        <para>
-        PodMultiDimArrayMemory instances are attached to an MultiDimArray,
-        either when constructed or later using Attach().
-        </para>
-        <para>
-        PodMultiDimArrayMemory instances returned by clients are special implementations
-        designed to proxy requests to the service. They cannot be attached
-        to an arbitrary array.
-        </para>
-        </remarks>
-        <typeparam name="T" />
-        */
+        /// <summary>
+        /// Construct an empty PodArrayMemory
+        /// </summary>
         [PublicApi]
         public PodArrayMemory() : base()
         {
@@ -1494,6 +1502,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1521,6 +1530,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1723,6 +1733,7 @@ namespace RobotRaconteurWeb
         <param name="memory">The array to attach</param>
         <returns />
         */
+        [PublicApi] 
         public NamedArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1924,6 +1935,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1951,6 +1963,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]

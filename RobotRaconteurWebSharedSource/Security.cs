@@ -72,17 +72,20 @@ namespace RobotRaconteurWeb
          * <summary>The user authentication</summary>
          * <remarks>None</remarks>
          */
+         [PublicApi] 
         public UserAuthenticator Authenticator;
         /**
          * <summary>The security policies</summary>
          * <remarks>None</remarks>
          */
+         [PublicApi] 
         public Dictionary<string, string> Policies;
 
         /**
          * <summary>Construct a new empty security policy</summary>
          * <remarks>None</remarks>
          */
+         [PublicApi] 
         public ServiceSecurityPolicy()
         {
             Authenticator = null;

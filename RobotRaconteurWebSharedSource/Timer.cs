@@ -47,6 +47,7 @@ namespace RobotRaconteurWeb
         Must be called after RobotRaconteurNode.CreateTimer()
         </remarks>
         */
+        [PublicApi] 
         void Start();
         /**
         <summary>
@@ -54,6 +55,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi] 
         void Stop();
         /**
         <summary>
@@ -61,6 +63,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi] 
         int Period {get; set;}
         /**
         <summary>
@@ -68,6 +71,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi] 
         bool IsRunning { get; }        
     }
 

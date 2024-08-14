@@ -183,8 +183,10 @@ namespace RobotRaconteurWeb
             transport. It will return before the peer endpoint has received the packet.
             </remarks>
             <param name="packet">The packet to send</param>
+            <param name="cancel">The cancellation token for the operation</param>
             <returns />
             */
+            [PublicApi] 
             public async Task<uint> SendPacket(T packet, CancellationToken cancel = default(CancellationToken))
             {
                 Task mutex = send_mutex.Enter();
@@ -374,10 +376,11 @@ namespace RobotRaconteurWeb
             </remarks>
             <param name="timeout">Timeout in milliseconds to wait for a packet, or RR_TIMEOUT_INFINITE for no
             timeout</param>
+            <param name="cancel">The cancellation token for the operation</param>
             <returns>The received packet</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<T> ReceivePacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
                 var ret = await TryReceivePacketWait(timeout, false, cancel).ConfigureAwait(false);
@@ -396,10 +399,11 @@ namespace RobotRaconteurWeb
             </remarks>
             <param name="timeout">Timeout in milliseconds to wait for a packet, or RR_TIMEOUT_INFINITE for no
             timeout</param>
+            <param name="cancel">The cancellation token for the operation</param>
             <returns>The received packet</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<T> PeekNextPacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
                 var ret = await TryReceivePacketWait(timeout, true, cancel).ConfigureAwait(false);
@@ -421,15 +425,15 @@ namespace RobotRaconteurWeb
             similar to the various Receive and Peek functions.
             </para>
             </remarks>
-            <param name="packet">[out] The received packet</param>
             <param name="timeout">The timeout in milliseconds. Set to zero for non-blocking operation, an arbitrary
             value
             in milliseconds for a finite duration timeout, or RR_TIMEOUT_INFINITE for no timeout</param>
             <param name="peek">If true, the packet is not removed from the receive queue</param>
-            <returns>true if packet was received, otherwise false</returns>
+            <param name="cancel">The cancellation token for the operation</param>
+            <returns>Succes and returned value as a tuple</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<Tuple<bool, T>> TryReceivePacketWait(int timeout = -1, bool peek = false, CancellationToken cancel = default)
             {
                 AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter;
@@ -585,6 +589,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="index">The index of the pipe endpoint, or (-1) to automatically select an index</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The connected pipe endpoint</returns>
         */
         [PublicApi]
@@ -1267,6 +1272,7 @@ namespace RobotRaconteurWeb
         Send packet to all connected pipe endpoint clients
         </summary>
         <param name="packet">The packet to send</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1413,6 +1419,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <value />
         */
+        [PublicApi] 
         public Func<object, uint, int, bool> Predicate { get; set; }
     }
 }

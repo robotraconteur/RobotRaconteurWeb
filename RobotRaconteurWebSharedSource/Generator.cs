@@ -249,6 +249,7 @@ namespace RobotRaconteurWeb
         Generator includes passing a parameter to the generator but no return.
         </remarks>
         <param name="param">Parameter to pass to generator</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]

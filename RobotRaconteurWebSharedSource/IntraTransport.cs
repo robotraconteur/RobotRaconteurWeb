@@ -78,6 +78,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Connection test heartbeat period in milliseconds
         /// </summary>
+        [PublicApi]
         public int HeartbeatPeriod
         {
             get
@@ -563,11 +564,6 @@ namespace RobotRaconteurWeb
 
         private DateTime LastMessageReceivedTime = DateTime.UtcNow;
 
-        /// <summary>
-        /// Creates a IntraClientTransport with parent IntraTransport
-        /// </summary>
-        /// <param name="c">Parent transport</param>
-        [PublicApi]
         public IntraTransportConnection(IntraTransport parent, bool server, uint local_endpoint)
         {
             node = parent.node;

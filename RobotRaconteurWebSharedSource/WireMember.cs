@@ -138,6 +138,7 @@ namespace RobotRaconteurWeb
              * <summary>The LocalEndpoint ID of the endpoint that owns this wire connection</summary>
              * <remarks>None</remarks>
              */
+             [PublicApi] 
             public uint Endpoint { get { return endpoint.LocalEndpoint; } }
 #pragma warning disable 1591
             protected T inval;
@@ -538,10 +539,11 @@ namespace RobotRaconteurWeb
             or false if timeout occurred.
             </remarks>
             <param name="timeout">Timeout in milliseconds, or RR_TIMEOUT_INFINITE for no timeout</param>
+            <param name="token">The cancellation token for the operation</param>
             <returns>true if InValue is valid, otherwise false</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
             {
                 var waiter = inval_waiter.CreateWaiterTask(timeout, token);
@@ -562,10 +564,11 @@ namespace RobotRaconteurWeb
             or false if timeout occurred.
             </remarks>
             <param name="timeout">Timeout in milliseconds, or RR_TIMEOUT_INFINITE for no timeout</param>
+            <param name="token">The cancellation token for the operation</param>
             <returns>true if InValue is valid, otherwise false</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<bool> WaitOutValueValid(int timeout = -1, CancellationToken token = default)
             {
                 var waiter = outval_waiter.CreateWaiterTask(timeout, token);
@@ -840,6 +843,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="value">The new OutValue</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1689,9 +1693,9 @@ namespace RobotRaconteurWeb
         value is valid, or false if value is invalid. Value will be invalid if no value has
         been received, or the value lifespan has expired.
         </remarks>
-        <param name="value">[out] The current InValue</param>
-        <param name="time">[out] The current InValue timestamp</param>
-        <param name="client">[out] The client endpoint ID of the InValue</param>
+        <param name="val">[out] The current InValue</param>
+        <param name="ts">[out] The current InValue timestamp</param>
+        <param name="ep">[out] The client endpoint ID of the InValue</param>
         <returns>true if value is valid, otherwise false</returns>
         */
 
@@ -1760,7 +1764,9 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <remarks>None</remarks>
         /// <param name="timeout">Timeout in milliseconds</param>
+        /// <param name="token">The cancellation token for the operation</param>
         /// <returns>True if valid at timeout</returns>
+        [PublicApi] 
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
         {
             var waiter = inval_waiter.CreateWaiterTask(timeout, token);

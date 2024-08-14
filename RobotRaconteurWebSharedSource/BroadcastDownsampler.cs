@@ -240,9 +240,9 @@ namespace RobotRaconteurWeb
         <param name="downsampler">The downsampler to step</param>
         */
         [PublicApi]
-        public BroadcasterDownsamplerStep(BroadcastDownsampler parent)
+        public BroadcasterDownsamplerStep(BroadcastDownsampler downsampler)
         {
-            this.parent = parent;
+            this.parent = downsampler;
             parent.BeginStep();
         }
         /// <summary>

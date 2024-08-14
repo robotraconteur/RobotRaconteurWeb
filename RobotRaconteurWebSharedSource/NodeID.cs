@@ -195,6 +195,7 @@ namespace RobotRaconteurWeb
         /// Convert to a byte array containing the UUID bytes
         /// </summary>
         /// <param name="i">The NodeID UUID as bytes</param>
+        [PublicApi] 
 
         public static explicit operator byte[](NodeID i)
         {
@@ -287,6 +288,7 @@ namespace RobotRaconteurWeb
         /// Get a hashcode for the NodeID
         /// </summary>
         /// <returns>The hash code</returns>
+        [PublicApi] 
         public override int GetHashCode()
         {
             int sum = 0;

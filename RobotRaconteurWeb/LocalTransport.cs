@@ -546,7 +546,7 @@ namespace RobotRaconteurWeb
         <remarks>
         Throws NodeIDAlreadyInUse if another node is using nodeid
         </remarks>
-        <param name="name">The NodeName</param>
+        <param name="nodeid">The NodeID</param>
         */
         [PublicApi]
         public void StartServerAsNodeID(NodeID nodeid)
@@ -1443,36 +1443,42 @@ namespace RobotRaconteurWeb
     /// Exception thrown when a node ID is already in use
     /// </summary>
     /// <remarks>None</remarks>
+    [PublicApi] 
     public class NodeIDAlreadyInUse : IOException
     {
         /// <summary>
         /// Construct a new NodeIDAlreadyInUse
         /// </summary>
         /// <remarks>None</remarks>
+        [PublicApi] 
         public NodeIDAlreadyInUse() : base("NodeID already in use") { }
         /// <summary>
         /// Construct a new NodeIDAlreadyInUse with a message
         /// </summary>
         /// <remarks>None</remarks> 
         /// <param name="message">Message for exception</param>
+        [PublicApi]
         public NodeIDAlreadyInUse(string message) : base(message) { }
     }
     /// <summary>
     /// Exception thrown when a node name is already in use
     /// </summary>
     /// <remarks>None</remarks>
+    [PublicApi]
     public class NodeNameAlreadyInUse : IOException
     {
         /// <summary>
         /// Construct a new NodeNameAlreadyInUse
         /// </summary>
         /// <remarks>None</remarks>
+        [PublicApi] 
         public NodeNameAlreadyInUse() : base("NodeName already in use") { }
         /// <summary>
         /// Construct a new NodeNameAlreadyInUse with a message
         /// </summary>
         /// <remarks>None</remarks> 
         /// <param name="message">Message for exception</param>
+        [PublicApi]
         public NodeNameAlreadyInUse(string message) : base(message) { }
     }
 }

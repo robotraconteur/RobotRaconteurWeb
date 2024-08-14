@@ -28,6 +28,7 @@ namespace RobotRaconteurWeb
     /// 
     /// Note: for root user, system and user directories are identical.
     /// </remarks>
+    [PublicApi] 
     public class NodeDirectories
     {
         /// <summary>
@@ -38,6 +39,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\data
         /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_DATA_DIR
         /// </remarks>
+        [PublicApi] 
         public string system_data_dir;
         /// <summary>
         /// Robot Raconteur System config directory
@@ -47,6 +49,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\
         /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_CONFIG_DIR
         /// </remarks>
+        [PublicApi] 
         public string system_config_dir;
         /// <summary>
         /// Robot Raconteur System config directory
@@ -56,6 +59,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\state
         /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_STATE_DIR
         /// </remarks>
+        [PublicApi] 
         public string system_state_dir;
         /// <summary>
         /// Robot Raconteur System cache directory
@@ -65,6 +69,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\cache
         /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_CACHE_DIR
         /// </remarks>
+        [PublicApi] 
         public string system_cache_dir;
         /// <summary>
         /// Robot Raconteur System run directory
@@ -74,6 +79,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\run
         /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_RUN_DIR
         /// </remarks>
+        [PublicApi] 
         public string system_run_dir;
         /// <summary>
         /// Robot Raconteur User data directory
@@ -83,6 +89,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\data
         /// Environmental variable override: ROBOTRACONTEUR_USER_DATA_DIR
         /// </remarks>
+        [PublicApi] 
         public string user_data_dir;
         /// <summary>
         /// Robot Raconteur User config directory
@@ -92,6 +99,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\
         /// Environmental variable override: ROBOTRACONTEUR_USER_CONFIG_DIR
         /// </remarks>
+        [PublicApi] 
         public string user_config_dir;
         /// <summary>
         /// Robot Raconteur User state directory
@@ -101,6 +109,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\state
         /// Environmental variable override: ROBOTRACONTEUR_USER_STATE_DIR
         /// </remarks>
+        [PublicApi] 
         public string user_state_dir;
         /// <summary>
         /// Robot Raconteur User cache directory
@@ -110,6 +119,7 @@ namespace RobotRaconteurWeb
         /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\cache
         /// Environmental variable override: ROBOTRACONTEUR_USER_CACHE_DIR
         /// </remarks>
+        [PublicApi] 
         public string user_cache_dir;
         /// <summary>
         /// Robot Raconteur User state directory
@@ -120,6 +130,7 @@ namespace RobotRaconteurWeb
         /// Default value for root: {system_run_dir}/root
         /// Environmental variable override: ROBOTRACONTEUR_USER_RUN_DIR
         /// </remarks>
+        [PublicApi] 
         public string user_run_dir;
     }
 

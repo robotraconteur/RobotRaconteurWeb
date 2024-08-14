@@ -34,35 +34,43 @@ namespace RobotRaconteurWeb
         /**
         <summary>No options enabled</summary>
         */
+        [PublicApi] 
         None = 0x0,
         /**
         <summary>Enable node discovery listening on all transports</summary>
         */
+        [PublicApi] 
         EnableNodeDiscoveryListening = 0x1,
         /**
         <summary>Enable node announce on all transports</summary>
         */
+        [PublicApi] 
         EnableNodeAnnounce = 0x2,
         /**
         <summary>Enable LocalTransport</summary>
         */        
+        [PublicApi] 
         EnableLocalTransport = 0x4,
         /**
         <summary>Enable TcpTransport</summary>
         */
+        [PublicApi] 
         EnableTcpTransport = 0x8,
         // EnableHardwareTransport = 0x10,
         /**
         <summary>Start the LocalTransport server to listen for incoming clients</summary>
         */
+        [PublicApi] 
         LocalTransportStartServer = 0x20,
         /**
         <summary>Start the LocalTransport client with specified node name</summary>
         */
+        [PublicApi] 
         LocalTransportStartClient = 0x40,
         /**
         <summary>Start the TcpTransport server to listen for incoming clients on the specified port</summary>
         */
+        [PublicApi] 
         TcpTransportStartServer = 0x80,
         // TcpTransportStartServerPortSharer = 0x100,
         // DisableMessage4 = 0x200,
@@ -71,50 +79,66 @@ namespace RobotRaconteurWeb
         /**
         <summary>Load the TLS certificate for TcpTransport</summary>
         */
+        [PublicApi] 
         LoadTlsCert = 0x1000,
         /**
         <summary>Require TLS for all clients on TcpTransport</summary>
         */
+        [PublicApi] 
         RequireTls = 0x2000,
         /**
         <summary>Make LocalTransport server listen for incoming clients from all users</summary>
         */
+        [PublicApi] 
         LocalTransportServerPublic = 0x4000,
         /** <summary>Only listen on localhost connections for TcpTransport</summary> */
+        [PublicApi] 
         TcpTransportListenLocalHost = 0x8000,
         /** <summary>Allow NodeName to be configured using command line options</summary> */
+        [PublicApi] 
         NodeNameOverride = 0x10000,
         /** <summary>Allow NodeID to be configured using command line options</summary> */
+        [PublicApi] 
         NodeIdOverride = 0x20000,
         /** <summary>Allow TCP port to be configured using command line options</summary> */
+        [PublicApi] 
         TcpPortOverride = 0x40000,
         /** <summary>Allow TCP WebSocket origin control to be configured using command line options</summary> */
+        [PublicApi] 
         TcpWebSocketOriginOverride = 0x80000,
         /**
         <summary>Enable IntraTransport</summary>
         */
+        [PublicApi] 
         EnableIntraTransport = 0x100000,
         /**
         <summary>Start the IntraTransport server to listen for incoming clients</summary>
         */
+        [PublicApi] 
         IntraTransportStartServer = 0x200000,
         /** <summary>Enable TcpTransport IPv4 discovery</summary> */
+        [PublicApi] 
         TcpTransportIpv4Discovery = 0x400000,
         /** <summary>Enable TcpTransport IPv6 discovery</summary> */
+        [PublicApi] 
         TcpTransportIpv6Discovery = 0x800000,
         /**
         <summary>Enable the LocalTap debug logging system</summary>
         */
+        [PublicApi] 
         LocalTapEnable = 0x1000000,
         /**
         <summary>Allow the user to set the LocalTap name</summary>
         */
+        [PublicApi] 
         LocalTapName = 0x2000000,
         /** <summary>Enable jumbo messages (up to 100 MB per message)</summary> */
+        [PublicApi] 
         JumboMessage = 0x4000000,
         /**
         <summary>Convenience flag to enable all transports</summary>
         */
+        [PublicApi] 
         EnableAllTransports = EnableLocalTransport 
             | EnableTcpTransport 
             //| EnableHardwareTransport 
@@ -122,6 +146,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default configuration for client nodes (See ClientNodeSetup)</summary>
         */
+        [PublicApi] 
         ClientDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -132,6 +157,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default allowed overrides for client nodes (See ClientNodeSetup)</summary>
         */
+        [PublicApi] 
         ClientDefaultAllowedOverride = EnableAllTransports
         | EnableNodeDiscoveryListening
         | TcpTransportIpv6Discovery
@@ -149,6 +175,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default configuration for server nodes</summary>
         */
+        [PublicApi] 
         ServerDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -163,6 +190,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default allowed overrides for server nodes</summary>
         */
+        [PublicApi] 
         ServerDefaultAllowedOverride = EnableAllTransports
         | TcpTransportIpv6Discovery
         | TcpTransportIpv4Discovery
@@ -188,6 +216,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default configuration for server nodes requiring TLS network transports</summary>
         */
+        [PublicApi] 
         SecureServerDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -204,6 +233,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default allowed overrides for server nodes requiring TLS network transports</summary>
         */
+        [PublicApi] 
         SecureServerDefaultAllowedOverride = EnableAllTransports
         | LocalTransportStartServer
         | TcpTransportStartServer
@@ -477,7 +507,7 @@ namespace RobotRaconteurWeb
         Returns default_value if option not specified on command line
         </remarks>
         <param name="option">The name of the option</param>
-        <param name="default_value">The default option value</param>
+        <param name="defaultValue">The default option value</param>
         <returns>The option value, or default_value if not specified on command line</returns>
         */
         [PublicApi]
@@ -551,7 +581,7 @@ namespace RobotRaconteurWeb
         Returns default_value if option not specified on command line
         </remarks>
         <param name="option">The name of the option</param>
-        <param name="default_value">The default option value</param>
+        <param name="defaultValue">The default option value</param>
         <returns>The option value, or default_value if not specified on command line</returns>
         */
         [PublicApi]
@@ -600,7 +630,7 @@ namespace RobotRaconteurWeb
         Returns default_value if option not specified on command line
         </remarks>
         <param name="option">The name of the option</param>
-        <param name="default_value">The default option value</param>
+        <param name="defaultValue">The default option value</param>
         <returns>The option value, or default_value if not specified on command line</returns>
         */
         [PublicApi]
@@ -727,6 +757,7 @@ namespace RobotRaconteurWeb
         /// The RobotRaconteurNode being initialized
         /// </summary>
         /// <remarks>None</remarks>
+        [PublicApi] 
         public RobotRaconteurNode Node => node;
         /**
         <summary>
@@ -1128,7 +1159,7 @@ namespace RobotRaconteurWeb
         <param name="node">The node to setup</param>
         <param name="service_types">The service types to register</param>
         <param name="scan_assembly_types">If true, scan assemblies for service types</param>
-        <param name="node_name">The NodeName</param>
+        <param name="nodename">The NodeName</param>
         <param name="tcp_port">The port to listen for incoming TCP clients</param>
         <param name="flags">The configuration flags</param>
         */    
@@ -1152,7 +1183,7 @@ namespace RobotRaconteurWeb
         <param name="node">The node to setup</param>
         <param name="service_types">The service types to register</param>
         <param name="scan_assembly_types">If true, scan assemblies for service types</param>
-        <param name="node_name">The NodeName</param>
+        <param name="nodename">The NodeName</param>
         <param name="tcp_port">The port to listen for incoming TCP clients</param>
         <param name="flags">The configuration flags</param>
         <param name="allowed_overrides">The allowed command line overrides</param>
@@ -1438,6 +1469,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Initialize client node with default options
         /// </summary>
+        [PublicApi] 
         public ClientNodeSetup()
             :base(RobotRaconteurNode.s, null, true, null, 0, RobotRaconteurNodeSetupFlags.ClientDefault)
         {

@@ -87,7 +87,8 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Construct an empty ServiceInfo2
         /// </summary>
-        /// <remarks>None</remarks> 
+        /// <remarks>None</remarks>
+        [PublicApi] 
         public ServiceInfo2() { }
 
         /// <summary>
@@ -96,6 +97,7 @@ namespace RobotRaconteurWeb
         /// <remarks>None</remarks>
         /// <param name="info">ServiceInfo structure returned by node service index</param>
         /// <param name="ninfo">NodeInfo from discovery</param>
+        [PublicApi] 
         public ServiceInfo2(RobotRaconteurServiceIndex.ServiceInfo info, RobotRaconteurServiceIndex.NodeInfo ninfo)
         {
             Name = info.Name;

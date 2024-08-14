@@ -304,6 +304,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Construct a new RobotRaconteurNode instance
         /// </summary>
+        [PublicApi] 
         public RobotRaconteurNode()
         {
             serviceindexer = new ServiceIndexer(this);
@@ -1091,7 +1092,7 @@ namespace RobotRaconteurWeb
         Register a service type
         </summary>
         <remarks>None</remarks>
-        <param name="servicetype">The service factory implementing the type to register</param>
+        <param name="f">The service factory implementing the type to register</param>
         */
         [PublicApi]
         public void RegisterServiceType(ServiceFactory f)
@@ -1313,7 +1314,7 @@ namespace RobotRaconteurWeb
             Register a transport for use by the node
         </summary>
         <remarks>None</remarks>
-        <param name="transport">The transport to register</param>
+        <param name="c">The transport to register</param>
         <returns>The transport internal id</returns>
         */
         [PublicApi]
@@ -1597,6 +1598,7 @@ namespace RobotRaconteurWeb
         <param name="credentials">Optional credentials for authentication</param>
         <param name="listener">An optional listener callback function</param>
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The root object reference of the connected service</returns>
         */
         [PublicApi]
@@ -1681,6 +1683,7 @@ namespace RobotRaconteurWeb
         <param name="credentials">Optional credentials for authentication</param>
         <param name="listener">An optional listener callback function</param>
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The root object reference of the connected service</returns>
         */
         [PublicApi]
@@ -1787,6 +1790,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="obj">The root object of the service to disconnect</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
         [PublicApi]
         public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
@@ -1983,6 +1987,7 @@ namespace RobotRaconteurWeb
         /// <remarks>This is raw information from listening to multicast packtes. 
         /// These nodes are not validated and may not be reachable</remarks> 
         /// <value></value>
+        [PublicApi] 
         public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
         internal Discovery m_Discovery;
@@ -2143,6 +2148,7 @@ namespace RobotRaconteurWeb
         <param name="servicetype">The service type to find, ie `com.robotraconteur.robotics.robot.Robot`</param>
         <param name="transportschemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
         etc</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The detected services</returns>
         */
         [PublicApi]
@@ -2182,6 +2188,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="id">The NodeID to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        <param name="cancel">The cancellation token for the operation</param>
         etc</param> <returns>The detected nodes</returns>
         */
         [PublicApi]
@@ -2221,7 +2228,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="name">The NodeName to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
-        etc</param> 
+        etc</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The detected nodes</returns>
         */
         [PublicApi]
@@ -2243,6 +2251,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="obj">The object to lock. Must be returned by ConnectService or returned by an `objref`</param>
         <param name="flags">Select either a "User" or "Session" lock</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>"OK" on success</returns>
         */
         [PublicApi]
@@ -2266,6 +2275,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="obj">The object previously locked</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>"OK" on success</returns>
         */
         [PublicApi]
@@ -2302,6 +2312,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="obj">The object to lock</param>
         <param name="timeout">The timeout in milliseconds to acquire the monitor lock, or RR_TIMEOUT_INFINITE</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
         [PublicApi]
         public async Task<MonitorLock> MonitorEnter(object obj, int timeout = -1, CancellationToken cancel = default(CancellationToken))
@@ -2317,7 +2328,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None
         </remarks>
-        <param name="obj">The object previously locked by MonitorEnter()</param>
+        <param name="lock_">The object previously locked by MonitorEnter()</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
         [PublicApi]
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
@@ -2344,6 +2356,7 @@ namespace RobotRaconteurWeb
         <param name="obj">The object with the desired `objref`</param>
         <param name="objref">The name of the `objref` member</param>
         <param name="objecttype">The desired service object type</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The object with the specified interface type. Must be cast to the desired type</returns>
         */
         [PublicApi]
@@ -2367,6 +2380,7 @@ namespace RobotRaconteurWeb
         <param name="objref">The name of the `objref` member</param>
         <param name="index">The index for the `objref`, convert int to string for int32 index type</param>
         <param name="objecttype">The desired service object type</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The object with the specified interface type. Must be cast to the desired type</returns>
         */
         [PublicApi]
@@ -2444,6 +2458,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="count">Length of string</param>
         /// <returns>The random string</returns>
+        [PublicApi] 
         public string GetRandomString(int count)
         {
             string o = "";

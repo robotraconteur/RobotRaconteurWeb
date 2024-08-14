@@ -1172,26 +1172,31 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// client has been closed
         /// </summary>
+        [PublicApi] 
         ClientClosed = 1,
 
         /// <summary>
         /// client connection has timed out
         /// </summary>
+        [PublicApi] 
         ClientConnectionTimeout,
 
         /// <summary>
         /// client transport has been connected
         /// </summary>
+        [PublicApi] 
         TransportConnectionConnected,
 
         /// <summary>
         /// client transport connection has been closed or lost
         /// </summary>
+        [PublicApi] 
         TransportConnectionClosed,
 
         /// <summary>
         /// client has received notification that service path was released
         /// </summary>
+        [PublicApi]
         ServicePathReleased
     }
 

@@ -189,10 +189,12 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Checks if the transport is configured to accept incoming connections
         /// </summary>
+        [PublicApi] 
         public override bool IsServer { get { return true; } }
         /// <summary>
         /// Checks if the transport is configured to initiate client connections
         /// </summary>
+        [PublicApi] 
         public override bool IsClient { get { return true; } }
 
         internal Dictionary<uint, AsyncStreamTransport> TransportConnections = new Dictionary<uint, AsyncStreamTransport>();
@@ -204,20 +206,24 @@ namespace RobotRaconteurWeb
         /// If a message is not received in the specified timeout
         /// period the connection is closed
         /// </remarks>
+        [PublicApi] 
         public int DefaultReceiveTimeout { get; set; }
         /// <summary>
         /// Default connect timeout in milliseconds
         /// </summary>
+        [PublicApi]
         public int DefaultConnectTimeout { get; set; }
 
         /// <summary>
         /// Allow incoming Web Socket connections from HTTP clients
         /// </summary>
+        [PublicApi]  
         public bool AcceptWebSockets { get; set; }
 
         /// <summary>
         /// The supported URL transport schemes
         /// </summary>
+        [PublicApi] 
         public override string[] UrlSchemeString { get { return new string[] {"tcp", "rr+tcp", "rrs+tcp", "rr+ws", "rrs+ws", "rr+wss", "rrs+wss"}; } }
 
         private int m_HeartbeatPeriod = 5000;
@@ -229,6 +235,7 @@ namespace RobotRaconteurWeb
         /// The transport will send a connection test heartbeat message
         /// if a message has not been sent within the specified interval
         /// </remarks>
+        [PublicApi] 
         public int HeartbeatPeriod
         {
             get
@@ -245,6 +252,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// The IPEndPoints that the transport is listening on for incoming connections
         /// </summary>
+        [PublicApi] 
         public List<IPEndPoint> ListeningEndpoints
         {            
             get
@@ -1227,6 +1235,7 @@ namespace RobotRaconteurWeb
          * </remarks>
          * <returns>The currently configured WebSocket origins</returns>
          */
+        [PublicApi] 
         public string[] GetWebSocketAllowedOrigins()
         {
             lock (this)
@@ -1383,6 +1392,7 @@ namespace RobotRaconteurWeb
          *
          * 
          */
+        [PublicApi] 
         public IPEndPoint[] ResolvedListenerEndpoints
         {
             get
@@ -1460,6 +1470,7 @@ namespace RobotRaconteurWeb
          *
          * <returns>Candidate connections urls for the node, without service specified</returns>
          */
+         [PublicApi] 
         public override string[] ServerListenUrls
         {
             get

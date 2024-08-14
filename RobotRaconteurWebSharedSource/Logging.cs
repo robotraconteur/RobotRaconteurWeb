@@ -25,36 +25,43 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Trace log level.
         /// </summary>
+        [PublicApi] 
         Trace,
 
         /// <summary>
         /// Debug log level.
         /// </summary>
+        [PublicApi] 
         Debug,
 
         /// <summary>
         /// Info log level.
         /// </summary>
+        [PublicApi] 
         Info,
 
         /// <summary>
         /// Warning log level.
         /// </summary>
+        [PublicApi] 
         Warning,
 
         /// <summary>
         /// Error log level.
         /// </summary>
+        [PublicApi] 
         Error,
 
         /// <summary>
         /// Fatal log level.
         /// </summary>
+        [PublicApi] 
         Fatal,
 
         /// <summary>
         /// Disabled log level.
         /// </summary>
+        [PublicApi] 
         Disable = 1000
     }
 
@@ -65,101 +72,121 @@ namespace RobotRaconteurWeb
     /// Log records contain the code of the component where
     /// the log record was generated.
     /// </remarks>
+    [PublicApi] 
     public enum RobotRaconteur_LogComponent
     {
         /// <summary>
         /// Default component.
         /// </summary>
+        [PublicApi] 
         Default,
 
         /// <summary>
         /// Robot Raconteur Node component.
         /// </summary>
+        [PublicApi] 
         Node,
 
         /// <summary>
         /// Transport component.
         /// </summary>
+        [PublicApi] 
         Transport,
 
         /// <summary>
         /// Message or message serialization component.
         /// </summary>
+        [PublicApi] 
         Message,
 
         /// <summary>
         /// Client component.
         /// </summary>
+        [PublicApi]  
         Client,
 
         /// <summary>
         /// Service component.
         /// </summary>
+        [PublicApi] 
         Service,
 
         /// <summary>
         /// Member component.
         /// </summary>
+        [PublicApi]  
         Member,
 
         /// <summary>
         /// Data message packing component.
         /// </summary>
+        [PublicApi] 
         Pack,
 
         /// <summary>
         /// Data message unpacking component.
         /// </summary>
+        [PublicApi] 
         Unpack,
 
         /// <summary>
         /// Service definition parser component.
         /// </summary>
+        [PublicApi]  
         ServiceDefinition,
 
         /// <summary>
         /// Node or service discovery component.
         /// </summary>
+        [PublicApi] 
         Discovery,
 
         /// <summary>
         /// Subscription component.
         /// </summary>
+        [PublicApi]
         Subscription,
 
         /// <summary>
         /// Node setup component.
         /// </summary>
+        [PublicApi]  
         NodeSetup,
 
         /// <summary>
         /// Utility component.
         /// </summary>
+        [PublicApi] 
         Utility,
 
         /// <summary>
         /// Service definition standard library component (external).
         /// </summary>
+        [PublicApi] 
         RobDefLib,
 
         /// <summary>
         /// User component (external).
         /// </summary>
+        [PublicApi] 
         User,
 
         /// <summary>
         /// User client component (external).
         /// </summary>
+        [PublicApi]  
         UserClient,
 
         /// <summary>
         /// User service component (external).
         /// </summary>
+        [PublicApi] 
         UserService,
 
         /// <summary>
         /// Third party library component (external).
         /// </summary>
+        [PublicApi] 
         ThirdParty
     }
 
