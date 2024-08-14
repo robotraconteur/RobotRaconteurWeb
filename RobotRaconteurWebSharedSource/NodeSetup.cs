@@ -9,6 +9,25 @@ using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
+    /**
+     * <summary>Setup option flags</summary>
+     * <remarks>
+     * Setup option flags passed to node setup classes to select options to enable
+     * and disable. Flags are used to configure the following types of options:
+     *
+     * 1. Enable and disable transport types
+     * 2. Modify transport options including discovery, security requirements, and connection listening
+     * 3. Configure TLS behavior
+     * 4. Enable local tap for logging
+     *
+     * Node setup classes also allow options and flags to be "overridden" using
+     * command line options. Use the `*_ALLOW_OVERRIDE` options to configure
+     * when these overrides are allowed.
+     *
+     * The ClientNodeSetup, ServerNodeSetup, and SecureServerNodeSetup
+     * are convenience classes for the most commonly used options.
+     * </remarks>
+     */
     [Flags,PublicApi]
     public enum RobotRaconteurNodeSetupFlags
     {
@@ -49,22 +68,27 @@ namespace RobotRaconteurWeb
         // DisableMessage4 = 0x200,
         // DisableStringTable = 0x400,
         // DisableTimeouts = 0x800,
-        LoadTlsCert = 0x1000,
         /**
         <summary>Load the TLS certificate for TcpTransport</summary>
         */
-        RequireTls = 0x2000,
+        LoadTlsCert = 0x1000,
         /**
         <summary>Require TLS for all clients on TcpTransport</summary>
         */
-        LocalTransportServerPublic = 0x4000,
+        RequireTls = 0x2000,
         /**
         <summary>Make LocalTransport server listen for incoming clients from all users</summary>
         */
+        LocalTransportServerPublic = 0x4000,
+        /** <summary>Only listen on localhost connections for TcpTransport</summary> */
         TcpTransportListenLocalHost = 0x8000,
+        /** <summary>Allow NodeName to be configured using command line options</summary> */
         NodeNameOverride = 0x10000,
+        /** <summary>Allow NodeID to be configured using command line options</summary> */
         NodeIdOverride = 0x20000,
+        /** <summary>Allow TCP port to be configured using command line options</summary> */
         TcpPortOverride = 0x40000,
+        /** <summary>Allow TCP WebSocket origin control to be configured using command line options</summary> */
         TcpWebSocketOriginOverride = 0x80000,
         /**
         <summary>Enable IntraTransport</summary>
@@ -74,7 +98,9 @@ namespace RobotRaconteurWeb
         <summary>Start the IntraTransport server to listen for incoming clients</summary>
         */
         IntraTransportStartServer = 0x200000,
+        /** <summary>Enable TcpTransport IPv4 discovery</summary> */
         TcpTransportIpv4Discovery = 0x400000,
+        /** <summary>Enable TcpTransport IPv6 discovery</summary> */
         TcpTransportIpv6Discovery = 0x800000,
         /**
         <summary>Enable the LocalTap debug logging system</summary>
@@ -84,6 +110,7 @@ namespace RobotRaconteurWeb
         <summary>Allow the user to set the LocalTap name</summary>
         */
         LocalTapName = 0x2000000,
+        /** <summary>Enable jumbo messages (up to 100 MB per message)</summary> */
         JumboMessage = 0x4000000,
         /**
         <summary>Convenience flag to enable all transports</summary>
@@ -696,6 +723,10 @@ namespace RobotRaconteurWeb
     [PublicApi]
     public class RobotRaconteurNodeSetup : IDisposable
     {
+        /// <summary>
+        /// The RobotRaconteurNode being initialized
+        /// </summary>
+        /// <remarks>None</remarks>
         public RobotRaconteurNode Node => node;
         /**
         <summary>
@@ -735,7 +766,7 @@ namespace RobotRaconteurWeb
 #if !ROBOTRACONTEUR_H5
         internal TcpTransport tcp_transport = null;
 
-        public LocalTransport local_transport = null;
+        internal LocalTransport local_transport = null;
 
         private CommandLineConfigParser config;
 
@@ -748,7 +779,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public CommandLineConfigParser Config => config;
 #endif
-
+#pragma warning disable 1591
         public void DoSetup(RobotRaconteurNode node, ServiceFactory[] serviceTypes, bool scan_assembly_types, CommandLineConfigParser config)
         {
             this.node = node;
@@ -1081,6 +1112,7 @@ namespace RobotRaconteurWeb
 
             LogTrace("Node setup complete");
         }
+#pragma warning restore 1591
 
         bool release_node = false;
         /**

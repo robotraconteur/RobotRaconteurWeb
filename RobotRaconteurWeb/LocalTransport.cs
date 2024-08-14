@@ -126,21 +126,6 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public override string[] UrlSchemeString { get { return new string[] { "rr+local" }; } }
 
-        private int m_HeartbeatPeriod = 5000;
-
-        public int HeartbeatPeriod
-        {
-            get
-            {
-                return m_HeartbeatPeriod;
-            }
-            set
-            {
-                if (value < 500) throw new InvalidOperationException();
-                m_HeartbeatPeriod = value;
-            }
-        }
-
         /**
         <summary>
         Construct a new LocalTransport for a non-default node. Must be registered with node using
@@ -153,7 +138,7 @@ namespace RobotRaconteurWeb
         public LocalTransport(RobotRaconteurNode node = null)
             : base(node)
         {
-            DefaultReceiveTimeout = 15000;
+            DefaultReceiveTimeout = 600000;
             DefaultConnectTimeout = 2500;
             parent_adapter = new AsyncStreamTransportParentImpl(this);
         }
@@ -320,6 +305,16 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Check if the Local Transport is supported
+        /// </summary>
+        /// <remarks>
+        /// Not all versions of Windows support the UNIX socket used
+        /// by the Local Transport. It will be disabled automatically
+        /// if not available.
+        /// </remarks>
+        /// <return>true if available</return>
+        [PublicApi]
         public bool IsLocalTransportSupported
         {
             get
@@ -646,7 +641,7 @@ namespace RobotRaconteurWeb
 
             return true;
         }
-
+#pragma warning disable 1591
         public override async Task SendMessage(Message m, CancellationToken cancel)
         {
             if (m.header.SenderNodeID != node.NodeID)
@@ -671,7 +666,7 @@ namespace RobotRaconteurWeb
         }
 
         LocalTransportFDs fds = new LocalTransportFDs();
-
+#pragma warning restore 1591
         /**
         <summary>
         Close the transport. Done automatically by node shutdown.
@@ -715,7 +710,7 @@ namespace RobotRaconteurWeb
             return Task.FromResult(0);
         }
 
-        
+#pragma warning disable 1591
         public override void CheckConnection(uint endpoint)
         {
             try
@@ -778,8 +773,14 @@ namespace RobotRaconteurWeb
             }
             return Task.FromResult(o);
         }
-
+#pragma warning restore 1591
         LocalTransportDiscovery discovery;
+        
+        /// <summary>
+        /// Enable discovery listening for nodes using the LocalTransport
+        /// </summary>
+        /// <remarks>None</remarks>
+        [PublicApi]
         public void EnableNodeDiscoveryListening()
         {
             lock(this)
@@ -793,7 +794,11 @@ namespace RobotRaconteurWeb
                 discovery.Start();
             }
         }
-
+        /// <summary>
+        /// Disable discovery listening for nodes using the LocalTransport
+        /// </summary>
+        /// <remarks>None</remarks>
+        [PublicApi]
         public void DisableNodeDiscoveryListening()
         {
             lock(this)
@@ -846,6 +851,12 @@ namespace RobotRaconteurWeb
 
         internal readonly AsyncStreamTransportParent parent_adapter;
 
+        /// <summary>
+        /// Urls the transport is listening on
+        /// </summary>
+        /// <remarks>None</remarks>
+        /// <value></value>
+        [PublicApi]
         public override string[] ServerListenUrls
         {
             get
@@ -899,7 +910,7 @@ namespace RobotRaconteurWeb
             m_LocalEndpoint = e.LocalEndpoint;
 
             m_Connected = true;
-            await ConnectStream(socket, true, null, null, false, false, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+            await ConnectStream(socket, true, null, null, false, false, 30000, cancel).ConfigureAwait(false);
 
             parenttransport.TransportConnections.Add(LocalEndpoint, this);
         }
@@ -938,7 +949,7 @@ namespace RobotRaconteurWeb
             //socket.Client.NoDelay = true;
 
             m_Connected = true;
-            await ConnectStream(socket, true, null, null, false, false, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+            await ConnectStream(socket, true, null, null, false, false, 30000, cancel).ConfigureAwait(false);
         }
 
 
@@ -1428,15 +1439,40 @@ namespace RobotRaconteurWeb
 
     }
 
+    /// <summary>
+    /// Exception thrown when a node ID is already in use
+    /// </summary>
+    /// <remarks>None</remarks>
     public class NodeIDAlreadyInUse : IOException
     {
+        /// <summary>
+        /// Construct a new NodeIDAlreadyInUse
+        /// </summary>
+        /// <remarks>None</remarks>
         public NodeIDAlreadyInUse() : base("NodeID already in use") { }
+        /// <summary>
+        /// Construct a new NodeIDAlreadyInUse with a message
+        /// </summary>
+        /// <remarks>None</remarks> 
+        /// <param name="message">Message for exception</param>
         public NodeIDAlreadyInUse(string message) : base(message) { }
     }
-
+    /// <summary>
+    /// Exception thrown when a node name is already in use
+    /// </summary>
+    /// <remarks>None</remarks>
     public class NodeNameAlreadyInUse : IOException
     {
+        /// <summary>
+        /// Construct a new NodeNameAlreadyInUse
+        /// </summary>
+        /// <remarks>None</remarks>
         public NodeNameAlreadyInUse() : base("NodeName already in use") { }
+        /// <summary>
+        /// Construct a new NodeNameAlreadyInUse with a message
+        /// </summary>
+        /// <remarks>None</remarks> 
+        /// <param name="message">Message for exception</param>
         public NodeNameAlreadyInUse(string message) : base(message) { }
     }
 }

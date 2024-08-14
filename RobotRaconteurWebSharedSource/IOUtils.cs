@@ -18,6 +18,7 @@ using System.Text;
 using System.IO;
 using RobotRaconteurWeb.Extensions;
 
+#pragma warning disable 1591
 
 namespace RobotRaconteurWeb
 {

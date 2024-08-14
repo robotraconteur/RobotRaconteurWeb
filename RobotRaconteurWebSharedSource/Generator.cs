@@ -75,6 +75,7 @@ namespace RobotRaconteurWeb
         Generator includes passing a parameter v to the generator.
         </remarks>
         <param name="param">Parameter to pass to generator</param>
+        <param name="cancel">Cancellation token for operation</param>
         <returns>Return value from generator</returns>
         */
 
@@ -279,7 +280,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         Task Close(CancellationToken cancel = default(CancellationToken));
     }
-
+#pragma warning disable 1591
     public abstract class GeneratorClientBase
     {
         protected ServiceStub stub;
@@ -511,7 +512,7 @@ namespace RobotRaconteurWeb
             return m_ret;
         }
     }
-
+    #pragma warning restore 1591
     /**
     <summary>
     Adapter class to create a generator from an enumerator
@@ -552,7 +553,7 @@ namespace RobotRaconteurWeb
         {
             this.enumerator = enumerator;
         }
-
+#pragma warning disable 1591
         public Task Abort(CancellationToken cancel = default(CancellationToken))
         {
             lock (this)
@@ -596,5 +597,5 @@ namespace RobotRaconteurWeb
             return o.ToArray();
         }
     }
-
+#pragma warning restore 1591
 }

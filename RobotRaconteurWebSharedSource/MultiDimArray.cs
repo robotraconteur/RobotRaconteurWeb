@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace RobotRaconteurWeb
 {
-
+#pragma warning disable 1591
     public class MultiDimArray_CalculateCopyIndicesIter
     {
         uint[] mema_dims;
@@ -146,7 +146,7 @@ namespace RobotRaconteurWeb
             return true;
         }
     }
-
+#pragma warning restore 1591
 
     /**
     <summary>

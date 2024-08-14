@@ -24,12 +24,13 @@ using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
-
+#pragma warning disable 1591
     public abstract class ArrayMemoryBase
     {
         public abstract Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken));
     }
-    
+#pragma warning restore 1591
+
     /**
     <summary>
     Single dimensional numeric primitive random access memory region
@@ -184,13 +185,14 @@ namespace RobotRaconteurWeb
             return Task.FromResult(0);
         }
     }
-
+#pragma warning disable 1591
     public abstract class MultiDimArrayMemoryBase
     {
         public abstract Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken));
 
         public abstract Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken));        
     }
+#pragma warning restore 1591
     /**
     <summary>
     Multidimensional numeric primitive random access memory region
@@ -220,7 +222,7 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The numeric primitive type of the array</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class MultiDimArrayMemory<T> : MultiDimArrayMemoryBase
     {
         private MultiDimArray multimemory;
@@ -357,6 +359,7 @@ namespace RobotRaconteurWeb
         }
     }
 
+#pragma warning disable 1591
     public abstract class ArrayMemoryServiceSkelBase
     {
         protected string m_MemberName;

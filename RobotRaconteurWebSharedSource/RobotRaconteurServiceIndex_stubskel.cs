@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 namespace RobotRaconteurServiceIndex{
 
+#pragma warning disable 1591
+
 public class NodeInfo_stub : IStructureStub {
     public NodeInfo_stub(RobotRaconteurServiceIndexFactory d) {def=d;}
     private RobotRaconteurServiceIndexFactory def;

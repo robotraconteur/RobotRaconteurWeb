@@ -154,6 +154,7 @@ namespace RobotRaconteurWeb
         public DateTime current_real;
     }
 
+#pragma warning disable 1591
     public class WallTimer : ITimer
     {
 
@@ -319,5 +320,6 @@ namespace RobotRaconteurWeb
             last_time = p2;            
         }
     }
+#pragma warning restore 1591
 
 }

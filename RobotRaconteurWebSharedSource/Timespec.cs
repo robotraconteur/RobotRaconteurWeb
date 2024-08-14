@@ -88,6 +88,14 @@ namespace RobotRaconteurWeb
             this.nanoseconds = 0;
         }
 
+        /**
+        <summary>
+        Returns a TimeSpec with the current performance clock time
+        </summary>
+        <remarks>The time returned is a monotonic performance clock time and may not be relative
+        to any standard epoch.</remarks>
+        */
+        [PublicApi]
         public static TimeSpec Now
         {
             get
@@ -323,7 +331,15 @@ namespace RobotRaconteurWeb
         {
             return t2 > t1;
         }
-
+        /**
+        <summary>
+        Determines if the TimeSpec is equal to another object
+        </summary>
+        <remarks>None</remarks>
+        <param name="obj">The object to compare</param>
+        <returns>True if the objects are equal</returns>
+        */
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -331,6 +347,14 @@ namespace RobotRaconteurWeb
             return this == (TimeSpec)obj;
         }
 
+        /**
+        <summary>
+        Returns the hash code for the TimeSpec
+        </summary>
+        <remarks>None</remarks>
+        <returns>The hash code</returns>
+        */
+        [PublicApi]
         public override int GetHashCode()
         {
             return nanoseconds + (int)seconds;

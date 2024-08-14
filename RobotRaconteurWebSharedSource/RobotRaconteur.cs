@@ -80,6 +80,11 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>The current version of RobotRaconteurWeb ins tring format</summary>
+         * <remarks>None</remarks>
+         */
+        [PublicApi]
         public const string Version = "0.18.0";
 
         private NodeID m_NodeID;
@@ -122,6 +127,11 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+        /// <summary>
+        /// Try to get the NodeID. Do not automatically generate if not previously configured
+        /// </summary>
+        /// <param name="nodeid">The current NodeID</param>
+        /// <returns>true if NodeID has been configured, otherwise false</returns>
         [PublicApi]
         public bool TryGetNodeID(out NodeID nodeid)
         {
@@ -194,6 +204,12 @@ namespace RobotRaconteurWeb
             }
 
         }
+
+        /// <summary>
+        /// Try to get the NodeName. Do not automatically generate if not previously configured
+        /// </summary>
+        /// <param name="nodename">The current NodeName</param>
+        /// <returns>true if NodeID has been configured, otherwise false</returns>
         [PublicApi]
         public bool TryGetNodeName(out string nodename)
         {
@@ -218,6 +234,10 @@ namespace RobotRaconteurWeb
 
         internal DynamicServiceFactory dynamic_factory;
 
+        /// <summary>
+        /// Get the dynamic service factory if set
+        /// </summary>
+        [PublicApi]
         public DynamicServiceFactory DynamicServiceFactory { get { return dynamic_factory; } }
 
         internal Dictionary<string, ServerContext> services = new Dictionary<string, ServerContext>();
@@ -281,7 +301,9 @@ namespace RobotRaconteurWeb
 #if ROBOTRACONTEUR_H5
         public readonly BrowserWebSocketTransport browser_transport;
 #endif
-
+        /// <summary>
+        /// Construct a new RobotRaconteurNode instance
+        /// </summary>
         public RobotRaconteurNode()
         {
             serviceindexer = new ServiceIndexer(this);
@@ -316,6 +338,7 @@ namespace RobotRaconteurWeb
             return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);
         }
 
+#pragma warning disable 1591
         public MessageElementNestedElementList PackStructure(Object s, ClientContext context)
         {
             if (s == null) return null;
@@ -1060,6 +1083,9 @@ namespace RobotRaconteurWeb
             return ret;
 
         }
+
+#pragma warning restore 1591
+
         /**
         <summary>
         Register a service type
@@ -1100,7 +1126,18 @@ namespace RobotRaconteurWeb
             }
             return f;
         }
-
+        /**
+        <summary>
+       Returns a previously registered service type.
+       </summary>
+        <remarks>
+        Same as GetServiceType() but returns false on failure instead of throwing an exception
+        </remarks>
+       <remarks>None</remarks>
+       <param name="servicetype">The name of the service type to retrieve</param>
+        <param name="f">Returns the service factory</param>
+       */
+        [PublicApi]
         public bool TryGetServiceType(string servicetype, out ServiceFactory f)
         {
             lock (service_factories)
@@ -1125,6 +1162,13 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Register a dynamic service factory.
+        /// </summary>
+        /// <remarks>Dynamic service factories are used by clients to generate service factories to
+        /// implement plug-and-play typing</remarks>
+        /// <param name="f">The dynamic service factory</param>
+        [PublicApi]
         public void RegisterDynamicServiceFactory(DynamicServiceFactory f)
         {
             if (this.dynamic_factory != null)
@@ -1239,6 +1283,12 @@ namespace RobotRaconteurWeb
 
         }
 
+        /// <summary>
+        /// Return a previously registered service
+        /// </summary>
+        /// <param name="name">The name of the service</param>
+        /// <returns>The context of the service</returns>
+        [PublicApi]
         public ServerContext GetService(string name)
         {
             try
@@ -1281,7 +1331,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-
+#pragma warning disable 1591
         public async Task<Message> SpecialRequest(Message m, uint transportid)
         {
 
@@ -1516,6 +1566,7 @@ namespace RobotRaconteurWeb
 
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         Create a client connection to a remote service using a URL
@@ -1761,7 +1812,7 @@ namespace RobotRaconteurWeb
             ServiceStub stub = (ServiceStub)obj;
             return stub.RRContext.Attributes;
         }
-
+#pragma warning disable 1591
         public uint RegisterEndpoint(Endpoint e)
         {
             lock (endpoints)
@@ -1804,6 +1855,7 @@ namespace RobotRaconteurWeb
             }
             catch { }
         }
+#pragma warning restore 1591
         /**
         <summary>
             Check that the TransportConnection associated with an endpoint
@@ -1925,11 +1977,16 @@ namespace RobotRaconteurWeb
         }
 
 
-
+        /// <summary>
+        /// Returns the currently detected nodes from discovery
+        /// </summary>
+        /// <remarks>This is raw information from listening to multicast packtes. 
+        /// These nodes are not validated and may not be reachable</remarks> 
+        /// <value></value>
         public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
         internal Discovery m_Discovery;
-
+#pragma warning disable 1591
         public void NodeAnnouncePacketReceived(string packet)
         {
             m_Discovery.NodeAnnouncePacketReceived(packet);
@@ -1945,6 +2002,7 @@ namespace RobotRaconteurWeb
         {
             m_Discovery.CleanDiscoveredNodes();
         }
+#pragma warning restore 1591
         /**
         <summary>
             Select the "best" URL from a std::vector of candidates
@@ -2219,6 +2277,10 @@ namespace RobotRaconteurWeb
             return await s.RRContext.ReleaseObjectLock(obj, cancel).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Handle to a monitor lock
+        /// </summary>
+        [PublicApi]
         public class MonitorLock
         {
             internal IDisposable lock_;
@@ -2377,6 +2439,11 @@ namespace RobotRaconteurWeb
             return new WallRate(frequency, this);
         }
 
+        /// <summary>
+        /// Return a random alphanumeric string of the specified length
+        /// </summary>
+        /// <param name="count">Length of string</param>
+        /// <returns>The random string</returns>
         public string GetRandomString(int count)
         {
             string o = "";
@@ -2390,6 +2457,7 @@ namespace RobotRaconteurWeb
             return o;
         }
 
+#pragma warning disable 1591
         protected string service_state_nonce;
 
         public string ServiceStateNonce
@@ -2426,6 +2494,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+#pragma warning restore 1591
         /**
         <summary>
         Subscribe to listen for available services information
@@ -2682,6 +2751,16 @@ namespace RobotRaconteurWeb
 
         internal NodeDirectories node_dirs;
 
+        /// <summary>
+        /// Get or set the NodeDirectories object for the node
+        /// </summary>
+        /// <remarks>
+        /// The NodeDirectories controls where the node searches for local transport connections,
+        /// stores node information, searches for configuration information,
+        /// and other node specific directories. The NodeDirectories cannot be modified after
+        /// it has been configured. A default configuration is used if not set.</remarks> 
+        /// <value></value>
+        [PublicApi]
         public NodeDirectories NodeDirectories
         {
             get

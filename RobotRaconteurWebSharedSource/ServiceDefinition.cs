@@ -20,6 +20,10 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 
+#pragma warning disable 1591
+
+// TODO: Document this file
+
 namespace RobotRaconteurWeb
 {
     public struct RobotRaconteurVersion

@@ -28,6 +28,8 @@ using System.Security.Authentication;
 #endif
 using System.Reflection;
 
+#pragma warning disable 1591
+
 namespace RobotRaconteurWeb 
 {
 

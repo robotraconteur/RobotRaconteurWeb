@@ -22,6 +22,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 
+#pragma warning disable 1591
+
 namespace RobotRaconteurWeb
 {
     public interface DynamicServiceFactory

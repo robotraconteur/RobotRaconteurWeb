@@ -46,10 +46,12 @@ namespace RobotRaconteurWeb
     [PublicApi]
     public class BroadcastDownsampler
     {
+#pragma warning disable 1591
         protected internal ServerContext context;
         protected internal uint default_downsample;
         protected internal ulong step_count;
         protected internal Dictionary<uint, uint> client_downsamples = new Dictionary<uint, uint>();
+#pragma warning restore 1591
         /**
         <summary>
         Construct a new BroadcastDownsampler
@@ -140,12 +142,30 @@ namespace RobotRaconteurWeb
         {
 
         }
-
+        /**
+        * <summary>
+        * Add a PipeBroadcaster to the downsampler
+        * </summary>
+        * <remarks>
+        * Sets the predicate of the broadcaster to this downsampler
+        * </remarks>
+        * <param name="broadcaster">The broadcaster to add</param>
+        */
+        [PublicApi]
         public void AddPipeBroadcaster<T>(PipeBroadcaster<T> broadcaster)
         {
             broadcaster.Predicate = pipe_predicate;
         }
-
+        /**
+        * <summary>
+        * Add a WireBroadcaster to the downsampler
+        * </summary>
+        * <remarks>
+        * Sets the predicate of the broadcaster to this downsampler
+        * </remarks>
+        * <param name="broadcaster">The broadcaster to add</param>
+        */
+        [PublicApi]
         public void AddWireBroadcaster<T>(WireBroadcaster<T> broadcaster)
         {
             broadcaster.Predicate = wire_predicate;

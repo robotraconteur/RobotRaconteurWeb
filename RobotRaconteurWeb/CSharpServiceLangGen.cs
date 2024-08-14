@@ -22,6 +22,8 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Text.RegularExpressions;
 
+#pragma warning disable 1591
+
 namespace RobotRaconteurWeb
 {
     public class CSharpServiceLangGen

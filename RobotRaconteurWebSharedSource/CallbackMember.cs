@@ -49,14 +49,14 @@ namespace RobotRaconteurWeb
     [PublicApi]
     public abstract class Callback<T>
     {
-
+#pragma warning disable 1591
         protected string m_MemberName;
 
         public Callback(string name)
         {
             m_MemberName = name;
         }
-
+#pragma warning restore 1591
         /**
         <summary>
         Get or set the currently configured callback function on client side
@@ -126,6 +126,7 @@ namespace RobotRaconteurWeb
 
     }
 
+#pragma warning disable 1591
     public class CallbackClient<T> : Callback<T>
     {
         public CallbackClient(string name)

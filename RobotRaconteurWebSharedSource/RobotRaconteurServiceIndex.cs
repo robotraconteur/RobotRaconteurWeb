@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 namespace RobotRaconteurServiceIndex {
 
+#pragma warning disable 1591
+
 public class RobotRaconteurServiceIndexFactory : ServiceFactory {
     public override string DefString() {
     const string d=@"service RobotRaconteurServiceIndex

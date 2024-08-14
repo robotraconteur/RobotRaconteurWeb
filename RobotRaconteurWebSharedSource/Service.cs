@@ -23,6 +23,8 @@ using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 using static RobotRaconteurWeb.RRLogFuncs;
 
+#pragma warning disable 1591
+
 namespace RobotRaconteurWeb
 {
 

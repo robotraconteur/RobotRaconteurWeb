@@ -706,7 +706,7 @@ namespace RobotRaconteurWeb
         {
         }
     }
-
+#pragma warning disable 1591
     public class RobotRaconteurExceptionUtil
     {
         public static void ExceptionToMessageEntry(Exception exception, MessageEntry entry)
@@ -932,4 +932,5 @@ namespace RobotRaconteurWeb
 
         }
     }
+#pragma warning restore 1591
 }

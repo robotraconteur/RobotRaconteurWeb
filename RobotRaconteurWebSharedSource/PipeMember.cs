@@ -160,14 +160,15 @@ namespace RobotRaconteurWeb
             */
 
         [PublicApi]
-            public bool RequestPacketAck = false;
-
+            public bool RequestPacketAck { get; set; } = false;
+#pragma warning disable 1591
             public PipeEndpoint(Pipe<T> parent, int index, Endpoint endpoint = null)
             {
                 this.parent = parent;
                 this.index = index;
                 this.endpoint = endpoint;
             }
+#pragma warning restore 1591
 
             private AsyncMutex send_mutex = new AsyncMutex();
 
@@ -240,7 +241,7 @@ namespace RobotRaconteurWeb
             public event PipePacketReceivedCallbackFunction PacketReceivedEvent;
 
             AsyncValueWaiter<bool> recv_waiter = new AsyncValueWaiter<bool>();
-
+#pragma warning disable 1591
             internal protected void PipePacketReceived(T packet, uint packetnum)
             {
                 if (IgnoreInValue) return;
@@ -278,6 +279,7 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
+#pragma warning restore 1591
             /**
             <summary>
             Signal called when a packet ack has been received
@@ -294,7 +296,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public event PipePacketAckReceivedCallbackFunction PacketAckReceivedEvent;
 
             internal void PipePacketAckReceived(uint packetnum)
@@ -472,7 +474,9 @@ namespace RobotRaconteurWeb
                     return Tuple.Create(false, default(T));                    
                 }
             }
-
+            /// <summary>
+            /// Set if the PipeEndpoint should ignore incoming values
+            /// </summary>
             public bool IgnoreInValue { get; set; }
 
             private PipeDisconnectCallbackFunction close_callback;
@@ -515,13 +519,14 @@ namespace RobotRaconteurWeb
         }
 
         private bool rawelements = false;
-
+#pragma warning disable 1591
         public Pipe()
         {
             if (typeof(T) == typeof(MessageElement))
                 rawelements = true;
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         The pipe member name
@@ -532,16 +537,38 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public abstract string MemberName { get; }
 
+        /// <summary>
+        /// Delegate type for pipe endpoint connection callaback functions
+        /// </summary>
+        /// <param name="newpipe">The new connected PipeEndpoint</param>
+        [PublicApi]
         public delegate void PipeConnectCallbackFunction(PipeEndpoint newpipe);
 
+        /// <summary>
+        /// Delegate type for pipe endpoint disconnect callback functions
+        /// </summary>
+        /// <param name="closedpipe">The PipeEpndoint that was disconnected</param>
+        [PublicApi]
         public delegate void PipeDisconnectCallbackFunction(PipeEndpoint closedpipe);
 
+        /// <summary>
+        /// Delegate type for pipe packet received callback functions
+        /// </summary>
+        /// <param name="e">The PipeEndpoint that received the packet</param>
+        [PublicApi]
         public delegate void PipePacketReceivedCallbackFunction(PipeEndpoint e);
 
+        /// <summary>
+        /// Delegate type for pipe packet ack received callback functions
+        /// </summary>
+        /// <param name="e">The PipeEndpoint that reecived the packet ack</param>
+        /// <param name="packetnum">The packet number ack that was received</param>
+        [PublicApi]
         public delegate void PipePacketAckReceivedCallbackFunction(PipeEndpoint e, uint packetnum);
-
+#pragma warning disable 1591
         protected abstract Task SendPipePacket(T packet, int index, uint packetnumber, bool requestack, Endpoint endpoint, CancellationToken cancel = default(CancellationToken));
-        
+#pragma warning restore 1591
+
         /**
         <summary>
         Connect a pipe endpoint
@@ -587,7 +614,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public abstract PipeConnectCallbackFunction PipeConnectCallback { get; set; }
-
+#pragma warning disable 1591
         public abstract void PipePacketReceived(MessageEntry m, Endpoint e = null);
 
         public abstract void Shutdown();
@@ -649,9 +676,10 @@ namespace RobotRaconteurWeb
         protected abstract object PackAnyType(ref T o);
 
         protected abstract T UnpackAnyType(MessageElement o);
+#pragma warning restore 1591
 
     }
-
+#pragma warning disable 1591
     public sealed class PipeClient<T> : Pipe<T>
     {
 
@@ -1083,6 +1111,7 @@ namespace RobotRaconteurWeb
             return skel.RRContext.UnpackAnyType<T>(o);
         }
     }
+#pragma warning restore 1591
     /**
     <summary>
     Broadcaster to send packets to all connected clients
@@ -1123,9 +1152,10 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The packet data type</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class PipeBroadcaster<T>
     {
+#pragma warning disable 1591
         protected Pipe<T> pipe;
         protected List<connected_endpoint> endpoints = new List<connected_endpoint>();
         protected int maximum_backlog;
@@ -1143,6 +1173,7 @@ namespace RobotRaconteurWeb
                 this.ep = ep;
             }
         }
+#pragma warning restore 1591
         /**
         <summary>
         Get the associated pipe
@@ -1169,7 +1200,7 @@ namespace RobotRaconteurWeb
             this.maximum_backlog = maximum_backlog;
             pipe.PipeConnectCallback = EndpointConnected;
         }
-
+#pragma warning disable 1591
         protected void EndpointConnected(Pipe<T>.PipeEndpoint ep)
         {
             lock (endpoints)
@@ -1230,6 +1261,7 @@ namespace RobotRaconteurWeb
                 catch { }
             }
         }
+#pragma warning restore 1591
         /**
         <summary>
         Send packet to all connected pipe endpoint clients

@@ -20,6 +20,8 @@ using System.Net;
 using System.Text.RegularExpressions;
 using RobotRaconteurWeb.Extensions;
 
+#pragma warning disable 1591
+
 namespace RobotRaconteurWeb
 {
 

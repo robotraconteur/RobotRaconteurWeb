@@ -68,9 +68,21 @@ namespace RobotRaconteurWeb
         [PublicApi]
     public class ServiceSecurityPolicy
     {
+        /**
+         * <summary>The user authentication</summary>
+         * <remarks>None</remarks>
+         */
         public UserAuthenticator Authenticator;
+        /**
+         * <summary>The security policies</summary>
+         * <remarks>None</remarks>
+         */
         public Dictionary<string, string> Policies;
 
+        /**
+         * <summary>Construct a new empty security policy</summary>
+         * <remarks>None</remarks>
+         */
         public ServiceSecurityPolicy()
         {
             Authenticator = null;
@@ -150,7 +162,7 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public DateTime LastAccessTime { get { return m_LastAccessTime; } }
-
+#pragma warning disable 1591
         public AuthenticatedUser(string username, string[] privileges)
         {
             this.m_Username = username;
@@ -163,15 +175,34 @@ namespace RobotRaconteurWeb
         {
             m_LastAccessTime = DateTime.UtcNow;
         }
+#pragma warning restore 1591
 
     }
 
-
+    /// <summary>
+    /// Interface for service user authenticators
+    /// </summary>
+    [PublicApi]
     public interface UserAuthenticator
     {
+        /// <summary>
+        /// Function called by service to authenticate user.
+        /// </summary>
+        /// <remarks>
+        /// Throw AuthenticationException if authentication fails. Return a populated AuthenticatedUser
+        /// on success.
+        /// 
+        /// Authenticators may use any combination of credentials. Example credentials
+        /// include passwords, tokens, OTP, etc.
+        /// 
+        /// AuthenticationException may contain additional fields to return a challenge to the
+        /// client.
+        /// </remarks>
+        /// <param name="username">The username as a string</param>
+        /// <param name="credentials">Dictionary containing credentials</param>
+        /// <returns></returns>
+        [PublicApi]
         AuthenticatedUser AuthenticateUser(string username, Dictionary<string, object> credentials);
-
-
     }
 
 #if !ROBOTRACONTEUR_H5
@@ -285,7 +316,7 @@ namespace RobotRaconteurWeb
 
             }
         }
-
+#pragma warning disable 1591
         public AuthenticatedUser AuthenticateUser(string username, Dictionary<string, object> credentials)
         {
             if (!validusers.Keys.Contains(username)) throw new AuthenticationException("Invalid username or password");
@@ -326,6 +357,7 @@ namespace RobotRaconteurWeb
 
             return strBuilder.ToString();
         }
+#pragma warning restore 1591
 
     }
 #endif
