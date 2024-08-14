@@ -1,4 +1,4 @@
-exclude: (^generated_src/.*$|^build\d?/.*$|^test/gen/.*$|rrversion\.txt\.in)
+exclude: (^\.pre-commit-config\.yaml$)
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: "v4.5.0"
