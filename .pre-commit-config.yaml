@@ -14,6 +14,7 @@ repos:
   - id: check-docstring-first
   - id: debug-statements
   - id: end-of-file-fixer
+    exclude: (^.*\.cs$|^.*\.csproj$|^.*\.sln$)
   - id: mixed-line-ending
     exclude: (^.*\.cs$|^.*\.csproj$|^.*\.sln$)
   - id: trailing-whitespace
@@ -44,7 +45,7 @@ repos:
     name: dos2unix
     entry: dos2unix
     args: ["-n", "-o"]
-    files: '\.(c|cpp|h|hpp|java|cs|i|m|cmake|txt|css|js|ts|html|md|txt|py|yaml|yml|csproj|rst|py\.in|csproj\.in)$'
+    files: '\.(c|cpp|h|hpp|java|i|m|cmake|txt|css|js|ts|html|md|txt|py|yaml|yml|rst|py\.in|)$'
     language: system
 -   repo: local
     hooks:
