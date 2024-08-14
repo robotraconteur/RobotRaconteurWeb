@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,13 @@ using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
-
+#pragma warning disable 1591
     public abstract class ArrayMemoryBase
     {
         public abstract Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken));
     }
-    
+#pragma warning restore 1591
+
     /**
     <summary>
     Single dimensional numeric primitive random access memory region
@@ -143,6 +144,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start index in the buffer to write the data</param>
         <param name="count">The number of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -172,6 +174,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start index in the buffer to read the data</param>
         <param name="count">The number of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -184,13 +187,14 @@ namespace RobotRaconteurWeb
             return Task.FromResult(0);
         }
     }
-
+#pragma warning disable 1591
     public abstract class MultiDimArrayMemoryBase
     {
         public abstract Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken));
 
         public abstract Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken));        
     }
+#pragma warning restore 1591
     /**
     <summary>
     Multidimensional numeric primitive random access memory region
@@ -220,7 +224,7 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The numeric primitive type of the array</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class MultiDimArrayMemory<T> : MultiDimArrayMemoryBase
     {
         private MultiDimArray multimemory;
@@ -320,6 +324,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -347,6 +352,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -357,6 +363,7 @@ namespace RobotRaconteurWeb
         }
     }
 
+#pragma warning disable 1591
     public abstract class ArrayMemoryServiceSkelBase
     {
         protected string m_MemberName;
@@ -1243,40 +1250,44 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /**
+    <summary>
+    Multidimensional pod random access memory region
+    </summary>
+    <remarks>
+    <para>
+    Memories represent random access memory regions that are typically
+    represented as arrays of various shapes and types. Memories can be
+    declared in service definition files using the `memory` member keyword
+    within service definitions. Services expose memories to clients, and
+    the nodes will proxy read, write, and parameter requests between the client
+    and service. The node will also break up large requests to avoid the
+    message size limit of the transport.
+    </para>
+    <para>
+    The PodMultiDimArrayMemory class is used to represent a multidimensional
+    pod array. Single dimensional pod arrays should use PodArrayMemory.
+    Type T must be declared in a service definition using the `pod`
+    keyword, and generated using RobotRaconteurGen.
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances are attached to an MultiDimArray,
+    either when constructed or later using Attach().
+    </para>
+    <para>
+    PodMultiDimArrayMemory instances returned by clients are special implementations
+    designed to proxy requests to the service. They cannot be attached
+    to an arbitrary array.
+    </para>
+    </remarks>
+    <typeparam name="T" />
+    */
+    [PublicApi] 
     public class PodArrayMemory<T> : ArrayMemory<T> where T : struct
     {
-        /**
-        <summary>
-        Multidimensional pod random access memory region
-        </summary>
-        <remarks>
-        <para>
-        Memories represent random access memory regions that are typically
-        represented as arrays of various shapes and types. Memories can be
-        declared in service definition files using the `memory` member keyword
-        within service definitions. Services expose memories to clients, and
-        the nodes will proxy read, write, and parameter requests between the client
-        and service. The node will also break up large requests to avoid the
-        message size limit of the transport.
-        </para>
-        <para>
-        The PodMultiDimArrayMemory class is used to represent a multidimensional
-        pod array. Single dimensional pod arrays should use PodArrayMemory.
-        Type T must be declared in a service definition using the `pod`
-        keyword, and generated using RobotRaconteurGen.
-        </para>
-        <para>
-        PodMultiDimArrayMemory instances are attached to an MultiDimArray,
-        either when constructed or later using Attach().
-        </para>
-        <para>
-        PodMultiDimArrayMemory instances returned by clients are special implementations
-        designed to proxy requests to the service. They cannot be attached
-        to an arbitrary array.
-        </para>
-        </remarks>
-        <typeparam name="T" />
-        */
+        /// <summary>
+        /// Construct an empty PodArrayMemory
+        /// </summary>
         [PublicApi]
         public PodArrayMemory() : base()
         {
@@ -1491,6 +1502,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1518,6 +1530,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1720,6 +1733,7 @@ namespace RobotRaconteurWeb
         <param name="memory">The array to attach</param>
         <returns />
         */
+        [PublicApi] 
         public NamedArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1921,6 +1935,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to receive the read data</param>
         <param name="bufferpos">The start position in the buffer to write the data</param>
         <param name="count">The count of array elements to read</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1948,6 +1963,7 @@ namespace RobotRaconteurWeb
         <param name="buffer">The buffer to write the data from</param>
         <param name="bufferpos">The start position in the buffer to read the data</param>
         <param name="count">The count of array elements to write</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]

@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ namespace RobotRaconteurWeb
             }
             this.id = id1;
         }
-
+#pragma warning disable 1591
         protected static bool TryParse(string stringid, out byte[] bytes)
         {
             if (stringid == "{0}")
@@ -129,6 +129,7 @@ namespace RobotRaconteurWeb
             nodeid = new NodeID(bytes);
             return true;
         }
+#pragma warning restore 1591
 
         /**
         <summary>
@@ -190,6 +191,11 @@ namespace RobotRaconteurWeb
                     throw new ArgumentException("Invalid NodeID format");
             }
         }
+        /// <summary>
+        /// Convert to a byte array containing the UUID bytes
+        /// </summary>
+        /// <param name="i">The NodeID UUID as bytes</param>
+        [PublicApi] 
 
         public static explicit operator byte[](NodeID i)
         {
@@ -212,6 +218,11 @@ namespace RobotRaconteurWeb
             return new NodeID(guid);
         }
 
+        /**
+         * <summary>Test if NodeID is equal</summary>
+         * <remarks>None</remarks>
+         */
+        [PublicApi]
         public static bool operator ==(NodeID id1, NodeID id2)
         {
             if ((object)id1 == null && (object)id2 == null) return true;
@@ -220,6 +231,11 @@ namespace RobotRaconteurWeb
             return id1.id.SequenceEqual(id2.id);
         }
 
+        /**
+         * <summary>Test if NodeID is not equal</summary>
+         * <remarks>None</remarks>
+         */
+        [PublicApi]
         public static bool operator !=(NodeID id1, NodeID id2)
         {
             if ((object)id1 == null && (object)id2 == null) return false;
@@ -247,6 +263,11 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Test if NodeID is equal</summary>
+         * <remarks>None</remarks>
+         */
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -263,6 +284,11 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public static NodeID Any { get { return new NodeID(new byte[16]); } }
 
+        /// <summary>
+        /// Get a hashcode for the NodeID
+        /// </summary>
+        /// <returns>The hash code</returns>
+        [PublicApi] 
         public override int GetHashCode()
         {
             int sum = 0;

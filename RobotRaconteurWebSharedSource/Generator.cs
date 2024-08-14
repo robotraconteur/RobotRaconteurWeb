@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ namespace RobotRaconteurWeb
         Generator includes passing a parameter v to the generator.
         </remarks>
         <param name="param">Parameter to pass to generator</param>
+        <param name="cancel">Cancellation token for operation</param>
         <returns>Return value from generator</returns>
         */
 
@@ -248,6 +249,7 @@ namespace RobotRaconteurWeb
         Generator includes passing a parameter to the generator but no return.
         </remarks>
         <param name="param">Parameter to pass to generator</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -279,7 +281,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         Task Close(CancellationToken cancel = default(CancellationToken));
     }
-
+#pragma warning disable 1591
     public abstract class GeneratorClientBase
     {
         protected ServiceStub stub;
@@ -511,7 +513,7 @@ namespace RobotRaconteurWeb
             return m_ret;
         }
     }
-
+    #pragma warning restore 1591
     /**
     <summary>
     Adapter class to create a generator from an enumerator
@@ -552,7 +554,7 @@ namespace RobotRaconteurWeb
         {
             this.enumerator = enumerator;
         }
-
+#pragma warning disable 1591
         public Task Abort(CancellationToken cancel = default(CancellationToken))
         {
             lock (this)
@@ -596,5 +598,5 @@ namespace RobotRaconteurWeb
             return o.ToArray();
         }
     }
-
+#pragma warning restore 1591
 }

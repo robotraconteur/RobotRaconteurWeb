@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -131,10 +131,16 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public class WireConnection
         {
+#pragma warning disable 1591
             protected Endpoint endpoint;
-
+#pragma warning restore 1591
+            /**
+             * <summary>The LocalEndpoint ID of the endpoint that owns this wire connection</summary>
+             * <remarks>None</remarks>
+             */
+             [PublicApi] 
             public uint Endpoint { get { return endpoint.LocalEndpoint; } }
-
+#pragma warning disable 1591
             protected T inval;
             protected bool inval_valid = false;
             protected TimeSpec last_sendtime = new TimeSpec(0, 0);
@@ -148,6 +154,7 @@ namespace RobotRaconteurWeb
             }
 
             protected object sendlock = new object();
+#pragma warning restore 1591
             /**
             <summary>
             Get the current InValue
@@ -159,7 +166,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public virtual T InValue
             {
                 get
@@ -196,12 +203,13 @@ namespace RobotRaconteurWeb
                 value = inval;
                 return true;
             }
-
+#pragma warning disable 1591
             protected T outval;
             protected bool outval_valid=false;
             protected TimeSpec lasttime_send;
             protected DateTime lasttime_send_local;
             protected bool send_closed = false;
+#pragma warning restore 1591
             /**
             <summary>
             Get or set the current OutValue
@@ -220,7 +228,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public virtual T OutValue
             {
                 get
@@ -262,7 +270,11 @@ namespace RobotRaconteurWeb
                 value = outval;
                 return true;
             }
-
+            /// <summary>
+            /// Send value to peer wire connection. Use to receive errors when send fails.
+            /// </summary>
+            /// <param name="value">The value to send</param>
+            [PublicApi]
             public Task SendOutValue(T value)
             {
                 lock (sendlock)
@@ -363,7 +375,7 @@ namespace RobotRaconteurWeb
 
             private TimeSpec lasttime_recv = null;
             private DateTime lasttime_recv_local = default;
-
+#pragma warning disable 1591
             protected internal virtual void WirePacketReceived(TimeSpec timespec, T packet)
             {
                 lock (recv_lock)
@@ -392,6 +404,7 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
+#pragma warning restore 1591
 
             private WireDisconnectCallbackFunction close_callback;
             /**
@@ -416,7 +429,7 @@ namespace RobotRaconteurWeb
                 set { close_callback = value; }
             }
 
-
+#pragma warning disable 1591
             internal protected virtual void RemoteClose()
             {
                 if (close_callback != null)
@@ -430,6 +443,7 @@ namespace RobotRaconteurWeb
 
                 Close();
             }
+#pragma warning restore 1591
             /**
             <summary>
             Get or set whether wire connection should ignore incoming values
@@ -441,7 +455,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public bool IgnoreInValue { get; set; } = false;
             /**
             <summary>
@@ -490,6 +504,10 @@ namespace RobotRaconteurWeb
         [PublicApi]
             public int OutValueLifespan { get; set; } = -1;
 
+            /// <summary>
+            /// Constant value for infinite value lifespan. Equal to -1
+            /// </summary>
+            [PublicApi]
             public const int RR_VALUE_LIFESPAN_INFINITE = -1;
 
             internal static bool IsValueExpired(DateTime recv_time,int lifespan)
@@ -521,10 +539,11 @@ namespace RobotRaconteurWeb
             or false if timeout occurred.
             </remarks>
             <param name="timeout">Timeout in milliseconds, or RR_TIMEOUT_INFINITE for no timeout</param>
+            <param name="token">The cancellation token for the operation</param>
             <returns>true if InValue is valid, otherwise false</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
             {
                 var waiter = inval_waiter.CreateWaiterTask(timeout, token);
@@ -545,10 +564,11 @@ namespace RobotRaconteurWeb
             or false if timeout occurred.
             </remarks>
             <param name="timeout">Timeout in milliseconds, or RR_TIMEOUT_INFINITE for no timeout</param>
+            <param name="token">The cancellation token for the operation</param>
             <returns>true if InValue is valid, otherwise false</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<bool> WaitOutValueValid(int timeout = -1, CancellationToken token = default)
             {
                 var waiter = outval_waiter.CreateWaiterTask(timeout, token);
@@ -609,8 +629,18 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public abstract Task<WireConnection> Connect(CancellationToken cancel = default(CancellationToken));
 
+        /// <summary>
+        /// Delegate type for wire connect callback functions
+        /// </summary>
+        /// <param name="wire">The parent wire</param>
+        /// <param name="connection">The wire connection that was connected</param>
+        [PublicApi]
         public delegate void WireConnectCallbackFunction(Wire<T> wire, WireConnection connection);
-
+        /// <summary>
+        /// Delegate type for wire disconnect callback functions
+        /// </summary>
+        /// <param name="wire">The wire connection that was disconnected</param>
+        [PublicApi]
         public delegate void WireDisconnectCallbackFunction(WireConnection wire);
         /**
         <summary>
@@ -640,6 +670,13 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public abstract WireConnectCallbackFunction WireConnectCallback { get; set; }
 
+        /// <summary>
+        /// Delegate type for wire value changed callback functions
+        /// </summary>
+        /// <param name="connection">The connection that had a value change</param>
+        /// <param name="value">The new value</param>
+        /// <param name="time">The TimeSpec of the new value in the sender's clock</param>
+        [PublicApi]
         public delegate void WireValueChangedFunction(WireConnection connection, T value, TimeSpec time);
         /**
         <summary>
@@ -650,8 +687,9 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public abstract string MemberName { get; }
-
+#pragma warning disable 1591
         protected MemberDefinition_Direction direction = MemberDefinition_Direction.both;
+#pragma warning restore 1591
         /**
         <summary>
         Get the direction of the wire
@@ -668,7 +706,7 @@ namespace RobotRaconteurWeb
         {
             get { return direction; }
         }
-
+#pragma warning disable 1591
         public Wire()
         {
             if (typeof(T) == typeof(MessageElement))
@@ -736,6 +774,7 @@ namespace RobotRaconteurWeb
         protected abstract object PackAnyType(ref T o);
 
         protected abstract object UnpackAnyType(MessageElement o);
+#pragma warning restore 1591
         /**
         <summary>
         Peek the current InValue
@@ -804,6 +843,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="value">The new OutValue</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -918,7 +958,7 @@ namespace RobotRaconteurWeb
     }
 
 
-    
+#pragma warning disable 1591
     public class WireClient<T> : Wire<T>
     {
         protected internal ServiceStub stub;
@@ -1264,6 +1304,7 @@ namespace RobotRaconteurWeb
             throw new InvalidOperationException("Invalid for wire server");
         }
     }
+#pragma warning restore 1591
     /**
     <summary>
     Broadcaster to send values to all connected clients
@@ -1297,9 +1338,10 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The value data type</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class WireBroadcaster<T>
     {
+#pragma warning disable 1591
         protected class connected_connection
         {
             public Wire<T>.WireConnection connection = null;
@@ -1314,6 +1356,7 @@ namespace RobotRaconteurWeb
         protected List<connected_connection> connected_wires = new List<connected_connection>();
         protected object connected_wires_lock = new object();
         protected Wire<T> wire;
+#pragma warning restore 1591
         /**
         <summary>
         Get the assosciated wire
@@ -1323,7 +1366,7 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public Wire<T> Wire { get => (Wire<T>)wire; }
-
+#pragma warning disable 1591
         protected void ConnectionClosed(connected_connection ep)
         {
             lock (connected_wires_lock)
@@ -1346,6 +1389,7 @@ namespace RobotRaconteurWeb
             }
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         Construct a new WireBroadcaster
@@ -1364,9 +1408,10 @@ namespace RobotRaconteurWeb
             wire.PeekOutValueCallback = ClientPeekOutValue;
             wire.PokeOutValueCallback = ClientPokeOutValue;
         }
-
+#pragma warning disable 1591
         protected T current_out_value = default(T);
         protected bool out_value_valid = false;
+#pragma warning restore 1591
         /**
         <summary>
         Set the OutValue for all connections
@@ -1441,7 +1486,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-
+#pragma warning disable 1591
         protected T ClientPeekInValue(uint c)
         {
             lock (connected_wires_lock)
@@ -1463,6 +1508,7 @@ namespace RobotRaconteurWeb
         {
             throw new ReadOnlyMemberException("Read only wire");
         }
+#pragma warning restore 1591
         /**
         <summary>
         Set the predicate callback function
@@ -1531,6 +1577,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
     public class WireUnicastReceiver<T>
     {
+#pragma warning disable 1591
         protected class connected_connection
         {
             public Wire<T>.WireConnection connection = null;
@@ -1550,6 +1597,7 @@ namespace RobotRaconteurWeb
         DateTime lasttime_recv_local;
         bool in_value_valid;
         uint in_value_ep;
+#pragma warning restore 1591
         /**
         <summary>
         Get the associated wire
@@ -1559,7 +1607,7 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public Wire<T> Wire { get => (Wire<T>)wire; }
-
+#pragma warning disable 1591
         protected void ConnectionClosed(connected_connection ep)
         {
             lock (this)
@@ -1591,6 +1639,7 @@ namespace RobotRaconteurWeb
             }
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         Construct a new WireUnicastReceiverBase
@@ -1644,9 +1693,9 @@ namespace RobotRaconteurWeb
         value is valid, or false if value is invalid. Value will be invalid if no value has
         been received, or the value lifespan has expired.
         </remarks>
-        <param name="value">[out] The current InValue</param>
-        <param name="time">[out] The current InValue timestamp</param>
-        <param name="client">[out] The client endpoint ID of the InValue</param>
+        <param name="val">[out] The current InValue</param>
+        <param name="ts">[out] The current InValue timestamp</param>
+        <param name="ep">[out] The client endpoint ID of the InValue</param>
         <returns>true if value is valid, otherwise false</returns>
         */
 
@@ -1668,7 +1717,7 @@ namespace RobotRaconteurWeb
                 return true;
             }
         }
-
+#pragma warning disable 1591
         protected T ClientPeekInValue(uint c)
         {
             throw new WriteOnlyMemberException("Write only wire");
@@ -1697,6 +1746,7 @@ namespace RobotRaconteurWeb
 
             if (InValueChanged!=null) InValueChanged(v, ts, c);
         }
+#pragma warning restore 1591
         /**
         <summary>
         Event fired when InValue has changed.
@@ -1714,7 +1764,9 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <remarks>None</remarks>
         /// <param name="timeout">Timeout in milliseconds</param>
+        /// <param name="token">The cancellation token for the operation</param>
         /// <returns>True if valid at timeout</returns>
+        [PublicApi] 
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
         {
             var waiter = inval_waiter.CreateWaiterTask(timeout, token);

@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -145,39 +159,98 @@ namespace RobotRaconteurWeb
         public uint MaxConnection;
     }
 
+    /**
+     * <summary>Subscription filter attribute for use with ServiceSubscriptionFilter</summary>
+     *
+     */
+    [PublicApi]
     public class ServiceSubscriptionFilterAttribute
     {
+        /** <summary>The attribute name. Empty for no name</summary> */
+        [PublicApi]
         public string Name = string.Empty;
+        /**<summary>The string value of the attribute</summary> */
+        [PublicApi]
         public string Value = string.Empty;
+        /** <summary>The regex value of the attribute</summary> */
+        [PublicApi]
         public Regex ValueRegex;
+        /** <summary>True if ValueRegex is used, otherwise Value is matched</summary> */
+        [PublicApi]
         public bool UseRegex = false;
 
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute object</summary>
+         *
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttribute() { }
 
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute object</summary>
+         *
+         * <remarks>
+         * This is a nameless attribute for use with attribute lists
+         * </remarks>
+         *
+         * <param name="value">The attribute value</param>
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttribute(string value)
         {
             Value = value;
         }
 
+        /**
+         * <sumarry>Construct a new Service Subscription Filter Attribute object</sumarry>
+         *
+         * <remarks>
+         * This is a nameless attribute for use with attribute lists. The value is compared using a regex
+         * </remarks>
+         * <param name="valueRegex">The attribute value regex</param>
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttribute(Regex valueRegex)
         {
             ValueRegex = valueRegex;
             UseRegex = true;
         }
-
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute object</summary>
+         * <remarks>
+         * This is a named attribute for use with attribute maps
+         * </remarks>
+         * <param name="name">The attribute name</param>
+         * <param name="value"> The attribute value</param>
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttribute(string name, string value)
         {
             Name = name;
             Value = value;
         }
-
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute object</summary>
+         *
+         * <remarks>
+         * This is a named attribute for use with attribute maps. The value is compared using a regex
+         * </remarks>
+         * <param name="name">The attribute name</param>
+         * <param name="valueRegex">The attribute value regex</param>
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttribute(string name, Regex valueRegex)
         {
             Name = name;
             ValueRegex = valueRegex;
             UseRegex = true;
         }
-
+        /// <summary>
+        /// Compare the attribute to a value
+        /// </summary>
+        /// <param name="value">The value to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(string value)
         {
             if (!string.IsNullOrEmpty(Name))
@@ -194,6 +267,13 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Compare the attribute to a named value
+        /// </summary>
+        /// <param name="name">The name to compare</param>
+        /// <param name="value">The value to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(string name, string value)
         {
             if (!string.IsNullOrEmpty(Name) && Name != name)
@@ -210,6 +290,12 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Compare the attribute to a value list using OR logic
+        /// </summary>
+        /// <param name="values">The values to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<string> values)
         {
             foreach (string e in values)
@@ -222,6 +308,12 @@ namespace RobotRaconteurWeb
             return false;
         }
 
+        /// <summary>
+        /// Compare the attribute to a value list using OR logic
+        /// </summary>
+        /// <param name="values">The values to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<object> values)
         {
             if (values == null)
@@ -252,6 +344,12 @@ namespace RobotRaconteurWeb
             return false;
         }
 
+        /// <summary>
+        /// Compare the attribute to a value map using OR logic
+        /// </summary>
+        /// <param name="values">The values to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(Dictionary<string, object> values)
         {
             if (values == null)
@@ -282,6 +380,12 @@ namespace RobotRaconteurWeb
             return false;
         }
 
+        /// <summary>
+        /// Compare the attribute to a value map using OR logic
+        /// </summary>
+        /// <param name="values">The values to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(Dictionary<string, string> values)
         {
             foreach (KeyValuePair<string, string> e in values)
@@ -295,13 +399,30 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /// <summary>
+    /// Utility factory functions for filter attributes
+    /// </summary>
+    [PublicApi]
     public static class ServiceSubscriptionFilterAttributeFactory
     {
+        /**
+         * <summary>Create a ServiceSubscriptionFilterAttribute from a regex string</summary>
+         *
+         * <param name="regexValue">The regex string to compile</param> 
+         * 
+         */
+        [PublicApi]
         public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeRegex(string regexValue)
         {
             return new ServiceSubscriptionFilterAttribute(new Regex(regexValue));
         }
-
+        /**
+         * <summary>Create a ServiceSubscriptionFilterAttribute from a regex string</summary>
+         *
+         * <param name="name">The attribute name</param>
+         * <param name="regexValue">The regex string to compile</param>
+         */
+        [PublicApi]
         public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeRegex(string name, string regexValue)
         {
             return new ServiceSubscriptionFilterAttribute(name, new Regex(regexValue));
@@ -433,58 +554,138 @@ namespace RobotRaconteurWeb
 
             return IdentifierToRegex(combinedString, "");
         }
-
+        /**
+         * <summary>Create a ServiceSubscriptionFilterAttribute from a combined identifier string</summary>
+         * <remarks>
+         * The identifier may be a name, UUID, or a combination of both using a "|" to separate the name and UUID.
+         * </remarks>
+         * <param name="combinedIdentifier">The identifier as a string</param>
+         */
+        [PublicApi]
         public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeCombinedIdentifier(string combinedIdentifier)
         {
             return new ServiceSubscriptionFilterAttribute(IdentifierToRegex(combinedIdentifier));
         }
-
+        /**
+         * <summary>Create a ServiceSubscriptionFilterAttribute from an identifier</summary>
+         *
+         * <param name="identifierName">The identifier name</param>
+         * <param name="uuidString">The identifier UUID as a string</param>
+         * @return ServiceSubscriptionFilterAttribute The created attribute
+         */
+        [PublicApi]
         public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeIdentifier(string identifierName, string uuidString)
         {
             return new ServiceSubscriptionFilterAttribute(IdentifierToRegex(identifierName, uuidString));
         }
-
+        /**
+         * <summary>Create a ServiceSubscriptionFilterAttribute from an identifier</summary>
+         *
+         * <param name="name">The attribute name</param>
+         * <param name="identifierName">The identifier name</param>
+         * <param name="uuidString">The identifier UUID as a string</param>
+         */
+        [PublicApi]
         public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeIdentifier(string name, string identifierName, string uuidString)
         {
             return new ServiceSubscriptionFilterAttribute(name, IdentifierToRegex(identifierName, uuidString));
         }
     }
 
+    /// <summary>
+    /// Comparison operations for ServiceSubscriptionFilterAttributeGroup
+    /// </summary>
+    [PublicApi]
     public enum ServiceSubscriptionFilterAttributeGroupOperation
     {
+        /// <summary>
+        /// OR operation
+        /// </summary>
+        [PublicApi] 
         Or,
+        /// <summary>
+        /// AND operation
+        /// </summary>
+        [PublicApi] 
         And,
-        Nor,  // Also used for NOT
+        /// <summary>
+        /// NOR operation. Also used for NOT
+        /// </summary>
+        [PublicApi] 
+        Nor,
+        /// <summary>
+        /// NAND operation
+        /// </summary>
+        [PublicApi] 
         Nand
     }
-
+    /**
+     * <summary>Subscription filter attribute group for use with ServiceSubscriptionFilter</summary>
+     * <remarks>
+     * Used to combine multiple ServiceSubscriptionFilterAttribute objects for comparison using
+     * AND, OR, NOR, or NAND logic. Other groups can be nested, to allow for complex comparisons.
+     * </remarks>
+     */
+    [PublicApi]
     public class ServiceSubscriptionFilterAttributeGroup
     {
+        /** <summary>The attributes in the group</summary> */
+        [PublicApi]
         public List<ServiceSubscriptionFilterAttribute> Attributes = new List<ServiceSubscriptionFilterAttribute>();
+        /** <summary>The nested groups in the group</summary> */
+        [PublicApi]
         public List<ServiceSubscriptionFilterAttributeGroup> Groups = new List<ServiceSubscriptionFilterAttributeGroup>();
+        /** <summary>The operation to use for matching the attributes and groups</summary> */
+        [PublicApi]
         public ServiceSubscriptionFilterAttributeGroupOperation Operation = ServiceSubscriptionFilterAttributeGroupOperation.Or;
+        /** <summary>True if string attributes will be split into a list with delimiter (default ",")</summary> */
+        [PublicApi]
         public bool SplitStringAttribute = true;
+        /** <summary>Delimiter to use to split string attributes (default ",")</summary> */
+        [PublicApi]
         public char SplitStringDelimiter = ',';
 
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute Group object</summary>
+         *
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttributeGroup() { }
-
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute Group object</summary>
+         *
+         * <param name="operation">The operation to use for matching the attributes and groups</param>
+         */
+        [PublicApi]
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation)
         {
             Operation = operation;
         }
-
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute Group object</summary>
+         *
+         * <param name="operation">The operation to use for matching the attributes and groups</param>
+         * <param name="attributes">The attributes in the group</param>
+         */
+         [PublicApi] 
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttribute> attributes)
         {
             Operation = operation;
             Attributes = attributes;
         }
-
+        /**
+         * <summary>Construct a new Service Subscription Filter Attribute Group object</summary>
+         *
+         * <param name="operation">The operation to use for matching the attributes and groups</param>
+         * <param name="groups">The nested groups in the group</param>
+         */
+         [PublicApi] 
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttributeGroup> groups)
         {
             Operation = operation;
             Groups = groups;
         }
-
+#pragma warning disable 1591
         public static bool ServiceSubscriptionFilterAttributeGroupDoFilter<T>(
     ServiceSubscriptionFilterAttributeGroupOperation operation,
     List<ServiceSubscriptionFilterAttribute> attributes,
@@ -551,7 +752,14 @@ namespace RobotRaconteurWeb
                     }
             }
         }
+#pragma warning restore 1591
 
+        /// <summary>
+        /// Compare the group to a value
+        /// </summary>
+        /// <param name="value">The value to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(string value)
         {
             if (!SplitStringAttribute)
@@ -567,12 +775,23 @@ namespace RobotRaconteurWeb
             }
         }
 
-       
+        /// <summary>
+        /// Compare the group to a list of values
+        /// </summary>
+        /// <param name="values">The values to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<string> values)
         {
             return ServiceSubscriptionFilterAttributeGroupDoFilter<string>(Operation, Attributes, Groups, values.Select(x => (object)x).ToList());
         }
 
+        /// <summary>
+        /// Compare the group to a list of values
+        /// </summary>
+        /// <param name="values">The values to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(List<object> values)
         {
             return ServiceSubscriptionFilterAttributeGroupDoFilter<object>(Operation, Attributes, Groups, values);
@@ -590,6 +809,12 @@ namespace RobotRaconteurWeb
             throw new NotImplementedException();
         }*/
 
+        /// <summary>
+        /// Compare the group to a value
+        /// </summary>
+        /// <param name="value">The value to compare</param>
+        /// <returns></returns>
+        [PublicApi] 
         public bool IsMatch(object value)
         {
             if (value == null)
@@ -655,8 +880,8 @@ namespace RobotRaconteurWeb
         Construct a ServiceSubscriptionClientID
         </summary>
         <remarks>None</remarks>
-        <param name="node_id">The NodeID</param>
-        <param name="service_name">The Service Name</param>
+        <param name="NodeID">The NodeID</param>
+        <param name="ServiceName">The Service Name</param>
         */
         [PublicApi]
 
@@ -665,7 +890,7 @@ namespace RobotRaconteurWeb
             this.NodeID = NodeID;
             this.ServiceName = ServiceName;
         }
-
+#pragma warning disable 1591
         public override bool Equals(object obj)
         {
             if (obj is ServiceSubscriptionClientID)
@@ -690,6 +915,7 @@ namespace RobotRaconteurWeb
         {
             return !(left == right);
         }
+#pragma warning restore 1591
     }
 
     static class SubscriptionFilterUtil
@@ -915,6 +1141,7 @@ namespace RobotRaconteurWeb
 
         Discovery parent;
         RobotRaconteurNode node;
+#pragma warning disable 1591
         public ServiceInfo2Subscription(Discovery parent)
         {
             this.parent = parent;
@@ -922,6 +1149,7 @@ namespace RobotRaconteurWeb
             active = true;
             retry_delay = 15000;
         }
+#pragma warning restore 1591
         /**
         <summary>
         Close the subscription
@@ -1171,7 +1399,7 @@ namespace RobotRaconteurWeb
     
     public class ServiceSubscription : IServiceSubscription
     {
-
+#pragma warning disable 1591
         bool active = false;
         Dictionary<ServiceSubscriptionClientID, ServiceSubscription_client> clients = new Dictionary<ServiceSubscriptionClientID, ServiceSubscription_client>();
 
@@ -1188,6 +1416,7 @@ namespace RobotRaconteurWeb
         protected internal Dictionary<string, object> service_url_credentials;
 
         CancellationTokenSource cancel = new CancellationTokenSource();
+#pragma warning restore 1591
         /**
         <summary>
         Close the subscription
@@ -1236,7 +1465,7 @@ namespace RobotRaconteurWeb
 
             parent.SubscriptionClosed(this);
         }
-
+#pragma warning disable 1591
         public void SoftClose()
         {
 
@@ -1608,6 +1837,7 @@ namespace RobotRaconteurWeb
             }
             
         }
+#pragma warning restore 1591
         /**
         <summary>
         Returns a dictionary of connected clients
@@ -2115,13 +2345,14 @@ namespace RobotRaconteurWeb
 
             return null;
         }
-
+#pragma warning disable 1591
         public ServiceSubscription(Discovery parent)
         {
             this.parent = parent;
             active = true;
             this.node = parent.node;
         }
+#pragma warning restore 1591
         /**
         <summary>
         Creates a wire subscription
@@ -2233,7 +2464,26 @@ namespace RobotRaconteurWeb
                 pipe_subscriptions.Remove(s);
             }
         }
-
+        /**
+         * <summary>Creates a sub object subscription</summary>
+         * <remarks>
+         * <para>
+         * Sub objects are objects within a service that are not the root object. Sub objects are typically
+         * referenced using objref members, however they can also be referenced using a service path.
+         * The SubObjectSubscription class is used to automatically access sub objects of the default client.
+         * </para>
+         * <para>
+         * The service path is broken up into segments using periods. See the Robot Raconter
+         * documentation for more information. <!-- The BuildServicePath() function can be used to assist
+         * building service paths.--> The first level of the* service path may be "*" to match any service name.
+         * For instance, the service path "*.sub_obj" will match any service name, and use the "sub_obj" objref
+         * </para>
+         * </remarks>
+         * <param name="service_path">The service path of the sub object</param>
+         * <param name="object_type"> Optional object type to use for the sub object</param>
+         * <return>The sub object subscription</return>
+         */
+         [PublicApi] 
         public SubObjectSubscription SubscribeSubObject(string service_path, string object_type=null)
         {
             var o = new SubObjectSubscription(this, service_path, object_type);
@@ -2250,10 +2500,14 @@ namespace RobotRaconteurWeb
         internal bool closed;
         internal CancellationTokenSource cancel;
     }
-  
+
+    /// <summary>
+    /// Base class for WireSubscription
+    /// </summary>
+    [PublicApi]
     public abstract class WireSubscriptionBase
     {
-
+#pragma warning disable 1591
         protected internal RobotRaconteurNode node;
         protected internal ServiceSubscription parent;
         protected internal object in_value;
@@ -2270,6 +2524,7 @@ namespace RobotRaconteurWeb
         protected internal CancellationTokenSource cancel = new CancellationTokenSource();
 
         internal Dictionary<ServiceSubscriptionClientID, WireSubscription_connection> connections = new Dictionary<ServiceSubscriptionClientID, WireSubscription_connection>();
+#pragma warning restore 1591
         /**
         <summary>
         Closes the wire subscription
@@ -2286,7 +2541,7 @@ namespace RobotRaconteurWeb
             this.cancel.Cancel();
             parent.WireSubscriptionClosed(this);
         }
-
+#pragma warning disable 1591
         public object GetInValueBase(out TimeSpec time, out object wire_connection)
         {
             if (!TryGetInValueBase(out var in_value, out time, out wire_connection))
@@ -2331,6 +2586,18 @@ namespace RobotRaconteurWeb
         }
 
         protected internal bool closed;
+#pragma warning restore 1591
+
+        /**
+         * <summary>Wait for a valid InValue to be received from a client</summary>
+         *
+         * Awaitable task until value is received or timeout
+         *
+         * <param name="timeout">The timeout in milliseconds</param> 
+         * <param name="cancel">A cancellation token for the operation</param>
+         * <return>true if a value was received within the specified timeout</return>
+         */
+         [PublicApi] 
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken cancel = default)
         {
             AsyncValueWaiter<object>.AsyncValueWaiterTask waiter = null;
@@ -2457,10 +2724,12 @@ namespace RobotRaconteurWeb
 
     public class WireSubscription<T> : WireSubscriptionBase
     {
+#pragma warning disable 1591
         public WireSubscription(ServiceSubscription parent, string membernname, string servicepath) 
             : base(parent, membernname, servicepath)
         {
         }
+#pragma warning restore 1591
 
         internal override async Task RunConnection(ServiceSubscriptionClientID id, object client)
         {
@@ -2756,6 +3025,10 @@ namespace RobotRaconteurWeb
 
     }
 
+    /// <summary>
+    /// Base class for PipeSubscription
+    /// </summary>
+    [PublicApi]
     public abstract class PipeSubscriptionBase
     {
         /**
@@ -2774,7 +3047,7 @@ namespace RobotRaconteurWeb
             this.cancel.Cancel();
             parent.PipeSubscriptionClosed(this);
         }
-
+#pragma warning disable 1591
         internal protected object ReceivePacketBase()
         {
             if (!TryReceivedPacketBase(out var packet))
@@ -2847,6 +3120,7 @@ namespace RobotRaconteurWeb
             }
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         Get the number of packets available to receive
@@ -2891,7 +3165,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
 
         public bool IgnoreReceived { get; set; }
-
+#pragma warning disable 1591
         internal protected PipeSubscriptionBase(ServiceSubscription parent, string membername, string servicepath="", int max_recv_packets = -1, int max_send_backlog = 5)
         {
             this.parent = parent;
@@ -2937,6 +3211,7 @@ namespace RobotRaconteurWeb
         protected internal int max_recv_packets;
         protected internal int max_send_backlog;
         protected internal CancellationTokenSource cancel = new CancellationTokenSource();
+#pragma warning restore 1591
     }
 
     /**
@@ -2969,14 +3244,16 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The type of the pipe packets</typeparam>
     */
-        [PublicApi]
+    [PublicApi]
 
     public class PipeSubscription<T> : PipeSubscriptionBase
     {
+#pragma warning disable 1591
         protected internal PipeSubscription(ServiceSubscription parent, string membername, string servicepath = "", int max_recv_packets = -1, int max_send_backlog = 5) 
             : base(parent, membername, servicepath, max_recv_packets, max_send_backlog)
         {
         }
+#pragma warning restore 1591
 
         /**
         <summary>
@@ -3232,6 +3509,25 @@ namespace RobotRaconteurWeb
         public event Action<PipeSubscription<T>> PipePacketReceived;
     }
 
+    /**
+     * <summary>Subscription for sub objects of the default client</summary>
+     * <remarks>
+     * <para>
+     * SubObjectSubscription is used to access sub objects of the default client. Sub objects are objects within a service
+     * that are not the root object. Sub objects are typically referenced using objref members, however they can also be
+     * referenced using a service path. The SubObjectSubscription class is used to automatically access sub objects of the
+     * default client.
+     * </para>
+     * <para>
+     * Use ServiceSubscription::SubscribeSubObject() to create a SubObjectSubscription.
+     * </para>
+     * <para>
+     * This class should not be used to access Pipe or Wire members. Use the ServiceSubscription::SubscribePipe() and
+     * ServiceSubscription::SubscribeWire() functions to access Pipe and Wire members.
+     * </para>
+     * </remarks>
+     */
+    [PublicApi]
     public class SubObjectSubscription
     {
 
@@ -3246,6 +3542,20 @@ namespace RobotRaconteurWeb
             return (T)await client.RRContext.FindObjRef(service_path1, objecttype, cancel);
         }
 
+        /**
+         * <summary>Get the "default client" sub object</summary>
+         * <remarks>
+         * The sub object is retrieved from the default client. The default client is the first client
+         * that connected to the service. If no clients are currently connected, an exception is thrown.
+         *
+         * Clients using GetDefaultClient() should not store a reference to the client. Call GetDefaultClient()
+         * each time the client is needed.
+         * </remarks>         
+         * <typeparam name="T">The type of the sub object</typeparam>
+         * <param name="cancel">The cancellation token for the operation</param>
+         * <returns>The default client</returns>
+         */
+        [PublicApi]
         public async  Task<T> GetDefaultClient<T>(CancellationToken cancel = default)
         {
             var client = (ServiceStub)parent.GetDefaultClient<object>();
@@ -3253,6 +3563,17 @@ namespace RobotRaconteurWeb
             return await GetObjFromRoot<T>(client, cancel);         
         }
 
+        /**
+         * <summary>Try getting the "default client" sub object</summary>
+         * <remarks>
+         * Same as GetDefaultClient(), but returns a bool for success or failure instead of throwing
+         * an exception on failure.
+         * </remarks>         
+         * <typeparam name="T">The type of the sub object</typeparam>
+         * <param name="cancel">The cancellation token for the operation</param>
+         * <returns>Success and the default client as tuple</returns>
+         */
+         [PublicApi] 
         public async Task<Tuple<bool,T>> TryGetDefaultClient<T>(CancellationToken cancel = default)
         {
             try
@@ -3266,14 +3587,32 @@ namespace RobotRaconteurWeb
                 return Tuple.Create(false, default(T));
             }
         }
-
+        /**
+         * <summary>Get the "default client" sub object and wait if not available</summary>
+         * <remarks>
+         * Same as GetDefaultClient() but waits for a client to be available
+         * </remarks>         
+         * <typeparam name="T">The type of the sub object</typeparam>
+         * <param name="cancel">The cancellation token for the operation</param>
+         * <returns>The default client</returns>
+         */
+         [PublicApi] 
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel)
         {
             var client = (ServiceStub) await parent.GetDefaultClientWait<object>(cancel);
 
             return await GetObjFromRoot<T>(client, cancel);
         }
-
+        /**
+         * <summary>Try getting the "default client" sub object aind wait if not available</summary>
+         * <remarks>
+         * Same as TryGetDefaultClient() but waits for a client to be available
+         * </remarks>         
+         * <typeparam name="T">The type of the sub object</typeparam>
+         * <param name="cancel">The cancellation token for the operation</param>
+         * <returns>Success and the default client as tuple</returns>
+         */
+         [PublicApi] 
         public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel)
         {
             try
@@ -3288,11 +3627,16 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Close the sub object subscription
+        /// </summary>
+        [PublicApi]
         public void Close()
         {
             
         }
 
+#pragma warning disable 1591
         protected internal SubObjectSubscription(ServiceSubscription parent, string servicepath, string objecttype)
         {
             this.parent = parent;
@@ -3305,31 +3649,86 @@ namespace RobotRaconteurWeb
         protected RobotRaconteurNode node;
         string servicepath;
         string objecttype;
+#pragma warning restore 1591
     }
-
+    /**
+     * <summary>Connection method for ServiceSubscriptionManager subscription</summary>
+     * <remarks>
+     * Select between using URLs or service types for subscription
+     * </remarks>
+     */
+    [PublicApi]
     public enum ServiceSubscriptionManagerConnectionMethod
     {
-        Default=0,
+        /** <summary>Implicitly select between URL and service types</summary> */
+        [PublicApi] 
+        Default = 0,
+        /** <summary>Use URLs types for subscription</summary> */
+        [PublicApi] 
         Url,
+        /** <summary>Use service types for subscription</summary> */
+        [PublicApi] 
         Type
     }
 
+    /**
+     * <summary>ServiceSubscriptionManager subscription connection information</summary>
+     * <remarks>
+     * Contains the connection information for a ServiceSubscriptionManager subscription
+     * and the local name of the subscription
+     * </remarks>
+     */
+    [PublicApi]
     public class ServiceSubscriptionManagerDetails
     {
+        /** <summary>The local name of the subscription</summary> */
+        [PublicApi]
         public string Name;
+        /** <summary>The connection method to use, URL or service type</summary> */
+        [PublicApi]
         public ServiceSubscriptionManagerConnectionMethod ConnectionMethod;
+        /** <summary>The URLs to use for subscription</summary> */
+        [PublicApi]
         public string[] Urls;
+        /** <summary>The username to use for URLs (optional)</summary> */
+        [PublicApi]
         public string UrlUsername;
+        /** <summary>The credentials to use for URLs (optional)</summary> */
+        [PublicApi]
         public Dictionary<string, object> UrlCredentials;
+        /** <summary>The service types to use for subscription</summary> */
+        [PublicApi]
         public string[] ServiceTypes;
+        /** <summary>The filter to use for subscription when service type is used (optional)</summary> */
+        [PublicApi]
         public ServiceSubscriptionFilter Filter;
+        /** <summary>If the subscription is enabled</summary> */
+        [PublicApi]
         public bool Enabled=true;
     }
 
+    /**
+     * <summary>Class to manage multiple subscriptions to services</summary>
+     * <remarks>
+     * ServiceSubscriptionManager is used to manage multiple subscriptions to services. Subscriptions
+     * are created using information contained in ServiceSubscriptionManagerDetails structures. The subscriptions
+     * can connect using URLs or service types. The subscriptions can be enabled or disabled, and can be
+     * closed.
+     * </remarks>
+     */
+    [PublicApi]
     public class ServiceSubscriptionManager
     {
+#pragma warning disable 1591
         protected internal RobotRaconteurNode node;
         internal Dictionary<string, ServiceSubscriptionManager_subscription> subscriptions = new Dictionary<string, ServiceSubscriptionManager_subscription>();
+#pragma warning restore 1591
+        /**
+         * <summary>Construct a new ServiceSubscriptionManager object</summary>
+         *
+         * <param name="node">The node to use for the subscription manager. Defaults to RobotRaconteurNode.s</param>
+         */
+        [PublicApi]
         public ServiceSubscriptionManager(RobotRaconteurNode node = null)
         {
             if (node == null)
@@ -3550,6 +3949,12 @@ namespace RobotRaconteurWeb
            Task.Run(() => d.DoUpdateAllDetectedServices(sub.sub)).IgnoreResult();
         }
 
+        /**
+         * <summary>Initialize the subscription manager with a list of subscriptions</summary>
+         *
+         * <param name="details">The list of subscriptions to initialize</param>
+         */
+        [PublicApi]
         public void Init(ServiceSubscriptionManagerDetails[] details)
         {
             lock(this)
@@ -3567,6 +3972,12 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Add a subscription to the manager</summary>
+         *
+         * <param name="details">The subscription to add</param>
+         */
+        [PublicApi]
         public void AddSubscription(ServiceSubscriptionManagerDetails details)
         {
             lock(this)
@@ -3585,6 +3996,13 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Remove a subscription from the manager</summary>
+         *
+         * <param name="name">The local name of the subscription to remove</param>
+         * <param name="close">If true, close the subscription. Default true</param>
+         */
+        [PublicApi]
         public void RemoveSubscription(string name, bool close=true)
         {
             lock(this)
@@ -3609,6 +4027,12 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Enable a subscription</summary>
+         *
+         * <param name="name">The local name of the subscription to enable</param>
+         */
+        [PublicApi]
         public void EnableSubscription(string name)
         {
             lock(this)
@@ -3627,6 +4051,13 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Disable a subscription</summary>
+         *
+         * <param name="name">The local name of the subscription to disable</param>
+         * <param name="close">If true, close subscription if connected. Default true</param>
+         */
+        [PublicApi]
         public void DisableSubscription(string name, bool close=true)
         {
             lock(this)
@@ -3646,6 +4077,14 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Get a subscription by name</summary>
+         *
+         * <param name="name">The local name of the subscription</param>
+         * <param name="force_create">If true, create the subscription if it does not exist. Default false</param>
+         * <return>The subscription</return>
+         */
+        [PublicApi]
         public ServiceSubscription GetSubscription(string name, bool force_create = false)
         {
             lock(this)
@@ -3678,12 +4117,25 @@ namespace RobotRaconteurWeb
                 return sub;
             }
         }
-
+        /**
+         * <summary>Get if a subscription is connected</summary>
+         *
+         * <param name="name">The local name of the subscription</param>
+         * <return>True if the subscription is connected</return>
+         */
+        [PublicApi]
         public bool IsConnected(string name)
         {
             return GetSubscription(name)?.TryGetDefaultClient<object>(out var a) ?? false;        
         }
 
+        /**
+         * <summary>Get if a subscription is enabled</summary>
+         *
+         * <param name="name">The local name of the subscription</param>
+         * <return>True if the subscription is enabled</return>
+         */
+         [PublicApi] 
         public bool IsEnabled(string name)
         {
             lock(this)
@@ -3697,6 +4149,12 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Close the subscription manager</summary>
+         *
+         * <param name="close_subscriptions">If true, close all subscriptions. Default true</param>
+         */
+        [PublicApi]
         public void Close(bool close_subscriptions = true)
         {
             Dictionary<string, ServiceSubscriptionManager_subscription> subs2;
@@ -3723,7 +4181,10 @@ namespace RobotRaconteurWeb
 
             subs2.Clear();
         }
-
+        /// <summary>
+        /// Get the names of all subscriptions
+        /// </summary>
+        [PublicApi]
         public string[] SubscriptionNames
         {
             get
@@ -3735,6 +4196,10 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Get the details of all subscriptions
+        /// </summary>
+        [PublicApi]
         public ServiceSubscriptionManagerDetails[] SubscriptionDetails
         {
             get

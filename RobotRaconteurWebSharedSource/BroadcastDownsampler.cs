@@ -1,3 +1,17 @@
+// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,10 +60,12 @@ namespace RobotRaconteurWeb
     [PublicApi]
     public class BroadcastDownsampler
     {
+#pragma warning disable 1591
         protected internal ServerContext context;
         protected internal uint default_downsample;
         protected internal ulong step_count;
         protected internal Dictionary<uint, uint> client_downsamples = new Dictionary<uint, uint>();
+#pragma warning restore 1591
         /**
         <summary>
         Construct a new BroadcastDownsampler
@@ -140,12 +156,30 @@ namespace RobotRaconteurWeb
         {
 
         }
-
+        /**
+        * <summary>
+        * Add a PipeBroadcaster to the downsampler
+        * </summary>
+        * <remarks>
+        * Sets the predicate of the broadcaster to this downsampler
+        * </remarks>
+        * <param name="broadcaster">The broadcaster to add</param>
+        */
+        [PublicApi]
         public void AddPipeBroadcaster<T>(PipeBroadcaster<T> broadcaster)
         {
             broadcaster.Predicate = pipe_predicate;
         }
-
+        /**
+        * <summary>
+        * Add a WireBroadcaster to the downsampler
+        * </summary>
+        * <remarks>
+        * Sets the predicate of the broadcaster to this downsampler
+        * </remarks>
+        * <param name="broadcaster">The broadcaster to add</param>
+        */
+        [PublicApi]
         public void AddWireBroadcaster<T>(WireBroadcaster<T> broadcaster)
         {
             broadcaster.Predicate = wire_predicate;
@@ -220,9 +254,9 @@ namespace RobotRaconteurWeb
         <param name="downsampler">The downsampler to step</param>
         */
         [PublicApi]
-        public BroadcasterDownsamplerStep(BroadcastDownsampler parent)
+        public BroadcasterDownsamplerStep(BroadcastDownsampler downsampler)
         {
-            this.parent = parent;
+            this.parent = downsampler;
             parent.BeginStep();
         }
         /// <summary>

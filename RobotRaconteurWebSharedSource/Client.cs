@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 using static RobotRaconteurWeb.RRLogFuncs;
+
+#pragma warning disable 1591
 
 namespace RobotRaconteurWeb
 {
@@ -1170,26 +1172,31 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// client has been closed
         /// </summary>
+        [PublicApi] 
         ClientClosed = 1,
 
         /// <summary>
         /// client connection has timed out
         /// </summary>
+        [PublicApi] 
         ClientConnectionTimeout,
 
         /// <summary>
         /// client transport has been connected
         /// </summary>
+        [PublicApi] 
         TransportConnectionConnected,
 
         /// <summary>
         /// client transport connection has been closed or lost
         /// </summary>
+        [PublicApi] 
         TransportConnectionClosed,
 
         /// <summary>
         /// client has received notification that service path was released
         /// </summary>
+        [PublicApi]
         ServicePathReleased
     }
 

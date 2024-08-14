@@ -1,3 +1,17 @@
+// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 
 namespace RobotRaconteurWeb
@@ -88,6 +102,14 @@ namespace RobotRaconteurWeb
             this.nanoseconds = 0;
         }
 
+        /**
+        <summary>
+        Returns a TimeSpec with the current performance clock time
+        </summary>
+        <remarks>The time returned is a monotonic performance clock time and may not be relative
+        to any standard epoch.</remarks>
+        */
+        [PublicApi]
         public static TimeSpec Now
         {
             get
@@ -323,7 +345,15 @@ namespace RobotRaconteurWeb
         {
             return t2 > t1;
         }
-
+        /**
+        <summary>
+        Determines if the TimeSpec is equal to another object
+        </summary>
+        <remarks>None</remarks>
+        <param name="obj">The object to compare</param>
+        <returns>True if the objects are equal</returns>
+        */
+        [PublicApi]
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -331,6 +361,14 @@ namespace RobotRaconteurWeb
             return this == (TimeSpec)obj;
         }
 
+        /**
+        <summary>
+        Returns the hash code for the TimeSpec
+        </summary>
+        <remarks>None</remarks>
+        <returns>The hash code</returns>
+        */
+        [PublicApi]
         public override int GetHashCode()
         {
             return nanoseconds + (int)seconds;

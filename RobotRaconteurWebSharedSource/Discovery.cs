@@ -1,4 +1,16 @@
-// Implement Discovery class in csharp based on RobotRaconteurCore cpp file
+// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using System;
 using System.Collections.Generic;
@@ -84,8 +96,20 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public string NodeName;
 
+        /// <summary>
+        /// Construct an empty ServiceInfo2
+        /// </summary>
+        /// <remarks>None</remarks>
+        [PublicApi] 
         public ServiceInfo2() { }
 
+        /// <summary>
+        /// Construct a ServiceInfo2 using information returned from discovery
+        /// </summary>
+        /// <remarks>None</remarks>
+        /// <param name="info">ServiceInfo structure returned by node service index</param>
+        /// <param name="ninfo">NodeInfo from discovery</param>
+        [PublicApi] 
         public ServiceInfo2(RobotRaconteurServiceIndex.ServiceInfo info, RobotRaconteurServiceIndex.NodeInfo ninfo)
         {
             Name = info.Name;
@@ -166,24 +190,66 @@ namespace RobotRaconteurWeb
 
     }
 
+    /**
+     * <summary>Raw information used to announce and detect nodes</summary>
+     * <remarks>
+     * For TCP/IP and QUIC/IP, this information is transmitted using
+     * UDP multicast packets. For local transports, the filesystem is used.
+     *
+     * The data contained in NodeDiscoveryInfo is unverified and unfiltered.
+     *
+     * NodeDiscoveryInfo is used with RobotRaconteurNode::GetDetectedNodes(),
+     * RobotRaconteurNode::AddNodeServicesDetectedListener(),
+     * and RobotRaconteurNode::AddNodeDetectionLostListener()
+     * </remarks>
+     */
+    [PublicApi]
     public class NodeDiscoveryInfo
     {
+        /** <summary>The detected NodeID</summary> */
+        [PublicApi]
         public NodeID NodeID;
+        /** <summary>The detected NodeName</summary> */
+        [PublicApi]
         public string NodeName = "";
+        /** <summary>Candidate URLs to connect to the node</summary> */
+        [PublicApi]
         public List<NodeDiscoveryInfoURL> URLs = new List<NodeDiscoveryInfoURL>();
+        /** <summary>The current nonce for the node's services</summary>
+         *
+         * <remarks>
+         * The ServiceStateNonce is a random string that represents the current
+         * state of the nodes services. If the services change, the nonce will
+         * change to a new random string, indicating that the client should
+         * reinterrogate the node.
+         * </remarks>
+         */
+        [PublicApi]
         public string ServiceStateNonce;
     }
 
+    /** <summary>A candidate node connection URL and its timestamp</summary>
+     *  <remarks>None</remarks>
+     */
+    [PublicApi]
     public class NodeDiscoveryInfoURL
     {
+        /** <summary>Candidate node connection URL</summary> */
+        [PublicApi]
         public string URL;
+        /**
+         * <summary>Last time that this URL announce was received</summary>
+         * <remarks>
+         * Candidate URLs typically expire after one minute. If all
+         * candidate URLs expire, the node is considered lost.
+         * </remarks> 
+        */
+        [PublicApi]
         public DateTime LastAnnounceTime;
     }
 
     
-
-    // Use Discovery_private.h and Discovery.cpp as reference
-
+    #pragma warning disable 1591
     public class Discovery
     {
         internal Dictionary<string, Discovery_nodestorage> m_DiscoveredNodes = new Dictionary<string, Discovery_nodestorage>();

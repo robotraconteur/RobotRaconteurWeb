@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -160,14 +160,15 @@ namespace RobotRaconteurWeb
             */
 
         [PublicApi]
-            public bool RequestPacketAck = false;
-
+            public bool RequestPacketAck { get; set; } = false;
+#pragma warning disable 1591
             public PipeEndpoint(Pipe<T> parent, int index, Endpoint endpoint = null)
             {
                 this.parent = parent;
                 this.index = index;
                 this.endpoint = endpoint;
             }
+#pragma warning restore 1591
 
             private AsyncMutex send_mutex = new AsyncMutex();
 
@@ -182,8 +183,10 @@ namespace RobotRaconteurWeb
             transport. It will return before the peer endpoint has received the packet.
             </remarks>
             <param name="packet">The packet to send</param>
+            <param name="cancel">The cancellation token for the operation</param>
             <returns />
             */
+            [PublicApi] 
             public async Task<uint> SendPacket(T packet, CancellationToken cancel = default(CancellationToken))
             {
                 Task mutex = send_mutex.Enter();
@@ -240,7 +243,7 @@ namespace RobotRaconteurWeb
             public event PipePacketReceivedCallbackFunction PacketReceivedEvent;
 
             AsyncValueWaiter<bool> recv_waiter = new AsyncValueWaiter<bool>();
-
+#pragma warning disable 1591
             internal protected void PipePacketReceived(T packet, uint packetnum)
             {
                 if (IgnoreInValue) return;
@@ -278,6 +281,7 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
+#pragma warning restore 1591
             /**
             <summary>
             Signal called when a packet ack has been received
@@ -294,7 +298,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public event PipePacketAckReceivedCallbackFunction PacketAckReceivedEvent;
 
             internal void PipePacketAckReceived(uint packetnum)
@@ -372,10 +376,11 @@ namespace RobotRaconteurWeb
             </remarks>
             <param name="timeout">Timeout in milliseconds to wait for a packet, or RR_TIMEOUT_INFINITE for no
             timeout</param>
+            <param name="cancel">The cancellation token for the operation</param>
             <returns>The received packet</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<T> ReceivePacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
                 var ret = await TryReceivePacketWait(timeout, false, cancel).ConfigureAwait(false);
@@ -394,10 +399,11 @@ namespace RobotRaconteurWeb
             </remarks>
             <param name="timeout">Timeout in milliseconds to wait for a packet, or RR_TIMEOUT_INFINITE for no
             timeout</param>
+            <param name="cancel">The cancellation token for the operation</param>
             <returns>The received packet</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<T> PeekNextPacketWait(int timeout = -1, CancellationToken cancel = default(CancellationToken))
             {
                 var ret = await TryReceivePacketWait(timeout, true, cancel).ConfigureAwait(false);
@@ -419,15 +425,15 @@ namespace RobotRaconteurWeb
             similar to the various Receive and Peek functions.
             </para>
             </remarks>
-            <param name="packet">[out] The received packet</param>
             <param name="timeout">The timeout in milliseconds. Set to zero for non-blocking operation, an arbitrary
             value
             in milliseconds for a finite duration timeout, or RR_TIMEOUT_INFINITE for no timeout</param>
             <param name="peek">If true, the packet is not removed from the receive queue</param>
-            <returns>true if packet was received, otherwise false</returns>
+            <param name="cancel">The cancellation token for the operation</param>
+            <returns>Succes and returned value as a tuple</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task<Tuple<bool, T>> TryReceivePacketWait(int timeout = -1, bool peek = false, CancellationToken cancel = default)
             {
                 AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter;
@@ -472,7 +478,9 @@ namespace RobotRaconteurWeb
                     return Tuple.Create(false, default(T));                    
                 }
             }
-
+            /// <summary>
+            /// Set if the PipeEndpoint should ignore incoming values
+            /// </summary>
             public bool IgnoreInValue { get; set; }
 
             private PipeDisconnectCallbackFunction close_callback;
@@ -515,13 +523,14 @@ namespace RobotRaconteurWeb
         }
 
         private bool rawelements = false;
-
+#pragma warning disable 1591
         public Pipe()
         {
             if (typeof(T) == typeof(MessageElement))
                 rawelements = true;
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         The pipe member name
@@ -532,16 +541,38 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public abstract string MemberName { get; }
 
+        /// <summary>
+        /// Delegate type for pipe endpoint connection callaback functions
+        /// </summary>
+        /// <param name="newpipe">The new connected PipeEndpoint</param>
+        [PublicApi]
         public delegate void PipeConnectCallbackFunction(PipeEndpoint newpipe);
 
+        /// <summary>
+        /// Delegate type for pipe endpoint disconnect callback functions
+        /// </summary>
+        /// <param name="closedpipe">The PipeEpndoint that was disconnected</param>
+        [PublicApi]
         public delegate void PipeDisconnectCallbackFunction(PipeEndpoint closedpipe);
 
+        /// <summary>
+        /// Delegate type for pipe packet received callback functions
+        /// </summary>
+        /// <param name="e">The PipeEndpoint that received the packet</param>
+        [PublicApi]
         public delegate void PipePacketReceivedCallbackFunction(PipeEndpoint e);
 
+        /// <summary>
+        /// Delegate type for pipe packet ack received callback functions
+        /// </summary>
+        /// <param name="e">The PipeEndpoint that reecived the packet ack</param>
+        /// <param name="packetnum">The packet number ack that was received</param>
+        [PublicApi]
         public delegate void PipePacketAckReceivedCallbackFunction(PipeEndpoint e, uint packetnum);
-
+#pragma warning disable 1591
         protected abstract Task SendPipePacket(T packet, int index, uint packetnumber, bool requestack, Endpoint endpoint, CancellationToken cancel = default(CancellationToken));
-        
+#pragma warning restore 1591
+
         /**
         <summary>
         Connect a pipe endpoint
@@ -558,6 +589,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="index">The index of the pipe endpoint, or (-1) to automatically select an index</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The connected pipe endpoint</returns>
         */
         [PublicApi]
@@ -587,7 +619,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public abstract PipeConnectCallbackFunction PipeConnectCallback { get; set; }
-
+#pragma warning disable 1591
         public abstract void PipePacketReceived(MessageEntry m, Endpoint e = null);
 
         public abstract void Shutdown();
@@ -649,9 +681,10 @@ namespace RobotRaconteurWeb
         protected abstract object PackAnyType(ref T o);
 
         protected abstract T UnpackAnyType(MessageElement o);
+#pragma warning restore 1591
 
     }
-
+#pragma warning disable 1591
     public sealed class PipeClient<T> : Pipe<T>
     {
 
@@ -1083,6 +1116,7 @@ namespace RobotRaconteurWeb
             return skel.RRContext.UnpackAnyType<T>(o);
         }
     }
+#pragma warning restore 1591
     /**
     <summary>
     Broadcaster to send packets to all connected clients
@@ -1123,9 +1157,10 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The packet data type</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class PipeBroadcaster<T>
     {
+#pragma warning disable 1591
         protected Pipe<T> pipe;
         protected List<connected_endpoint> endpoints = new List<connected_endpoint>();
         protected int maximum_backlog;
@@ -1143,6 +1178,7 @@ namespace RobotRaconteurWeb
                 this.ep = ep;
             }
         }
+#pragma warning restore 1591
         /**
         <summary>
         Get the associated pipe
@@ -1169,7 +1205,7 @@ namespace RobotRaconteurWeb
             this.maximum_backlog = maximum_backlog;
             pipe.PipeConnectCallback = EndpointConnected;
         }
-
+#pragma warning disable 1591
         protected void EndpointConnected(Pipe<T>.PipeEndpoint ep)
         {
             lock (endpoints)
@@ -1230,11 +1266,13 @@ namespace RobotRaconteurWeb
                 catch { }
             }
         }
+#pragma warning restore 1591
         /**
         <summary>
         Send packet to all connected pipe endpoint clients
         </summary>
         <param name="packet">The packet to send</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
 
         [PublicApi]
@@ -1381,6 +1419,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <value />
         */
+        [PublicApi] 
         public Func<object, uint, int, bool> Predicate { get; set; }
     }
 }

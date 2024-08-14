@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -75,6 +89,10 @@ namespace RobotRaconteurWeb
 
         private int m_HeartbeatPeriod = 5000;
 
+        /// <summary>
+        /// Connection test heartbeat period in milliseconds
+        /// </summary>
+        [PublicApi]
         public int HeartbeatPeriod
         {
             get
@@ -264,7 +282,7 @@ namespace RobotRaconteurWeb
             Init();
             DiscoverAllNodes();
         }
-
+#pragma warning disable 1591
         protected internal bool TryGetNodeInfo(out NodeID node_id, out string node_name, out string service_nonce)
         {
             if (!node.TryGetNodeID(out node_id))
@@ -287,6 +305,7 @@ namespace RobotRaconteurWeb
 
             return true;
         }
+#pragma warning restore 1591
 
         CancellationTokenSource close_token = new CancellationTokenSource();
         TaskCompletionSource<int> close_task = new TaskCompletionSource<int>();
@@ -427,7 +446,7 @@ namespace RobotRaconteurWeb
         {
             return base.TransportCapability(name);
         }
-
+#pragma warning disable 1591
         public override Task<List<NodeDiscoveryInfo>> GetDetectedNodes(CancellationToken token)
         {
             var now = DateTime.UtcNow;
@@ -538,17 +557,18 @@ namespace RobotRaconteurWeb
                 return new string[] { string.Format("rr+intra:///?nodeid={0}", node.NodeID.ToString("D")) };
             }
         }
+#pragma warning restore 1591
     }
 
 
-   
+
     sealed class IntraTransportConnection : ITransportConnection
     {
         private WeakReference<IntraTransportConnection> peer_connection;
         bool connected = false;
         List<Message> recv_queue = new List<Message>();
         bool recv_queue_post_requested = false;
-        private Stream socket;
+        //private Stream socket;
         //public NetworkStream netstream;
         bool server = false;
         RobotRaconteurNode node;
@@ -558,11 +578,6 @@ namespace RobotRaconteurWeb
 
         private DateTime LastMessageReceivedTime = DateTime.UtcNow;
 
-        /// <summary>
-        /// Creates a IntraClientTransport with parent IntraTransport
-        /// </summary>
-        /// <param name="c">Parent transport</param>
-        [PublicApi]
         public IntraTransportConnection(IntraTransport parent, bool server, uint local_endpoint)
         {
             node = parent.node;

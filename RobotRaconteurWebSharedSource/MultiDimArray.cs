@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace RobotRaconteurWeb
 {
-
+#pragma warning disable 1591
     public class MultiDimArray_CalculateCopyIndicesIter
     {
         uint[] mema_dims;
@@ -146,7 +146,7 @@ namespace RobotRaconteurWeb
             return true;
         }
     }
-
+#pragma warning restore 1591
 
     /**
     <summary>

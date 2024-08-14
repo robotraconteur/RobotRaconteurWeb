@@ -1,4 +1,17 @@
-﻿
+﻿// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #if !ROBOTRACONTEUR_H5
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -16,19 +29,125 @@ using static RobotRaconteurWeb.RRLogFuncs;
 namespace RobotRaconteurWeb
 {
 
+    /// <summary>
+    /// Directories on local system used by the node
+    /// </summary>
+    /// <remarks>
+    /// The node uses local directories to load configuration information,
+    /// cache data, communicate with other processes, etc. These directories
+    /// can be configured using the NodeDirectories structure and
+    /// RobotRaconteurNode.GetNodeDirectories() and RobotRaconteurNode.SetNodeDirectories().
+    /// Use GetDefaultNodeDirectories() to retrieve the default directories.
+    /// 
+    /// Note: for root user, system and user directories are identical.
+    /// </remarks>
+    [PublicApi] 
     public class NodeDirectories
     {
+        /// <summary>
+        /// Robot Raconteur System data directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: /usr/local/share/robotraconteur
+        /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\data
+        /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_DATA_DIR
+        /// </remarks>
+        [PublicApi] 
         public string system_data_dir;
+        /// <summary>
+        /// Robot Raconteur System config directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: /etc/robotraconteur
+        /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\
+        /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_CONFIG_DIR
+        /// </remarks>
+        [PublicApi] 
         public string system_config_dir;
+        /// <summary>
+        /// Robot Raconteur System config directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: /var/lib/robotraconteur
+        /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\state
+        /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_STATE_DIR
+        /// </remarks>
+        [PublicApi] 
         public string system_state_dir;
+        /// <summary>
+        /// Robot Raconteur System cache directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: /var/cache/robotraconteur
+        /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\cache
+        /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_CACHE_DIR
+        /// </remarks>
+        [PublicApi] 
         public string system_cache_dir;
+        /// <summary>
+        /// Robot Raconteur System run directory
+        /// </summary>
+        /// <remarks>
+        /// Default value: /var/run/robotraconteur
+        /// Default value Windows: %PROGRAMDATA%\RobotRaconteur\run
+        /// Environmental variable override: ROBOTRACONTEUR_SYSTEM_RUN_DIR
+        /// </remarks>
+        [PublicApi] 
         public string system_run_dir;
+        /// <summary>
+        /// Robot Raconteur User data directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: $HOME/.local/share/RobotRaconteur or $XDG_DATA_HOME/RobotRaconteur
+        /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\data
+        /// Environmental variable override: ROBOTRACONTEUR_USER_DATA_DIR
+        /// </remarks>
+        [PublicApi] 
         public string user_data_dir;
+        /// <summary>
+        /// Robot Raconteur User config directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: $HOME/.config/RobotRaconteur or $XDG_CONFIG_HOME/RobotRaconteur
+        /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\
+        /// Environmental variable override: ROBOTRACONTEUR_USER_CONFIG_DIR
+        /// </remarks>
+        [PublicApi] 
         public string user_config_dir;
+        /// <summary>
+        /// Robot Raconteur User state directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: $HOME/.local/state/RobotRaconteur or $XDG_STATE_HOME/RobotRaconteur
+        /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\state
+        /// Environmental variable override: ROBOTRACONTEUR_USER_STATE_DIR
+        /// </remarks>
+        [PublicApi] 
         public string user_state_dir;
+        /// <summary>
+        /// Robot Raconteur User cache directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: $HOME/.cache/RobotRaconteur or $XDG_CACHE_HOME/RobotRaconteur
+        /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\cache
+        /// Environmental variable override: ROBOTRACONTEUR_USER_CACHE_DIR
+        /// </remarks>
+        [PublicApi] 
         public string user_cache_dir;
+        /// <summary>
+        /// Robot Raconteur User state directory
+        /// </summary>
+        /// <remarks>
+        /// Default value Unix: $XDG_RUNTIME_DIR/robotraconteur or /tmp/robotraconteur-run-$UID
+        /// Default value Windows: %LOCALAPPDATA%\RobotRaconteur\run
+        /// Default value for root: {system_run_dir}/root
+        /// Environmental variable override: ROBOTRACONTEUR_USER_RUN_DIR
+        /// </remarks>
+        [PublicApi] 
         public string user_run_dir;
     }
+
+#pragma warning disable 1591
 
 #if !ROBOTRACONTEUR_H5
     static class NodeDirectoriesUtil

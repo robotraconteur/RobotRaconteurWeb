@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,6 +80,11 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>The current version of RobotRaconteurWeb ins tring format</summary>
+         * <remarks>None</remarks>
+         */
+        [PublicApi]
         public const string Version = "0.18.0";
 
         private NodeID m_NodeID;
@@ -122,6 +127,11 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+        /// <summary>
+        /// Try to get the NodeID. Do not automatically generate if not previously configured
+        /// </summary>
+        /// <param name="nodeid">The current NodeID</param>
+        /// <returns>true if NodeID has been configured, otherwise false</returns>
         [PublicApi]
         public bool TryGetNodeID(out NodeID nodeid)
         {
@@ -194,6 +204,12 @@ namespace RobotRaconteurWeb
             }
 
         }
+
+        /// <summary>
+        /// Try to get the NodeName. Do not automatically generate if not previously configured
+        /// </summary>
+        /// <param name="nodename">The current NodeName</param>
+        /// <returns>true if NodeID has been configured, otherwise false</returns>
         [PublicApi]
         public bool TryGetNodeName(out string nodename)
         {
@@ -218,6 +234,10 @@ namespace RobotRaconteurWeb
 
         internal DynamicServiceFactory dynamic_factory;
 
+        /// <summary>
+        /// Get the dynamic service factory if set
+        /// </summary>
+        [PublicApi]
         public DynamicServiceFactory DynamicServiceFactory { get { return dynamic_factory; } }
 
         internal Dictionary<string, ServerContext> services = new Dictionary<string, ServerContext>();
@@ -281,7 +301,10 @@ namespace RobotRaconteurWeb
 #if ROBOTRACONTEUR_H5
         public readonly BrowserWebSocketTransport browser_transport;
 #endif
-
+        /// <summary>
+        /// Construct a new RobotRaconteurNode instance
+        /// </summary>
+        [PublicApi] 
         public RobotRaconteurNode()
         {
             serviceindexer = new ServiceIndexer(this);
@@ -316,6 +339,7 @@ namespace RobotRaconteurWeb
             return GetServiceFactoryForType(ServiceDefinitionUtil.FindStructRRType(type), context);
         }
 
+#pragma warning disable 1591
         public MessageElementNestedElementList PackStructure(Object s, ClientContext context)
         {
             if (s == null) return null;
@@ -1060,12 +1084,15 @@ namespace RobotRaconteurWeb
             return ret;
 
         }
+
+#pragma warning restore 1591
+
         /**
         <summary>
         Register a service type
         </summary>
         <remarks>None</remarks>
-        <param name="servicetype">The service factory implementing the type to register</param>
+        <param name="f">The service factory implementing the type to register</param>
         */
         [PublicApi]
         public void RegisterServiceType(ServiceFactory f)
@@ -1100,7 +1127,18 @@ namespace RobotRaconteurWeb
             }
             return f;
         }
-
+        /**
+        <summary>
+       Returns a previously registered service type.
+       </summary>
+        <remarks>
+        Same as GetServiceType() but returns false on failure instead of throwing an exception
+        </remarks>
+       <remarks>None</remarks>
+       <param name="servicetype">The name of the service type to retrieve</param>
+        <param name="f">Returns the service factory</param>
+       */
+        [PublicApi]
         public bool TryGetServiceType(string servicetype, out ServiceFactory f)
         {
             lock (service_factories)
@@ -1125,6 +1163,13 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Register a dynamic service factory.
+        /// </summary>
+        /// <remarks>Dynamic service factories are used by clients to generate service factories to
+        /// implement plug-and-play typing</remarks>
+        /// <param name="f">The dynamic service factory</param>
+        [PublicApi]
         public void RegisterDynamicServiceFactory(DynamicServiceFactory f)
         {
             if (this.dynamic_factory != null)
@@ -1239,6 +1284,12 @@ namespace RobotRaconteurWeb
 
         }
 
+        /// <summary>
+        /// Return a previously registered service
+        /// </summary>
+        /// <param name="name">The name of the service</param>
+        /// <returns>The context of the service</returns>
+        [PublicApi]
         public ServerContext GetService(string name)
         {
             try
@@ -1263,7 +1314,7 @@ namespace RobotRaconteurWeb
             Register a transport for use by the node
         </summary>
         <remarks>None</remarks>
-        <param name="transport">The transport to register</param>
+        <param name="c">The transport to register</param>
         <returns>The transport internal id</returns>
         */
         [PublicApi]
@@ -1281,7 +1332,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-
+#pragma warning disable 1591
         public async Task<Message> SpecialRequest(Message m, uint transportid)
         {
 
@@ -1516,6 +1567,7 @@ namespace RobotRaconteurWeb
 
 
         }
+#pragma warning restore 1591
         /**
         <summary>
         Create a client connection to a remote service using a URL
@@ -1546,6 +1598,7 @@ namespace RobotRaconteurWeb
         <param name="credentials">Optional credentials for authentication</param>
         <param name="listener">An optional listener callback function</param>
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The root object reference of the connected service</returns>
         */
         [PublicApi]
@@ -1630,6 +1683,7 @@ namespace RobotRaconteurWeb
         <param name="credentials">Optional credentials for authentication</param>
         <param name="listener">An optional listener callback function</param>
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The root object reference of the connected service</returns>
         */
         [PublicApi]
@@ -1736,6 +1790,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="obj">The root object of the service to disconnect</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
         [PublicApi]
         public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
@@ -1761,7 +1816,7 @@ namespace RobotRaconteurWeb
             ServiceStub stub = (ServiceStub)obj;
             return stub.RRContext.Attributes;
         }
-
+#pragma warning disable 1591
         public uint RegisterEndpoint(Endpoint e)
         {
             lock (endpoints)
@@ -1804,6 +1859,7 @@ namespace RobotRaconteurWeb
             }
             catch { }
         }
+#pragma warning restore 1591
         /**
         <summary>
             Check that the TransportConnection associated with an endpoint
@@ -1925,11 +1981,17 @@ namespace RobotRaconteurWeb
         }
 
 
-
+        /// <summary>
+        /// Returns the currently detected nodes from discovery
+        /// </summary>
+        /// <remarks>This is raw information from listening to multicast packtes. 
+        /// These nodes are not validated and may not be reachable</remarks> 
+        /// <value></value>
+        [PublicApi] 
         public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
         internal Discovery m_Discovery;
-
+#pragma warning disable 1591
         public void NodeAnnouncePacketReceived(string packet)
         {
             m_Discovery.NodeAnnouncePacketReceived(packet);
@@ -1945,6 +2007,7 @@ namespace RobotRaconteurWeb
         {
             m_Discovery.CleanDiscoveredNodes();
         }
+#pragma warning restore 1591
         /**
         <summary>
             Select the "best" URL from a std::vector of candidates
@@ -2085,6 +2148,7 @@ namespace RobotRaconteurWeb
         <param name="servicetype">The service type to find, ie `com.robotraconteur.robotics.robot.Robot`</param>
         <param name="transportschemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
         etc</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The detected services</returns>
         */
         [PublicApi]
@@ -2124,6 +2188,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="id">The NodeID to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
+        <param name="cancel">The cancellation token for the operation</param>
         etc</param> <returns>The detected nodes</returns>
         */
         [PublicApi]
@@ -2163,7 +2228,8 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="name">The NodeName to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
-        etc</param> 
+        etc</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The detected nodes</returns>
         */
         [PublicApi]
@@ -2185,6 +2251,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="obj">The object to lock. Must be returned by ConnectService or returned by an `objref`</param>
         <param name="flags">Select either a "User" or "Session" lock</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>"OK" on success</returns>
         */
         [PublicApi]
@@ -2208,6 +2275,7 @@ namespace RobotRaconteurWeb
         </para>
         </remarks>
         <param name="obj">The object previously locked</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>"OK" on success</returns>
         */
         [PublicApi]
@@ -2219,6 +2287,10 @@ namespace RobotRaconteurWeb
             return await s.RRContext.ReleaseObjectLock(obj, cancel).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Handle to a monitor lock
+        /// </summary>
+        [PublicApi]
         public class MonitorLock
         {
             internal IDisposable lock_;
@@ -2240,6 +2312,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="obj">The object to lock</param>
         <param name="timeout">The timeout in milliseconds to acquire the monitor lock, or RR_TIMEOUT_INFINITE</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
         [PublicApi]
         public async Task<MonitorLock> MonitorEnter(object obj, int timeout = -1, CancellationToken cancel = default(CancellationToken))
@@ -2255,7 +2328,8 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None
         </remarks>
-        <param name="obj">The object previously locked by MonitorEnter()</param>
+        <param name="lock_">The object previously locked by MonitorEnter()</param>
+        <param name="cancel">The cancellation token for the operation</param>
         */
         [PublicApi]
         public async Task MonitorExit(RobotRaconteurNode.MonitorLock lock_, CancellationToken cancel = default(CancellationToken))
@@ -2282,6 +2356,7 @@ namespace RobotRaconteurWeb
         <param name="obj">The object with the desired `objref`</param>
         <param name="objref">The name of the `objref` member</param>
         <param name="objecttype">The desired service object type</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The object with the specified interface type. Must be cast to the desired type</returns>
         */
         [PublicApi]
@@ -2305,6 +2380,7 @@ namespace RobotRaconteurWeb
         <param name="objref">The name of the `objref` member</param>
         <param name="index">The index for the `objref`, convert int to string for int32 index type</param>
         <param name="objecttype">The desired service object type</param>
+        <param name="cancel">The cancellation token for the operation</param>
         <returns>The object with the specified interface type. Must be cast to the desired type</returns>
         */
         [PublicApi]
@@ -2377,6 +2453,12 @@ namespace RobotRaconteurWeb
             return new WallRate(frequency, this);
         }
 
+        /// <summary>
+        /// Return a random alphanumeric string of the specified length
+        /// </summary>
+        /// <param name="count">Length of string</param>
+        /// <returns>The random string</returns>
+        [PublicApi] 
         public string GetRandomString(int count)
         {
             string o = "";
@@ -2390,6 +2472,7 @@ namespace RobotRaconteurWeb
             return o;
         }
 
+#pragma warning disable 1591
         protected string service_state_nonce;
 
         public string ServiceStateNonce
@@ -2426,6 +2509,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
+#pragma warning restore 1591
         /**
         <summary>
         Subscribe to listen for available services information
@@ -2682,6 +2766,16 @@ namespace RobotRaconteurWeb
 
         internal NodeDirectories node_dirs;
 
+        /// <summary>
+        /// Get or set the NodeDirectories object for the node
+        /// </summary>
+        /// <remarks>
+        /// The NodeDirectories controls where the node searches for local transport connections,
+        /// stores node information, searches for configuration information,
+        /// and other node specific directories. The NodeDirectories cannot be modified after
+        /// it has been configured. A default configuration is used if not set.</remarks> 
+        /// <value></value>
+        [PublicApi]
         public NodeDirectories NodeDirectories
         {
             get

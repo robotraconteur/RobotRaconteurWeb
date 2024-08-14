@@ -1,3 +1,17 @@
+// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,36 +39,43 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Trace log level.
         /// </summary>
+        [PublicApi] 
         Trace,
 
         /// <summary>
         /// Debug log level.
         /// </summary>
+        [PublicApi] 
         Debug,
 
         /// <summary>
         /// Info log level.
         /// </summary>
+        [PublicApi] 
         Info,
 
         /// <summary>
         /// Warning log level.
         /// </summary>
+        [PublicApi] 
         Warning,
 
         /// <summary>
         /// Error log level.
         /// </summary>
+        [PublicApi] 
         Error,
 
         /// <summary>
         /// Fatal log level.
         /// </summary>
+        [PublicApi] 
         Fatal,
 
         /// <summary>
         /// Disabled log level.
         /// </summary>
+        [PublicApi] 
         Disable = 1000
     }
 
@@ -65,101 +86,121 @@ namespace RobotRaconteurWeb
     /// Log records contain the code of the component where
     /// the log record was generated.
     /// </remarks>
+    [PublicApi] 
     public enum RobotRaconteur_LogComponent
     {
         /// <summary>
         /// Default component.
         /// </summary>
+        [PublicApi] 
         Default,
 
         /// <summary>
         /// Robot Raconteur Node component.
         /// </summary>
+        [PublicApi] 
         Node,
 
         /// <summary>
         /// Transport component.
         /// </summary>
+        [PublicApi] 
         Transport,
 
         /// <summary>
         /// Message or message serialization component.
         /// </summary>
+        [PublicApi] 
         Message,
 
         /// <summary>
         /// Client component.
         /// </summary>
+        [PublicApi]  
         Client,
 
         /// <summary>
         /// Service component.
         /// </summary>
+        [PublicApi] 
         Service,
 
         /// <summary>
         /// Member component.
         /// </summary>
+        [PublicApi]  
         Member,
 
         /// <summary>
         /// Data message packing component.
         /// </summary>
+        [PublicApi] 
         Pack,
 
         /// <summary>
         /// Data message unpacking component.
         /// </summary>
+        [PublicApi] 
         Unpack,
 
         /// <summary>
         /// Service definition parser component.
         /// </summary>
+        [PublicApi]  
         ServiceDefinition,
 
         /// <summary>
         /// Node or service discovery component.
         /// </summary>
+        [PublicApi] 
         Discovery,
 
         /// <summary>
         /// Subscription component.
         /// </summary>
+        [PublicApi]
         Subscription,
 
         /// <summary>
         /// Node setup component.
         /// </summary>
+        [PublicApi]  
         NodeSetup,
 
         /// <summary>
         /// Utility component.
         /// </summary>
+        [PublicApi] 
         Utility,
 
         /// <summary>
         /// Service definition standard library component (external).
         /// </summary>
+        [PublicApi] 
         RobDefLib,
 
         /// <summary>
         /// User component (external).
         /// </summary>
+        [PublicApi] 
         User,
 
         /// <summary>
         /// User client component (external).
         /// </summary>
+        [PublicApi]  
         UserClient,
 
         /// <summary>
         /// User service component (external).
         /// </summary>
+        [PublicApi] 
         UserService,
 
         /// <summary>
         /// Third party library component (external).
         /// </summary>
+        [PublicApi] 
         ThirdParty
     }
 
@@ -284,8 +325,20 @@ namespace RobotRaconteurWeb
         public string ThreadID;
     }
 
+    /// <summary>
+    /// Logging functions for Robot Raconteur
+    /// </summary>
     public static class RRLogFuncs
     {
+        /**
+        <summary>
+        Convert a log level to a string
+        </summary>
+        <param name="logLevel">The log level</param>
+        <returns>The log level as a string</returns>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public static string LogLevel_ToString(RobotRaconteur_LogLevel logLevel)
         {
             switch (logLevel)
@@ -306,7 +359,16 @@ namespace RobotRaconteurWeb
                     return "unknown";
             }
         }
-
+        
+        /**
+        <summary>
+        Convert a log component to a string
+        </summary>
+        <param name="component">The log component</param>
+        <returns>The log component as a string</returns>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public static string LogComponent_ToString(RobotRaconteur_LogComponent component)
         {
             switch (component)
@@ -354,6 +416,16 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+        <summary>
+        Create a string representation of a node's identity
+        for logging.
+        </summary>
+        <param name="node">The node</param>
+        <returns>The node identity as a string</returns>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public static string Node_ToString(RobotRaconteurNode node)
         {
             if (node == null)
@@ -378,6 +450,16 @@ namespace RobotRaconteurWeb
         {
             return time.ToString("o");
         }
+
+        /**
+        <summary>
+        Write a log record to a text writer
+        </summary>
+        <param name="writer">The text writer</param>
+        <param name="record">The log record</param>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public static void WriteLogRecord(TextWriter writer, RRLogRecord record)
         {
             writer.Write("[{0}] [{1}] [{2}] [{3}]", 
@@ -413,6 +495,15 @@ namespace RobotRaconteurWeb
             writer.Write(" {0}", record.Message);
         }
 
+        /**
+        <summary>
+        Convert a log record to a string
+        </summary>
+        <param name="record">The log record</param>
+        <returns>The log record as a string</returns>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         public static string LogRecordToString(RRLogRecord record)
         {
             var s = new StringWriter();
@@ -420,11 +511,35 @@ namespace RobotRaconteurWeb
             return s.ToString();
         }
 
+        /**
+        <summary>
+        Log a LogRecord to the node's log record handler
+        </summary>
+        <remarks>The node stored in the Node field of the record is used to log the record</remarks>
+        */
+        [PublicApi]
         public static void Log(RRLogRecord record)
         {
             record?.Node?.LogRecord(record);
         }
 
+        /// <summary>
+        /// Log a message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="level">The level of the log message</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi]
         public static void Log(string message, RobotRaconteurNode node=null, RobotRaconteur_LogLevel level = RobotRaconteur_LogLevel.Warning, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "", 
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -450,6 +565,22 @@ namespace RobotRaconteurWeb
             Log(r);
         }
 
+        /// <summary>
+        /// Log a "Fatal" message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi]
         public static void LogFatal(string message, RobotRaconteurNode node = null, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "", 
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -457,6 +588,22 @@ namespace RobotRaconteurWeb
             Log(message, node, RobotRaconteur_LogLevel.Fatal, component, component_name, component_object_id, endpoint, service_path, member, time, source_file, source_line, thread_id);
         }
 
+        /// <summary>
+        /// Log an "Error" message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi] 
         public static void LogError(string message, RobotRaconteurNode node = null, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "", 
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -464,6 +611,22 @@ namespace RobotRaconteurWeb
             Log(message, node, RobotRaconteur_LogLevel.Error, component, component_name, component_object_id, endpoint, service_path, member, time, source_file, source_line, thread_id);
         }
 
+        /// <summary>
+        /// Log a "Warning" message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi]
         public static void LogWarning(string message, RobotRaconteurNode node = null, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "", 
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -471,6 +634,22 @@ namespace RobotRaconteurWeb
             Log(message, node, RobotRaconteur_LogLevel.Warning, component, component_name, component_object_id, endpoint, service_path, member, time, source_file, source_line, thread_id);
         }
 
+        /// <summary>
+        /// Log an "Info" message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi]
         public static void LogInfo(string message, RobotRaconteurNode node = null, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "",
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -478,6 +657,22 @@ namespace RobotRaconteurWeb
             Log(message, node, RobotRaconteur_LogLevel.Info, component, component_name, component_object_id, endpoint, service_path, member, time, source_file, source_line, thread_id);
         }
 
+        /// <summary>
+        /// Log a "Debug" message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi] 
         public static void LogDebug(string message, RobotRaconteurNode node = null, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "",
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -485,6 +680,22 @@ namespace RobotRaconteurWeb
             Log(message, node, RobotRaconteur_LogLevel.Debug, component, component_name, component_object_id, endpoint, service_path, member, time, source_file, source_line, thread_id);
         }
 
+        /// <summary>
+        /// Log a "Trace" message to the node's log record handler
+        /// </summary>
+        /// <param name="message">The message to log as a string</param>
+        /// <param name="node">The node that produced the message and logs it</param>
+        /// <param name="component">The component that produced the message</param>
+        /// <param name="component_name">The component subname</param>
+        /// <param name="component_object_id">An object id to help identify the source</param>
+        /// <param name="endpoint">The endpoint that produced the message</param>
+        /// <param name="service_path">The service path of the object that produced the message</param>
+        /// <param name="member">The name of the member that produced the message</param>
+        /// <param name="time">The UTC time of the message</param>
+        /// <param name="source_file">The source file of the message</param>
+        /// <param name="source_line">The source file line of the message</param>
+        /// <param name="thread_id">The ID of the thread that produced the message</param>
+        [PublicApi]
         public static void LogTrace(string message, RobotRaconteurNode node = null, RobotRaconteur_LogComponent component = RobotRaconteur_LogComponent.Default,
             string component_name = "", string component_object_id = "", long endpoint = -1, string service_path = "", string member = "",
             DateTime time = default, [CallerFilePath] string source_file = "", [CallerLineNumber] int source_line = 0, string thread_id = "")
@@ -493,8 +704,22 @@ namespace RobotRaconteurWeb
         }
     }
 
+    /**
+    <summary>
+    Interface for log record handlers. Use this interface to implement custom log record handlers.
+    </summary>
+    **/
+    [PublicApi]
     public interface ILogRecordHandler
     {
+        /**
+        <summary>
+        Log a log record
+        </summary>
+        <param name="record">The log record</param>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
         void Log(RRLogRecord record);
     }
 }

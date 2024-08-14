@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -186,20 +186,56 @@ namespace RobotRaconteurWeb
         private bool transportopen = false;
         private CancellationTokenSource transportcancel = new CancellationTokenSource();
 
+        /// <summary>
+        /// Checks if the transport is configured to accept incoming connections
+        /// </summary>
+        [PublicApi] 
         public override bool IsServer { get { return true; } }
+        /// <summary>
+        /// Checks if the transport is configured to initiate client connections
+        /// </summary>
+        [PublicApi] 
         public override bool IsClient { get { return true; } }
 
         internal Dictionary<uint, AsyncStreamTransport> TransportConnections = new Dictionary<uint, AsyncStreamTransport>();
         
+        /// <summary>
+        /// Default message receive timeout in milliseconds
+        /// </summary>
+        /// <remarks>
+        /// If a message is not received in the specified timeout
+        /// period the connection is closed
+        /// </remarks>
+        [PublicApi] 
         public int DefaultReceiveTimeout { get; set; }
+        /// <summary>
+        /// Default connect timeout in milliseconds
+        /// </summary>
+        [PublicApi]
         public int DefaultConnectTimeout { get; set; }
 
+        /// <summary>
+        /// Allow incoming Web Socket connections from HTTP clients
+        /// </summary>
+        [PublicApi]  
         public bool AcceptWebSockets { get; set; }
 
+        /// <summary>
+        /// The supported URL transport schemes
+        /// </summary>
+        [PublicApi] 
         public override string[] UrlSchemeString { get { return new string[] {"tcp", "rr+tcp", "rrs+tcp", "rr+ws", "rrs+ws", "rr+wss", "rrs+wss"}; } }
 
         private int m_HeartbeatPeriod = 5000;
 
+        /// <summary>
+        /// The transport connection heartbeat period in milliseconds
+        /// </summary>
+        /// <remarks>
+        /// The transport will send a connection test heartbeat message
+        /// if a message has not been sent within the specified interval
+        /// </remarks>
+        [PublicApi] 
         public int HeartbeatPeriod
         {
             get
@@ -213,6 +249,10 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// The IPEndPoints that the transport is listening on for incoming connections
+        /// </summary>
+        [PublicApi] 
         public List<IPEndPoint> ListeningEndpoints
         {            
             get
@@ -255,7 +295,7 @@ namespace RobotRaconteurWeb
             allowed_websocket_origins.Add("https://*.robotraconteur.com:443");
         }
 
-       
+#pragma warning disable 1591
         public override async  Task<ITransportConnection> CreateTransportConnection(string url, Endpoint e, CancellationToken cancel)
         {
             TcpClientTransport p = new TcpClientTransport(this);
@@ -273,7 +313,13 @@ namespace RobotRaconteurWeb
         }
 
         bool listen_started = false;
+#pragma warning restore 1591
 
+        /// <summary>
+        /// Start the TcpTransport service listening on the specified TCP port
+        /// </summary>
+        /// <param name="porte">The TCP port to listen on</param>
+        [PublicApi]
         public void StartServer(int porte)
         {
             //sProgramName = progname;
@@ -684,14 +730,25 @@ namespace RobotRaconteurWeb
 
         }
 
-
+        /// <summary>
+        /// Accept an incoming WebSocket previously accepted by a web server
+        /// </summary>
+        /// <remarks>
+        /// Use this function to embed RobotRaconteurWeb in an ASP.NET server.
+        /// Receive WebSockets as normal and pass to this function. To not
+        /// use StartServer()
+        /// </remarks>
+        /// <param name="s">The WebSocket to accept</param>
+        /// <param name="url">The URL used to connect the WebSocket</param>
+        /// <returns></returns>
+        [PublicApi]
         public async Task AcceptAndProcessServerWebSocket(WebSocket s, string url)
         {
             TcpServerTransport c = new TcpServerTransport(this);
             c.ReceiveTimeout = DefaultReceiveTimeout;
             await c.ProccessWebSocket(s, url).ConfigureAwait(false);
         }
-
+#pragma warning disable 1591
         public override bool CanConnectService(string url)
         {
             Uri u = new Uri(url);
@@ -726,7 +783,13 @@ namespace RobotRaconteurWeb
                     node.MessageReceived(m);
                
         }
+#pragma warning restore 1591
 
+        /// <summary>
+        /// Close the TcpTransport and all active connections
+        /// </summary>
+        /// <returns></returns>
+        [PublicApi]
         public override Task Close()
         {
             transportopen = false;
@@ -783,7 +846,7 @@ namespace RobotRaconteurWeb
 
             return Task.FromResult(0);
         }
-
+#pragma warning disable 1591
         public override void CheckConnection(uint endpoint)
         {
             try
@@ -795,6 +858,7 @@ namespace RobotRaconteurWeb
                 throw new ConnectionException("Transport not connected");
             }
         }
+#pragma warning restore 1591
 
         private IPNodeDiscovery node_discovery;
         /**
@@ -868,12 +932,13 @@ namespace RobotRaconteurWeb
 
             FireTransportEventListener(TransportListenerEventType.TransportConnectionClosed, e);
         }
-                
 
+#pragma warning disable 1591
         public override uint TransportCapability(string name)
         {
             return base.TransportCapability(name);
         }
+#pragma warning restore 1591
 
         internal Tuple<X509Certificate, X509CertificateCollection> nodecertificate = null;
 
@@ -888,6 +953,10 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Check if a TLS node certificate has been loaded
+        /// </summary>
+        [PublicApi]
         public bool IsTlsNodeCertificateLoaded
         {
             get
@@ -898,7 +967,11 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-
+        /// <summary>
+        /// Load a TLS node certificate. This is done automatically
+        /// by SecureServerNodeSetup
+        /// </summary>
+        [PublicApi]
         public void LoadTlsNodeCertificate()
         {
             lock (this)
@@ -926,6 +999,11 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Set to require all connections to use TLS. Automatically configured by
+        /// SecureServerNodeSetup
+        /// </summary>
+        [PublicApi]
         public bool RequireTls { get; set; }
 
         private class AsyncStreamTransportParentImpl : AsyncStreamTransportParent
@@ -972,7 +1050,12 @@ namespace RobotRaconteurWeb
 
         internal readonly AsyncStreamTransportParent parent_adapter;
 
-
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="endpoint">The LocalEndpoint ID of the connection</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
         public bool IsTransportConnectionSecure(uint endpoint)
         { 
             try
@@ -992,11 +1075,23 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="endpoint">The Endpoint of the connection</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
         public bool IsTransportConnectionSecure(Endpoint endpoint)
         {
             return IsTransportConnectionSecure(endpoint.LocalEndpoint);
         }
 
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="obj">An object reference of a connected client</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
         public bool IsTransportConnectionSecure(object obj)
         {
             ServiceStub s = obj as ServiceStub;
@@ -1004,6 +1099,12 @@ namespace RobotRaconteurWeb
             return IsTransportConnectionSecure(s.RRContext.LocalEndpoint);
         }
 
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="transport">The transport connection</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
         public bool IsTransportConnectionSecure(ITransportConnection transport)
         {
             AsyncStreamTransport s = transport as AsyncStreamTransport;
@@ -1011,6 +1112,12 @@ namespace RobotRaconteurWeb
             return s.IsSecure;
         }
 
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The LocalEndpoint ID of the connection</param>
+        /// <returns></returns>
+        [PublicApi]
         public bool IsSecurePeerIdentityVerified(uint endpoint)
         {
             try
@@ -1030,11 +1137,23 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The Endpoint of the connection</param>
+        /// <returns></returns>
+        [PublicApi]
         public bool IsSecurePeerIdentityVerified(Endpoint endpoint)
         {
             return IsSecurePeerIdentityVerified(endpoint.LocalEndpoint);
         }
 
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="obj">An object reference of a connected client</param>
+        /// <returns></returns>
+        [PublicApi]
         public bool IsSecurePeerIdentityVerified(object obj)
         {
             ServiceStub s = obj as ServiceStub;
@@ -1042,6 +1161,12 @@ namespace RobotRaconteurWeb
             return IsSecurePeerIdentityVerified(s.RRContext.LocalEndpoint);
         }
 
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="transport">The transport connection</param>
+        /// <returns></returns>
+        [PublicApi]
         public bool IsSecurePeerIdentityVerified(ITransportConnection transport)
         {
             AsyncStreamTransport s = transport as AsyncStreamTransport;
@@ -1049,6 +1174,12 @@ namespace RobotRaconteurWeb
             return s.IsSecurePeerIdentityVerified;
         }
 
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The LocalEndpoint ID of the connection</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
         public string GetSecurePeerIdentity(uint endpoint)
         {
             AsyncStreamTransport t = null;
@@ -1060,19 +1191,34 @@ namespace RobotRaconteurWeb
 
             return t.GetSecurePeerIdentity();
         }
-
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The Endpoint of the connection</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
         public string GetSecurePeerIdentity(Endpoint endpoint)
         {
             return GetSecurePeerIdentity(endpoint.LocalEndpoint);
         }
-
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="obj">An object reference of a connected client</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
         public string GetSecurePeerIdentity(object obj)
         {
             ServiceStub s = obj as ServiceStub;
             if (s == null) throw new InvalidOperationException("Object must be a service stub");
             return GetSecurePeerIdentity(s.RRContext.LocalEndpoint);
         }
-
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="transport">The transport connection</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
         public string GetSecurePeerIdentity(ITransportConnection transport)
         {
             AsyncStreamTransport s = transport as AsyncStreamTransport;
@@ -1082,6 +1228,14 @@ namespace RobotRaconteurWeb
 
         List<string> allowed_websocket_origins=new List<string>();
 
+        /**
+         * <summary>Get the currently configured WebSocket origins</summary>
+         * <remarks>
+         * See AddWebSocketAllowedOrigin()
+         * </remarks>
+         * <returns>The currently configured WebSocket origins</returns>
+         */
+        [PublicApi] 
         public string[] GetWebSocketAllowedOrigins()
         {
             lock (this)
@@ -1089,7 +1243,49 @@ namespace RobotRaconteurWeb
                 return allowed_websocket_origins.ToArray();
             }
         }
-
+        /**
+         * <summayr>brief Add a WebSocket allowed origin</summayr>
+         * 
+         * <remarks>
+         * WebSockets are vulnerable to an attack method called "cross-site scripting" (XSS). In
+         * XSS, a malicious website will attempt to create a connection to an arbitrary website or local
+         * device and attempt to hack or otherwise interact with it. WebSockets protect against this attack
+         * using an "Origin" HTTP header field specified in the header upon connection. This header
+         * field contains the domain name, the IP address, and/or the port of the web page that is
+         * attempting to initiate the connection. This header field is filled by the browser, and cannot
+         * be modified by the web page. If the web page is loaded from the local filesystem, the origin
+         * will be the empty string ("") or null ("null"). The Robot Raconteur Core library uses the
+         * empty string origin when initiating WebSocket connections. By default, it accepts
+         * the following origins:
+         * 
+         * * (empty string)
+         * * "null"
+         * * "file://"
+         * * "http://robotraconteur.com"
+         * * "http://robotraconteur.com:80"
+         * * "http://(*).robotraconteur.com"
+         * * "http://(*).robotraconteur.com:80"
+         * * "https://robotraconteur.com"
+         * * "https://robotraconteur.com:443"
+         * * "https://(*).robotraconteur.com"
+         * * "https://(*).robotraconteur.com:443"
+         *
+         * <para>
+         *    Note: forward-slash-star is not a valid comment, assume (*) is *
+         * </para>
+         * <para>
+         * The star symbol can be used for a subdomain wildcard when matching origins.
+         * </para>
+         * <para>
+         * Additional allowed origins can be added using this function, or the
+         * `--robotraconteur-tcp-ws-add-origin=` command line option if
+         * the RobotRaconteurNodeSetup classes are being used.
+         * </para>
+         * </remarks>
+         *
+         * <param name="origin">he origin to add</param>
+         */
+        [PublicApi]
         public void AddWebSocketAllowedOrigin(string origin)
         {
             lock (this)
@@ -1153,7 +1349,14 @@ namespace RobotRaconteurWeb
 
             }
         }
-
+        /**
+         * <summary>Remove a previously added WebSocket origin</summary>
+         * <remarks>
+         * See AddWebSocketAllowedOrigin()
+         * </remarks>
+         * <param name="origin">The origin to remove</param>
+         */
+        [PublicApi]
         public void RemoveWebSocketAllowedOrigin(string origin)
         {
             lock (this)
@@ -1161,7 +1364,7 @@ namespace RobotRaconteurWeb
                 allowed_websocket_origins.Remove(origin);
             }
         }
-
+#pragma warning disable 1591
         public override void LocalNodeServicesChanged()
         {
             if (node_discovery == null) return;
@@ -1183,7 +1386,13 @@ namespace RobotRaconteurWeb
             }
             return new List<NodeDiscoveryInfo>();
         }
-
+#pragma warning restore 1591
+        /**
+         * <summary>Get the TCP endpoints the server is listening with "all" addresses resolved to specific addresses</summary>
+         *
+         * 
+         */
+        [PublicApi] 
         public IPEndPoint[] ResolvedListenerEndpoints
         {
             get
@@ -1256,6 +1465,12 @@ namespace RobotRaconteurWeb
             }
         }
 
+        /**
+         * <summary>Get the TCP endpoints the server is listening on as Robot Raconteur candidate URLs</summary>
+         *
+         * <returns>Candidate connections urls for the node, without service specified</returns>
+         */
+         [PublicApi] 
         public override string[] ServerListenUrls
         {
             get
@@ -1838,16 +2053,30 @@ namespace RobotRaconteurWeb
         }
     }
 
-
+    /// <summary>
+    /// Configuration flags for IP network node discovery
+    /// </summary>
     [Flags, PublicApi]
     public enum  IPNodeDiscoveryFlags
-    {        
+    {
+        /// <summary>
+        /// Use IPv6 FF01:: node local  multicast addresses
+        /// </summary>
         [PublicApi]
         NodeLocal=0x1,
+        /// <summary>
+        /// Use IPv6 FF02:: link local  multicast addresses
+        /// </summary>
         [PublicApi]
         LinkLocal=0x2,
+        /// <summary>
+        /// Use IPv6 FF05:: site local  multicast addresses
+        /// </summary>
         [PublicApi]
         SiteLocal=0x4,
+        /// <summary>
+        /// Use IPv4 255.255.255.255 broadcast addresses
+        /// </summary>
         [PublicApi]
         IPv4Broadcast = 0x8
 

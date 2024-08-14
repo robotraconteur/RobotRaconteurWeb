@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ namespace RobotRaconteurWeb
         Must be called after RobotRaconteurNode.CreateTimer()
         </remarks>
         */
+        [PublicApi] 
         void Start();
         /**
         <summary>
@@ -54,6 +55,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi] 
         void Stop();
         /**
         <summary>
@@ -61,6 +63,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi] 
         int Period {get; set;}
         /**
         <summary>
@@ -68,6 +71,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
+        [PublicApi] 
         bool IsRunning { get; }        
     }
 
@@ -154,6 +158,7 @@ namespace RobotRaconteurWeb
         public DateTime current_real;
     }
 
+#pragma warning disable 1591
     public class WallTimer : ITimer
     {
 
@@ -319,5 +324,6 @@ namespace RobotRaconteurWeb
             last_time = p2;            
         }
     }
+#pragma warning restore 1591
 
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+﻿// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 using static RobotRaconteurWeb.RRLogFuncs;
+
+#pragma warning disable 1591
 
 namespace RobotRaconteurWeb
 {
@@ -1879,16 +1881,19 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// service has been closed
         /// </summary>
+        [PublicApi] 
         ServiceClosed = 1,
         
         /// <summary>
         /// client has connected
         /// </summary>
+        [PublicApi] 
         ClientConnected,
 
         /// <summary>
         /// client has disconnected
         /// </summary>
+        [PublicApi] 
         ClientDisconnected
     }
 
