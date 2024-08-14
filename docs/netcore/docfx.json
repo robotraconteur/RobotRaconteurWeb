@@ -12,7 +12,10 @@
       ],
       "dest": "api",
       "disableGitFeatures": false,
-      "disableDefaultFilter": false
+      "disableDefaultFilter": false,
+      "properties": {
+        "remarks": "None"
+      }
     }
   ],
   "build": {
