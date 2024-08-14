@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -70,9 +70,9 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The packet data type</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public abstract class Pipe<T>
-    {        
+    {
         /**
         <summary>
         Connect to any pipe index
@@ -133,7 +133,7 @@ namespace RobotRaconteurWeb
             <remarks>None</remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public int Index { get { return index; } }
             /**
             <summary>
@@ -146,7 +146,7 @@ namespace RobotRaconteurWeb
             */
 
 
-        [PublicApi]
+            [PublicApi]
             public uint Endpoint { get { return endpoint.LocalEndpoint; } }
             /**
             <summary>
@@ -159,7 +159,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public bool RequestPacketAck { get; set; } = false;
 #pragma warning disable 1591
             public PipeEndpoint(Pipe<T> parent, int index, Endpoint endpoint = null)
@@ -186,7 +186,7 @@ namespace RobotRaconteurWeb
             <param name="cancel">The cancellation token for the operation</param>
             <returns />
             */
-            [PublicApi] 
+            [PublicApi]
             public async Task<uint> SendPacket(T packet, CancellationToken cancel = default(CancellationToken))
             {
                 Task mutex = send_mutex.Enter();
@@ -215,7 +215,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public async Task Close()
             {
                 await parent.Close(this).ConfigureAwait(false);
@@ -239,7 +239,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public event PipePacketReceivedCallbackFunction PacketReceivedEvent;
 
             AsyncValueWaiter<bool> recv_waiter = new AsyncValueWaiter<bool>();
@@ -316,7 +316,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public int Available
             {
                 get
@@ -339,7 +339,7 @@ namespace RobotRaconteurWeb
             <returns>The next packet in the receive queue</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public T PeekNextPacket()
             {
                 lock (recv_lock)
@@ -359,7 +359,7 @@ namespace RobotRaconteurWeb
             <returns>The received packet</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public T ReceivePacket()
             {
                 lock (recv_lock)
@@ -438,7 +438,7 @@ namespace RobotRaconteurWeb
             {
                 AsyncValueWaiter<bool>.AsyncValueWaiterTask waiter;
                 lock (recv_lock)
-                {              
+                {
                     if (recv_packets.Count > 0)
                     {
                         if (!peek)
@@ -474,8 +474,8 @@ namespace RobotRaconteurWeb
                             return Tuple.Create(true, recv_packets.Peek());
                         }
 
-                    }                    
-                    return Tuple.Create(false, default(T));                    
+                    }
+                    return Tuple.Create(false, default(T));
                 }
             }
             /// <summary>
@@ -500,7 +500,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public PipeDisconnectCallbackFunction PipeCloseCallback
             {
                 get { return close_callback; }
@@ -615,7 +615,7 @@ namespace RobotRaconteurWeb
         <para>
         Only valid for services. Will throw InvalidOperationException on the client side.
         </para>
-        
+
         */
         [PublicApi]
         public abstract PipeConnectCallbackFunction PipeConnectCallback { get; set; }
@@ -644,10 +644,10 @@ namespace RobotRaconteurWeb
                 data = MessageElement.FindElement(elems, "packet");
             e.PipePacketReceived((T)data, packetnumber);
 
-            bool requestack=(elems.Any(x => x.ElementName == "requestack"));
+            bool requestack = (elems.Any(x => x.ElementName == "requestack"));
             return requestack;
         }
-        
+
         protected MessageElement PackPacket(T data, int index, uint packetnumber, bool requestack)
         {
             List<MessageElement> elems = new List<MessageElement>();
@@ -670,12 +670,12 @@ namespace RobotRaconteurWeb
             }
 
             var delems = new MessageElementNestedElementList(DataTypes.dictionary_t, "", elems);
-            
+
             MessageElement me = new MessageElement(index.ToString(), delems);
 
             return me;
         }
-        
+
         protected abstract void DeleteEndpoint(PipeEndpoint e);
 
         protected abstract object PackAnyType(ref T o);
@@ -691,7 +691,7 @@ namespace RobotRaconteurWeb
         private Dictionary<int, PipeEndpoint> pipeendpoints = new Dictionary<int, PipeEndpoint>();
 
         private string m_Name;
-        
+
         public override string MemberName { get { return m_Name; } }
 
         private ServiceStub stub;
@@ -702,7 +702,7 @@ namespace RobotRaconteurWeb
             this.stub = stub;
             stub.RRContext.ClientServiceListener += ClientContextListener;
         }
-        
+
         protected override async Task SendPipePacket(T data, int index, uint packetnumber, bool requestack, Endpoint e = null, CancellationToken cancel = default(CancellationToken))
         {
             MessageElement me = PackPacket(data, index, packetnumber, requestack);
@@ -711,8 +711,8 @@ namespace RobotRaconteurWeb
             await stub.SendPipeMessage(m, cancel).ConfigureAwait(false);
         }
 
-        List<Tuple<int,object>> connecting = new List<Tuple<int,object>>();
-        Dictionary<int,PipeEndpoint> early_endpoints = new Dictionary<int,PipeEndpoint>();
+        List<Tuple<int, object>> connecting = new List<Tuple<int, object>>();
+        Dictionary<int, PipeEndpoint> early_endpoints = new Dictionary<int, PipeEndpoint>();
 
         public override async Task<PipeEndpoint> Connect(int index, CancellationToken cancel = default(CancellationToken))
         {
@@ -721,7 +721,7 @@ namespace RobotRaconteurWeb
             {
                 connecting.Add(Tuple.Create(index, connecting_key));
             }
-            int rindex=-1;
+            int rindex = -1;
             try
             {
                 MessageEntry m = new MessageEntry(MessageEntryType.PipeConnectReq, MemberName);
@@ -758,20 +758,20 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-        
+
         protected override async Task Close(PipeEndpoint e, Endpoint ee = null, CancellationToken cancel = default(CancellationToken))
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeDisconnectReq, MemberName);
             m.AddElement("index", e.Index);
             MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
-        
+
         public override PipeConnectCallbackFunction PipeConnectCallback
         {
             get { throw new InvalidOperationException(); }
             set { throw new InvalidOperationException(); }
         }
-        
+
         public override void PipePacketReceived(MessageEntry m, Endpoint e = null)
         {
             if (m.EntryType == MessageEntryType.PipeClosed)
@@ -799,7 +799,7 @@ namespace RobotRaconteurWeb
                         int index = Int32.Parse(me.ElementName);
                         uint pnum;
 
-                        PipeEndpoint p=null;
+                        PipeEndpoint p = null;
                         lock (this)
                         {
                             if (pipeendpoints.ContainsKey(index))
@@ -859,7 +859,7 @@ namespace RobotRaconteurWeb
                 catch { }
             }
         }
-        
+
         public override void Shutdown()
         {
             Pipe<T>.PipeEndpoint[] endps = pipeendpoints.Values.ToArray();
@@ -872,7 +872,7 @@ namespace RobotRaconteurWeb
                 catch { }
             }
         }
-        
+
         protected override void DeleteEndpoint(PipeEndpoint e)
         {
             lock (this)
@@ -899,16 +899,16 @@ namespace RobotRaconteurWeb
             return stub.RRContext.UnpackAnyType<T>(o);
         }
     }
-    
+
     public sealed class PipeServer<T> : Pipe<T>
     {
 
         private Dictionary<uint, Dictionary<int, PipeEndpoint>> pipeendpoints = new Dictionary<uint, Dictionary<int, PipeEndpoint>>();
 
-        private PipeConnectCallbackFunction callback;        
+        private PipeConnectCallbackFunction callback;
 
         private string m_Name;
-        
+
         public override string MemberName { get { return m_Name; } }
 
         private ServiceSkel skel;
@@ -918,7 +918,7 @@ namespace RobotRaconteurWeb
             m_Name = name;
             this.skel = skel;
         }
-        
+
         protected override async Task SendPipePacket(T data, int index, uint packetnumber, bool requestack, Endpoint e = null, CancellationToken cancel = default(CancellationToken))
         {
             MessageElement me;
@@ -935,27 +935,27 @@ namespace RobotRaconteurWeb
 
             await skel.SendPipeMessage(m, e, cancel).ConfigureAwait(false);
         }
-        
+
         public override Task<PipeEndpoint> Connect(int endpoint, CancellationToken cancel = default(CancellationToken))
         {
             throw new InvalidOperationException();
         }
-        
+
         protected override async Task Close(PipeEndpoint e, Endpoint ee, CancellationToken cancel = default(CancellationToken))
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeClosed, MemberName);
             m.AddElement("index", e.Index);
             await skel.SendPipeMessage(m, ee, cancel).ConfigureAwait(false);
 
-            DeleteEndpoint(e);            
+            DeleteEndpoint(e);
         }
-        
+
         public override PipeConnectCallbackFunction PipeConnectCallback
         {
             get { return callback; }
             set { callback = value; }
         }
-        
+
         public override void PipePacketReceived(MessageEntry m, Endpoint e = null)
         {
 
@@ -1019,7 +1019,7 @@ namespace RobotRaconteurWeb
         }
 
         object pipeendpointlock = new object();
-        
+
         public Task<MessageEntry> PipeCommand(MessageEntry m, Endpoint e)
         {
             lock (pipeendpointlock)
@@ -1071,7 +1071,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-        
+
         public override void Shutdown()
         {
             lock (pipeendpointlock)
@@ -1097,7 +1097,7 @@ namespace RobotRaconteurWeb
                 pipeendpoints.Clear();
             }
         }
-        
+
         protected override void DeleteEndpoint(PipeEndpoint e)
         {
             lock (pipeendpointlock)
@@ -1211,9 +1211,9 @@ namespace RobotRaconteurWeb
             lock (endpoints)
             {
                 connected_endpoint cep = new connected_endpoint(ep);
-                ep.PipeCloseCallback = delegate(Pipe<T>.PipeEndpoint ep1) { EndpointClosed(cep); };
+                ep.PipeCloseCallback = delegate (Pipe<T>.PipeEndpoint ep1) { EndpointClosed(cep); };
                 ep.PacketReceivedEvent += PacketReceived;
-                ep.PacketAckReceivedEvent += delegate(Pipe<T>.PipeEndpoint ep1, uint pnum) { PacketAckReceived(cep, pnum); };
+                ep.PacketAckReceivedEvent += delegate (Pipe<T>.PipeEndpoint ep1, uint pnum) { PacketAckReceived(cep, pnum); };
                 ep.RequestPacketAck = true;
                 endpoints.Add(cep);
             }
@@ -1276,7 +1276,7 @@ namespace RobotRaconteurWeb
         */
 
         [PublicApi]
-        public async Task SendPacket(T packet, CancellationToken cancel=default(CancellationToken))
+        public async Task SendPacket(T packet, CancellationToken cancel = default(CancellationToken))
         {
             List<connected_endpoint> endpoints1 = new List<connected_endpoint>();
             lock (endpoints)
@@ -1284,7 +1284,7 @@ namespace RobotRaconteurWeb
                 endpoints.ForEach(item => endpoints1.Add(item));
             }
 
-            var eps=new List<Tuple<Task<uint>,connected_endpoint,object>>();
+            var eps = new List<Tuple<Task<uint>, connected_endpoint, object>>();
 
             foreach (connected_endpoint cep in endpoints1)
             {
@@ -1301,7 +1301,7 @@ namespace RobotRaconteurWeb
                         continue;
                     }
 
-                    if(Predicate != null && !Predicate(this, ep.Endpoint, ep.Index))
+                    if (Predicate != null && !Predicate(this, ep.Endpoint, ep.Index))
                     {
                         continue;
                     }
@@ -1319,7 +1319,7 @@ namespace RobotRaconteurWeb
                     {
                         cep.active_sends.Add(send_key);
                     }
-                    eps.Add(Tuple.Create(t,cep,send_key));
+                    eps.Add(Tuple.Create(t, cep, send_key));
                 }
                 catch { }
             }
@@ -1328,9 +1328,9 @@ namespace RobotRaconteurWeb
             {
                 await Task.WhenAny(eps.Select(x => x.Item1).ToArray()).ConfigureAwait(false);
 
-                for (int i = 0; i < eps.Count; )
+                for (int i = 0; i < eps.Count;)
                 {
-                    var t=eps[i].Item1;
+                    var t = eps[i].Item1;
                     var cep1 = eps[i].Item2;
                     if (t.IsCompleted || t.IsFaulted || t.IsCanceled)
                     {
@@ -1341,7 +1341,7 @@ namespace RobotRaconteurWeb
                             {
                                 cep1.active_sends.Remove(eps[i].Item3);
                                 if (maximum_backlog != -1)
-                                {                                
+                                {
                                     if (cep1.forward_backlog.Count(x => x == pnum) != 0)
                                     {
                                         cep1.forward_backlog.Remove(pnum);
@@ -1419,7 +1419,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <value />
         */
-        [PublicApi] 
+        [PublicApi]
         public Func<object, uint, int, bool> Predicate { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class NodeID
     {
         private byte[] id;
@@ -87,7 +87,7 @@ namespace RobotRaconteurWeb
                 this.id = id1;
                 return;
             }
-                        
+
             if (id1 == null)
             {
                 throw new InvalidOperationException("Invalid format for NodeID");
@@ -195,7 +195,7 @@ namespace RobotRaconteurWeb
         /// Convert to a byte array containing the UUID bytes
         /// </summary>
         /// <param name="i">The NodeID UUID as bytes</param>
-        [PublicApi] 
+        [PublicApi]
 
         public static explicit operator byte[](NodeID i)
         {
@@ -288,7 +288,7 @@ namespace RobotRaconteurWeb
         /// Get a hashcode for the NodeID
         /// </summary>
         /// <returns>The hash code</returns>
-        [PublicApi] 
+        [PublicApi]
         public override int GetHashCode()
         {
             int sum = 0;

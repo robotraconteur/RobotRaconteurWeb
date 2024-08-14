@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ namespace RobotRaconteurWeb
             o.memb_dims = memb_dims;
             o.mema_pos = mema_pos;
             o.memb_pos = memb_pos;
-            o.count = count;            
+            o.count = count;
             o.current_count = new uint[count.Length];
             o.done = false;
             o.stridea = stridea;
@@ -157,14 +157,14 @@ namespace RobotRaconteurWeb
     Multidimensional arrays are stored as a uint array of
     dimensions, and an array of the flattened elements.
     Arrays are stored in column major, or "Fortran" order.
-    
+
     Valid types for array are `bool`, `double`, `float`, `sbyte`, `byte`, `short`,
     `ushort`, `int`, `uint`, `long`, `ulong`, `CDouble`,
     or `CSingle`. Attempts to use any other types will result in a compiler error.
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class MultiDimArray
     {
         /**
@@ -282,13 +282,13 @@ namespace RobotRaconteurWeb
     Multidimensional arrays are stored as a uint32_t array of
     dimensions, and an array of the flattened elements.
     Arrays are stored in column major, or "Fortran" order.
-    
+
     Stored type must be a od type that has been generated as part
     of the thunk source.
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class PodMultiDimArray
     {
         /**
@@ -409,7 +409,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class NamedMultiDimArray
     {
         /**

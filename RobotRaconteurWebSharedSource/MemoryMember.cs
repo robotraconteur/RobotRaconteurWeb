@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -123,8 +123,8 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public override Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken))
-        {            
-                return Task.FromResult((ulong)memory.LongLength);            
+        {
+            return Task.FromResult((ulong)memory.LongLength);
         }
         /**
         <summary>
@@ -148,7 +148,7 @@ namespace RobotRaconteurWeb
         */
 
         [PublicApi]
-        public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
+        public virtual Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
             lock (this)
             {
@@ -192,7 +192,7 @@ namespace RobotRaconteurWeb
     {
         public abstract Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken));
 
-        public abstract Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken));        
+        public abstract Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken));
     }
 #pragma warning restore 1591
     /**
@@ -207,16 +207,16 @@ namespace RobotRaconteurWeb
     the nodes will proxy read, write, and parameter requests between the client
     and service. The node will also break up large requests to avoid the
     message size limit of the transport.
-    
+
     The MultiDimArrayMemory class is used to represent a multidimensional numeric
     primitive array. Single dimensional numeric primitive arrays should use
     ArrayMemory. Valid types for T are `double`, `float`, `sbyte`,
     `byte`, `short`, `ushort`, `int`, `uint`, `long`,
     `ulong`, `bool`, `CDouble`, and `CSingle`.
-    
+
     MultiDimArrayMemory instances are attached to an MultiDimArray,
     either when constructed or later using Attach().
-    
+
     MultiDimArrayMemory instances returned by clients are special implementations
     designed to proxy requests to the service. They cannot be attached
     to an arbitrary array.
@@ -287,8 +287,8 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
-        {            
-            return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());            
+        {
+            return Task.FromResult(multimemory.Dims.Select(x => (ulong)x).ToArray());
         }
         /**
         <summary>
@@ -330,8 +330,8 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public virtual Task Read(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
-            multimemory.RetrieveSubArray(memorypos.Select(x=>(uint)x).ToArray(), buffer, bufferpos.Select(x=>(uint)x).ToArray(), count.Select(x=>(uint)x).ToArray());
-            return Task.FromResult(0);            
+            multimemory.RetrieveSubArray(memorypos.Select(x => (uint)x).ToArray(), buffer, bufferpos.Select(x => (uint)x).ToArray(), count.Select(x => (uint)x).ToArray());
+            return Task.FromResult(0);
         }
         /**
         <summary>
@@ -367,7 +367,7 @@ namespace RobotRaconteurWeb
     public abstract class ArrayMemoryServiceSkelBase
     {
         protected string m_MemberName;
-        protected ServiceSkel skel;        
+        protected ServiceSkel skel;
         protected MemberDefinition_Direction direction;
         protected DataTypes element_type;
         protected uint element_size;
@@ -376,7 +376,7 @@ namespace RobotRaconteurWeb
         protected ArrayMemoryServiceSkelBase(string membername, ServiceSkel skel, DataTypes element_type, uint element_size, MemberDefinition_Direction direction)
         {
             this.m_MemberName = membername;
-            this.skel = skel;            
+            this.skel = skel;
             this.direction = direction;
             this.element_type = element_type;
             this.element_size = element_size;
@@ -456,7 +456,7 @@ namespace RobotRaconteurWeb
     public class ArrayMemoryServiceSkel<T> : ArrayMemoryServiceSkelBase
     {
         public ArrayMemoryServiceSkel(string membername, ServiceSkel skel, MemberDefinition_Direction direction = MemberDefinition_Direction.both)
-			: base(membername, skel, DataTypeUtil.TypeIDFromType(typeof(T)), DataTypeUtil.size(DataTypeUtil.TypeIDFromType(typeof(T))), direction)
+            : base(membername, skel, DataTypeUtil.TypeIDFromType(typeof(T)), DataTypeUtil.size(DataTypeUtil.TypeIDFromType(typeof(T))), direction)
         {
 
         }
@@ -490,7 +490,7 @@ namespace RobotRaconteurWeb
         protected MultiDimArrayMemoryServiceSkelBase(string membername, ServiceSkel skel, DataTypes element_type, uint element_size, MemberDefinition_Direction direction)
         {
             this.m_MemberName = membername;
-            this.skel = skel;            
+            this.skel = skel;
             this.direction = direction;
             this.element_type = element_type;
             this.element_size = element_size;
@@ -579,7 +579,7 @@ namespace RobotRaconteurWeb
 
     public class MultiDimArrayMemoryServiceSkel<T> : MultiDimArrayMemoryServiceSkelBase
     {
-        public MultiDimArrayMemoryServiceSkel(string membername, ServiceSkel skel, MemberDefinition_Direction direction=MemberDefinition_Direction.both)
+        public MultiDimArrayMemoryServiceSkel(string membername, ServiceSkel skel, MemberDefinition_Direction direction = MemberDefinition_Direction.both)
             : base(membername, skel, DataTypeUtil.TypeIDFromType(typeof(T)), DataTypeUtil.size(DataTypeUtil.TypeIDFromType(typeof(T))), direction)
         {
 
@@ -588,7 +588,7 @@ namespace RobotRaconteurWeb
         protected override async Task<object> DoRead(ulong[] memorypos, ulong[] bufferpos, ulong[] count, ulong elem_count, MultiDimArrayMemoryBase mem)
         {
             var mem1 = (MultiDimArrayMemory<T>)mem;
-            var buf1 = new MultiDimArray(count.Select(x=>(uint)x).ToArray(), (T[])DataTypeUtil.ArrayFromDataType(element_type, (uint)elem_count));
+            var buf1 = new MultiDimArray(count.Select(x => (uint)x).ToArray(), (T[])DataTypeUtil.ArrayFromDataType(element_type, (uint)elem_count));
             await mem1.Read(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
             return skel.RRContext.PackMultiDimArray(buf1);
         }
@@ -609,11 +609,11 @@ namespace RobotRaconteurWeb
         protected DataTypes element_type;
         protected uint element_size;
 
-        public string MemberName { get => m_MemberName; }        
+        public string MemberName { get => m_MemberName; }
 
         protected ArrayMemoryClientImplBase(string membername, ServiceStub stub, DataTypes element_type, uint element_size, MemberDefinition_Direction direction)
         {
-            this.stub = stub;            
+            this.stub = stub;
             m_MemberName = membername;
             this.direction = direction;
             this.element_type = element_type;
@@ -665,7 +665,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public async Task ReadImpl(ulong memorypos, object buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
+        public async Task ReadImpl(ulong memorypos, object buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
             if (direction == MemberDefinition_Direction.writeonly)
             {
@@ -750,7 +750,7 @@ namespace RobotRaconteurWeb
                 }
             }
         }
-                
+
         protected abstract void UnpackReadResult(object res, object buffer, ulong bufferpos, ulong count);
         protected abstract object PackWriteRequest(object buffer, ulong bufferpos, ulong count);
         protected abstract ulong GetBufferLength(object buffer);
@@ -758,7 +758,7 @@ namespace RobotRaconteurWeb
 
     internal class ArrayMemoryClientImpl<T> : ArrayMemoryClientImplBase
     {
-        internal ArrayMemoryClientImpl(string membername, ServiceStub stub, MemberDefinition_Direction direction) 
+        internal ArrayMemoryClientImpl(string membername, ServiceStub stub, MemberDefinition_Direction direction)
             : base(membername, stub, DataTypeUtil.TypeIDFromType(typeof(T)), DataTypeUtil.size(DataTypeUtil.TypeIDFromType(typeof(T))), direction)
         {
         }
@@ -778,7 +778,7 @@ namespace RobotRaconteurWeb
             else if ((buffer1.LongLength - (long)(bufferpos)) >= (long)(count))
             {
                 var data = new T[count];
-                Array.Copy(buffer1, (long)bufferpos, data, 0, (long)count);                
+                Array.Copy(buffer1, (long)bufferpos, data, 0, (long)count);
                 return data;
             }
             else
@@ -814,15 +814,15 @@ namespace RobotRaconteurWeb
 
         public override Task<ulong> GetLength(CancellationToken cancel = default(CancellationToken))
         {
-            return impl.GetLength();   
+            return impl.GetLength();
         }
-                
+
         private Task<uint> GetMaxTransferSize(CancellationToken cancel)
         {
             return impl.GetMaxTransferSize();
         }
 
-        public override Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel=default(CancellationToken))
+        public override Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
         {
             return impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel);
         }
@@ -855,7 +855,7 @@ namespace RobotRaconteurWeb
             this.element_size = element_size;
         }
 
-        public virtual async Task<ulong> GetDimCount(CancellationToken cancel=default(CancellationToken))
+        public virtual async Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "DimCount");
@@ -863,14 +863,14 @@ namespace RobotRaconteurWeb
             return ret.FindElement("return").CastData<ulong[]>()[0];
         }
 
-        public virtual async Task<ulong[]> GetDimensions(CancellationToken cancel= default(CancellationToken))
+        public virtual async Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
             var m = new MessageEntry(MessageEntryType.MemoryGetParam, MemberName);
             m.AddElement("parameter", "Dimensions");
             var ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             return ret.FindElement("return").CastData<ulong[]>();
         }
-        
+
         protected bool max_size_read;
         protected uint remote_max_size;
         public async Task<uint> GetMaxTransferSize(CancellationToken cancel = default(CancellationToken))
@@ -915,7 +915,7 @@ namespace RobotRaconteurWeb
 
             uint max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
 
-            ulong elemcount = count.Aggregate((ulong)1,(x,y) => x*y);            
+            ulong elemcount = count.Aggregate((ulong)1, (x, y) => x * y);
             ulong max_elems = max_transfer_size / element_size;
 
             if (elemcount <= max_elems)
@@ -1019,10 +1019,10 @@ namespace RobotRaconteurWeb
                 throw new ReadOnlyMemberException("Read only member");
             }
 
-             uint max_transfer_size = await GetMaxTransferSize().ConfigureAwait(false);
+            uint max_transfer_size = await GetMaxTransferSize().ConfigureAwait(false);
 
-            ulong elemcount = count.Aggregate((ulong)1, (x,y) => x*y);
-            
+            ulong elemcount = count.Aggregate((ulong)1, (x, y) => x * y);
+
             uint max_elems = max_transfer_size / element_size;
 
             if (elemcount <= max_elems)
@@ -1035,7 +1035,7 @@ namespace RobotRaconteurWeb
 
                 e.AddElement("data", PackWriteRequest(buffer, bufferpos, count, elemcount));
 
-                var ret = stub.ProcessRequest(e,cancel);
+                var ret = stub.ProcessRequest(e, cancel);
 
             }
             else
@@ -1190,9 +1190,9 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                var data = new MultiDimArray(count.Select(x=>(uint)x).ToArray(), new T[elem_count]);
+                var data = new MultiDimArray(count.Select(x => (uint)x).ToArray(), new T[elem_count]);
 
-                buffer1.RetrieveSubArray(bufferpos.Select(x=>(uint)x).ToArray(), data, new uint[count.Length], count.Select(x=>(uint)x).ToArray());
+                buffer1.RetrieveSubArray(bufferpos.Select(x => (uint)x).ToArray(), data, new uint[count.Length], count.Select(x => (uint)x).ToArray());
                 return stub.rr_node.PackMultiDimArray(data);
             }
         }
@@ -1218,7 +1218,7 @@ namespace RobotRaconteurWeb
         {
             impl = new MultiDimArrayMemoryClientImpl<T>(membername, stub, direction);
         }
-               
+
         public override void Attach(MultiDimArray memory)
         {
             throw new InvalidOperationException();
@@ -1226,14 +1226,14 @@ namespace RobotRaconteurWeb
 
         public override Task<ulong[]> GetDimensions(CancellationToken cancel = default(CancellationToken))
         {
-            return impl.GetDimensions(cancel);  
+            return impl.GetDimensions(cancel);
         }
 
         public override Task<ulong> GetDimCount(CancellationToken cancel = default(CancellationToken))
         {
             return impl.GetDimCount(cancel);
         }
-        
+
         private Task<uint> GetMaxTransferSize(CancellationToken cancel = default(CancellationToken))
         {
             return impl.GetMaxTransferSize(cancel);
@@ -1243,7 +1243,7 @@ namespace RobotRaconteurWeb
         {
             await impl.ReadImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
         }
-        
+
         public override async Task Write(ulong[] memorypos, MultiDimArray buffer, ulong[] bufferpos, ulong[] count, CancellationToken cancel = default(CancellationToken))
         {
             await impl.WriteImpl(memorypos, buffer, bufferpos, count, cancel).ConfigureAwait(false);
@@ -1282,7 +1282,7 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T" />
     */
-    [PublicApi] 
+    [PublicApi]
     public class PodArrayMemory<T> : ArrayMemory<T> where T : struct
     {
         /// <summary>
@@ -1307,7 +1307,7 @@ namespace RobotRaconteurWeb
         }
     }
 
-    internal class PodArrayMemoryClientImpl<T> : ArrayMemoryClientImplBase where T: struct
+    internal class PodArrayMemoryClientImpl<T> : ArrayMemoryClientImplBase where T : struct
     {
         internal PodArrayMemoryClientImpl(string membername, ServiceStub stub, uint element_size, MemberDefinition_Direction direction)
             : base(membername, stub, DataTypes.pod_t, element_size, direction)
@@ -1321,21 +1321,21 @@ namespace RobotRaconteurWeb
 
         protected override object PackWriteRequest(object buffer, ulong bufferpos, ulong count)
         {
-            var buffer1 = (T[])buffer;            
+            var buffer1 = (T[])buffer;
             var o = new T[count];
             Array.Copy(buffer1, (long)bufferpos, o, 0, (long)count);
-            return stub.rr_node.PackPodArray(o, stub.RRContext);           
+            return stub.rr_node.PackPodArray(o, stub.RRContext);
         }
 
         protected override void UnpackReadResult(object res, object buffer, ulong bufferpos, ulong count)
-        {            
+        {
             var data = stub.rr_node.UnpackPodArray<T>((MessageElementNestedElementList)res, stub.RRContext);
             var buffer1 = (T[])buffer;
             Array.Copy(data, 0, buffer1, (long)bufferpos, (long)count);
         }
     }
 
-    public class PodArrayMemoryClient<T> : PodArrayMemory<T>  where T: struct
+    public class PodArrayMemoryClient<T> : PodArrayMemory<T> where T : struct
     {
         private PodArrayMemoryClientImpl<T> impl;
 
@@ -1673,7 +1673,7 @@ namespace RobotRaconteurWeb
             var buf1 = skel.rr_node.UnpackPodMultiDimArray<T>((MessageElementNestedElementList)buffer, null);
             await mem1.Write(memorypos, buf1, new ulong[count.Length], count).ConfigureAwait(false);
         }
-}
+    }
     /**
     <summary>
     Single dimensional namedarray random access memory region
@@ -1707,7 +1707,7 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The namedarray type of the array</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class NamedArrayMemory<T> : ArrayMemory<T> where T : struct
     {
         /**
@@ -1733,7 +1733,7 @@ namespace RobotRaconteurWeb
         <param name="memory">The array to attach</param>
         <returns />
         */
-        [PublicApi] 
+        [PublicApi]
         public NamedArrayMemory(T[] memory) : base(memory)
         {
         }
@@ -1837,7 +1837,7 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The namedarray type of the array</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class NamedMultiDimArrayMemory<T> : MultiDimArrayMemoryBase where T : struct
     {
         private NamedMultiDimArray multimemory;

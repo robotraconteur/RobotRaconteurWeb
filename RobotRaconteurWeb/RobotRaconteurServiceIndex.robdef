@@ -1,4 +1,4 @@
-﻿service RobotRaconteurServiceIndex
+service RobotRaconteurServiceIndex
 struct NodeInfo
 field string NodeName
 field uint8[16] NodeID

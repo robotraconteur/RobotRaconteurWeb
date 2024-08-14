@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using RobotRaconteurWeb;
-using com.robotraconteur.testing.TestService1;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using com.robotraconteur.testing.TestService1;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
 {
@@ -20,7 +20,7 @@ namespace RobotRaconteurTest
             subscription = config.client_node.SubscribeServiceByType(servicetype);
 
             StartSubscriberTestProgram2();
-        }        
+        }
 
         public void StartSubscriberUrlTestProgram(string[] url)
         {
@@ -132,7 +132,7 @@ namespace RobotRaconteurTest
         }
 
         public async void StartSubscriberTestProgram2()
-        {           
+        {
 
             subscription.ClientConnected += delegate (ServiceSubscription c, ServiceSubscriptionClientID d, object e)
             {
@@ -248,7 +248,7 @@ namespace RobotRaconteurTest
                     {
                         if (args.Length < 2)
                         {
-                            throw new ArgumentException("Usage for subscriberurltest:  RobotRaconteurTest subscriberurltest url");                            
+                            throw new ArgumentException("Usage for subscriberurltest:  RobotRaconteurTest subscriberurltest url");
                         }
 
                         await RunSubscriberUrlTestProgram(new string[] { args[1] });

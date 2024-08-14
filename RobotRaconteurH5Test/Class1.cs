@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,10 +24,10 @@ namespace RobotRaconteurH5Test
 
         public static void SetWriteLine()
         {
-            RRWebTest.WriteLineFunc = delegate(string format, object[] args)
+            RRWebTest.WriteLineFunc = delegate (string format, object[] args)
             {
                 var log_elem = document.getElementById("log");
-                log_elem.innerHTML += string.Format(format,args) + "<br>";
+                log_elem.innerHTML += string.Format(format, args) + "<br>";
             };
         }
 
@@ -63,7 +63,7 @@ namespace RobotRaconteurH5Test
             var cancel2 = new CancellationTokenSource();
             cancel2.CancelAfter(6000);
             await subscription.GetDefaultClientWait<object>(cancel2.Token);
-               
+
             var cancel1 = new CancellationTokenSource();
             cancel1.CancelAfter(6000);
             var client2 = await subscription.GetDefaultClientWait<object>(cancel1.Token);
@@ -101,8 +101,8 @@ namespace RobotRaconteurH5Test
         public static async void Main()
         {
             await SubscriberTest();
-    }
+        }
     }
 
-    
+
 }

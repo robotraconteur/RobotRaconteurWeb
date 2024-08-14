@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+// Copyright 2011-2019 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using com.robotraconteur.testing.TestService2;
 using com.robotraconteur.testing.TestService3;
 using RobotRaconteurWeb;
-using System.Threading;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace RobotRaconteurTest
 {
@@ -63,7 +63,7 @@ namespace RobotRaconteurTest
             await r.get_o4();
 
             await TestWirePeekPoke();
-            
+
             await TestEnums();
 
             await TestPods();
@@ -150,7 +150,7 @@ namespace RobotRaconteurTest
         {
             var g = await r.gen_func1();
             var res = await g.NextAll();
-            RRWebTest.WriteLine(string.Join(", ", res.Select(x=>x.ToString())));
+            RRWebTest.WriteLine(string.Join(", ", res.Select(x => x.ToString())));
 
             var g2 = await r.gen_func1();
             await g2.Next();
@@ -176,7 +176,7 @@ namespace RobotRaconteurTest
                 RRWebTest.WriteLine("Stop iteration caught");
             }
 
-            var gen2 =await r.gen_func4();
+            var gen2 = await r.gen_func4();
             await gen2.Next(new byte[] { 2, 3, 4 });
             await gen2.Close();
             try
@@ -331,7 +331,7 @@ namespace RobotRaconteurTest
             if (count > 0) len = count;
             for (int i = 0; i < count; i++)
             {
-                RRAssert.AreEqual(v1[i],v2[i]);
+                RRAssert.AreEqual(v1[i], v2[i]);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,49 +42,49 @@ namespace RobotRaconteurWeb
      * are convenience classes for the most commonly used options.
      * </remarks>
      */
-    [Flags,PublicApi]
+    [Flags, PublicApi]
     public enum RobotRaconteurNodeSetupFlags
     {
         /**
         <summary>No options enabled</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         None = 0x0,
         /**
         <summary>Enable node discovery listening on all transports</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         EnableNodeDiscoveryListening = 0x1,
         /**
         <summary>Enable node announce on all transports</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         EnableNodeAnnounce = 0x2,
         /**
         <summary>Enable LocalTransport</summary>
-        */        
-        [PublicApi] 
+        */
+        [PublicApi]
         EnableLocalTransport = 0x4,
         /**
         <summary>Enable TcpTransport</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         EnableTcpTransport = 0x8,
         // EnableHardwareTransport = 0x10,
         /**
         <summary>Start the LocalTransport server to listen for incoming clients</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         LocalTransportStartServer = 0x20,
         /**
         <summary>Start the LocalTransport client with specified node name</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         LocalTransportStartClient = 0x40,
         /**
         <summary>Start the TcpTransport server to listen for incoming clients on the specified port</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         TcpTransportStartServer = 0x80,
         // TcpTransportStartServerPortSharer = 0x100,
         // DisableMessage4 = 0x200,
@@ -93,74 +93,74 @@ namespace RobotRaconteurWeb
         /**
         <summary>Load the TLS certificate for TcpTransport</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         LoadTlsCert = 0x1000,
         /**
         <summary>Require TLS for all clients on TcpTransport</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         RequireTls = 0x2000,
         /**
         <summary>Make LocalTransport server listen for incoming clients from all users</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         LocalTransportServerPublic = 0x4000,
         /** <summary>Only listen on localhost connections for TcpTransport</summary> */
-        [PublicApi] 
+        [PublicApi]
         TcpTransportListenLocalHost = 0x8000,
         /** <summary>Allow NodeName to be configured using command line options</summary> */
-        [PublicApi] 
+        [PublicApi]
         NodeNameOverride = 0x10000,
         /** <summary>Allow NodeID to be configured using command line options</summary> */
-        [PublicApi] 
+        [PublicApi]
         NodeIdOverride = 0x20000,
         /** <summary>Allow TCP port to be configured using command line options</summary> */
-        [PublicApi] 
+        [PublicApi]
         TcpPortOverride = 0x40000,
         /** <summary>Allow TCP WebSocket origin control to be configured using command line options</summary> */
-        [PublicApi] 
+        [PublicApi]
         TcpWebSocketOriginOverride = 0x80000,
         /**
         <summary>Enable IntraTransport</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         EnableIntraTransport = 0x100000,
         /**
         <summary>Start the IntraTransport server to listen for incoming clients</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         IntraTransportStartServer = 0x200000,
         /** <summary>Enable TcpTransport IPv4 discovery</summary> */
-        [PublicApi] 
+        [PublicApi]
         TcpTransportIpv4Discovery = 0x400000,
         /** <summary>Enable TcpTransport IPv6 discovery</summary> */
-        [PublicApi] 
+        [PublicApi]
         TcpTransportIpv6Discovery = 0x800000,
         /**
         <summary>Enable the LocalTap debug logging system</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         LocalTapEnable = 0x1000000,
         /**
         <summary>Allow the user to set the LocalTap name</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         LocalTapName = 0x2000000,
         /** <summary>Enable jumbo messages (up to 100 MB per message)</summary> */
-        [PublicApi] 
+        [PublicApi]
         JumboMessage = 0x4000000,
         /**
         <summary>Convenience flag to enable all transports</summary>
         */
-        [PublicApi] 
-        EnableAllTransports = EnableLocalTransport 
-            | EnableTcpTransport 
-            //| EnableHardwareTransport 
+        [PublicApi]
+        EnableAllTransports = EnableLocalTransport
+            | EnableTcpTransport
+            //| EnableHardwareTransport
             | EnableIntraTransport,
         /**
         <summary>Default configuration for client nodes (See ClientNodeSetup)</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         ClientDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -171,7 +171,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default allowed overrides for client nodes (See ClientNodeSetup)</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         ClientDefaultAllowedOverride = EnableAllTransports
         | EnableNodeDiscoveryListening
         | TcpTransportIpv6Discovery
@@ -189,7 +189,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default configuration for server nodes</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         ServerDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -204,7 +204,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default allowed overrides for server nodes</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         ServerDefaultAllowedOverride = EnableAllTransports
         | TcpTransportIpv6Discovery
         | TcpTransportIpv4Discovery
@@ -230,7 +230,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default configuration for server nodes requiring TLS network transports</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         SecureServerDefault = EnableTcpTransport
         | EnableLocalTransport
         | EnableIntraTransport
@@ -247,7 +247,7 @@ namespace RobotRaconteurWeb
         /**
         <summary>Default allowed overrides for server nodes requiring TLS network transports</summary>
         */
-        [PublicApi] 
+        [PublicApi]
         SecureServerDefaultAllowedOverride = EnableAllTransports
         | LocalTransportStartServer
         | TcpTransportStartServer
@@ -450,7 +450,7 @@ namespace RobotRaconteurWeb
                 desc.Parse(args);
             }
 #endif
-        
+
         }
         /**
         <summary>
@@ -713,7 +713,7 @@ namespace RobotRaconteurWeb
             h.Add<bool>("jumbo-message", "enable jumbo messages (up to 100 MB)", RobotRaconteurNodeSetupFlags.JumboMessage);
         }
 #endif
-}
+    }
 
     /**
     <summary>
@@ -771,7 +771,7 @@ namespace RobotRaconteurWeb
         /// The RobotRaconteurNode being initialized
         /// </summary>
         /// <remarks>None</remarks>
-        [PublicApi] 
+        [PublicApi]
         public RobotRaconteurNode Node => node;
         /**
         <summary>
@@ -864,8 +864,8 @@ namespace RobotRaconteurWeb
             string nodeId = config.GetOptionOrDefaultAsString("nodeid", "");
             ushort tcpPort = (ushort)config.GetOptionOrDefaultAsInt("tcp-port");
 
-                    //LogInfo($"Setting up RobotRaconteurNode version {node.GetRobotRaconteurVersion()} with NodeName: \"{nodeName}\" TCP port: {tcpPort}");
-                    LogInfo($"Setting up RobotRaconteurNode with NodeName: \"{nodeName}\" TCP port: {tcpPort}");
+            //LogInfo($"Setting up RobotRaconteurNode version {node.GetRobotRaconteurVersion()} with NodeName: \"{nodeName}\" TCP port: {tcpPort}");
+            LogInfo($"Setting up RobotRaconteurNode with NodeName: \"{nodeName}\" TCP port: {tcpPort}");
 
             if (serviceTypes != null)
             {
@@ -979,7 +979,7 @@ namespace RobotRaconteurWeb
             {
                 if (!nodeNameSet)
                 {
-                    node.NodeName =(nodeName);
+                    node.NodeName = (nodeName);
                 }
                 else
                 {
@@ -1176,8 +1176,8 @@ namespace RobotRaconteurWeb
         <param name="nodename">The NodeName</param>
         <param name="tcp_port">The port to listen for incoming TCP clients</param>
         <param name="flags">The configuration flags</param>
-        */    
-        [PublicApi]    
+        */
+        [PublicApi]
         public RobotRaconteurNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, bool scan_assembly_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags)
         {
             var c = new CommandLineConfigParser(0);
@@ -1201,8 +1201,8 @@ namespace RobotRaconteurWeb
         <param name="tcp_port">The port to listen for incoming TCP clients</param>
         <param name="flags">The configuration flags</param>
         <param name="allowed_overrides">The allowed command line overrides</param>
-        <param name="args">The command line arguments</param>        
-        */ 
+        <param name="args">The command line arguments</param>
+        */
         [PublicApi]
         public RobotRaconteurNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, bool scan_assembly_types, string nodename, ushort tcp_port, RobotRaconteurNodeSetupFlags flags, RobotRaconteurNodeSetupFlags allowed_overrides, string[] args)
         {
@@ -1231,7 +1231,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public RobotRaconteurNodeSetup(RobotRaconteurNode node, ServiceFactory[] service_types, bool scan_assembly_types, CommandLineConfigParser config)
-        {            
+        {
             DoSetup(node, service_types, scan_assembly_types, config);
         }
         /**
@@ -1483,9 +1483,9 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Initialize client node with default options
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         public ClientNodeSetup()
-            :base(RobotRaconteurNode.s, null, true, null, 0, RobotRaconteurNodeSetupFlags.ClientDefault)
+            : base(RobotRaconteurNode.s, null, true, null, 0, RobotRaconteurNodeSetupFlags.ClientDefault)
         {
 
         }
@@ -1570,7 +1570,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Initializes a new instance of the ServerNodeSetup class with the provided node, service types, node name, TCP port, and flags.
         /// </summary>
-        /// <remarks>None</remarks> 
+        /// <remarks>None</remarks>
         /// <param name="node">The RobotRaconteurNode instance.</param>
         /// <param name="service_types">Array of ServiceFactory types to register.</param>
         /// <param name="nodename">The node name.</param>
@@ -1774,7 +1774,7 @@ namespace RobotRaconteurWeb
     [PublicApi]
     public class SecureServerNodeSetup : RobotRaconteurNodeSetup
     {
-         /// <summary>
+        /// <summary>
         /// Initializes a new instance of the SecureServerNodeSetup class with the provided node, service types, node name, TCP port, and flags.
         /// </summary>
         /// <remarks>None</remarks>

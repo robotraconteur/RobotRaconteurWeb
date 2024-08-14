@@ -29,7 +29,7 @@ namespace RobotRaconteurWeb
         "1970-01-01T00:00:00Z"</para>
     </remarks>
     */
-        [PublicApi]
+    [PublicApi]
 
 
     public class TimeSpec
@@ -174,7 +174,7 @@ namespace RobotRaconteurWeb
             if (!started)
             {
 
-    #if !ROBOTRACONTEUR_H5
+#if !ROBOTRACONTEUR_H5
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.WinCE)
                 {
                     iswindows = true;
@@ -183,7 +183,7 @@ namespace RobotRaconteurWeb
 
 
                 }
-    #endif
+#endif
 
                 start_time = DateTime.UtcNow.ToUniversalTime();
                 TimeSpan t = start_time - (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));
@@ -243,14 +243,14 @@ namespace RobotRaconteurWeb
 
 
         }
-        
+
         /// <summary>
         /// Determines whether two TimeSpec objects are equal.
         /// </summary>
         /// <param name="t1">The first TimeSpec object to compare.</param>
         /// <param name="t2">The second TimeSpec object to compare.</param>
         /// <returns>true if the two TimeSpec objects are equal; otherwise, false.</returns>
-        [PublicApi] 
+        [PublicApi]
         public static bool operator ==(TimeSpec t1, TimeSpec t2)
         {
             if (((object)t1) == null && ((object)t2) == null) return true;

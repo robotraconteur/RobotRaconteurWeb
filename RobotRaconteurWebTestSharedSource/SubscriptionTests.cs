@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -182,14 +182,14 @@ namespace RobotRaconteurSubTest
             {
                 var connectErrCalledTcs = new TaskCompletionSource<bool>();
 
-                
+
 
                 // Pass an invalid URL and make sure error is called
                 var sub = client_node.SubscribeService(new string[] { "rr+intra:///?nodename=server5&service=test_service" });
-                Action<ServiceSubscription,ServiceSubscriptionClientID, string[], Exception> connectErrHandler =
+                Action<ServiceSubscription, ServiceSubscriptionClientID, string[], Exception> connectErrHandler =
                     delegate (ServiceSubscription sub2, ServiceSubscriptionClientID cid, string[] urls, Exception e)
                 {
-                    RRAssert.IsTrue(e!=null);
+                    RRAssert.IsTrue(e != null);
                     RRAssert.IsTrue(e is ConnectionException);
                     RRAssert.IsTrue(urls.Contains("rr+intra:///?nodename=server5&service=test_service"));
                     connectErrCalledTcs.SetResult(true);
@@ -249,7 +249,7 @@ namespace RobotRaconteurSubTest
                 var connectCalledTcs = new TaskCompletionSource<bool>();
 
                 Action<ServiceInfo2Subscription, ServiceSubscriptionClientID, ServiceInfo2> connectHandler =
-                    delegate(ServiceInfo2Subscription sub2, ServiceSubscriptionClientID cid, ServiceInfo2 info)
+                    delegate (ServiceInfo2Subscription sub2, ServiceSubscriptionClientID cid, ServiceInfo2 info)
                 {
                     RRAssert.AreEqual(cid.NodeID, test_servers["server2"]);
                     RRAssert.AreEqual(cid.ServiceName, "test_service");

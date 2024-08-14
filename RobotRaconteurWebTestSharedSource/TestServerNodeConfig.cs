@@ -1,9 +1,9 @@
-﻿using RobotRaconteurWeb;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
 {
@@ -23,7 +23,7 @@ namespace RobotRaconteurTest
         public Transport client_local_transport;
         public Transport client_intra_transport;
 
-        public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server=true, int tcp_port=0)
+        public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server = true, int tcp_port = 0)
         {
             if (start_server)
             {
@@ -45,11 +45,11 @@ namespace RobotRaconteurTest
 #if !ROBOTRACONTEUR_H5
                 // Create TcpTransport using reflection and create dynamic reference
 
-                
-                
+
+
                 if (enable_local_transport)
                 {
-                    var t1 = new LocalTransport(node);                    
+                    var t1 = new LocalTransport(node);
                     t1.StartServerAsNodeName(nodename);
                     node.RegisterTransport(t1);
                     local_transport = t1;
@@ -58,7 +58,7 @@ namespace RobotRaconteurTest
                 if (enable_tcp_transport)
                 {
                     var t2 = new TcpTransport(node);
-                    
+
                     t2.StartServer(tcp_port);
                     t2.EnableNodeAnnounce();
                     t2.EnableNodeDiscoveryListening();
@@ -66,7 +66,7 @@ namespace RobotRaconteurTest
                     tcp_transport = t2;
                 }
 
-                
+
 
 #endif
                     var s1 = new RobotRaconteurTestServiceSupport(node);
@@ -96,8 +96,8 @@ namespace RobotRaconteurTest
 #if !ROBOTRACONTEUR_H5
             if (enable_local_transport)
             {
-                client_local_transport = new LocalTransport(client_node);               
-                
+                client_local_transport = new LocalTransport(client_node);
+
                 client_node.RegisterTransport(client_local_transport);
             }
 
@@ -127,7 +127,7 @@ namespace RobotRaconteurTest
             {
                 if (ep.Contains("?"))
                 {
-                    o.Add( ep + "&service=" + service_name );
+                    o.Add(ep + "&service=" + service_name);
                 }
                 else
                 {
@@ -138,10 +138,10 @@ namespace RobotRaconteurTest
         }
 
         public string[] GetServiceUrl(string service_name, string scheme = null)
-        {            
+        {
             if (node == null)
             {
-                return append_service(new[] { node_endpoint_url }, service_name);                
+                return append_service(new[] { node_endpoint_url }, service_name);
             }
             else
             {

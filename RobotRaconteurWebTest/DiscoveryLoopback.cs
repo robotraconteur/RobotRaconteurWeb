@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ using RobotRaconteurWeb;
 namespace RobotRaconteurTest
 {
     public static class DiscoveryLoopbackTest
-    {        
+    {
         public static async Task RunDiscoveryLoopbackTest()
         {
             var client_node = new RobotRaconteurNode();
@@ -33,7 +33,7 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(discovered_services.Length >= 2);
 
             var found_services = 0;
-            foreach(var s in discovered_services)
+            foreach (var s in discovered_services)
             {
                 RRAssert.IsTrue(expected_service_names.Remove(s.Name));
                 if (s.NodeName != "discovery_test_server_node")

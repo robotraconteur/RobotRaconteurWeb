@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+// Copyright 2011-2019 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RobotRaconteurWeb;
-using com.robotraconteur.testing.TestService3;
 using System.Threading;
-using com.robotraconteur.testing.TestService1;
 using System.Threading.Tasks;
+using com.robotraconteur.testing.TestService1;
+using com.robotraconteur.testing.TestService3;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
 {
@@ -67,7 +67,7 @@ namespace RobotRaconteurTest
             }
             set
             {
-                base.peekwire = value;                
+                base.peekwire = value;
                 _peekwire_b_timer = new Timer(delegate (object ev)
                 {
                     rrvar_peekwire.OutValue = 56295674;
@@ -79,7 +79,7 @@ namespace RobotRaconteurTest
 
 
         public override Pipe<int> unreliable1 { get; set; }
-        
+
         public override ArrayMemory<double> readmem { get; }
 
         public override Task<testenum1> get_testenum1_prop(CancellationToken cancel = default(CancellationToken))
@@ -102,7 +102,7 @@ namespace RobotRaconteurTest
         }
 
         public override Task set_testpod1_prop(testpod1 value, CancellationToken cancel = default(CancellationToken))
-        {            
+        {
             ServiceTest2_pod.verify_testpod1(ref value, 85932659);
             return Task.FromResult(0);
         }
@@ -117,7 +117,7 @@ namespace RobotRaconteurTest
             ServiceTest2_pod.verify_teststruct3(value, 858362);
             return Task.FromResult(0);
         }
-                
+
         //public PodArrayMemory<testpod2> pod_m1 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         //public PodMultiDimArrayMemory<testpod2> pod_m2 { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -144,7 +144,7 @@ namespace RobotRaconteurTest
 
         public override Task<Generator1<byte[], byte[]>> gen_func4(CancellationToken cancel = default(CancellationToken))
         {
-            return Task.FromResult((Generator1<byte[],byte[]>)new func4_gen());
+            return Task.FromResult((Generator1<byte[], byte[]>)new func4_gen());
         }
 
         public override Task<Generator1<teststruct2, teststruct2>> gen_func5(CancellationToken cancel = default(CancellationToken))
@@ -258,7 +258,7 @@ namespace RobotRaconteurTest
             return Task.FromResult(0);
         }
 
-        
+
         NamedArrayMemory<transform> m_namedarray_m1 = new NamedArrayMemory<transform>(new transform[512]);
         public override NamedArrayMemory<transform> namedarray_m1
         {
@@ -400,10 +400,10 @@ namespace RobotRaconteurTest
         }
 
         ArrayMemory<CDouble> c_m1_v = new ArrayMemory<CDouble>(new CDouble[512]);
-        public override ArrayMemory<CDouble> c_m1 => c_m1_v; 
+        public override ArrayMemory<CDouble> c_m1 => c_m1_v;
 
         MultiDimArrayMemory<CDouble> c_m2_v = new MultiDimArrayMemory<CDouble>(new MultiDimArray(new uint[] { 10, 10 }, new CDouble[100]));
-        public override MultiDimArrayMemory<CDouble> c_m2 => c_m2_v; 
+        public override MultiDimArrayMemory<CDouble> c_m2 => c_m2_v;
 
     }
 
@@ -460,7 +460,7 @@ namespace RobotRaconteurTest
         {
             return Task.FromResult(i_ind);
         }
-               
+
 
         public Task<sub3> get_o3_1(string ind, CancellationToken rr_cancel = default(CancellationToken))
         {

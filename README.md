@@ -13,15 +13,15 @@ compiler. RobotRaconteurH5 is RobotRaconteurWeb compiled to JavaScript for use w
 It uses WebSockets to communicate with Robot Raconteur services. RobotRaconteurWeb can also be used with ASP.NET
 web servers using WebSockets. See the examples for a demonstration of how this work. This capability allows
 for Robot Raconteur to be easily integrated into cloud and information systems without requiring any modifications
-to the infrastructure! 
+to the infrastructure!
 
 **See the Documentation here!!** [RobotRaconteurWeb Documentation](https://github.com/robotraconteur/RobotRaconteurWeb/wiki/Documentation)
 
 RobotRaconteurWeb is very similar to RobotRaconteurNET. The main difference is that RobotRaconteurWeb
-uses the asynchronous Task framework instead of blocking. All function that could potentially block 
+uses the asynchronous Task framework instead of blocking. All function that could potentially block
 are instead asynchronous, and should be used with async/await.
 
-See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library: 
+See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library:
 https://github.com/robotraconteur/robotraconteur/wiki/Documentation
 
 Also see the H5 compiler: https://github.com/theolivenbaum/h5
@@ -52,6 +52,6 @@ Copyright (C) 2023 Wason Technology, LLC
 
 This work was supported in part by the Advanced Robotics for Manufacturing ("ARM") Institute under Agreement Number W911NF-17-3-0004 sponsored by the Office of the Secretary of Defense. The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of either ARM or the Office of the Secretary of Defense of the U.S. Government. The U.S. Government is authorized to reproduce and distribute reprints for Government purposes, notwithstanding any copyright notation herein.
 
-This work was supported in part by the New York State Empire State Development Division of Science, Technology and Innovation (NYSTAR) under contract C160142. 
+This work was supported in part by the New York State Empire State Development Division of Science, Technology and Innovation (NYSTAR) under contract C160142.
 
 ![](docs/figures/arm_logo.jpg) ![](docs/figures/nys_logo.jpg)

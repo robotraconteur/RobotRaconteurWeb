@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public interface ITimer
     {
         /**
@@ -47,7 +47,7 @@ namespace RobotRaconteurWeb
         Must be called after RobotRaconteurNode.CreateTimer()
         </remarks>
         */
-        [PublicApi] 
+        [PublicApi]
         void Start();
         /**
         <summary>
@@ -55,7 +55,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
-        [PublicApi] 
+        [PublicApi]
         void Stop();
         /**
         <summary>
@@ -63,16 +63,16 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>None</remarks>
         */
-        [PublicApi] 
-        int Period {get; set;}
+        [PublicApi]
+        int Period { get; set; }
         /**
         <summary>
         Get if the timer is running
         </summary>
         <remarks>None</remarks>
         */
-        [PublicApi] 
-        bool IsRunning { get; }        
+        [PublicApi]
+        bool IsRunning { get; }
     }
 
     /**
@@ -85,7 +85,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public interface IRate
     {
         /**
@@ -108,7 +108,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public struct TimerEvent
     {
         /**
@@ -166,7 +166,7 @@ namespace RobotRaconteurWeb
         protected DateTime actual_last_time;
         protected DateTime last_time;
         protected bool oneshot;
-        
+
         protected RobotRaconteurNode node;
         protected Action<TimerEvent> handler;
         protected CancellationTokenSource cancel;
@@ -202,17 +202,17 @@ namespace RobotRaconteurWeb
                     var noop = PeriodicTask.Run(periodic_handler, TimeSpan.FromMilliseconds(Period), cancel.Token);
                 }
                 else
-                {                    
+                {
                     RunOne().IgnoreResult();
                 }
-                
+
             }
         }
 
         private async Task RunOne()
         {
             await Task.Delay(Period).ConfigureAwait(false);
-            
+
             if (!cancel.IsCancellationRequested)
             {
                 lock (this)
@@ -259,10 +259,10 @@ namespace RobotRaconteurWeb
                 if (!IsRunning) throw new InvalidOperationException("Not running");
                 if (cancel != null) cancel.Cancel();
                 cancel = null;
-            }            
+            }
         }
 
-        public int Period {get; set;}        
+        public int Period { get; set; }
 
         public bool IsRunning
         {
@@ -293,11 +293,11 @@ namespace RobotRaconteurWeb
     public class WallRate : IRate
     {
         protected RobotRaconteurNode node;
-        protected double period; 
+        protected double period;
         protected DateTime start_time;
         protected DateTime last_time;
 
-        public WallRate(double frequency, RobotRaconteurNode node=null)
+        public WallRate(double frequency, RobotRaconteurNode node = null)
         {
             if (node == null)
             {
@@ -321,7 +321,7 @@ namespace RobotRaconteurWeb
                 await Task.Delay((int)(p2 - node.UtcNow).TotalMilliseconds).ConfigureAwait(false);
             }
             catch { }
-            last_time = p2;            
+            last_time = p2;
         }
     }
 #pragma warning restore 1591

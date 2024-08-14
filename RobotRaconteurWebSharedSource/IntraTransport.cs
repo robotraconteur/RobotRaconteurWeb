@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
-using System.Runtime.InteropServices;
 using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
@@ -54,7 +54,7 @@ namespace RobotRaconteurWeb
             </para>
             </remarks>
     */
-        [PublicApi]
+    [PublicApi]
     public sealed class IntraTransport : Transport
     {
 
@@ -108,16 +108,16 @@ namespace RobotRaconteurWeb
 
         internal void Init()
         {
-            lock(this)
+            lock (this)
             {
-                if(transportopen)
+                if (transportopen)
                 {
                     return;
                 }
                 transportopen = true;
             }
 
-            lock(peer_transports)
+            lock (peer_transports)
             {
                 peer_transports.Add(new WeakReference<IntraTransport>(this));
             }
@@ -168,9 +168,9 @@ namespace RobotRaconteurWeb
 
             IntraTransport peer_transport = null;
 
-            lock(peer_transports)
+            lock (peer_transports)
             {
-                foreach( var peer_transport_w in peer_transports)
+                foreach (var peer_transport_w in peer_transports)
                 {
                     if (!peer_transport_w.TryGetTarget(out var transport))
                     {
@@ -182,7 +182,7 @@ namespace RobotRaconteurWeb
                         continue;
                     }
 
-                    if (!transport.TryGetNodeInfo(out var p_node_id, out var p_node_name, out var peer_nonce ))
+                    if (!transport.TryGetNodeInfo(out var p_node_id, out var p_node_name, out var peer_nonce))
                     {
                         continue;
                     }
@@ -196,7 +196,7 @@ namespace RobotRaconteurWeb
                         }
                     }
 
-                    if (!url_res.nodeid.IsAnyNode )
+                    if (!url_res.nodeid.IsAnyNode)
                     {
                         if (url_res.nodeid == p_node_id)
                         {
@@ -364,7 +364,7 @@ namespace RobotRaconteurWeb
                 transportopen = false;
             }
 
-            lock(peer_transports)
+            lock (peer_transports)
             {
                 peer_transports.RemoveAll(delegate (WeakReference<IntraTransport> x)
                 {
@@ -372,7 +372,7 @@ namespace RobotRaconteurWeb
                     {
                         return true;
                     }
-                    return object.ReferenceEquals(t2,this);
+                    return object.ReferenceEquals(t2, this);
 
                 });
             }
@@ -436,8 +436,8 @@ namespace RobotRaconteurWeb
         }
 
         internal void RemoveTransportConnection(IntraTransportConnection transport)
-        {           
-              RemoveTransportConnection(transport.LocalEndpoint);
+        {
+            RemoveTransportConnection(transport.LocalEndpoint);
         }
 
 
@@ -455,7 +455,7 @@ namespace RobotRaconteurWeb
 
             return Task.FromResult(o);
         }
-       
+
         protected void SendNodeDiscovery()
         {
             if (!serverstarted)
@@ -478,7 +478,7 @@ namespace RobotRaconteurWeb
             u.LastAnnounceTime = DateTime.UtcNow;
             info.URLs.Add(u);
 
-            lock(peer_transports)
+            lock (peer_transports)
             {
                 foreach (var transport1 in peer_transports)
                 {
@@ -540,7 +540,7 @@ namespace RobotRaconteurWeb
                     }
                     catch (Exception ex)
                     {
-                        LogDebug(String.Format("Error sending node discovery from IntraTransport: {0}",ex.Message), node, RobotRaconteur_LogComponent.Transport, "IntraTransport");
+                        LogDebug(String.Format("Error sending node discovery from IntraTransport: {0}", ex.Message), node, RobotRaconteur_LogComponent.Transport, "IntraTransport");
                     }
                 });
             }
@@ -592,7 +592,7 @@ namespace RobotRaconteurWeb
 
         void AcceptMessage(Message m)
         {
-            lock(recv_queue)
+            lock (recv_queue)
             {
                 recv_queue.Add(m);
                 if (!recv_queue_post_requested)
@@ -606,7 +606,7 @@ namespace RobotRaconteurWeb
         {
             Message m;
 
-            lock(recv_queue)
+            lock (recv_queue)
             {
                 if (recv_queue.Count == 0)
                 {
@@ -642,7 +642,7 @@ namespace RobotRaconteurWeb
                     remote_ep = this.remote_endpoint;
                 }
 
-                
+
                 Message ret = await this.parenttransport.SpecialRequest(mes).ConfigureAwait(false);
                 if (ret != null)
                 {
@@ -692,8 +692,8 @@ namespace RobotRaconteurWeb
 
                 tlastrec = DateTime.UtcNow;
 
-                
-                
+
+
                 if (mes.entries.Count == 1)
                 {
                     if (mes.entries[0].EntryType == MessageEntryType.ConnectClientRet && remote_ep == 0)
@@ -710,7 +710,7 @@ namespace RobotRaconteurWeb
 
                 }
 
-                
+
                 if (!((mes.entries.Count == 1) && ((mes.entries[0].EntryType == MessageEntryType.ConnectionTest) || (mes.entries[0].EntryType == MessageEntryType.ConnectionTestRet))))
                 {
                     tlastrec_mes = DateTime.UtcNow;
@@ -773,7 +773,7 @@ namespace RobotRaconteurWeb
         public Task SendMessage(Message m, CancellationToken cancel)
         {
             IntraTransportConnection peer = null;
-            if(!peer_connection?.TryGetTarget(out peer) ?? false || peer == null)
+            if (!peer_connection?.TryGetTarget(out peer) ?? false || peer == null)
             {
                 throw new ConnectionException("Connection lost");
             }
@@ -786,7 +786,7 @@ namespace RobotRaconteurWeb
         {
             bool connected1 = false;
             IntraTransportConnection peer1 = null;
-            lock(this)
+            lock (this)
             {
                 if (closed)
                     return;
@@ -819,7 +819,7 @@ namespace RobotRaconteurWeb
         public void CheckConnection(uint endpoint)
         {
             IntraTransportConnection peer1 = null;
-            lock(this)
+            lock (this)
             {
                 peer_connection?.TryGetTarget(out peer1);
             }
@@ -848,5 +848,5 @@ namespace RobotRaconteurWeb
         }
 
     }
-    
+
 }

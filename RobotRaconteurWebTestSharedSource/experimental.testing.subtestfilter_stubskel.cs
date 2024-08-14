@@ -74,7 +74,7 @@ public class experimental__testing__subtestfilterFactory : ServiceFactory
     string rr_stype;
     if (CompareNamespace(rr_type, out rr_stype)) {
     } else {
-    return base.DownCastException(rr_exp); 
+    return base.DownCastException(rr_exp);
     }
     return rr_exp;
     }
@@ -175,7 +175,7 @@ public class sub_testroot2_stub : ServiceStub , sub_testroot2 {
 public class sub_testroot_skel : ServiceSkel {
     protected sub_testroot obj;
     public sub_testroot_skel(string p,sub_testroot o,ServerContext c) : base(p,o,c) { obj=(sub_testroot)o; }
-    public override void ReleaseCastObject() { 
+    public override void ReleaseCastObject() {
     }
     public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {
     string ename=m.MemberName;
@@ -287,7 +287,7 @@ public class sub_testroot_skel : ServiceSkel {
 public class sub_testroot2_skel : ServiceSkel {
     protected sub_testroot2 obj;
     public sub_testroot2_skel(string p,sub_testroot2 o,ServerContext c) : base(p,o,c) { obj=(sub_testroot2)o; }
-    public override void ReleaseCastObject() { 
+    public override void ReleaseCastObject() {
     }
     public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {
     string ename=m.MemberName;

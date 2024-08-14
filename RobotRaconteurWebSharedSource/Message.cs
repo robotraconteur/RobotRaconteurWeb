@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,94 +36,94 @@ namespace RobotRaconteurWeb
     {
         /// <summary>void or null type</summary>
         void_t = 0,
-        
+
         /// <summary>IEEE-754 64-bit floating point number</summary>
         double_t,
-        
+
         /// <summary>IEEE-754 32-bit floating point number</summary>
         single_t,
-        
+
         /// <summary>8-bit signed integer</summary>
         int8_t,
-        
+
         /// <summary>8-bit unsigned integer</summary>
         uint8_t,
-        
+
         /// <summary>16-bit signed integer</summary>
         int16_t,
-        
+
         /// <summary>16-bit unsigned integer</summary>
         uint16_t,
-        
+
         /// <summary>32-bit signed integer</summary>
         int32_t,
-        
+
         /// <summary>32-bit unsigned integer</summary>
         uint32_t,
-        
+
         /// <summary>64-bit signed integer</summary>
         int64_t,
-        
+
         /// <summary>64-bit unsigned integer</summary>
         uint64_t,
-        
+
         /// <summary>UTF-8 string</summary>
         string_t,
-        
+
         /// <summary>128-bit complex double (real,imag)</summary>
         cdouble_t,
-        
+
         /// <summary>64-bit complex float (real,imag)</summary>
         csingle_t,
-        
+
         /// <summary>8-bit boolean</summary>
         bool_t,
-        
+
         /// <summary>structure (nested message type)</summary>
         structure_t = 101,
-        
+
         /// <summary>map with int32 key (nested message type)</summary>
         vector_t,
-        
+
         /// <summary>map with string key (nested message type)</summary>
         dictionary_t,
-        
+
         /// <summary>object type (not serializable)</summary>
         object_t,
-        
+
         /// <summary>varvalue type (not serializable)</summary>
         varvalue_t,
-        
+
         /// <summary>varobject type (not serializable)</summary>
         varobject_t,
-        
+
         /// <summary>list type (nested message type)</summary>
         list_t = 108,
-        
+
         /// <summary>pod type (nested message type)</summary>
         pod_t,
-        
+
         /// <summary>pod array type (nested message type)</summary>
         pod_array_t,
-        
+
         /// <summary>pod multidimarray type (nested message type)</summary>
         pod_multidimarray_t,
-        
+
         /// <summary>enum type (not serializable uses int32 for messages)</summary>
         enum_t,
-        
+
         /// <summary>namedtype definition (not serializable)</summary>
         namedtype_t,
-        
+
         /// <summary>namedarray type (not serializable)</summary>
         namedarray_t,
-        
+
         /// <summary>namedarray array type (nested message type)</summary>
         namedarray_array_t,
-        
+
         /// <summary>namedarray multidimarray type (nested message type)</summary>
         namedarray_multidimarray_t,
-        
+
         /// <summary>multi-dimensional numeric array (nested message type)</summary>
         multidimarray_t
     }
@@ -131,7 +131,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Array type enum for TypeDefinition parser class
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public enum DataTypes_ArrayTypes
     {
         /// <summary>type is not an array</summary>
@@ -147,7 +147,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Container type enum for TypeDefinition parser class
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public enum DataTypes_ContainerTypes
     {
         /// <summary>type does not have a container</summary>
@@ -437,147 +437,147 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Message error type codes enum
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public enum MessageErrorType
     {
         /// <summary>success</summary>
         None = 0,
-        
+
         /// <summary>connection error</summary>
         ConnectionError = 1,
-        
+
         /// <summary>protocol error serializing messages</summary>
         ProtocolError,
-        
+
         /// <summary>specified service not found</summary>
         ServiceNotFound,
-        
+
         /// <summary>specified object not found</summary>
         ObjectNotFound,
-        
+
         /// <summary>specified endpoint not found</summary>
         InvalidEndpoint,
-        
+
         /// <summary>communication with specified endpoint failed</summary>
         EndpointCommunicationFatalError,
-        
+
         /// <summary>specified node not found</summary>
         NodeNotFound,
-        
+
         /// <summary>service error</summary>
         ServiceError,
-        
+
         /// <summary>specified member not found</summary>
         MemberNotFound,
-        
+
         /// <summary>message format incompatible with specified member</summary>
         MemberFormatMismatch,
-        
+
         /// <summary>data type did not match expected type</summary>
         DataTypeMismatch,
-        
+
         /// <summary>data type failure</summary>
         DataTypeError,
-        
+
         /// <summary>failure serializing data type</summary>
         DataSerializationError,
-        
+
         /// <summary>specified message entry not found</summary>
         MessageEntryNotFound,
-        
+
         /// <summary>specified message element not found</summary>
         MessageElementNotFound,
-        
+
         /// <summary>unknown exception occurred check `error name`</summary>
         UnknownError,
-        
+
         /// <summary>invalid operation attempted</summary>
         InvalidOperation,
-        
+
         /// <summary>argument is invalid</summary>
         InvalidArgument,
-        
+
         /// <summary>the requested operation failed</summary>
         OperationFailed,
-        
+
         /// <summary>invalid null value</summary>
         NullValue,
-        
+
         /// <summary>internal error</summary>
         InternalError,
-        
+
         /// <summary>permission denied to a system resource</summary>
         SystemResourcePermissionDenied,
-        
+
         /// <summary>system resource has been exhausted</summary>
         OutOfSystemResource,
-        
+
         /// <summary>system resource error</summary>
         SystemResourceError,
-        
+
         /// <summary>a required resource was not found</summary>
         ResourceNotFound,
-        
+
         /// <summary>input/output error</summary>
         IOError,
-        
+
         /// <summary>a buffer underrun/overrun has occurred</summary>
         BufferLimitViolation,
-        
+
         /// <summary>service definition parse or validation error</summary>
         ServiceDefinitionError,
-        
+
         /// <summary>attempt to access an out of range element</summary>
         OutOfRange,
-        
+
         /// <summary>key not found</summary>
         KeyNotFound,
-        
+
         /// <summary>error occurred on remote node</summary>
         RemoteError = 100,
-        
+
         /// <summary>request timed out</summary>
         RequestTimeout,
-        
+
         /// <summary>attempt to write to a read only member</summary>
         ReadOnlyMember,
-        
+
         /// <summary>attempt to read a write only member</summary>
         WriteOnlyMember,
-        
+
         /// <summary>member not implemented</summary>
         NotImplementedError,
-        
+
         /// <summary>member is busy try again</summary>
         MemberBusy,
-        
+
         /// <summary>value has not been set</summary>
         ValueNotSet,
-        
+
         /// <summary>abort operation (generator only)</summary>
         AbortOperation,
-        
+
         /// <summary>the operation has been aborted</summary>
         OperationAborted,
-        
+
         /// <summary>stop generator iteration (generator only)</summary>
         StopIteration,
-        
+
         /// <summary>authentication has failed</summary>
         AuthenticationError = 150,
-        
+
         /// <summary>the object is locked by another user or session</summary>
         ObjectLockedError,
-        
+
         /// <summary>permission to service object or resource denied</summary>
-        PermissionDenied      
+        PermissionDenied
     }
 
 
     /// <summary>
     /// Represents a complex number using double precision.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public struct CDouble
     {
         /// <summary>
@@ -646,7 +646,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents a complex number using single precision.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public struct CSingle
     {
         /// <summary>
@@ -745,7 +745,7 @@ namespace RobotRaconteurWeb
                 case DataTypes.bool_t:
                     return 1;
                 default:
-                    throw new DataTypeException("Invalid data type");                    
+                    throw new DataTypeException("Invalid data type");
             }
         }
 
@@ -777,7 +777,7 @@ namespace RobotRaconteurWeb
                     return DataTypes.uint64_t;
                 case "System.String":
                     return DataTypes.string_t;
-                case "System.Boolean":                
+                case "System.Boolean":
                     return DataTypes.bool_t;
                 case "RobotRaconteurWeb.CDouble":
                     return DataTypes.cdouble_t;
@@ -808,7 +808,7 @@ namespace RobotRaconteurWeb
 
             }
 
-            
+
 
             throw new DataTypeException("Unknown data type");
         }
@@ -818,27 +818,27 @@ namespace RobotRaconteurWeb
             switch (stype)
             {
                 case "null":
-                    
+
                 case "System.Double":
-                    
+
                 case "System.Single":
-                    
+
                 case "System.SByte":
-                   
+
                 case "System.Byte":
-                    
+
                 case "System.Int16":
-                    
+
                 case "System.UInt16":
-                    
+
                 case "System.Int32":
-                    
+
                 case "System.UInt32":
-                    
+
                 case "System.Int64":
-                    
+
                 case "System.UInt64":
-                    
+
                 case "System.String":
 
                 case "System.Boolean":
@@ -848,13 +848,13 @@ namespace RobotRaconteurWeb
                 case "RobotRaconteurWeb.CSingle":
 
                 case "RobotRaconteurWeb.MessageElementStructure":
-                    
+
                 case "RobotRaconteurWeb.MessageElementIndexedSet<int>":
-                    
+
                 case "RobotRaconteurWeb.MessageElementIndexedSet<string>":
-                    
+
                 case "RobotRaconteurWeb.MessageElementMultiDimArray":
-                    
+
                 case "System.Object":
                     return true;
 
@@ -892,28 +892,28 @@ namespace RobotRaconteurWeb
         {
             switch (t)
             {
-                
+
                 case DataTypes.double_t:
                     return new double[length];
                 case DataTypes.single_t:
                     return new float[length];
-                case  DataTypes.int8_t:
+                case DataTypes.int8_t:
                     return new sbyte[length];
                 case DataTypes.uint8_t:
                     return new byte[length];
-                case  DataTypes.int16_t:
+                case DataTypes.int16_t:
                     return new short[length];
-                case  DataTypes.uint16_t:
+                case DataTypes.uint16_t:
                     return new ushort[length];
-                case  DataTypes.int32_t:
+                case DataTypes.int32_t:
                     return new int[length];
-                case  DataTypes.uint32_t:
+                case DataTypes.uint32_t:
                     return new uint[length];
-                case  DataTypes.int64_t:
+                case DataTypes.int64_t:
                     return new long[length];
-                case  DataTypes.uint64_t:
+                case DataTypes.uint64_t:
                     return new ulong[length];
-                case  DataTypes.string_t:
+                case DataTypes.string_t:
                     return null;
                 case DataTypes.cdouble_t:
                     return new CDouble[length];
@@ -921,7 +921,7 @@ namespace RobotRaconteurWeb
                     return new CSingle[length];
                 case DataTypes.bool_t:
                     return new bool[length];
-                case  DataTypes.structure_t:
+                case DataTypes.structure_t:
                     return null;
             }
 
@@ -937,9 +937,9 @@ namespace RobotRaconteurWeb
             switch (stype)
             {
                 case "System.Double":
-                    return new double[] {((double)inv)};
+                    return new double[] { ((double)inv) };
                 case "System.Single":
-                    return new float[] {((float)inv)};
+                    return new float[] { ((float)inv) };
                 case "System.SByte":
                     return new sbyte[] { ((sbyte)inv) };
                 case "System.Byte":
@@ -970,7 +970,7 @@ namespace RobotRaconteurWeb
         public static DataTypes TypeIDFromType(Type stype)
         {
             switch (Type.GetTypeCode(stype))
-            {                
+            {
                 case TypeCode.Double:
                     return DataTypes.double_t;
                 case TypeCode.Single:
@@ -1024,7 +1024,7 @@ namespace RobotRaconteurWeb
                 default:
                     throw new DataTypeException("Unknown data type");
             }
-            
+
         }
 
         public static T[] VerifyArrayLength<T>(T[] a, int len, bool varlength) where T : struct
@@ -1183,8 +1183,8 @@ namespace RobotRaconteurWeb
 
             return a;
         }
-    }    
-    
+    }
+
 
     public class Message
     {
@@ -1193,12 +1193,12 @@ namespace RobotRaconteurWeb
 
         public Message()
         {
-            entries=new List<MessageEntry>();
+            entries = new List<MessageEntry>();
         }
 
         public uint ComputeSize()
         {
-            uint s=header.ComputeSize();
+            uint s = header.ComputeSize();
             foreach (MessageEntry e in entries)
             {
                 s += e.ComputeSize();
@@ -1235,7 +1235,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        public MessageEntry AddEntry(MessageEntryType t,string name)
+        public MessageEntry AddEntry(MessageEntryType t, string name)
         {
             MessageEntry m = new MessageEntry();
             m.MemberName = name;
@@ -1255,10 +1255,10 @@ namespace RobotRaconteurWeb
             r.PushRelativeLimit(header.MessageSize - header.HeaderLength);
 
             ushort s = header.EntryCount;
-            entries=new List<MessageEntry>(s);
-            for (int i=0; i<s; i++) 
+            entries = new List<MessageEntry>(s);
+            for (int i = 0; i < s; i++)
             {
-                MessageEntry e=new MessageEntry();
+                MessageEntry e = new MessageEntry();
                 e.Read(r);
                 entries.Add(e);
             }
@@ -1273,16 +1273,16 @@ namespace RobotRaconteurWeb
         public ushort HeaderLength;
         public uint SenderEndpoint;
         public uint ReceiverEndpoint;
-        public string SenderNodeName="";
+        public string SenderNodeName = "";
         public string ReceiverNodeName = "";
-        public NodeID SenderNodeID=new NodeID(new byte[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
-        public NodeID ReceiverNodeID = new NodeID(new byte[] { 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0 });
-        public string MetaData="";
+        public NodeID SenderNodeID = new NodeID(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        public NodeID ReceiverNodeID = new NodeID(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        public string MetaData = "";
         public ushort EntryCount;
         public ushort MessageID;
-        
+
         public ushort MessageResID;
-        
+
         public uint MessageSize;
 
         public ushort ComputeSize()
@@ -1303,7 +1303,7 @@ namespace RobotRaconteurWeb
             w.WriteString8("RRAC");
             w.Write(MessageSize);
             w.Write((ushort)2);
-            
+
             w.Write(HeaderLength);
 
             byte[] bSenderNodeID = SenderNodeID.ToByteArray();
@@ -1330,38 +1330,38 @@ namespace RobotRaconteurWeb
         public void Read(ArrayBinaryReader r)
         {
             string seed = r.ReadString8(4);
-            if (seed !="RRAC")
+            if (seed != "RRAC")
                 throw new ProtocolException("Incorrect message seed");
             MessageSize = r.ReadUInt32();
             ushort version = r.ReadUInt16();
             if (version != 2)
                 throw new ProtocolException("Uknown protocol version");
-            
+
             HeaderLength = r.ReadUInt16();
 
             r.PushRelativeLimit((uint)(HeaderLength - 12));
 
-            byte[] bSenderNodeID = new byte[] { 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0 };
+            byte[] bSenderNodeID = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 16; i++) { bSenderNodeID[i] = r.ReadByte(); };
             SenderNodeID = new NodeID(bSenderNodeID);
-            byte[] bReceiverNodeID = new byte[] { 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0 };
+            byte[] bReceiverNodeID = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             for (int i = 0; i < 16; i++) { bReceiverNodeID[i] = r.ReadByte(); };
             ReceiverNodeID = new NodeID(bReceiverNodeID);
             SenderEndpoint = r.ReadUInt32();
             ReceiverEndpoint = r.ReadUInt32();
-            ushort pname_s= r.ReadUInt16();
+            ushort pname_s = r.ReadUInt16();
             SenderNodeName = r.ReadString8(pname_s);
             ushort pname_r = r.ReadUInt16();
             ReceiverNodeName = r.ReadString8(pname_r);
             ushort meta_s = r.ReadUInt16();
             MetaData = r.ReadString8(meta_s);
-            
+
             EntryCount = r.ReadUInt16();
             MessageID = r.ReadUInt16();
             MessageResID = r.ReadUInt16();
             if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
             r.PopLimit();
-            
+
         }
     }
 
@@ -1372,20 +1372,21 @@ namespace RobotRaconteurWeb
 
         public MessageEntryType EntryType;
 
-        public string ServicePath="";
+        public string ServicePath = "";
 
-        public string MemberName="";
+        public string MemberName = "";
 
         public uint RequestID;
 
         public MessageErrorType Error;
 
-        public string MetaData="";
+        public string MetaData = "";
 
         public List<MessageElement> elements;
 
-        public MessageEntry() {
-            elements =new List<MessageElement>();
+        public MessageEntry()
+        {
+            elements = new List<MessageElement>();
         }
 
         public MessageEntry(MessageEntryType t, string n)
@@ -1435,7 +1436,7 @@ namespace RobotRaconteurWeb
                     {
                         m = m1;
                         return false;
-                    }                    
+                    }
                 }
             }
             m = null;
@@ -1464,7 +1465,7 @@ namespace RobotRaconteurWeb
 
         public void Write(ArrayBinaryWriter w)
         {
-            
+
             EntrySize = ComputeSize();
             w.PushRelativeLimit(EntrySize);
             w.Write(EntrySize);
@@ -1477,7 +1478,7 @@ namespace RobotRaconteurWeb
             w.WriteString8(MemberName);
             w.Write(RequestID);
             w.Write((ushort)Error);
-             w.Write((ushort)ArrayBinaryWriter.GetStringByteCount8(MetaData));
+            w.Write((ushort)ArrayBinaryWriter.GetStringByteCount8(MetaData));
             w.WriteString8(MetaData);
             w.Write((ushort)elements.Count);
 
@@ -1498,7 +1499,7 @@ namespace RobotRaconteurWeb
 
             EntryType = (MessageEntryType)r.ReadUInt16();
             r.ReadUInt16();
-            
+
             ushort sname_s = r.ReadUInt16();
             ServicePath = r.ReadString8(sname_s);
             ushort mname_s = r.ReadUInt16();
@@ -1511,9 +1512,9 @@ namespace RobotRaconteurWeb
 
             ushort ecount = r.ReadUInt16();
 
-            
 
-            elements=new List<MessageElement>(ecount);
+
+            elements = new List<MessageElement>(ecount);
             for (int i = 0; i < ecount; i++)
             {
                 MessageElement e = new MessageElement();
@@ -1533,13 +1534,13 @@ namespace RobotRaconteurWeb
     {
         public uint ElementSize;
 
-        public string ElementName="";
+        public string ElementName = "";
 
         public DataTypes ElementType;
 
         public string ElementTypeName = "";
 
-        public string MetaData="";
+        public string MetaData = "";
 
         public uint DataCount;
 
@@ -1565,16 +1566,16 @@ namespace RobotRaconteurWeb
             set
             {
                 dat = value;
-               
+
                 UpdateData();
             }
 
         }
-        
+
 
         public uint ComputeSize()
         {
-            uint s = 16 + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName)+(uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName) + (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+            uint s = 16 + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName) + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName) + (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
 
             switch (ElementType)
             {
@@ -1606,8 +1607,8 @@ namespace RobotRaconteurWeb
                         break;
                     }
             }
-            
-            return s; 
+
+            return s;
         }
 
 
@@ -1624,7 +1625,8 @@ namespace RobotRaconteurWeb
                 datatype = dat.GetType().GetElementType().ToString();
                 DataCount = (uint)((Array)dat).Length;
             }
-            else if (dat is MessageElementNestedElementList) {
+            else if (dat is MessageElementNestedElementList)
+            {
                 var dat2 = (MessageElementNestedElementList)dat;
                 DataCount = (uint)dat2.Elements.Count;
                 ElementTypeName = dat2.TypeName ?? "";
@@ -1643,7 +1645,7 @@ namespace RobotRaconteurWeb
                         datatype = "RobotRaconteurWeb.MessageElementMultiDimArray";
                         break;
                     case DataTypes.pod_t:
-                        datatype =  "RobotRaconteurWeb.MessageElementPod";
+                        datatype = "RobotRaconteurWeb.MessageElementPod";
                         break;
                     case DataTypes.pod_array_t:
                         datatype = "RobotRaconteurWeb.MessageElementPodArray";
@@ -1658,11 +1660,11 @@ namespace RobotRaconteurWeb
                         datatype = "RobotRaconteurWeb.MessageElementNamedMultiDimArray";
                         break;
                     default:
-                      datatype = "RobotRaconteurWeb.MessageElementStructure";
-                      break;
+                        datatype = "RobotRaconteurWeb.MessageElementStructure";
+                        break;
                 }
             }
-            else if (dat is string) 
+            else if (dat is string)
             {
                 datatype = "System.String";
                 DataCount = (uint)UTF8Encoding.UTF8.GetByteCount((string)dat);
@@ -1670,7 +1672,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                
+
                 DataCount = 1;
                 datatype = dat.GetType().ToString();
             }
@@ -1687,7 +1689,7 @@ namespace RobotRaconteurWeb
         }
 
         public void Write(ArrayBinaryWriter w)
-        {            
+        {
             UpdateData();
             w.PushRelativeLimit(ElementSize);
             w.Write(ElementSize);
@@ -1710,8 +1712,8 @@ namespace RobotRaconteurWeb
             else if (dat is MessageElementNestedElementList)
             {
                 List<MessageElement> l = ((MessageElementNestedElementList)dat).Elements;
-                foreach (MessageElement e in l) e.Write(w);                 
-            }            
+                foreach (MessageElement e in l) e.Write(w);
+            }
             else if (dat is string)
             {
                 w.WriteString8((string)dat);
@@ -1728,7 +1730,7 @@ namespace RobotRaconteurWeb
 
         public void Read(ArrayBinaryReader r)
         {
-            ElementSize=r.ReadUInt32();
+            ElementSize = r.ReadUInt32();
             r.PushRelativeLimit(ElementSize - 4);
             ushort name_s = r.ReadUInt16();
             ElementName = r.ReadString8(name_s);
@@ -1764,8 +1766,8 @@ namespace RobotRaconteurWeb
 
                         dat = new MessageElementNestedElementList(ElementType, ElementTypeName, l);
                         break;
-                    }      
-                
+                    }
+
                 case DataTypes.double_t:
                 case DataTypes.single_t:
                 case DataTypes.int8_t:
@@ -1793,10 +1795,10 @@ namespace RobotRaconteurWeb
                         break;
                     }
                 default:
-                    throw new DataTypeException("Unknown data type");                    
+                    throw new DataTypeException("Unknown data type");
             }
 
-            
+
             if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
             r.PopLimit();
 
@@ -1804,8 +1806,10 @@ namespace RobotRaconteurWeb
 
         public static MessageElement FindElement(List<MessageElement> m, string name)
         {
-            foreach (MessageElement e in m) {
-                if (e.ElementName == name) {
+            foreach (MessageElement e in m)
+            {
+                if (e.ElementName == name)
+                {
                     return e;
                 }
             }
@@ -1837,9 +1841,9 @@ namespace RobotRaconteurWeb
 
         public MessageElementNestedElementList CastDataToNestedList(DataTypes expected_type)
         {
-            var l= CastData<MessageElementNestedElementList>();
+            var l = CastData<MessageElementNestedElementList>();
 
-            if (l !=null && l.Type != expected_type)
+            if (l != null && l.Type != expected_type)
             {
                 throw new DataTypeMismatchException("Unexpected MessageElementNestedElementList type");
             }
@@ -1872,7 +1876,7 @@ namespace RobotRaconteurWeb
     public static class MessageElementUtil
     {
         public static MessageElement NewMessageElement(string name, object data)
-        {            
+        {
             var m = new MessageElement();
             m.ElementName = name;
             m.Data = data;
@@ -1901,8 +1905,8 @@ namespace RobotRaconteurWeb
 
         public static void AddMessageElement(List<MessageElement> vct, int i, object data)
         {
-            var m = NewMessageElement(i, data);            
-            vct.Add(m);           
+            var m = NewMessageElement(i, data);
+            vct.Add(m);
         }
 
         public static void AddMessageElement(MessageEntry m, int i, object data)
@@ -1912,8 +1916,8 @@ namespace RobotRaconteurWeb
         }
 
         public static void AddMessageElement(List<MessageElement> vct, MessageElement m)
-        {            
-             vct.Add(m);
+        {
+            vct.Add(m);
         }
 
         public static void AddMessageElement(MessageEntry m, MessageElement mm)
@@ -1924,8 +1928,8 @@ namespace RobotRaconteurWeb
         public static T FindElementAndCast<T>(List<MessageElement> elems, string name)
         {
             var e = MessageElement.FindElement(elems, name);
-            
-            return e.CastData<T>();            
+
+            return e.CastData<T>();
         }
 
         public static MessageElement FindElement(List<MessageElement> elems, string name)
@@ -1939,7 +1943,7 @@ namespace RobotRaconteurWeb
         }
 
         public static T CastData<T>(MessageElement m)
-        {            
+        {
             return m.CastData<T>();
         }
 
@@ -1961,8 +1965,8 @@ namespace RobotRaconteurWeb
         public static int GetMessageElementNumber(MessageElement e)
         {
             int res;
-            if(!Int32.TryParse(e.ElementName, out res))
-            { 
+            if (!Int32.TryParse(e.ElementName, out res))
+            {
                 throw new ProtocolException("Could not determine Element Number");
             }
             return res;
@@ -2003,12 +2007,12 @@ namespace RobotRaconteurWeb
 
         public static MessageElement PackStructure(RobotRaconteurNode node, ClientContext client, string name, object val)
         {
-            return NewMessageElement(name, node.PackStructure(val,client));
+            return NewMessageElement(name, node.PackStructure(val, client));
         }
 
         public static MessageElement PackVarType(RobotRaconteurNode node, ClientContext client, string name, object val)
         {
-            return NewMessageElement(name, node.PackVarType(val,client));
+            return NewMessageElement(name, node.PackVarType(val, client));
         }
 
         public static MessageElement PackAnyType<T>(RobotRaconteurNode node, ClientContext client, string name, ref T val)
@@ -2018,7 +2022,7 @@ namespace RobotRaconteurWeb
 
         public static MessageElement PackMapType<K, T>(RobotRaconteurNode node, ClientContext client, string name, Dictionary<K, T> val)
         {
-            return NewMessageElement(name, node.PackMapType<K, T>(val,client));
+            return NewMessageElement(name, node.PackMapType<K, T>(val, client));
         }
 
         public static MessageElement PackListType<T>(RobotRaconteurNode node, ClientContext client, string name, List<T> val)
@@ -2077,7 +2081,7 @@ namespace RobotRaconteurWeb
 
         public static MultiDimArray UnpackMultiDimArray(RobotRaconteurNode node, MessageElement m)
         {
-            MultiDimArray a = node.UnpackMultiDimArray(MessageElementUtil.CastDataToNestedList(m,DataTypes.multidimarray_t));
+            MultiDimArray a = node.UnpackMultiDimArray(MessageElementUtil.CastDataToNestedList(m, DataTypes.multidimarray_t));
             if (a == null) throw new NullReferenceException();
             return a;
         }
@@ -2091,7 +2095,7 @@ namespace RobotRaconteurWeb
 
         public static T UnpackStructure<T>(RobotRaconteurNode node, ClientContext client, MessageElement m)
         {
-            return node.UnpackStructure<T>(MessageElementUtil.CastDataToNestedList(m,DataTypes.structure_t), client);
+            return node.UnpackStructure<T>(MessageElementUtil.CastDataToNestedList(m, DataTypes.structure_t), client);
         }
 
         public static object UnpackVarType(RobotRaconteurNode node, ClientContext client, MessageElement m)
@@ -2123,22 +2127,22 @@ namespace RobotRaconteurWeb
 
         public static T UnpackPodFromArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackPodFromArray<T>(CastDataToNestedList(m,DataTypes.pod_array_t), client);
+            return node.UnpackPodFromArray<T>(CastDataToNestedList(m, DataTypes.pod_array_t), client);
         }
 
         public static T[] UnpackPodArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackPodArray<T>(CastDataToNestedList(m,DataTypes.pod_array_t), client);
+            return node.UnpackPodArray<T>(CastDataToNestedList(m, DataTypes.pod_array_t), client);
         }
 
         public static PodMultiDimArray UnpackPodMultiDimArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackPodMultiDimArray<T>(MessageElementUtil.CastDataToNestedList(m,DataTypes.pod_multidimarray_t), client);
+            return node.UnpackPodMultiDimArray<T>(MessageElementUtil.CastDataToNestedList(m, DataTypes.pod_multidimarray_t), client);
         }
 
         public static T UnpackNamedArrayFromArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
         {
-            return node.UnpackNamedArrayFromArray<T>(CastDataToNestedList(m,DataTypes.namedarray_array_t), client);
+            return node.UnpackNamedArrayFromArray<T>(CastDataToNestedList(m, DataTypes.namedarray_array_t), client);
         }
 
         public static T[] UnpackNamedArray<T>(RobotRaconteurNode node, ClientContext client, MessageElement m) where T : struct
@@ -2157,6 +2161,6 @@ namespace RobotRaconteurWeb
             return (string)f.GetValue(o);
         }
     }
-    
+
 
 }

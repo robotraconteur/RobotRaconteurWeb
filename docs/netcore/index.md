@@ -12,15 +12,15 @@ compiler. RobotRaconteurH5 is RobotRaconteurWeb compiled to JavaScript for use w
 It uses WebSockets to communicate with Robot Raconteur services. RobotRaconteurWeb can also be used with ASP.NET
 web servers using WebSockets. See the examples for a demonstration of how this work. This capability allows
 for Robot Raconteur to be easily integrated into cloud and information systems without requiring any modifications
-to the infrastructure! 
+to the infrastructure!
 
 **See the API Documentation here!!** [api/index.html](api/index.html)
 
 RobotRaconteurWeb is very similar to RobotRaconteurNET. The main difference is that RobotRaconteurWeb
-uses the asynchronous Task framework instead of blocking. All function that could potentially block 
+uses the asynchronous Task framework instead of blocking. All function that could potentially block
 are instead asynchronous, and should be used with async/await.
 
-See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library: 
+See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library:
 https://github.com/robotraconteur/robotraconteur/wiki/Documentation
 
 Also see the H5 compiler: https://github.com/theolivenbaum/h5

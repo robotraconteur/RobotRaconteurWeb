@@ -114,19 +114,19 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public void SetClientDownsample(uint ep, uint downsample)
+        {
+            lock (this)
             {
-                lock (this)
+                if (downsample == 0)
                 {
-                    if (downsample == 0)
-                    {
-                        client_downsamples.Remove(ep);
-                    }
-                    else
-                    {
-                        client_downsamples[ep] = downsample;
-                    }
+                    client_downsamples.Remove(ep);
+                }
+                else
+                {
+                    client_downsamples[ep] = downsample;
                 }
             }
+        }
         /**
         <summary>
         Begin the update loop step
@@ -138,7 +138,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void BeginStep()
         {
-            lock(this)
+            lock (this)
             {
                 ++step_count;
             }
@@ -187,7 +187,7 @@ namespace RobotRaconteurWeb
 
         bool wire_predicate(object wire, uint ep)
         {
-            lock(this)
+            lock (this)
             {
                 var downsample = default_downsample + 1;
                 if (client_downsamples.TryGetValue(ep, out uint e))
@@ -217,12 +217,12 @@ namespace RobotRaconteurWeb
             }
         }
 
-        void server_event(ServerContext ctx, ServerServiceListenerEventType evt, object param) 
+        void server_event(ServerContext ctx, ServerServiceListenerEventType evt, object param)
         {
             if (evt != ServerServiceListenerEventType.ClientDisconnected)
                 return;
 
-            lock(this)
+            lock (this)
             {
                 client_downsamples.Remove((uint)param);
             }

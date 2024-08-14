@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using RobotRaconteurWeb;
 using System.IO;
 using System.Linq;
+using System.Text;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
 {
@@ -82,8 +82,8 @@ namespace RobotRaconteurTest
                     if (c.Name == "structconst")
                     {
                         var s = c.ValueToStructFields();
-                        RRWebTest.WriteLine(string.Join(" ", s.Select(f=>f.Name + ": " + f.ConstantRefName).ToArray()));
-                        
+                        RRWebTest.WriteLine(string.Join(" ", s.Select(f => f.Name + ": " + f.ConstantRefName).ToArray()));
+
                         RRWebTest.WriteLine("");
                     }
                 }

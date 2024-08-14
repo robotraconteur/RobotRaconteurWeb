@@ -46,17 +46,17 @@ namespace RobotRaconteurSubTest
             node.RegisterTransport(intraTransport);
             intraTransport.StartServer();
 
-            
+
             node.RegisterServiceType(new experimental__testing__subtestfilterFactory());
 
             object serviceInstance;
             if (service_type == 1)
             {
-                serviceInstance = new sub_testroot1_impl(); 
+                serviceInstance = new sub_testroot1_impl();
             }
             else
             {
-                serviceInstance = new sub_testroot1_impl2(); 
+                serviceInstance = new sub_testroot1_impl2();
             }
             var serviceContext = node.RegisterService(serviceName, "experimental.testing.subtestfilter", serviceInstance);
             serviceContext.Attributes = (attributes);
@@ -189,13 +189,13 @@ namespace RobotRaconteurSubTest
                 { "a4", "test_attr_val4,test_attr_val4_1" }
             };
 
-                    var node2Attrs = new Dictionary<string, object>
+            var node2Attrs = new Dictionary<string, object>
             {
                 { "a2", "test_attr_val2" },
                 { "a3", "test_attr_val3,test_attr_val3_1" }
             };
 
-                    var node3Attrs = new Dictionary<string, object>
+            var node3Attrs = new Dictionary<string, object>
             {
                 { "a1", "test_attr_val3" },
                 { "a2", "test_attr_val5" },

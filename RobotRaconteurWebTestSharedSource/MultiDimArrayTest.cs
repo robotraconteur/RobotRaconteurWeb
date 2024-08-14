@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+// Copyright 2011-2019 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using RobotRaconteurWeb;
-using System.IO;
 
 namespace RobotRaconteurTest
 {
-	
+
 #if !ROBOTRACONTEUR_H5
     class MultiDimArrayTest
     {
@@ -42,14 +42,14 @@ namespace RobotRaconteurTest
 
             m1.AssignSubArray(new uint[] { 2, 2, 3, 3, 4 }, m2, new uint[] { 0, 2, 0, 0, 0 }, new uint[] { 1, 5, 5, 2, 1 });
 
-           
+
 
             ca<double>((double[])m1.Array_, (double[])m3.Array_);
-            
+
             MultiDimArray m6 = new MultiDimArray(new uint[] { 2, 2, 1, 1, 10 }, new double[40]);
             m1.RetrieveSubArray(new uint[] { 4, 2, 2, 8, 0 }, m6, new uint[] { 0, 0, 0, 0, 0 }, new uint[] { 2, 2, 1, 1, 10 });
             ca<double>((double[])m4.Array_, (double[])m6.Array_);
-            
+
             MultiDimArray m7 = new MultiDimArray(new uint[] { 4, 4, 4, 4, 10 }, new double[2560]);
             m1.RetrieveSubArray(new uint[] { 4, 2, 2, 8, 0 }, m7, new uint[] { 2, 1,2, 1, 0 }, new uint[] { 2, 2, 1, 1, 10 });
             ca<double>((double[])m5.Array_, (double[])m7.Array_);
@@ -70,12 +70,12 @@ namespace RobotRaconteurTest
 
 
             ca<byte>((byte[])m1.Array_, (byte[])m3.Array_);
-            
+
 
             MultiDimArray m6 = new MultiDimArray(new uint[] { 200,200 }, new byte[40000]);
             m1.RetrieveSubArray(new uint[] { 65,800 }, m6, new uint[] { 0, 0 }, new uint[] { 200,200 });
             ca<byte>((byte[])m4.Array_, (byte[])m6.Array_);
-            
+
 
             MultiDimArray m7 = new MultiDimArray(new uint[] { 512,512 }, new byte[512*512]);
             m1.RetrieveSubArray(new uint[] { 65,800 }, m7, new uint[] { 100,230}, new uint[] { 200,200 });
@@ -120,9 +120,9 @@ namespace RobotRaconteurTest
             for (int i = 0; i < count; i++)
             {
                 real[i] = r.ReadDouble();
-            }                        
+            }
             return new MultiDimArray(dims, real);
-            
+
         }
 
         public static MultiDimArray LoadByteArrayFromFile(string fname)

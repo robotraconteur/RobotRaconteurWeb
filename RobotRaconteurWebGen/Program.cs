@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+// Copyright 2011-2019 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RobotRaconteurWeb;
 using Mono.Options;
-using System.IO;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebGen
 {
@@ -43,7 +43,7 @@ namespace RobotRaconteurWebGen
                 bool show_version = false;
                 bool thunksource = false;
                 string lang = null;
-                var sources = new List<Source>();                
+                var sources = new List<Source>();
                 string outfile = null;
                 var include_dirs = new List<string>();
                 string output_dir = ".";
@@ -97,13 +97,13 @@ namespace RobotRaconteurWebGen
 
                 if (sources.Count(x => x.is_import == false) == 0)
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: no files specified for thunksource");                    
+                    Console.WriteLine("RobotRaconteurWebGen: fatal error: no files specified for thunksource");
                     return 1001;
                 }
 
                 if (lang != "csharp")
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: unknown or no language specified");                    
+                    Console.WriteLine("RobotRaconteurWebGen: fatal error: unknown or no language specified");
                     return 1012;
                 }
 
@@ -126,7 +126,7 @@ namespace RobotRaconteurWebGen
                             {
                                 s.filename = s3;
                                 break;
-                            }                            
+                            }
                         }
                     }
                 }
@@ -135,7 +135,7 @@ namespace RobotRaconteurWebGen
                 {
                     if (!File.Exists(s.filename))
                     {
-                        Console.WriteLine("RobotRaconteurWebGen: fatal error: input file not found {0}", s.filename);                        
+                        Console.WriteLine("RobotRaconteurWebGen: fatal error: input file not found {0}", s.filename);
                         return 1002;
                     }
                 }
@@ -145,7 +145,7 @@ namespace RobotRaconteurWebGen
                     Console.WriteLine("RobotRaconteurWebGen: fatal error: output director not found {0}", output_dir);
                     return 1003;
                 }
-                                
+
                 foreach (var s in sources)
                 {
                     ServiceDefinition d = null;
@@ -174,7 +174,7 @@ namespace RobotRaconteurWebGen
                     }
                     catch (ServiceDefinitionParseException ee)
                     {
-                        Console.WriteLine("{0}({1}): error: {2}",s.filename, ee.ParseInfo.LineNumber, ee.ShortMessage);
+                        Console.WriteLine("{0}({1}): error: {2}", s.filename, ee.ParseInfo.LineNumber, ee.ShortMessage);
                         return 1005;
                     }
                 }
@@ -194,13 +194,13 @@ namespace RobotRaconteurWebGen
                     return 1008;
                 }
                 catch (Exception ee)
-		        {
+                {
                     Console.WriteLine("RobotRaconteurWebGen: fatal error: could not verify service definition set {0}", ee.Message);
                     return 1009;
                 }
 
                 if (outfile == null)
-                {                   
+                {
                     foreach (var s in sources)
                     {
                         if (s.is_import)
@@ -218,7 +218,7 @@ namespace RobotRaconteurWebGen
                         }
                     }
                     return 0;
-                    
+
                 }
                 else
                 {

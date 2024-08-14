@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,99 +30,100 @@ using System.Reflection;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb 
+namespace RobotRaconteurWeb
 {
 
-public abstract class AsyncStreamTransport : ITransportConnection
-{
-    public uint LocalEndpoint { get { return m_LocalEndpoint; } }
-    protected uint m_LocalEndpoint=0;
-    public uint RemoteEndpoint { get { return m_RemoteEndpoint; } }
-    protected uint m_RemoteEndpoint=0;
-
-    public NodeID RemoteNodeID { get { lock (this) { return m_RemoteNodeID; } } }
-    protected NodeID m_RemoteNodeID=NodeID.Any;
-
-    protected NodeID target_nodeid=null;
-    protected string target_nodename=null;
-    protected bool is_server = false;
-
-    protected readonly RobotRaconteurNode node;
-
-    protected AsyncStreamTransportParent parent;
-
-    protected AsyncStreamTransport(RobotRaconteurNode node, AsyncStreamTransportParent parent)
+    public abstract class AsyncStreamTransport : ITransportConnection
     {
-        this.node = node;
-        this.parent = parent;
-    }
+        public uint LocalEndpoint { get { return m_LocalEndpoint; } }
+        protected uint m_LocalEndpoint = 0;
+        public uint RemoteEndpoint { get { return m_RemoteEndpoint; } }
+        protected uint m_RemoteEndpoint = 0;
 
+        public NodeID RemoteNodeID { get { lock (this) { return m_RemoteNodeID; } } }
+        protected NodeID m_RemoteNodeID = NodeID.Any;
 
-    protected bool m_Connected = false;
-    public bool Connected { 
-        get 
+        protected NodeID target_nodeid = null;
+        protected string target_nodename = null;
+        protected bool is_server = false;
+
+        protected readonly RobotRaconteurNode node;
+
+        protected AsyncStreamTransportParent parent;
+
+        protected AsyncStreamTransport(RobotRaconteurNode node, AsyncStreamTransportParent parent)
         {
-            lock (this)
+            this.node = node;
+            this.parent = parent;
+        }
+
+
+        protected bool m_Connected = false;
+        public bool Connected
+        {
+            get
             {
-                return m_Connected;
+                lock (this)
+                {
+                    return m_Connected;
+                }
             }
         }
-    }
 
 
-    protected CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        protected CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
-    protected MemoryStream mwrite;
-    protected MemoryStream mread;
-    private byte[] recbuf;
-    private byte[] sendbuf;
+        protected MemoryStream mwrite;
+        protected MemoryStream mread;
+        private byte[] recbuf;
+        private byte[] sendbuf;
 
-    protected ArrayBinaryWriter swriter;
-    protected ArrayBinaryReader sreader;
-
-    
-
-    protected Stream basestream;
-
-
-    protected bool m_RequireTls = false;
-    public bool RequireTls { get { return m_RequireTls; } }
-
-    protected bool m_IsTls = false;
-    public bool IsTls { get { return m_IsTls; } }
+        protected ArrayBinaryWriter swriter;
+        protected ArrayBinaryReader sreader;
 
 
 
-    protected async Task ConnectStream(Stream s, bool is_server, NodeID target_nodeid, string target_nodename, bool starttls, bool requiretls, int heartbeat_period, CancellationToken cancel)
-    { 
-        m_HeartbeatPeriod = heartbeat_period;
-        this.m_RequireTls = requiretls;
-        sendbuf = new byte[100000];
-        mwrite = new MemoryStream(sendbuf);
+        protected Stream basestream;
 
-        recbuf = new byte[100000];
-        mread = new MemoryStream(recbuf);
 
-        swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
-        sreader = new ArrayBinaryReader(mread, recbuf,recbuf.Length);
+        protected bool m_RequireTls = false;
+        public bool RequireTls { get { return m_RequireTls; } }
 
-        this.is_server = is_server;
-        this.target_nodename = target_nodename;
-        this.target_nodeid = target_nodeid;
+        protected bool m_IsTls = false;
+        public bool IsTls { get { return m_IsTls; } }
 
-        if (this.target_nodename == null) this.target_nodename = "";
-        if (this.target_nodeid == null) this.target_nodeid = NodeID.Any;
 
-        basestream = s;
-        
-        tlastsend = DateTime.UtcNow;
-        tlastrec = DateTime.UtcNow;
-        tlastrec_mes = DateTime.UtcNow;
 
-       Task recvtask = DoReceive();
-
-        if (!is_server)
+        protected async Task ConnectStream(Stream s, bool is_server, NodeID target_nodeid, string target_nodename, bool starttls, bool requiretls, int heartbeat_period, CancellationToken cancel)
         {
+            m_HeartbeatPeriod = heartbeat_period;
+            this.m_RequireTls = requiretls;
+            sendbuf = new byte[100000];
+            mwrite = new MemoryStream(sendbuf);
+
+            recbuf = new byte[100000];
+            mread = new MemoryStream(recbuf);
+
+            swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
+            sreader = new ArrayBinaryReader(mread, recbuf, recbuf.Length);
+
+            this.is_server = is_server;
+            this.target_nodename = target_nodename;
+            this.target_nodeid = target_nodeid;
+
+            if (this.target_nodename == null) this.target_nodename = "";
+            if (this.target_nodeid == null) this.target_nodeid = NodeID.Any;
+
+            basestream = s;
+
+            tlastsend = DateTime.UtcNow;
+            tlastrec = DateTime.UtcNow;
+            tlastrec_mes = DateTime.UtcNow;
+
+            Task recvtask = DoReceive();
+
+            if (!is_server)
+            {
                 if (starttls)
                 {
 #if !ROBOTRACONTEUR_H5
@@ -132,142 +133,142 @@ public abstract class AsyncStreamTransport : ITransportConnection
 #endif
                 }
 
-            NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
-            lock (this)
-            {
-                m_RemoteNodeID = rid;
+                NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
+                lock (this)
+                {
+                    m_RemoteNodeID = rid;
+                }
             }
+
+            var noop = DoHeartbeat();
+
+
         }
 
-        var noop = DoHeartbeat();
+        bool request_receive_pause = false;
+        TaskCompletionSource<int> request_receive_pause_task = null;
+        TaskCompletionSource<int> pause_receive_task = null;
 
-
-    }
-
-    bool request_receive_pause=false;
-    TaskCompletionSource<int> request_receive_pause_task = null;
-    TaskCompletionSource<int> pause_receive_task=null;
-
-    protected async Task RequestReceivePause()
-    {
-        TaskCompletionSource<int> request_pause_task1 = new TaskCompletionSource<int>();
-        lock (this)
+        protected async Task RequestReceivePause()
         {
-            if (request_receive_pause)
+            TaskCompletionSource<int> request_pause_task1 = new TaskCompletionSource<int>();
+            lock (this)
             {
-                if (request_receive_pause_task != null)
+                if (request_receive_pause)
                 {
-                    request_pause_task1 = request_receive_pause_task;
+                    if (request_receive_pause_task != null)
+                    {
+                        request_pause_task1 = request_receive_pause_task;
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {
-                    return;
+                    request_receive_pause = true;
+                    request_receive_pause_task = request_pause_task1;
                 }
             }
-            else
+
+            await request_pause_task1.Task.ConfigureAwait(false);
+        }
+
+        protected Task ResumeReceivePause()
+        {
+            TaskCompletionSource<int> pause_task1 = null;
+            lock (this)
             {
-                request_receive_pause = true;
-                request_receive_pause_task = request_pause_task1;
+                request_receive_pause = false;
+                pause_task1 = pause_receive_task;
             }
-        }
-
-        await request_pause_task1.Task.ConfigureAwait(false);
-    }
-
-    protected Task ResumeReceivePause()
-    {
-        TaskCompletionSource<int> pause_task1 = null;
-        lock (this)
-        {
-            request_receive_pause = false;
-            pause_task1 = pause_receive_task;
-        }
-        if (pause_task1 != null)
-        {
-            pause_task1.TrySetResult(0);
-        }
-
-        return Task.FromResult(0);
-
-    }
-
-    protected async Task DoReceive()
-    {
-        try
-        {
-            while (this.Connected)
+            if (pause_task1 != null)
             {
-                TaskCompletionSource<int> request_pause_task1=null;
-                lock (this)
+                pause_task1.TrySetResult(0);
+            }
+
+            return Task.FromResult(0);
+
+        }
+
+        protected async Task DoReceive()
+        {
+            try
+            {
+                while (this.Connected)
                 {
-                    if (request_receive_pause)
+                    TaskCompletionSource<int> request_pause_task1 = null;
+                    lock (this)
                     {
-                        pause_receive_task = new TaskCompletionSource<int>();
-                        request_pause_task1 = request_receive_pause_task;
-                        request_receive_pause_task = null;
-                    }
-                }                                
-
-                if (pause_receive_task != null && request_pause_task1 != null)
-                {
-                    request_pause_task1.TrySetResult(0);
-                    await pause_receive_task.Task.ConfigureAwait(false);
-                }
-
-                lock (this)
-                {
-                    pause_receive_task = null;
-                }
-
-                int mempos = 0;
-                while (mempos < 8)
-                {
-                    int n = await basestream.ReadAsync(recbuf, mempos, 8 - mempos).ConfigureAwait(false);
-                    if (n == 0)
-                    {
-                        Close();
-                        return;
-                    }
-                    mempos += n;
-                }
-
-                string seed = ASCIIEncoding.ASCII.GetString(recbuf, 0, 4);
-                if (seed != "RRAC") throw new IOException("Invalid seed");
-
-                int meslength = (int)BitConverter.ToUInt32(recbuf, 4);
-
-                if (recbuf.Length < meslength)
-                {
-                    byte[] newbuf = new byte[(int)(meslength * 1.2)];
-                    Buffer.BlockCopy(recbuf, 0, newbuf, 0, 8);
-                    recbuf = newbuf;
-                    mread = new MemoryStream(recbuf, 0, recbuf.Length, true);
-                    sreader = new ArrayBinaryReader(mread, recbuf,recbuf.Length);
-                }
-
-                while (mempos < meslength)
-                {
-                    int n = await basestream.ReadAsync(recbuf, mempos, meslength - mempos).ConfigureAwait(false);
-                    if (n == 0)
-                    {
-                        Close();
-                        return;
-                    }
-                    mempos += n;
-                }
-
-                if (mempos == meslength)
-                {
-                    try
-                    {
-
-                        mread.Position = 0;
-                        sreader.Reset(meslength);
-                        Message mes = new Message();
-                        mes.Read(sreader);
-
-                        if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
+                        if (request_receive_pause)
                         {
+                            pause_receive_task = new TaskCompletionSource<int>();
+                            request_pause_task1 = request_receive_pause_task;
+                            request_receive_pause_task = null;
+                        }
+                    }
+
+                    if (pause_receive_task != null && request_pause_task1 != null)
+                    {
+                        request_pause_task1.TrySetResult(0);
+                        await pause_receive_task.Task.ConfigureAwait(false);
+                    }
+
+                    lock (this)
+                    {
+                        pause_receive_task = null;
+                    }
+
+                    int mempos = 0;
+                    while (mempos < 8)
+                    {
+                        int n = await basestream.ReadAsync(recbuf, mempos, 8 - mempos).ConfigureAwait(false);
+                        if (n == 0)
+                        {
+                            Close();
+                            return;
+                        }
+                        mempos += n;
+                    }
+
+                    string seed = ASCIIEncoding.ASCII.GetString(recbuf, 0, 4);
+                    if (seed != "RRAC") throw new IOException("Invalid seed");
+
+                    int meslength = (int)BitConverter.ToUInt32(recbuf, 4);
+
+                    if (recbuf.Length < meslength)
+                    {
+                        byte[] newbuf = new byte[(int)(meslength * 1.2)];
+                        Buffer.BlockCopy(recbuf, 0, newbuf, 0, 8);
+                        recbuf = newbuf;
+                        mread = new MemoryStream(recbuf, 0, recbuf.Length, true);
+                        sreader = new ArrayBinaryReader(mread, recbuf, recbuf.Length);
+                    }
+
+                    while (mempos < meslength)
+                    {
+                        int n = await basestream.ReadAsync(recbuf, mempos, meslength - mempos).ConfigureAwait(false);
+                        if (n == 0)
+                        {
+                            Close();
+                            return;
+                        }
+                        mempos += n;
+                    }
+
+                    if (mempos == meslength)
+                    {
+                        try
+                        {
+
+                            mread.Position = 0;
+                            sreader.Reset(meslength);
+                            Message mes = new Message();
+                            mes.Read(sreader);
+
+                            if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
+                            {
 #if !ROBOTRACONTEUR_H5
                             if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                             {
@@ -301,984 +302,984 @@ public abstract class AsyncStreamTransport : ITransportConnection
                             }
 #endif
                                 await StreamOpMessageReceived(mes).ConfigureAwait(false);
-                            
-                            continue;
+
+                                continue;
+
+                            }
+
+                            Task noop = ProcessMessage(mes).IgnoreResult();
 
                         }
+                        catch (Exception)
+                        {
+                            Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Close();
+            }
 
-                        Task noop= ProcessMessage(mes).IgnoreResult();
+        }
 
+        protected virtual async Task ProcessMessage(Message mes)
+        {
+            try
+            {
+                NodeID RemoteNodeID1;
+                uint local_ep;
+                uint remote_ep;
+                lock (this)
+                {
+                    RemoteNodeID1 = m_RemoteNodeID;
+                    local_ep = m_LocalEndpoint;
+                    remote_ep = m_RemoteEndpoint;
+                }
+
+                if (RequireTls && !IsTls)
+                {
+                    bool bad_message = true;
+                    if (mes.entries.Count == 1)
+                    {
+                        if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
+                        {
+                            bad_message = false;
+                        }
+                    }
+                    if (bad_message)
+                    {
+                        Close();
+                        return;
+                    }
+                }
+
+                if (IsTls)
+                {
+                    if (!RemoteNodeID1.IsAnyNode)
+                    {
+
+                        if (RemoteNodeID1 != mes.header.SenderNodeID)
+                        {
+                            var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.NodeNotFound, "RobotRaconteurNode.NodeNotFound", "Invalid sender node");
+                            if (ret1.entries.Count > 0)
+                            {
+                                Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();
+                                return;
+                            }
+                        }
+                    }
+
+                    if (local_ep != 0 && remote_ep != 0)
+                    {
+                        if (local_ep != mes.header.ReceiverEndpoint || remote_ep != mes.header.SenderEndpoint)
+                        {
+                            var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.InvalidEndpoint, "RobotRaconteurNode.InvalidEndpoint", "Invalid sender endpoint");
+                            if (ret1.entries.Count > 0)
+                            {
+                                Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                Message ret = await parent.SpecialRequest(mes).ConfigureAwait(false);
+                if (ret != null)
+                {
+                    try
+                    {
+                        if ((mes.entries[0].EntryType == MessageEntryType.ConnectionTest || mes.entries[0].EntryType == MessageEntryType.ConnectionTestRet))
+                        {
+                            if (mes.entries[0].Error != MessageErrorType.None)
+                            {
+                                Close();
+                                return;
+                            }
+                        }
+
+                        if ((ret.entries[0].EntryType == MessageEntryType.ConnectClientRet || ret.entries[0].EntryType == MessageEntryType.ReconnectClient) && ret.entries[0].Error == MessageErrorType.None)
+                        {
+                            if (ret.header.SenderNodeID == node.NodeID)
+                            {
+
+                                m_RemoteEndpoint = ret.header.ReceiverEndpoint;
+                                m_LocalEndpoint = ret.header.SenderEndpoint;
+                                parent.AddTransportConnection(ret.header.SenderEndpoint, this);
+                            }
+                            else
+                            {
+                                //TODO: Handle this better
+                                Close();
+                            }
+                        }
+
+                        //if (mes.entries[0].EntryType != MessageEntryType.ConnectionTest && mes.entries[0].EntryType != MessageEntryType.ConnectionTestRet)
+                        {
+                            tlastrec = DateTime.UtcNow;
+                        }
+
+
+                        Task noop = SendMessage(ret, default(CancellationToken)).IgnoreResult();
                     }
                     catch (Exception)
                     {
                         Close();
                     }
-                }
-            }
-        }
-        catch (Exception)
-        {
-            Close();
-        }
-        
-    }
 
-    protected virtual async Task ProcessMessage(Message mes)
-    {
-        try
-        {
-            NodeID RemoteNodeID1;
-            uint local_ep;
-            uint remote_ep;
-            lock (this)
-            {
-                RemoteNodeID1 = m_RemoteNodeID;
-                local_ep = m_LocalEndpoint;
-                remote_ep = m_RemoteEndpoint;
-            }
-
-            if (RequireTls && !IsTls)
-            {
-                bool bad_message = true;
-                if (mes.entries.Count == 1)
-                {
-                    if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
-                    {
-                        bad_message = false;
-                    }
-                }
-                if (bad_message)
-                {
-                    Close();
                     return;
                 }
-            }
 
-            if (IsTls)
-            {
-                if (!RemoteNodeID1.IsAnyNode)
+
+                tlastrec = DateTime.UtcNow;
+
+                if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                 {
-
-                    if (RemoteNodeID1 != mes.header.SenderNodeID)
-                    {
-                        var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.NodeNotFound, "RobotRaconteurNode.NodeNotFound", "Invalid sender node");
-                        if (ret1.entries.Count > 0)
-                        {
-                            Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();
-                            return;
-                        }
-                    }
-                }
-
-                if (local_ep != 0 && remote_ep != 0)
-                {
-                    if (local_ep != mes.header.ReceiverEndpoint || remote_ep != mes.header.SenderEndpoint)
-                    {
-                        var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.InvalidEndpoint, "RobotRaconteurNode.InvalidEndpoint", "Invalid sender endpoint");
-                        if (ret1.entries.Count > 0)
-                        {
-                            Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();
-                            return;
-                        }
-                    }
-                }
-            }
-
-
-
-
-            Message ret = await parent.SpecialRequest(mes).ConfigureAwait(false);
-            if (ret != null)
-            {
-                try
-                {
-                    if ((mes.entries[0].EntryType == MessageEntryType.ConnectionTest || mes.entries[0].EntryType == MessageEntryType.ConnectionTestRet))
-                    {
-                        if (mes.entries[0].Error != MessageErrorType.None)
-                        {
-                            Close();
-                            return;
-                        }
-                    }
-
-                    if ((ret.entries[0].EntryType == MessageEntryType.ConnectClientRet || ret.entries[0].EntryType == MessageEntryType.ReconnectClient) && ret.entries[0].Error == MessageErrorType.None)
-                    {
-                        if (ret.header.SenderNodeID == node.NodeID)
-                        {
-
-                            m_RemoteEndpoint = ret.header.ReceiverEndpoint;
-                            m_LocalEndpoint = ret.header.SenderEndpoint;
-                            parent.AddTransportConnection(ret.header.SenderEndpoint, this);
-                        }
-                        else
-                        {
-                            //TODO: Handle this better
-                            Close();
-                        }
-                    }
-
-                    //if (mes.entries[0].EntryType != MessageEntryType.ConnectionTest && mes.entries[0].EntryType != MessageEntryType.ConnectionTestRet)
-                    {
-                        tlastrec = DateTime.UtcNow;
-                    }
-
-
-                    Task noop = SendMessage(ret, default(CancellationToken)).IgnoreResult();
-                }
-                catch (Exception)
-                {
-                    Close();
-                }
-
-                return;
-            }
-
-
-            tlastrec = DateTime.UtcNow;
-
-            if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
-            {
 #if !ROBOTRACONTEUR_H5
                 if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                 {
                     await DoServerTlsHandshake(mes).ConfigureAwait(false);
                 }
 #endif
-                await StreamOpMessageReceived(mes).ConfigureAwait(false);
-                return;
+                    await StreamOpMessageReceived(mes).ConfigureAwait(false);
+                    return;
 
-            }
-            
-            if (mes.entries.Count == 1 && (mes.entries[0].EntryType == MessageEntryType.StreamCheckCapability || mes.entries[0].EntryType == MessageEntryType.StreamCheckCapabilityRet))
-            {
-                CheckStreamCapability_MessageReceived(mes);
-                return;
-            }
-
-            if (mes.entries.Count == 1)
-            {
-                if (mes.entries[0].EntryType == MessageEntryType.ConnectClientRet && remote_ep == 0)
-                {
-                    lock (this)
-                    {
-                        if (m_RemoteEndpoint == 0)
-                        {
-                            m_RemoteEndpoint = mes.header.SenderEndpoint;
-                        }
-                        remote_ep = m_RemoteEndpoint;
-                    }
                 }
 
-            }
-
-            if (IsTls)
-            {
-                if (local_ep == 0 || remote_ep == 0)
+                if (mes.entries.Count == 1 && (mes.entries[0].EntryType == MessageEntryType.StreamCheckCapability || mes.entries[0].EntryType == MessageEntryType.StreamCheckCapabilityRet))
                 {
-                    if (mes.entries.Count != 1)
+                    CheckStreamCapability_MessageReceived(mes);
+                    return;
+                }
+
+                if (mes.entries.Count == 1)
+                {
+                    if (mes.entries[0].EntryType == MessageEntryType.ConnectClientRet && remote_ep == 0)
+                    {
+                        lock (this)
+                        {
+                            if (m_RemoteEndpoint == 0)
+                            {
+                                m_RemoteEndpoint = mes.header.SenderEndpoint;
+                            }
+                            remote_ep = m_RemoteEndpoint;
+                        }
+                    }
+
+                }
+
+                if (IsTls)
+                {
+                    if (local_ep == 0 || remote_ep == 0)
+                    {
+                        if (mes.entries.Count != 1)
+                        {
+                            Close();
+                            return;
+                        }
+                    }
+
+                    var command = mes.entries[0].EntryType;
+                    if ((ushort)command > 500)
                     {
                         Close();
                         return;
                     }
                 }
 
-                var command = mes.entries[0].EntryType;
-                if ((ushort)command > 500)
+                if (!((mes.entries.Count == 1) && ((mes.entries[0].EntryType == MessageEntryType.ConnectionTest) || (mes.entries[0].EntryType == MessageEntryType.ConnectionTestRet))))
                 {
-                    Close();
-                    return;
+                    tlastrec_mes = DateTime.UtcNow;
+                    await ProcessMessage2(mes).ConfigureAwait(false);
                 }
-            }            
 
-            if (!((mes.entries.Count == 1) && ((mes.entries[0].EntryType == MessageEntryType.ConnectionTest) || (mes.entries[0].EntryType == MessageEntryType.ConnectionTestRet))))
-            {
-                tlastrec_mes = DateTime.UtcNow;
-                await ProcessMessage2(mes).ConfigureAwait(false);
             }
-            
-        }
-        catch (Exception)
-        {
-            Close();
-        }
-
-    }
-
-
-    public virtual async Task ProcessMessage2(Message m)
-    {
-        try
-        {
-            Transport.m_CurrentThreadTransportConnectionURL = GetConnectionURL();
-            Transport.m_CurrentThreadTransport = this;
-            await MessageReceived(m).ConfigureAwait(false);
-        }
-        catch
-        {
-            Close();
-        }
-        finally
-        {
-            Transport.m_CurrentThreadTransportConnectionURL = null;
-            Transport.m_CurrentThreadTransport = null;
-        }
-    }
-
-    public virtual async Task MessageReceived(Message m)
-    {
-        await parent.MessageReceived(m).ConfigureAwait(false);
-    }
-
-    public abstract string GetConnectionURL();
-    
-
-    private bool sending = false;
-    private List<Tuple<TaskCompletionSource<int>, Message>> send_queue = new List<Tuple<TaskCompletionSource<int>, Message>>();
-
-    bool request_send_pause = false;
-    TaskCompletionSource<int> request_send_pause_task = null;
-    TaskCompletionSource<int> pause_send_task = null;
-   
-
-    protected async Task RequestSendPause()
-    {
-        TaskCompletionSource<int> request_pause_task1 = null;
-        
-        lock (this)
-        {
-            if (!sending)
+            catch (Exception)
             {
-                sending = true;
-                
+                Close();
             }
-            else
+
+        }
+
+
+        public virtual async Task ProcessMessage2(Message m)
+        {
+            try
             {
-                request_pause_task1 = new TaskCompletionSource<int>();
-                if (request_send_pause)
+                Transport.m_CurrentThreadTransportConnectionURL = GetConnectionURL();
+                Transport.m_CurrentThreadTransport = this;
+                await MessageReceived(m).ConfigureAwait(false);
+            }
+            catch
+            {
+                Close();
+            }
+            finally
+            {
+                Transport.m_CurrentThreadTransportConnectionURL = null;
+                Transport.m_CurrentThreadTransport = null;
+            }
+        }
+
+        public virtual async Task MessageReceived(Message m)
+        {
+            await parent.MessageReceived(m).ConfigureAwait(false);
+        }
+
+        public abstract string GetConnectionURL();
+
+
+        private bool sending = false;
+        private List<Tuple<TaskCompletionSource<int>, Message>> send_queue = new List<Tuple<TaskCompletionSource<int>, Message>>();
+
+        bool request_send_pause = false;
+        TaskCompletionSource<int> request_send_pause_task = null;
+        TaskCompletionSource<int> pause_send_task = null;
+
+
+        protected async Task RequestSendPause()
+        {
+            TaskCompletionSource<int> request_pause_task1 = null;
+
+            lock (this)
+            {
+                if (!sending)
                 {
-                    if (request_send_pause_task != null)
-                    {
-                        request_pause_task1 = request_send_pause_task;
-                    }
-                    else
-                    {
-                        return;
-                    }
+                    sending = true;
+
                 }
                 else
                 {
-                    request_send_pause = true;
-                    request_send_pause_task = request_pause_task1;
-
-                    if (!sending)
+                    request_pause_task1 = new TaskCompletionSource<int>();
+                    if (request_send_pause)
                     {
-                        pause_send_task = new TaskCompletionSource<int>();
-
-                    }
-
-                }
-            }
-        }
-
-        if (request_pause_task1 != null)
-        {
-            await request_pause_task1.Task.ConfigureAwait(false);
-        }
-        
-    }
-
-    protected Task ResumeSendPause()
-    {
-        TaskCompletionSource<int> pause_task1 = null;
-        lock (this)
-        {
-            request_send_pause = false;
-            pause_task1 = pause_send_task;
-           
-            if (pause_task1 == null)
-            {
-                if (send_queue.Count > 0)
-                {
-                    var t = send_queue[0];
-                    send_queue.RemoveAt(0);
-                    t.Item1.TrySetResult(0);
-                }
-                else
-                {
-                    sending = false;
-                }
-            }
-            
-        }
-        
-        if (pause_task1!=null)
-        {
-            pause_task1.TrySetResult(0);
-        }
-
-        
-
-        return Task.FromResult(0);
-    }
-
-    public virtual async Task SendMessage(Message m, CancellationToken cancel)
-    {          
-
-        TaskCompletionSource<int> waiter=null;
-        
-        lock (this)
-        {
-            if (!m_Connected) throw new ConnectionException("Transport connection closed");
-            if (sending)
-            {
-                waiter = new TaskCompletionSource<int>();
-                waiter.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
-
-                bool replaced = false;
-
-                for (int i = 0; i < send_queue.Count;)
-                {
-                    bool remove = false;
-
-                    var h1 = m.header;
-                    var h2 = send_queue[i].Item2.header;
-                    if (h1.ReceiverNodeName == h2.ReceiverNodeName
-                        && h1.SenderNodeName == h2.SenderNodeName
-                        && h1.ReceiverNodeID == h2.ReceiverNodeID
-                        && h1.SenderNodeID == h2.SenderNodeID
-                        && h1.ReceiverEndpoint == h2.ReceiverEndpoint
-                        && h1.SenderEndpoint == h2.SenderEndpoint)
-                    {
-                        if (send_queue[i].Item2.entries.Count == m.entries.Count && m.entries.Count == 1)
+                        if (request_send_pause_task != null)
                         {
-                            var mm1 = send_queue[i].Item2.entries[0];
-                            var mm2 = m.entries[0];
-                            if (mm1.EntryType == MessageEntryType.ConnectionTest
-                                && mm2.EntryType == MessageEntryType.ConnectionTest) return;
-
-                            if (mm1.EntryType == MessageEntryType.WirePacket
-                                && mm2.EntryType == MessageEntryType.WirePacket)
-                            {
-                                if (mm1.ServicePath == mm2.ServicePath
-                                    && mm1.MemberName == mm2.MemberName)
-                                {
-                                    remove = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (remove)
-                    {
-                        
-                        var c=send_queue[i].Item1;
-
-                        if (replaced)
-                        {
-                            send_queue.RemoveAt(i);
+                            request_pause_task1 = request_send_pause_task;
                         }
                         else
                         {
-                            send_queue[i] = Tuple.Create(waiter, m);
-                            i++;
+                            return;
                         }
-                        //Tell this send message to return immediately
-                        c.TrySetResult(1);
                     }
                     else
                     {
-                        i++;
+                        request_send_pause = true;
+                        request_send_pause_task = request_pause_task1;
+
+                        if (!sending)
+                        {
+                            pause_send_task = new TaskCompletionSource<int>();
+
+                        }
+
+                    }
+                }
+            }
+
+            if (request_pause_task1 != null)
+            {
+                await request_pause_task1.Task.ConfigureAwait(false);
+            }
+
+        }
+
+        protected Task ResumeSendPause()
+        {
+            TaskCompletionSource<int> pause_task1 = null;
+            lock (this)
+            {
+                request_send_pause = false;
+                pause_task1 = pause_send_task;
+
+                if (pause_task1 == null)
+                {
+                    if (send_queue.Count > 0)
+                    {
+                        var t = send_queue[0];
+                        send_queue.RemoveAt(0);
+                        t.Item1.TrySetResult(0);
+                    }
+                    else
+                    {
+                        sending = false;
                     }
                 }
 
-
-                if (!replaced)
-                {
-                    send_queue.Add(Tuple.Create(waiter, m));
-                }
             }
-            else
+
+            if (pause_task1 != null)
             {
-                sending = true;
+                pause_task1.TrySetResult(0);
             }
 
+
+
+            return Task.FromResult(0);
         }
 
-        if (waiter != null)
+        public virtual async Task SendMessage(Message m, CancellationToken cancel)
         {
-            if (await waiter.Task.ConfigureAwait(false) != 0) return; ;
-            if (!Connected) throw new ConnectionException("Transport connection closed");
-        }
 
-        TaskCompletionSource<int> request_pause_task1 = null;
-        lock (this)
-        {
-            if (request_send_pause)
-            {
-                
-                pause_send_task = new TaskCompletionSource<int>();                
-                request_pause_task1 = request_send_pause_task;
-                request_send_pause_task = null;
-            }
-        }
+            TaskCompletionSource<int> waiter = null;
 
-        if (pause_send_task != null && request_pause_task1 != null)
-        {
-            request_pause_task1.TrySetResult(0);
-            await pause_send_task.Task.ConfigureAwait(false);            
-        }
-
-        lock (this)
-        {
-            pause_send_task = null;
-        }
-
-        try
-        {
-            uint meslength = m.ComputeSize();
-
-            if (meslength > sendbuf.Length)
-            {
-                sendbuf = new byte[(int)(meslength * 1.2)];
-                mwrite = new MemoryStream(sendbuf, 0, sendbuf.Length, true);
-                swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
-            }
-
-            mwrite.Position = 0;
-            swriter.Reset((int)meslength);
-            m.Write(swriter);
-
-            tlastsend = DateTime.UtcNow;
-            await basestream.WriteAsync(sendbuf, 0, (int)mwrite.Position, cancel).ConfigureAwait(false);            
-        }
-        catch (Exception e)
-        {
-            Close();
-            throw e;
-        }
-        finally
-        {
-            TaskCompletionSource<int> next_send = null;
             lock (this)
             {
-                if (send_queue.Count > 0)
+                if (!m_Connected) throw new ConnectionException("Transport connection closed");
+                if (sending)
                 {
-                    var t = send_queue[0];
-                    send_queue.RemoveAt(0);
-                    next_send = t.Item1;
+                    waiter = new TaskCompletionSource<int>();
+                    waiter.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
+
+                    bool replaced = false;
+
+                    for (int i = 0; i < send_queue.Count;)
+                    {
+                        bool remove = false;
+
+                        var h1 = m.header;
+                        var h2 = send_queue[i].Item2.header;
+                        if (h1.ReceiverNodeName == h2.ReceiverNodeName
+                            && h1.SenderNodeName == h2.SenderNodeName
+                            && h1.ReceiverNodeID == h2.ReceiverNodeID
+                            && h1.SenderNodeID == h2.SenderNodeID
+                            && h1.ReceiverEndpoint == h2.ReceiverEndpoint
+                            && h1.SenderEndpoint == h2.SenderEndpoint)
+                        {
+                            if (send_queue[i].Item2.entries.Count == m.entries.Count && m.entries.Count == 1)
+                            {
+                                var mm1 = send_queue[i].Item2.entries[0];
+                                var mm2 = m.entries[0];
+                                if (mm1.EntryType == MessageEntryType.ConnectionTest
+                                    && mm2.EntryType == MessageEntryType.ConnectionTest) return;
+
+                                if (mm1.EntryType == MessageEntryType.WirePacket
+                                    && mm2.EntryType == MessageEntryType.WirePacket)
+                                {
+                                    if (mm1.ServicePath == mm2.ServicePath
+                                        && mm1.MemberName == mm2.MemberName)
+                                    {
+                                        remove = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (remove)
+                        {
+
+                            var c = send_queue[i].Item1;
+
+                            if (replaced)
+                            {
+                                send_queue.RemoveAt(i);
+                            }
+                            else
+                            {
+                                send_queue[i] = Tuple.Create(waiter, m);
+                                i++;
+                            }
+                            //Tell this send message to return immediately
+                            c.TrySetResult(1);
+                        }
+                        else
+                        {
+                            i++;
+                        }
+                    }
+
+
+                    if (!replaced)
+                    {
+                        send_queue.Add(Tuple.Create(waiter, m));
+                    }
                 }
                 else
                 {
-                    sending = false;
+                    sending = true;
                 }
+
             }
 
-            if (next_send != null)
+            if (waiter != null)
             {
-                next_send.TrySetResult(0);
+                if (await waiter.Task.ConfigureAwait(false) != 0) return; ;
+                if (!Connected) throw new ConnectionException("Transport connection closed");
             }
 
-
-        }
-        
-
-    }
-
-    private DateTime tlastsend;
-    private DateTime tlastrec;
-    private DateTime tlastrec_mes;
-
-    public int ReceiveTimeout = 2500;
-
-
-    protected int m_HeartbeatPeriod = 5000;
-    
-    private async Task DoHeartbeat()
-    {
-        
-        try
-        {
-            while (m_Connected)
+            TaskCompletionSource<int> request_pause_task1 = null;
+            lock (this)
             {
-                await Task.Delay(500, cancellationToken.Token).ConfigureAwait(false);
-
-
-                if ((DateTime.UtcNow - tlastsend).TotalMilliseconds > m_HeartbeatPeriod)
+                if (request_send_pause)
                 {
-                    Message m = new Message();
-                    m.header = new MessageHeader();
-                    m.header.SenderNodeID = node.NodeID;
-                    MessageEntry mm = new MessageEntry(MessageEntryType.ConnectionTest, "");
-                    m.entries.Add(mm);
 
-                    await SendMessage(m, default(CancellationToken)).ConfigureAwait(false);
-                }
-
-                if ((tlastsend - tlastrec).TotalMilliseconds > ReceiveTimeout)
-                {
-                        var diff = (tlastsend - tlastrec).TotalMilliseconds;
-                    Close();
-                }
-                else if ((DateTime.UtcNow - tlastrec_mes).TotalMilliseconds > node.TransportInactivityTimeout)
-                {
-                    Close();
+                    pause_send_task = new TaskCompletionSource<int>();
+                    request_pause_task1 = request_send_pause_task;
+                    request_send_pause_task = null;
                 }
             }
-        }
-        catch (Exception)
-        {
-            Close();
-        }
 
-    }
+            if (pause_send_task != null && request_pause_task1 != null)
+            {
+                request_pause_task1.TrySetResult(0);
+                await pause_send_task.Task.ConfigureAwait(false);
+            }
 
-    public virtual void Close()
-    {
-        TaskCompletionSource<Message> r1=null;
-        TaskCompletionSource<Message> r2=null;
-
-        List<TaskCompletionSource<int>> q1=new List<TaskCompletionSource<int>>();
-        List<TaskCompletionSource<int>> q2 = new List<TaskCompletionSource<int>>();
-
-        TaskCompletionSource<Message> h1 = null;
-        TaskCompletionSource<int> h2 = null;
-
-
-        lock (this)
-        {
-            if (!m_Connected) return;
-            m_Connected = false;
+            lock (this)
+            {
+                pause_send_task = null;
+            }
 
             try
             {
-                parent.RemoveTransportConnection(this);
+                uint meslength = m.ComputeSize();
+
+                if (meslength > sendbuf.Length)
+                {
+                    sendbuf = new byte[(int)(meslength * 1.2)];
+                    mwrite = new MemoryStream(sendbuf, 0, sendbuf.Length, true);
+                    swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
+                }
+
+                mwrite.Position = 0;
+                swriter.Reset((int)meslength);
+                m.Write(swriter);
+
+                tlastsend = DateTime.UtcNow;
+                await basestream.WriteAsync(sendbuf, 0, (int)mwrite.Position, cancel).ConfigureAwait(false);
             }
-            catch (Exception) { }
-
-        
-            foreach (var t in send_queue)
+            catch (Exception e)
             {
-                t.Item1.TrySetException(new ConnectionException("Transport connection closed"));
+                Close();
+                throw e;
+            }
+            finally
+            {
+                TaskCompletionSource<int> next_send = null;
+                lock (this)
+                {
+                    if (send_queue.Count > 0)
+                    {
+                        var t = send_queue[0];
+                        send_queue.RemoveAt(0);
+                        next_send = t.Item1;
+                    }
+                    else
+                    {
+                        sending = false;
+                    }
+                }
+
+                if (next_send != null)
+                {
+                    next_send.TrySetResult(0);
+                }
+
+
             }
 
-            send_queue.Clear();
-       
-            foreach (var t in streamop_queue)
+
+        }
+
+        private DateTime tlastsend;
+        private DateTime tlastrec;
+        private DateTime tlastrec_mes;
+
+        public int ReceiveTimeout = 2500;
+
+
+        protected int m_HeartbeatPeriod = 5000;
+
+        private async Task DoHeartbeat()
+        {
+
+            try
             {
-                q1.Add(t);
-                //t.TrySetException(new ConnectionException("Transport connection closed"));
+                while (m_Connected)
+                {
+                    await Task.Delay(500, cancellationToken.Token).ConfigureAwait(false);
+
+
+                    if ((DateTime.UtcNow - tlastsend).TotalMilliseconds > m_HeartbeatPeriod)
+                    {
+                        Message m = new Message();
+                        m.header = new MessageHeader();
+                        m.header.SenderNodeID = node.NodeID;
+                        MessageEntry mm = new MessageEntry(MessageEntryType.ConnectionTest, "");
+                        m.entries.Add(mm);
+
+                        await SendMessage(m, default(CancellationToken)).ConfigureAwait(false);
+                    }
+
+                    if ((tlastsend - tlastrec).TotalMilliseconds > ReceiveTimeout)
+                    {
+                        var diff = (tlastsend - tlastrec).TotalMilliseconds;
+                        Close();
+                    }
+                    else if ((DateTime.UtcNow - tlastrec_mes).TotalMilliseconds > node.TransportInactivityTimeout)
+                    {
+                        Close();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Close();
             }
 
-            streamop_queue.Clear();
+        }
 
-            r1 = streamop_ret;
-            streamop_ret = null;
+        public virtual void Close()
+        {
+            TaskCompletionSource<Message> r1 = null;
+            TaskCompletionSource<Message> r2 = null;
 
-            if (streamop_ret!=null)
+            List<TaskCompletionSource<int>> q1 = new List<TaskCompletionSource<int>>();
+            List<TaskCompletionSource<int>> q2 = new List<TaskCompletionSource<int>>();
+
+            TaskCompletionSource<Message> h1 = null;
+            TaskCompletionSource<int> h2 = null;
+
+
+            lock (this)
             {
-                streamop_ret.TrySetException(new ConnectionException("Transport connection closed"));
+                if (!m_Connected) return;
+                m_Connected = false;
+
+                try
+                {
+                    parent.RemoveTransportConnection(this);
+                }
+                catch (Exception) { }
+
+
+                foreach (var t in send_queue)
+                {
+                    t.Item1.TrySetException(new ConnectionException("Transport connection closed"));
+                }
+
+                send_queue.Clear();
+
+                foreach (var t in streamop_queue)
+                {
+                    q1.Add(t);
+                    //t.TrySetException(new ConnectionException("Transport connection closed"));
+                }
+
+                streamop_queue.Clear();
+
+                r1 = streamop_ret;
                 streamop_ret = null;
-            }
 
-            foreach (var t in CheckStreamCapability_queue)
-            {
-                //t.TrySetException(new ConnectionException("Transport connection closed"));
-                q2.Add(t);
-            }
+                if (streamop_ret != null)
+                {
+                    streamop_ret.TrySetException(new ConnectionException("Transport connection closed"));
+                    streamop_ret = null;
+                }
 
-            CheckStreamCapability_queue.Clear();
+                foreach (var t in CheckStreamCapability_queue)
+                {
+                    //t.TrySetException(new ConnectionException("Transport connection closed"));
+                    q2.Add(t);
+                }
 
-            //CheckStreamCapability_ret.TrySetException(new ConnectionException("Transport connection closed"));
-            r2 = CheckStreamCapability_ret;
-            CheckStreamCapability_ret = null;
+                CheckStreamCapability_queue.Clear();
+
+                //CheckStreamCapability_ret.TrySetException(new ConnectionException("Transport connection closed"));
+                r2 = CheckStreamCapability_ret;
+                CheckStreamCapability_ret = null;
 #if !ROBOTRACONTEUR_H5
             h1 = clienthandshake_recv_task;
             h2 = clienthandshake_recv_done_task;
 #endif
-        }
+            }
 
-        if (r1!=null) r1.TrySetException(new ConnectionException("Transport connection closed"));
-        if (r2 != null) r2.TrySetException(new ConnectionException("Transport connection closed"));
+            if (r1 != null) r1.TrySetException(new ConnectionException("Transport connection closed"));
+            if (r2 != null) r2.TrySetException(new ConnectionException("Transport connection closed"));
 
-        foreach (var q in q1) q.TrySetException(new ConnectionException("Transport connection closed"));
-        foreach (var q in q2) q.TrySetException(new ConnectionException("Transport connection closed"));
+            foreach (var q in q1) q.TrySetException(new ConnectionException("Transport connection closed"));
+            foreach (var q in q2) q.TrySetException(new ConnectionException("Transport connection closed"));
 
-        if (h1 != null) h1.TrySetCanceled();
-        if (h2 != null) h2.TrySetCanceled();
+            if (h1 != null) h1.TrySetCanceled();
+            if (h2 != null) h2.TrySetCanceled();
 
-        cancellationToken.Cancel();
+            cancellationToken.Cancel();
 
-        try
-        {
-            basestream.Close();
-        }
-        catch (Exception) { }
-
-    }
-
-
-    public virtual void CheckConnection(uint endpoint)
-    {
-        if (endpoint != LocalEndpoint) throw new InvalidEndpointException("Incorrect Transportendpoint");
-
-        if (!m_Connected) throw new ConnectionException("Transport not connected");
-    }
-
-
-    protected virtual Task<MessageEntry> PackStreamOpRequest(string command, object args)
-    {
-        var mm = new MessageEntry(MessageEntryType.StreamOp, command);
-
-        if (command == "GetRemoteNodeID")
-        {
+            try
+            {
+                basestream.Close();
+            }
+            catch (Exception) { }
 
         }
-        else
+
+
+        public virtual void CheckConnection(uint endpoint)
         {
-            throw new InvalidOperationException("Unknown StreamOp command");
+            if (endpoint != LocalEndpoint) throw new InvalidEndpointException("Incorrect Transportendpoint");
+
+            if (!m_Connected) throw new ConnectionException("Transport not connected");
         }
 
-        return Task.FromResult(mm);
 
-    }
-
-    protected virtual Task<object> UnpackStreamOpResponse(MessageEntry response, MessageHeader header)
-    {
-        var command = response.MemberName;
-        switch (command)
+        protected virtual Task<MessageEntry> PackStreamOpRequest(string command, object args)
         {
-            case "GetRemoteNodeID":
-                {
-                    NodeID n = header.SenderNodeID;
-                    return Task.FromResult<object>(n);                    
-                }
-            case "CreateConnection":
-                {
-                    lock (this)
-                    {
+            var mm = new MessageEntry(MessageEntryType.StreamOp, command);
 
-                        if (response.Error != MessageErrorType.None && response.Error != MessageErrorType.ProtocolError)
-                        {
-                            throw RobotRaconteurExceptionUtil.MessageEntryToException(response);
-                        }
+            if (command == "GetRemoteNodeID")
+            {
 
-                        if (!m_RemoteNodeID.IsAnyNode)
-                        {
-                            if (header.SenderNodeID != m_RemoteNodeID)
-                            {
-                                throw new ConnectionException("Invalid node connection");
-                            }
-                        }
-                        else
-                        {
-                            if (target_nodename != "")
-                            {
-                                if (target_nodename != header.SenderNodeName)
-                                {
-                                    throw new ConnectionException("Invalid node connection");
-                                }
-                            }
+            }
+            else
+            {
+                throw new InvalidOperationException("Unknown StreamOp command");
+            }
 
-                            if (!target_nodeid.IsAnyNode)
-                            {
-                                if (target_nodeid != header.SenderNodeID)
-                                {
-                                    throw new ConnectionException("Invalid node connection");
-                                }
-                            }
-                        }
-                    }
+            return Task.FromResult(mm);
 
-                    NodeID n = header.SenderNodeID;
-                    return Task.FromResult<object>(n);
-                }
-            default:
-                throw new MemberNotFoundException("Unknown command");
         }
 
-    }
-
-    protected virtual Task<MessageEntry> ProcessStreamOpRequest(MessageEntry request, MessageHeader header)
-    {
-        var command = request.MemberName;
-        var mmret = new MessageEntry(MessageEntryType.StreamOpRet, command);
-
-        try
+        protected virtual Task<object> UnpackStreamOpResponse(MessageEntry response, MessageHeader header)
         {
+            var command = response.MemberName;
             switch (command)
             {
                 case "GetRemoteNodeID":
-                    break;
+                    {
+                        NodeID n = header.SenderNodeID;
+                        return Task.FromResult<object>(n);
+                    }
                 case "CreateConnection":
                     {
                         lock (this)
                         {
-                            if (header.ReceiverNodeID.IsAnyNode && header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName)
+
+                            if (response.Error != MessageErrorType.None && response.Error != MessageErrorType.ProtocolError)
                             {
-                                m_RemoteNodeID = header.SenderNodeID;
-                                return Task.FromResult(mmret);
+                                throw RobotRaconteurExceptionUtil.MessageEntryToException(response);
                             }
 
-                            if (header.ReceiverNodeID == node.NodeID)
+                            if (!m_RemoteNodeID.IsAnyNode)
                             {
-                                if (header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName)
+                                if (header.SenderNodeID != m_RemoteNodeID)
+                                {
+                                    throw new ConnectionException("Invalid node connection");
+                                }
+                            }
+                            else
+                            {
+                                if (target_nodename != "")
+                                {
+                                    if (target_nodename != header.SenderNodeName)
+                                    {
+                                        throw new ConnectionException("Invalid node connection");
+                                    }
+                                }
+
+                                if (!target_nodeid.IsAnyNode)
+                                {
+                                    if (target_nodeid != header.SenderNodeID)
+                                    {
+                                        throw new ConnectionException("Invalid node connection");
+                                    }
+                                }
+                            }
+                        }
+
+                        NodeID n = header.SenderNodeID;
+                        return Task.FromResult<object>(n);
+                    }
+                default:
+                    throw new MemberNotFoundException("Unknown command");
+            }
+
+        }
+
+        protected virtual Task<MessageEntry> ProcessStreamOpRequest(MessageEntry request, MessageHeader header)
+        {
+            var command = request.MemberName;
+            var mmret = new MessageEntry(MessageEntryType.StreamOpRet, command);
+
+            try
+            {
+                switch (command)
+                {
+                    case "GetRemoteNodeID":
+                        break;
+                    case "CreateConnection":
+                        {
+                            lock (this)
+                            {
+                                if (header.ReceiverNodeID.IsAnyNode && header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName)
                                 {
                                     m_RemoteNodeID = header.SenderNodeID;
                                     return Task.FromResult(mmret);
                                 }
+
+                                if (header.ReceiverNodeID == node.NodeID)
+                                {
+                                    if (header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName)
+                                    {
+                                        m_RemoteNodeID = header.SenderNodeID;
+                                        return Task.FromResult(mmret);
+                                    }
+                                }
+
                             }
 
+                            mmret.Error = MessageErrorType.NodeNotFound;
+                            mmret.AddElement("errorname", "RobotRaconteur.NodeNotFound");
+                            mmret.AddElement("errorstring", "Node not found");
+
+                            break;
                         }
 
-                        mmret.Error = MessageErrorType.NodeNotFound;
-                        mmret.AddElement("errorname", "RobotRaconteur.NodeNotFound");
-                        mmret.AddElement("errorstring", "Node not found");
 
-                        break;
-                    }
-                    
+                    default:
+                        throw new ProtocolException("Unknown StreamOp Command");
+                }
 
-                default:
-                    throw new ProtocolException("Unknown StreamOp Command");
             }
-
-        }
-        catch (Exception)
-        {
-            mmret.Error = MessageErrorType.ProtocolError;
-            mmret.AddElement("errorname", "RobotRaconteur.ProtocolError");
-            mmret.AddElement("errorstring", "Invalid Stream Operation");
-        }
-
-        return Task.FromResult(mmret);
-
-    }
-
-    private Queue<TaskCompletionSource<int>> streamop_queue = new Queue<TaskCompletionSource<int>>();
-    private TaskCompletionSource<Message> streamop_ret = null;
-
-    protected virtual async Task<object> StreamOp(string command,object args=null, CancellationToken cancel=default(CancellationToken))
-    {
-        TaskCompletionSource<int> t = null;
-        lock (this)
-        {
-            if (!m_Connected)
+            catch (Exception)
             {
-                throw new ConnectionException("Transport connection closed");
+                mmret.Error = MessageErrorType.ProtocolError;
+                mmret.AddElement("errorname", "RobotRaconteur.ProtocolError");
+                mmret.AddElement("errorstring", "Invalid Stream Operation");
             }
 
-            if (streamop_ret == null)
-            {
-                streamop_ret = new TaskCompletionSource<Message>();
-                streamop_ret.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
-            }
-            else
-            {
-                t = new TaskCompletionSource<int>();
-                t.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
-                streamop_queue.Enqueue(t);
-            }
+            return Task.FromResult(mmret);
+
         }
 
-        if (t != null)
+        private Queue<TaskCompletionSource<int>> streamop_queue = new Queue<TaskCompletionSource<int>>();
+        private TaskCompletionSource<Message> streamop_ret = null;
+
+        protected virtual async Task<object> StreamOp(string command, object args = null, CancellationToken cancel = default(CancellationToken))
         {
-            await t.Task.ConfigureAwait(false);
-        }
-
-        try
-        {
-            Message m = new Message();
-            m.header = new MessageHeader();
-            m.header.ReceiverNodeName = "";
-            m.header.SenderNodeName = node.NodeName;
-            m.header.SenderNodeID = node.NodeID;
-            m.header.ReceiverNodeID = RemoteNodeID;
-
-
-            if (command == "CreateConnection")
-            {               
-                var a = (Tuple<NodeID, string>)args;
-                m.header.ReceiverNodeID = a.Item1;
-                m.header.ReceiverNodeName = a.Item2;
-                MessageEntry mm = new MessageEntry(MessageEntryType.StreamOp, command);
-                m.entries.Add(mm);
-            }
-            else
-            {
-                MessageEntry mm = await PackStreamOpRequest(command, args).ConfigureAwait(false);
-                m.entries.Add(mm);
-            }
-            
-            await SendMessage(m,cancel).ConfigureAwait(false);
-            
-            Message streamop_ret1 = await streamop_ret.Task.AwaitWithTimeout(10000).ConfigureAwait(false);
-
-            return await UnpackStreamOpResponse(streamop_ret1.entries[0], streamop_ret1.header).ConfigureAwait(false);
-        }
-        finally
-        {
+            TaskCompletionSource<int> t = null;
             lock (this)
             {
-                if (streamop_queue.Count == 0)
+                if (!m_Connected)
                 {
-                    streamop_ret = null;
+                    throw new ConnectionException("Transport connection closed");
                 }
-                else
+
+                if (streamop_ret == null)
                 {
                     streamop_ret = new TaskCompletionSource<Message>();
-                    TaskCompletionSource<int> t2 = streamop_queue.Dequeue();
-                    t2.TrySetResult(0);
-                }
-            }
-        }
-            
-
-            
-        
-    }
-
-    protected virtual async Task StreamOpMessageReceived(Message m)
-    {
-        MessageEntry mm;
-       
-        try
-        {
-            mm = m.entries[0];
-        }
-        catch { return; }
-        if (mm.EntryType == MessageEntryType.StreamOp)
-        {
-            string command = mm.MemberName;
-            Message mret = new Message();
-            mret.header = new MessageHeader();
-            mret.header.SenderNodeName = node.NodeName;
-            mret.header.ReceiverNodeName = m.header.SenderNodeName;
-            mret.header.SenderNodeID = node.NodeID;
-            mret.header.ReceiverNodeID = m.header.SenderNodeID;
-            MessageEntry mmret = await ProcessStreamOpRequest(mm, m.header).ConfigureAwait(false);
-
-            if (mmret != null)
-            {
-                mret.entries.Add(mmret);
-                await SendMessage(mret, default(CancellationToken)).IgnoreResult().ConfigureAwait(false);
-            }
-        }
-        else
-        {
-            TaskCompletionSource<Message> r = null;
-            lock (this)
-            {
-                if (streamop_ret==null) return;
-                r=streamop_ret;
-            }
-            r.TrySetResult(m);
-        }
-
-    }
-
-    TaskCompletionSource<Message> CheckStreamCapability_ret = null;
-    Queue<TaskCompletionSource<int>> CheckStreamCapability_queue = new Queue<TaskCompletionSource<int>>();
-    
-    public async Task<uint> CheckStreamCapability(string name, CancellationToken cancel=default(CancellationToken))
-    {
-        TaskCompletionSource<int> t = null;
-        lock (this)
-        {
-            if (!m_Connected)
-            {
-                throw new ConnectionException("Transport connection closed");
-            }
-
-            if (CheckStreamCapability_ret == null)
-            {
-                CheckStreamCapability_ret = new TaskCompletionSource<Message>();
-                CheckStreamCapability_ret.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
-            }
-            else
-            {
-                t = new TaskCompletionSource<int>();
-                t.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
-                CheckStreamCapability_queue.Enqueue(t);
-            }
-        }
-
-        if (t != null)
-        {
-            await t.Task.ConfigureAwait(false);
-        }
-
-        try
-        {
-            Message m = new Message();
-            
-            m.header.SenderNodeID = node.NodeID;
-                        
-            m.header.ReceiverNodeID =RemoteNodeID;
-            MessageEntry mm = new MessageEntry(MessageEntryType.StreamCheckCapability, name);
-            m.entries.Add(mm);
-
-            await SendMessage(m, cancel).ConfigureAwait(false);
-            
-            Message mret = await CheckStreamCapability_ret.Task.AwaitWithTimeout<Message>((int)node.RequestTimeout).ConfigureAwait(false);
-            return mret.entries[0].FindElement("return").CastData<uint>();
-        }
-        finally
-        {
-            lock (this)
-            {
-                if (CheckStreamCapability_queue.Count == 0)
-                {
-                    CheckStreamCapability_ret = null;
+                    streamop_ret.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
                 }
                 else
                 {
-                    CheckStreamCapability_ret = new TaskCompletionSource<Message>();
-                    TaskCompletionSource<int> t2 = CheckStreamCapability_queue.Dequeue();
-                    t2.TrySetResult(0);
+                    t = new TaskCompletionSource<int>();
+                    t.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
+                    streamop_queue.Enqueue(t);
                 }
             }
-        }
-       
-    }
 
-    protected void CheckStreamCapability_MessageReceived(Message m)
-    {
-        try
-        {
-            if (m.entries[0].EntryType == MessageEntryType.StreamCheckCapability)
+            if (t != null)
             {
-                Message ret = new Message();
-                ret.header = new MessageHeader();
-                ret.header.SenderNodeID = node.NodeID;
-                ret.header.ReceiverNodeID = m.header.SenderNodeID;
-                MessageEntry mret = new MessageEntry(MessageEntryType.StreamCheckCapabilityRet, m.entries[0].MemberName);
-                mret.ServicePath = m.entries[0].ServicePath;
-                mret.AddElement("return", StreamCapabilities(m.entries[0].MemberName));
-                ret.entries.Add(mret);
-                SendMessage(ret, default(CancellationToken)).IgnoreResult();
+                await t.Task.ConfigureAwait(false);
             }
-            else if (m.entries[0].EntryType == MessageEntryType.StreamCheckCapabilityRet)
+
+            try
+            {
+                Message m = new Message();
+                m.header = new MessageHeader();
+                m.header.ReceiverNodeName = "";
+                m.header.SenderNodeName = node.NodeName;
+                m.header.SenderNodeID = node.NodeID;
+                m.header.ReceiverNodeID = RemoteNodeID;
+
+
+                if (command == "CreateConnection")
+                {
+                    var a = (Tuple<NodeID, string>)args;
+                    m.header.ReceiverNodeID = a.Item1;
+                    m.header.ReceiverNodeName = a.Item2;
+                    MessageEntry mm = new MessageEntry(MessageEntryType.StreamOp, command);
+                    m.entries.Add(mm);
+                }
+                else
+                {
+                    MessageEntry mm = await PackStreamOpRequest(command, args).ConfigureAwait(false);
+                    m.entries.Add(mm);
+                }
+
+                await SendMessage(m, cancel).ConfigureAwait(false);
+
+                Message streamop_ret1 = await streamop_ret.Task.AwaitWithTimeout(10000).ConfigureAwait(false);
+
+                return await UnpackStreamOpResponse(streamop_ret1.entries[0], streamop_ret1.header).ConfigureAwait(false);
+            }
+            finally
+            {
+                lock (this)
+                {
+                    if (streamop_queue.Count == 0)
+                    {
+                        streamop_ret = null;
+                    }
+                    else
+                    {
+                        streamop_ret = new TaskCompletionSource<Message>();
+                        TaskCompletionSource<int> t2 = streamop_queue.Dequeue();
+                        t2.TrySetResult(0);
+                    }
+                }
+            }
+
+
+
+
+        }
+
+        protected virtual async Task StreamOpMessageReceived(Message m)
+        {
+            MessageEntry mm;
+
+            try
+            {
+                mm = m.entries[0];
+            }
+            catch { return; }
+            if (mm.EntryType == MessageEntryType.StreamOp)
+            {
+                string command = mm.MemberName;
+                Message mret = new Message();
+                mret.header = new MessageHeader();
+                mret.header.SenderNodeName = node.NodeName;
+                mret.header.ReceiverNodeName = m.header.SenderNodeName;
+                mret.header.SenderNodeID = node.NodeID;
+                mret.header.ReceiverNodeID = m.header.SenderNodeID;
+                MessageEntry mmret = await ProcessStreamOpRequest(mm, m.header).ConfigureAwait(false);
+
+                if (mmret != null)
+                {
+                    mret.entries.Add(mmret);
+                    await SendMessage(mret, default(CancellationToken)).IgnoreResult().ConfigureAwait(false);
+                }
+            }
+            else
             {
                 TaskCompletionSource<Message> r = null;
                 lock (this)
                 {
-                    if (CheckStreamCapability_ret == null)
-                    {
-                        return;
-                    }                    
-                    r=CheckStreamCapability_ret;
-                    
+                    if (streamop_ret == null) return;
+                    r = streamop_ret;
                 }
                 r.TrySetResult(m);
             }
-        }
-        catch { };
-    }
 
-    public virtual uint StreamCapabilities(string name)
-    {
-        return 0;
-    }
+        }
+
+        TaskCompletionSource<Message> CheckStreamCapability_ret = null;
+        Queue<TaskCompletionSource<int>> CheckStreamCapability_queue = new Queue<TaskCompletionSource<int>>();
+
+        public async Task<uint> CheckStreamCapability(string name, CancellationToken cancel = default(CancellationToken))
+        {
+            TaskCompletionSource<int> t = null;
+            lock (this)
+            {
+                if (!m_Connected)
+                {
+                    throw new ConnectionException("Transport connection closed");
+                }
+
+                if (CheckStreamCapability_ret == null)
+                {
+                    CheckStreamCapability_ret = new TaskCompletionSource<Message>();
+                    CheckStreamCapability_ret.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
+                }
+                else
+                {
+                    t = new TaskCompletionSource<int>();
+                    t.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
+                    CheckStreamCapability_queue.Enqueue(t);
+                }
+            }
+
+            if (t != null)
+            {
+                await t.Task.ConfigureAwait(false);
+            }
+
+            try
+            {
+                Message m = new Message();
+
+                m.header.SenderNodeID = node.NodeID;
+
+                m.header.ReceiverNodeID = RemoteNodeID;
+                MessageEntry mm = new MessageEntry(MessageEntryType.StreamCheckCapability, name);
+                m.entries.Add(mm);
+
+                await SendMessage(m, cancel).ConfigureAwait(false);
+
+                Message mret = await CheckStreamCapability_ret.Task.AwaitWithTimeout<Message>((int)node.RequestTimeout).ConfigureAwait(false);
+                return mret.entries[0].FindElement("return").CastData<uint>();
+            }
+            finally
+            {
+                lock (this)
+                {
+                    if (CheckStreamCapability_queue.Count == 0)
+                    {
+                        CheckStreamCapability_ret = null;
+                    }
+                    else
+                    {
+                        CheckStreamCapability_ret = new TaskCompletionSource<Message>();
+                        TaskCompletionSource<int> t2 = CheckStreamCapability_queue.Dequeue();
+                        t2.TrySetResult(0);
+                    }
+                }
+            }
+
+        }
+
+        protected void CheckStreamCapability_MessageReceived(Message m)
+        {
+            try
+            {
+                if (m.entries[0].EntryType == MessageEntryType.StreamCheckCapability)
+                {
+                    Message ret = new Message();
+                    ret.header = new MessageHeader();
+                    ret.header.SenderNodeID = node.NodeID;
+                    ret.header.ReceiverNodeID = m.header.SenderNodeID;
+                    MessageEntry mret = new MessageEntry(MessageEntryType.StreamCheckCapabilityRet, m.entries[0].MemberName);
+                    mret.ServicePath = m.entries[0].ServicePath;
+                    mret.AddElement("return", StreamCapabilities(m.entries[0].MemberName));
+                    ret.entries.Add(mret);
+                    SendMessage(ret, default(CancellationToken)).IgnoreResult();
+                }
+                else if (m.entries[0].EntryType == MessageEntryType.StreamCheckCapabilityRet)
+                {
+                    TaskCompletionSource<Message> r = null;
+                    lock (this)
+                    {
+                        if (CheckStreamCapability_ret == null)
+                        {
+                            return;
+                        }
+                        r = CheckStreamCapability_ret;
+
+                    }
+                    r.TrySetResult(m);
+                }
+            }
+            catch { };
+        }
+
+        public virtual uint StreamCapabilities(string name)
+        {
+            return 0;
+        }
 #if !ROBOTRACONTEUR_H5
     protected async Task DoServerTlsHandshake(Message m)
     {
@@ -1299,9 +1300,9 @@ public abstract class AsyncStreamTransport : ITransportConnection
             mmret.AddElement("errorstring", "Server certificate not loaded");
             await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
             Close();
-            return;       
+            return;
         }
-        
+
         bool good = false;
         lock (this)
         {
@@ -1342,27 +1343,27 @@ public abstract class AsyncStreamTransport : ITransportConnection
         }
 
         try
-        {  
+        {
             await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
 
             await RequestSendPause().ConfigureAwait(false);
-           
+
             var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
             await ssl.AuthenticateAsServerAsync(cert.Item1, mutualauth, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
-            basestream = ssl;            
-            
+            basestream = ssl;
+
             await ResumeSendPause().ConfigureAwait(false);
-            
+
             return;
 
         }
         catch (Exception)
         {
-            Close();            
+            Close();
         }
-       
+
     }
-    
+
     System.Security.Cryptography.AsymmetricAlgorithm OnPVKSelection (X509Certificate certificate, string targetHost)
     {
             return ((X509Certificate2)GetTlsCertificate().Item1).PrivateKey;
@@ -1370,7 +1371,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
     TaskCompletionSource<Message> clienthandshake_recv_task = null;
     TaskCompletionSource<int> clienthandshake_recv_done_task = null;
-            
+
     string handshake_host=null;
     protected virtual async Task DoClientTlsHandshake(CancellationToken cancel)
     {
@@ -1383,7 +1384,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         await RequestSendPause().ConfigureAwait(false);
 
         try
-        {        
+        {
 
             var m = new Message();
             m.header = new MessageHeader();
@@ -1397,7 +1398,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
                 mm.AddElement("mutualauth", "true");
             }
             m.entries.Add(mm);
-            
+
 
             byte[] m_mstream_buf=new byte[m.ComputeSize()];
             var m_mstream = new MemoryStream();
@@ -1421,10 +1422,10 @@ public abstract class AsyncStreamTransport : ITransportConnection
                 throw new ConnectionException("TLS handshake error");
             if (mutualauth && mret.entries[0].elements.Count(x => x.ElementName == "mutualauth" && x.CastData<string>().ToLower() == "true")==0)
                 throw new ConnectionException("TLS handshake error");
-			
+
 			var host="Robot Raconteur Node " + recv_nodeid.ToString();
             handshake_host=host;
-           
+
             X509CertificateCollection certs = null;
             if (mutualauth)
             {
@@ -1433,7 +1434,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
             var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
             await ssl.AuthenticateAsClientAsync(host, certs, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
-            basestream = ssl;            
+            basestream = ssl;
 
             await ResumeSendPause().ConfigureAwait(false);
         }
@@ -1453,7 +1454,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             }
             done_task.TrySetResult(0);
         }
-        
+
 
     }
 
@@ -1509,7 +1510,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
 
     bool RemoteCertificateValidationCallback2(X509Chain chain, bool embedded_root)
     {
-    
+
 
         if (chain.ChainElements[0].Certificate.Subject != "CN=" + handshake_host)
         {
@@ -1517,7 +1518,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
         }
 
         int CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT = 0x08000000;
-        
+
         for (int i=0; i<chain.ChainElements.Count; i++)
         {
             var element = chain.ChainElements[i];
@@ -1539,8 +1540,8 @@ public abstract class AsyncStreamTransport : ITransportConnection
                 {
                     found_crit_ext = true;
                     continue;
-                }              
-                
+                }
+
             }
 
             if (!found_ext || !found_crit_ext)
@@ -1598,7 +1599,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             if (s.Status != X509ChainStatusFlags.InvalidExtension && (int)s.Status != CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT)
             {
                 if (!(s.Status == X509ChainStatusFlags.UntrustedRoot && embedded_root))
-                    return false;                
+                    return false;
             }
         }
 
@@ -1612,7 +1613,7 @@ public abstract class AsyncStreamTransport : ITransportConnection
             if (basestream is SslStream)
             {
                 return true;
-            }                     
+            }
             return false;
         }
     }
@@ -1629,10 +1630,10 @@ public abstract class AsyncStreamTransport : ITransportConnection
                     var cert = s.RemoteCertificate;
                     if (cert != null)
                         return true;
-                }                
+                }
                 return false;
             }
-            catch 
+            catch
             {
                 return false;
             }
@@ -1648,32 +1649,32 @@ public abstract class AsyncStreamTransport : ITransportConnection
             {
                 var cert = s.RemoteCertificate;
                 if (cert == null) throw new AuthenticationException("Peer identity is not verified");
-                return cert.Subject.ReplaceFirst("CN=Robot Raconteur Node ", ""); 
-            }            
+                return cert.Subject.ReplaceFirst("CN=Robot Raconteur Node ", "");
+            }
             throw new AuthenticationException("Connection is not seccure");
         }
-        catch 
+        catch
         {
             throw new AuthenticationException("Connection is not seccure");
-        }               
+        }
     }
 
 #endif
-}
+    }
 
-public interface AsyncStreamTransportParent
-{
-    Task<Message> SpecialRequest(Message m);
+    public interface AsyncStreamTransportParent
+    {
+        Task<Message> SpecialRequest(Message m);
 
-    Task MessageReceived(Message m);
+        Task MessageReceived(Message m);
 
-    void AddTransportConnection(uint endpoint, AsyncStreamTransport transport);
+        void AddTransportConnection(uint endpoint, AsyncStreamTransport transport);
 
-    void RemoveTransportConnection(AsyncStreamTransport transport);
+        void RemoveTransportConnection(AsyncStreamTransport transport);
 
 #if !ROBOTRACONTEUR_H5
     Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate();
 #endif
-}
+    }
 
 }

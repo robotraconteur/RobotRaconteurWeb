@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -37,7 +37,7 @@ namespace RobotRaconteurWeb
     </summary>
     */
 
-        [PublicApi]
+    [PublicApi]
     public abstract class ServiceFactory
     {
         private ServiceDefinition sdef = null;
@@ -92,7 +92,7 @@ namespace RobotRaconteurWeb
             else
             {
                 return node.PackStructure(s, context);
-            }                        
+            }
         }
 
         public virtual T UnpackStructure<T>(MessageElementNestedElementList l)
@@ -104,7 +104,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                return node.UnpackStructure<T>(l,context);
+                return node.UnpackStructure<T>(l, context);
             }
         }
 
@@ -174,7 +174,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                return node.UnpackPodArray<T>(l,context);
+                return node.UnpackPodArray<T>(l, context);
             }
         }
 
@@ -247,7 +247,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                return node.UnpackPod(m,context);
+                return node.UnpackPod(m, context);
             }
         }
 
@@ -275,7 +275,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                return node.UnpackNamedArrayFromArray<T>(l,context);
+                return node.UnpackNamedArrayFromArray<T>(l, context);
             }
         }
 
@@ -301,7 +301,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                return node.UnpackNamedArray<T>(l,context);
+                return node.UnpackNamedArray<T>(l, context);
             }
         }
 
@@ -327,7 +327,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                return node.UnpackNamedMultiDimArray<T>(l,context);
+                return node.UnpackNamedMultiDimArray<T>(l, context);
             }
         }
 
@@ -418,12 +418,12 @@ namespace RobotRaconteurWeb
                     }
                 }
 
-                if (f==null)
+                if (f == null)
                 {
                     return exp;
                 }
 
-                return f.DownCastException(exp);                
+                return f.DownCastException(exp);
             }
             catch (Exception)
             {

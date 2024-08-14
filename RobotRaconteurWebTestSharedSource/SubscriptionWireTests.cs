@@ -43,7 +43,7 @@ namespace RobotRaconteurSubTest.Wires
             obj = new testobj_impl();
             node = new RobotRaconteurNode();
             node.NodeID = nodeId;
-            
+
             nodeSetup = new RobotRaconteurNodeSetup(node, null, true, nodeName, 0, RobotRaconteurSubTest.testservice_impl.intra_server_flags);
             node.RegisterService("test_service", "experimental.wire_sub_test", obj);
         }
@@ -118,7 +118,7 @@ namespace RobotRaconteurSubTest.Wires
                     RRAssert.IsTrue(valueChangedCount > 0);
 
                     wireSub.InValueLifespan = 100;
-                    RRAssert.AreEqual(wireSub.InValueLifespan,100);
+                    RRAssert.AreEqual(wireSub.InValueLifespan, 100);
 
                     await Task.Delay(200);
 
