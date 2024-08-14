@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -32,19 +32,19 @@ namespace RobotRaconteurWeb
     public abstract class ServiceSkel
     {
 
-        public ServiceSkel(string s,Object o,ServerContext c)
+        public ServiceSkel(string s, Object o, ServerContext c)
         {
             m_ServicePath = s;
             m_context = c;
-            uncastobj = o ;
+            uncastobj = o;
             if (o == null) throw new NullReferenceException();
 
             rr_node = c.node;
-            
+
             RegisterEvents(o);
             InitPipeServers(o);
             InitCallbackServers(o);
-            
+
             var init_obj = o as IRRServiceObject;
             if (init_obj != null)
             {
@@ -58,7 +58,7 @@ namespace RobotRaconteurWeb
         public virtual void InitCallbackServers(object o)
         { }
 
-        
+
 
         public string ServicePath { get { return m_ServicePath; } }
         protected string m_ServicePath;
@@ -88,22 +88,24 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                string ind= RRUriExtensions.UnescapeDataString( s1[1].Replace("]",""));
+                string ind = RRUriExtensions.UnescapeDataString(s1[1].Replace("]", ""));
                 return GetSubObj(s1[0], ind);
             }
         }
 
-        public virtual void RegisterEvents(Object obj1) {
+        public virtual void RegisterEvents(Object obj1)
+        {
 
             if (obj1 is IRobotRaconteurServiceObject)
             {
                 IRobotRaconteurServiceObject obj2 = (IRobotRaconteurServiceObject)obj1;
                 obj2.RobotRaconteurObjRefChanged += ObjRefChanged;
             }
-        
+
         }
 
-        public virtual void UnregisterEvents(Object obj1) {
+        public virtual void UnregisterEvents(Object obj1)
+        {
             if (obj1 is IRobotRaconteurServiceObject)
             {
                 IRobotRaconteurServiceObject obj2 = (IRobotRaconteurServiceObject)obj1;
@@ -205,13 +207,13 @@ namespace RobotRaconteurWeb
         {
             int index = m.FindElement("index").CastData<int[]>()[0];
             GeneratorServerBase gen;
-            lock(generators)
+            lock (generators)
             {
-                if(!generators.TryGetValue(index, out gen))
+                if (!generators.TryGetValue(index, out gen))
                 {
                     throw new InvalidOperationException("Invalid generator");
                 }
-                gen.last_access_time = DateTime.UtcNow;                
+                gen.last_access_time = DateTime.UtcNow;
             }
 
             if (gen.Endpoint != ep.LocalEndpoint)
@@ -225,7 +227,7 @@ namespace RobotRaconteurWeb
     public interface ServiceSkelDynamic
     {
         string GetObjectType();
-        
+
     }
     /**
     <summary>
@@ -288,9 +290,9 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
-    public class ServerContext 
-   {
+    [PublicApi]
+    public class ServerContext
+    {
         /**
         <summary>
         Get/Set the service attributes
@@ -306,11 +308,11 @@ namespace RobotRaconteurWeb
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
-        
+
         protected ServiceFactory m_ServiceDef;
 
         public string ServiceName { get { return m_ServiceName; } }
-        
+
         protected string m_ServiceName;
 
 
@@ -320,11 +322,11 @@ namespace RobotRaconteurWeb
 
         public string RootObjectType { get { return m_RootObjectType; } }
 
-        protected string m_RootObjectType= "";
-       
-      
+        protected string m_RootObjectType = "";
 
-       
+
+
+
 
         /*public Message SendRequest(Message m)
         {
@@ -334,9 +336,9 @@ namespace RobotRaconteurWeb
 
         protected internal readonly RobotRaconteurNode node;
 
-        protected CancellationTokenSource cancel_source = new CancellationTokenSource();        
+        protected CancellationTokenSource cancel_source = new CancellationTokenSource();
 
-        public ServerContext(ServiceFactory f, RobotRaconteurNode node=null)
+        public ServerContext(ServiceFactory f, RobotRaconteurNode node = null)
         {
             m_ServiceDef = f;
             if (node != null)
@@ -348,12 +350,12 @@ namespace RobotRaconteurWeb
                 this.node = RobotRaconteurNode.s;
             }
 
-            var noop=PeriodicTask.Run(PeriodicCleanupTask, TimeSpan.FromSeconds(5), cancel_source.Token);
+            var noop = PeriodicTask.Run(PeriodicCleanupTask, TimeSpan.FromSeconds(5), cancel_source.Token);
         }
 
         public virtual Task SendEvent(MessageEntry m)
         {
-            
+
 
             Message mm = new Message();
 
@@ -363,50 +365,50 @@ namespace RobotRaconteurWeb
                 cc = client_endpoints.Values.ToArray();
             }
 
-                foreach (ServerEndpoint c in cc)
+            foreach (ServerEndpoint c in cc)
+            {
+
+                if (RequireValidUser)
                 {
-
-                    if (RequireValidUser)
-                    {
-                        if (String.IsNullOrWhiteSpace(c.AuthenticatedUsername))
-                            continue;
-                    }
-
-                    try
-                    {
-                        node.CheckConnection(c.LocalEndpoint);
-                        SendMessage(m, c, default(CancellationToken)).ContinueWith(delegate(Task t)
-                        {
-                            var e = t.Exception;
-                            if (e!=null)
-                            {
-                                try
-                                {
-                                    RemoveClient(c);
-                                }
-                                catch (Exception)
-                                { };
-                            }
-                        });
-                    }
-                    catch (Exception)
-                    {
-                        try
-                        {
-                            RemoveClient(c);
-                        }
-                        catch (Exception)
-                        { };
-                    }
+                    if (String.IsNullOrWhiteSpace(c.AuthenticatedUsername))
+                        continue;
                 }
 
-                return Task.FromResult(0);
-            
+                try
+                {
+                    node.CheckConnection(c.LocalEndpoint);
+                    SendMessage(m, c, default(CancellationToken)).ContinueWith(delegate (Task t)
+                    {
+                        var e = t.Exception;
+                        if (e != null)
+                        {
+                            try
+                            {
+                                RemoveClient(c);
+                            }
+                            catch (Exception)
+                            { };
+                        }
+                    });
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        RemoveClient(c);
+                    }
+                    catch (Exception)
+                    { };
+                }
+            }
+
+            return Task.FromResult(0);
+
         }
 
         public async virtual Task SendMessage(MessageEntry m, Endpoint e, CancellationToken cancel)
         {
-            
+
 
             //m.ServicePath = ServiceName;
 
@@ -422,7 +424,7 @@ namespace RobotRaconteurWeb
 
         private object rec_sync = new object();
 
-        
+
 
         bool base_object_set = false;
 
@@ -445,7 +447,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        public virtual void SetBaseObject(string name, object o, ServiceSecurityPolicy policy=null)
+        public virtual void SetBaseObject(string name, object o, ServiceSecurityPolicy policy = null)
         {
             if (base_object_set) throw new InvalidOperationException("Base object already set");
 
@@ -456,20 +458,20 @@ namespace RobotRaconteurWeb
 
             m_ServiceName = name;
             ServiceSkel s = ServiceDef.CreateSkel(name, o, this);
-            
+
             m_RootObjectType = s.GetType().ToString().Replace("_skel", "");
             base_object_set = true;
             lock (skels)
             {
                 skels[name] = s;
             }
-            
+
         }
 
         readonly Dictionary<string, Task<ServiceSkel>> get_sub_obj_tasks = new Dictionary<string, Task<ServiceSkel>>();
 
         public virtual async Task<ServiceSkel> GetObjectSkel(string servicepath)
-        {            
+        {
 
             //object obj = null;
             string[] p = servicepath.Split(new char[] { '.' });
@@ -534,7 +536,7 @@ namespace RobotRaconteurWeb
                 }
 
                 skel = skel1;
-            }      
+            }
 
             return skel;
         }
@@ -547,7 +549,7 @@ namespace RobotRaconteurWeb
             m_CurrentServicePath = null;
             m_CurrentServerContext = null;
 
-            var ppath = String.Join(".", new string[] { ppath1, objname});
+            var ppath = String.Join(".", new string[] { ppath1, objname });
 
             var skel1 = ServiceDef.CreateSkel(ppath, obj1, this);
             if (skel.objectlock != null)
@@ -558,7 +560,7 @@ namespace RobotRaconteurWeb
             return skel1;
         }
 
-              
+
         public virtual void ReplaceObject(string path)
         {
 
@@ -569,7 +571,7 @@ namespace RobotRaconteurWeb
 
         public virtual async Task<string> GetObjectType(string servicepath)
         {
-            
+
             ServiceSkel s = await GetObjectSkel(servicepath).ConfigureAwait(false);
 
             if (s is ServiceSkelDynamic)
@@ -577,9 +579,9 @@ namespace RobotRaconteurWeb
                 return ((ServiceSkelDynamic)s).GetObjectType();
             }
             return Regex.Replace(s.GetType().ToString(), "_skel", "");
-            
 
-            
+
+
         }
         /**
         <summary>
@@ -593,7 +595,7 @@ namespace RobotRaconteurWeb
         */
 
         [PublicApi]
-        public static ServerContext CurrentServerContext {get {return m_CurrentServerContext;}}
+        public static ServerContext CurrentServerContext { get { return m_CurrentServerContext; } }
         [ThreadStatic()]
         private static ServerContext m_CurrentServerContext;
         /**
@@ -610,7 +612,7 @@ namespace RobotRaconteurWeb
         */
 
         [PublicApi]
-        public static string CurrentServicePath {get {return m_CurrentServicePath;}}
+        public static string CurrentServicePath { get { return m_CurrentServicePath; } }
         [ThreadStatic()]
         private static string m_CurrentServicePath;
 
@@ -621,125 +623,125 @@ namespace RobotRaconteurWeb
             //{
 
             bool noreturn = false;
-                MessageEntry ret = null;
+            MessageEntry ret = null;
 
 
-                if (m.EntryType == MessageEntryType.ServicePathReleasedRet) return null;
-            
-                try
+            if (m.EntryType == MessageEntryType.ServicePathReleasedRet) return null;
+
+            try
+            {
+                //ClientSessionOp methods
+                if (m.EntryType == MessageEntryType.ClientSessionOpReq)
                 {
-                    //ClientSessionOp methods
-                    if (m.EntryType == MessageEntryType.ClientSessionOpReq)
+                    return await ClientSessionOp(m, c).ConfigureAwait(false);
+
+                }
+
+                if (m.EntryType == MessageEntryType.ClientKeepAliveReq)
+                {
+                    ret = new MessageEntry(MessageEntryType.ClientKeepAliveRet, m.MemberName);
+                    ret.RequestID = m.RequestID;
+                    ret.ServicePath = m.ServicePath;
+                    return ret;
+                }
+
+                if (m.EntryType == MessageEntryType.ServiceCheckCapabilityReq)
+                {
+                    ret = CheckServiceCapability(m, c);
+                }
+
+
+
+                if (RequireValidUser)
+                {
+                    if (ServerEndpoint.CurrentAuthenticatedUser == null)
+                        throw new AuthenticationException("User must authenticate before accessing this service");
+                }
+
+                if (m.EntryType == MessageEntryType.PipePacket || m.EntryType == MessageEntryType.PipePacketRet)
+                {
+                    (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchPipeMessage(m, c);
+                    ret = null;
+                    noreturn = true;
+                }
+
+                if (m.EntryType == MessageEntryType.WirePacket)
+                {
+                    (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchWireMessage(m, c);
+                    ret = null;
+                    noreturn = true;
+                }
+
+
+
+
+
+                m_CurrentServicePath = m.ServicePath;
+                m_CurrentServerContext = this;
+
+                //Object member methods
+
+                if (m.EntryType == MessageEntryType.PropertyGetReq)
+                {
+                    ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
+                    check_lock(skel, m);
+                    ret = await skel.CallGetProperty(m).ConfigureAwait(false);
+                }
+
+                if (m.EntryType == MessageEntryType.PropertySetReq)
+                {
+                    ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
+                    check_lock(skel, m);
+                    ret = await skel.CallSetProperty(m).ConfigureAwait(false);
+                }
+
+                if (m.EntryType == MessageEntryType.FunctionCallReq)
+                {
+                    ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
+                    check_lock(skel, m);
+                    ret = await skel.CallFunction(m).ConfigureAwait(false);
+                }
+
+                if (m.EntryType == MessageEntryType.PipeConnectReq || m.EntryType == MessageEntryType.PipeDisconnectReq)
+                {
+                    ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
+                    check_lock(skel, m);
+                    ret = await skel.CallPipeFunction(m, c).ConfigureAwait(false);
+                }
+
+                if (m.EntryType == MessageEntryType.WireConnectReq || m.EntryType == MessageEntryType.WireDisconnectReq || m.EntryType == MessageEntryType.WirePeekInValueReq || m.EntryType == MessageEntryType.WirePeekOutValueReq || m.EntryType == MessageEntryType.WirePokeOutValueReq)
+                {
+                    ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
+                    check_lock(skel, m);
+                    ret = await skel.CallWireFunction(m, c).ConfigureAwait(false);
+                }
+
+
+
+                if (m.EntryType == MessageEntryType.MemoryWrite || m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)
+                {
+                    ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
+                    check_lock(skel, m);
+                    ret = await skel.CallMemoryFunction(m, c).ConfigureAwait(false);
+                }
+
+                else if (m.EntryType == MessageEntryType.CallbackCallRet)
+                {
+                    // Console.WriteLine("Got " + m.TransactionID + " " + m.EntryType + " " + m.MemberName);
+                    TaskCompletionSource<MessageEntry> r = null;
+                    lock (rec_wait)
                     {
-                        return await ClientSessionOp(m, c).ConfigureAwait(false);
-
-                    }
-
-                    if (m.EntryType == MessageEntryType.ClientKeepAliveReq)
-                    {
-                        ret = new MessageEntry(MessageEntryType.ClientKeepAliveRet, m.MemberName);
-                        ret.RequestID = m.RequestID;
-                        ret.ServicePath = m.ServicePath;
-                        return ret;
-                    }
-
-                    if (m.EntryType == MessageEntryType.ServiceCheckCapabilityReq)
-                    {
-                        ret = CheckServiceCapability(m, c);
-                    }
-
-
-
-                    if (RequireValidUser)
-                    {
-                        if (ServerEndpoint.CurrentAuthenticatedUser == null)
-                            throw new AuthenticationException("User must authenticate before accessing this service");
-                    }
-
-                    if (m.EntryType == MessageEntryType.PipePacket || m.EntryType == MessageEntryType.PipePacketRet)
-                    {
-                        (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchPipeMessage(m, c);
-                        ret = null;
-                        noreturn = true;
-                    }
-
-                    if (m.EntryType == MessageEntryType.WirePacket)
-                    {
-                        (await GetObjectSkel(m.ServicePath).ConfigureAwait(false)).DispatchWireMessage(m, c);
-                        ret = null;
-                        noreturn = true;
-                    }
-
-                    
-
-                    
-
-                    m_CurrentServicePath=m.ServicePath;
-                    m_CurrentServerContext=this;
-
-                    //Object member methods
-
-                    if (m.EntryType == MessageEntryType.PropertyGetReq)
-                    {
-                        ServiceSkel skel=await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                        check_lock(skel, m);
-                        ret = await skel.CallGetProperty(m).ConfigureAwait(false);
-                    }
-
-                    if (m.EntryType == MessageEntryType.PropertySetReq)
-                    {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                        check_lock(skel, m);
-                        ret = await skel.CallSetProperty(m).ConfigureAwait(false);
-                    }
-
-                    if (m.EntryType == MessageEntryType.FunctionCallReq)
-                    {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                        check_lock(skel, m);
-                        ret = await skel.CallFunction(m).ConfigureAwait(false);
-                    }
-
-                    if (m.EntryType == MessageEntryType.PipeConnectReq || m.EntryType==MessageEntryType.PipeDisconnectReq)
-                    {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                        check_lock(skel, m);
-                        ret = await skel.CallPipeFunction(m,c).ConfigureAwait(false);
-                    }
-
-                    if (m.EntryType == MessageEntryType.WireConnectReq || m.EntryType == MessageEntryType.WireDisconnectReq || m.EntryType == MessageEntryType.WirePeekInValueReq || m.EntryType == MessageEntryType.WirePeekOutValueReq || m.EntryType == MessageEntryType.WirePokeOutValueReq)
-                    {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                        check_lock(skel, m);
-                        ret = await skel.CallWireFunction(m, c).ConfigureAwait(false);
-                    }
-
-                    
-
-                    if (m.EntryType == MessageEntryType.MemoryWrite || m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)
-                    {
-                        ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                        check_lock(skel, m);
-                        ret=await skel.CallMemoryFunction(m, c).ConfigureAwait(false);
-                    }
-
-                    else if (m.EntryType == MessageEntryType.CallbackCallRet)
-                    {
-                        // Console.WriteLine("Got " + m.TransactionID + " " + m.EntryType + " " + m.MemberName);
-                        TaskCompletionSource<MessageEntry> r = null;
-                        lock (rec_wait)
+                        uint t_id = m.RequestID;
+                        if (rec_wait.ContainsKey(t_id))
                         {
-                            uint t_id = m.RequestID;
-                            if (rec_wait.ContainsKey(t_id))
-                            {
-                                r = rec_wait[t_id].Item1;
-                            }
+                            r = rec_wait[t_id].Item1;
                         }
-
-                        if (r != null) r.TrySetResult(m);
-                        noreturn = true;
-
                     }
+
+                    if (r != null) r.TrySetResult(m);
+                    noreturn = true;
+
+                }
                 else if (m.EntryType == MessageEntryType.GeneratorNextReq)
                 {
                     var skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
@@ -749,41 +751,41 @@ namespace RobotRaconteurWeb
                 }
 
             }
-                catch (Exception e)
-                {
+            catch (Exception e)
+            {
 #if RR_LOG_DEBUG
                 LogDebug(string.Format("Error processing service entry: {0}", e.ToString()), node,
                     RobotRaconteur_LogComponent.Service, service_path: m.ServicePath, member: m.MemberName, endpoint: c.LocalEndpoint);
 #endif
-                ret = new MessageEntry(m.EntryType+1, m.MemberName);
-                    RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
+                ret = new MessageEntry(m.EntryType + 1, m.MemberName);
+                RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
 
-                }
+            }
 
-                m_CurrentServicePath=null;
-                m_CurrentServerContext=null;
+            m_CurrentServicePath = null;
+            m_CurrentServerContext = null;
 
-                if (ret == null && !noreturn && (int)m.EntryType %2 ==1)
-                {
-                    ret = new MessageEntry(m.EntryType+1, m.MemberName);
-                    ret.Error = MessageErrorType.ProtocolError;
-                    ret.AddElement("errorname", "RobotRaconteur.ProtocolError");
-                    ret.AddElement("errorstring", "Unknown transaction type");
+            if (ret == null && !noreturn && (int)m.EntryType % 2 == 1)
+            {
+                ret = new MessageEntry(m.EntryType + 1, m.MemberName);
+                ret.Error = MessageErrorType.ProtocolError;
+                ret.AddElement("errorname", "RobotRaconteur.ProtocolError");
+                ret.AddElement("errorstring", "Unknown transaction type");
 
-                }
+            }
 
-                if (!noreturn)
-                {
-                    ret.ServicePath = m.ServicePath;
-                    ret.RequestID = m.RequestID;
-                }
+            if (!noreturn)
+            {
+                ret.ServicePath = m.ServicePath;
+                ret.RequestID = m.RequestID;
+            }
 
-                return ret;
+            return ret;
 
 
             //}
 
-            
+
 
         }
 
@@ -846,14 +848,14 @@ namespace RobotRaconteurWeb
                 {
                     this.RemoveClient(e);
                     return;
-                }               
+                }
 
-                MessageEntry mmret=await ProcessMessageEntry(mm, e).ConfigureAwait(false);
-                if (mmret!=null)
-                mret.entries.Add(mmret);
+                MessageEntry mmret = await ProcessMessageEntry(mm, e).ConfigureAwait(false);
+                if (mmret != null)
+                    mret.entries.Add(mmret);
             }
             if (mret.entries.Count > 0)
-            await e.SendMessage(mret,default(CancellationToken)).ConfigureAwait(false);
+                await e.SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
         }
 
         public virtual void AddClient(ServerEndpoint cendpoint)
@@ -877,8 +879,8 @@ namespace RobotRaconteurWeb
 
             //TODO: possible deadlock
 
-            string cusername=cendpoint.AuthenticatedUsername;
-            uint ce=cendpoint.LocalEndpoint;
+            string cusername = cendpoint.AuthenticatedUsername;
+            uint ce = cendpoint.LocalEndpoint;
 
             lock (client_endpoints)
             {
@@ -918,8 +920,8 @@ namespace RobotRaconteurWeb
 
                 }
             }
-            
-            
+
+
 
             try
             {
@@ -992,8 +994,8 @@ namespace RobotRaconteurWeb
         private UserAuthenticator user_authenticator;
         private Dictionary<string, string> security_policies;
 
-        private bool RequireValidUser=false;
-        private bool AllowObjectLock=false;
+        private bool RequireValidUser = false;
+        private bool AllowObjectLock = false;
 
         private async Task<MessageEntry> ClientSessionOp(MessageEntry m, ServerEndpoint e)
         {
@@ -1009,7 +1011,7 @@ namespace RobotRaconteurWeb
                 case "AuthenticateUser":
                     {
                         string username = m.FindElement("username").CastData<string>();
-                        Dictionary<string, object> credentials = (Dictionary<string,object>)UnpackMapType<string, object>(m.FindElement("credentials").Data);
+                        Dictionary<string, object> credentials = (Dictionary<string, object>)UnpackMapType<string, object>(m.FindElement("credentials").Data);
                         e.AuthenticateUser(username, credentials);
                         ret.AddElement("return", "OK");
                         return ret;
@@ -1017,7 +1019,7 @@ namespace RobotRaconteurWeb
                 case "LogoutUser":
                     {
                         e.LogoutUser();
-                        ret.AddElement("return","OK");
+                        ret.AddElement("return", "OK");
                         return ret;
                     }
 
@@ -1049,7 +1051,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        
+
 
         private object ClientLockOp_lockobj = new object();
 
@@ -1104,7 +1106,7 @@ namespace RobotRaconteurWeb
                             ret.AddElement("return", "OK");
                         }
                         break;
-                        
+
                     }
                 case "RequestClientObjectLock":
                     {
@@ -1123,7 +1125,7 @@ namespace RobotRaconteurWeb
                             ret.AddElement("return", "OK");
                         }
                         break;
-                        
+
                     }
 
                 case "ReleaseObjectLock":
@@ -1145,7 +1147,7 @@ namespace RobotRaconteurWeb
                     break;
                 case "MonitorEnter":
                     {
-                        int timeout=0;
+                        int timeout = 0;
                         MonitorObjectSkel s;
                         lock (ClientLockOp_lockobj)
                         {
@@ -1240,7 +1242,7 @@ namespace RobotRaconteurWeb
 
             string m_RootServicePath = null;
 
-            public ObjectLock(string username, ServiceSkel root_skel, uint endpoint=0)
+            public ObjectLock(string username, ServiceSkel root_skel, uint endpoint = 0)
             {
                 lock (skels)
                 {
@@ -1277,10 +1279,10 @@ namespace RobotRaconteurWeb
                         return;
                     }
 
-                    
+
                     skels.Add(skel);
                 }
-                    
+
 
 
 
@@ -1310,8 +1312,8 @@ namespace RobotRaconteurWeb
                     }
 
                     skels.Remove(skel);
-                    
-                    
+
+
                 }
             }
 
@@ -1331,9 +1333,9 @@ namespace RobotRaconteurWeb
                     {
                         try
                         {
-                            s.objectlock=null;
+                            s.objectlock = null;
                         }
-                        catch {}
+                        catch { }
 
                     }
 
@@ -1347,7 +1349,7 @@ namespace RobotRaconteurWeb
 
 
         }
-        
+
         public virtual void PeriodicCleanupTask()
         {
             lock (client_endpoints)
@@ -1369,7 +1371,7 @@ namespace RobotRaconteurWeb
             ret.RequestID = m.RequestID;
             ret.AddElement("return", (uint)0);
             return ret;
-            
+
         }
 
         /// <summary>
@@ -1402,7 +1404,7 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public void ReleaseServicePath(string path)
-        {            
+        {
 
             if (path == ServiceName) throw new ServiceException("Root object cannot be released");
 
@@ -1423,7 +1425,7 @@ namespace RobotRaconteurWeb
                             {
                                 active_object_locks.Remove(s.objectlock.Username);
                                 s.objectlock.ReleaseLock();
-                                
+
                             }
                             else
                             {
@@ -1512,7 +1514,7 @@ namespace RobotRaconteurWeb
             m.ServicePath = path;
 
             var cc = new List<ServerEndpoint>();
-            
+
             lock (client_endpoints)
             {
                 foreach (var e in endpoints)
@@ -1545,7 +1547,7 @@ namespace RobotRaconteurWeb
                 try
                 {
                     node.CheckConnection(c.LocalEndpoint);
-                    SendMessage(m, c, default(CancellationToken)).ContinueWith(delegate(Task t)
+                    SendMessage(m, c, default(CancellationToken)).ContinueWith(delegate (Task t)
                     {
                         var e = t.Exception;
                         if (e != null)
@@ -1591,7 +1593,7 @@ namespace RobotRaconteurWeb
                 request_number++;
                 m.RequestID = request_number;
                 t_id = request_number;
-                rec_wait.Add(t_id, Tuple.Create(rec_source,e));
+                rec_wait.Add(t_id, Tuple.Create(rec_source, e));
                 if (ProcessCallbackRequest_checkconnection_current == null)
                 {
                     ProcessCallbackRequest_checkconnection_current = ProcessCallbackRequest_checkconnection();
@@ -1601,13 +1603,13 @@ namespace RobotRaconteurWeb
             MessageEntry rec_message = null;
             try
             {
-                cancel.Register(delegate()
+                cancel.Register(delegate ()
                 {
                     rec_source.TrySetCanceled();
                 });
 
 
-                Func<Task> r = async delegate()
+                Func<Task> r = async delegate ()
                 {
                     await SendMessage(m, e, cancel).ConfigureAwait(false);
                     rec_message = await rec_source.Task.ConfigureAwait(false);
@@ -1632,7 +1634,7 @@ namespace RobotRaconteurWeb
                 Exception e1 = RobotRaconteurExceptionUtil.MessageEntryToException(rec_message);
                 RobotRaconteurRemoteException e2 = e1 as RobotRaconteurRemoteException;
                 if (e2 != null)
-                {                    
+                {
                     Exception e3 = ServiceDef.DownCastException(e2);
                     if (e3 != null) e1 = e3;
                 }
@@ -1687,7 +1689,7 @@ namespace RobotRaconteurWeb
                 await Task.Delay(500).ConfigureAwait(false);
             }
             catch { }
-            
+
 
         }
 
@@ -1698,7 +1700,7 @@ namespace RobotRaconteurWeb
             IRobotRaconteurMonitorObject obj;
             uint local_endpoint = 0;
             int timeout = 0;
-            Exception monitor_acquire_exception=null;
+            Exception monitor_acquire_exception = null;
             bool monitor_acquired = false;
             TaskCompletionSource<int> monitor_thread_event;
             bool maintain_lock = false;
@@ -1738,7 +1740,7 @@ namespace RobotRaconteurWeb
                     skel.monitorlocks.Add(local_endpoint, this);
                 }
 
-                wait_thread = thread_func().IgnoreResult();                
+                wait_thread = thread_func().IgnoreResult();
 
                 try
                 {
@@ -1752,8 +1754,8 @@ namespace RobotRaconteurWeb
                     throw monitor_acquire_exception;
                 }
 
-                return (monitor_acquired ?  "OK" : "Continue" );
-                
+                return (monitor_acquired ? "OK" : "Continue");
+
             }
 
             DateTime last_refreshed = DateTime.UtcNow;
@@ -1786,7 +1788,7 @@ namespace RobotRaconteurWeb
                     throw monitor_acquire_exception;
                 }
 
-                return (monitor_acquired ? "OK" : "Continue" );
+                return (monitor_acquired ? "OK" : "Continue");
             }
 
             public Task MonitorRefresh(uint localendpoint)
@@ -1799,21 +1801,21 @@ namespace RobotRaconteurWeb
             }
 
             public Task<string> MonitorExit(uint local_endpoint)
-            {                
+            {
 
                 maintain_lock = false;
                 monitor_thread_event.TrySetResult(0);
-                
+
                 return Task.FromResult("OK");
             }
 
             private async Task thread_func()
             {
-                
-                IDisposable l=null;
+
+                IDisposable l = null;
                 try
                 {
-                    l=await obj.RobotRaconteurMonitorEnter(timeout).ConfigureAwait(false);
+                    l = await obj.RobotRaconteurMonitorEnter(timeout).ConfigureAwait(false);
                     monitor_acquired = true;
                     skel.monitorlock = this;
                 }
@@ -1841,13 +1843,13 @@ namespace RobotRaconteurWeb
                             await monitor_thread_event.Task.AwaitWithTimeout(30000).ConfigureAwait(false);
                         }
                         catch
-                        {                            
+                        {
                         }
                         lock (this)
-                        if (DateTime.UtcNow > last_refreshed.AddSeconds(30))
-                        {
-                            maintain_lock = false;
-                        }
+                            if (DateTime.UtcNow > last_refreshed.AddSeconds(30))
+                            {
+                                maintain_lock = false;
+                            }
                     }
 
                 }
@@ -1858,14 +1860,14 @@ namespace RobotRaconteurWeb
                     {
                         skel.monitorlocks.Remove(local_endpoint);
                     }
-                    
+
                     l.Dispose();
-                    
+
                     //obj.RobotRaconteurMonitorExit();
                     monitor_acquired = false;
                     wait_event.TrySetResult(0);
-                    
-                }     
+
+                }
 
             }
 
@@ -1875,25 +1877,25 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Enum of service listener events
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public enum ServerServiceListenerEventType
     {
         /// <summary>
         /// service has been closed
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         ServiceClosed = 1,
-        
+
         /// <summary>
         /// client has connected
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         ClientConnected,
 
         /// <summary>
         /// client has disconnected
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         ClientDisconnected
     }
 
@@ -1919,7 +1921,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class ServerEndpoint : Endpoint
     {
         protected internal readonly ServerContext service;
@@ -1971,7 +1973,7 @@ namespace RobotRaconteurWeb
 
         private AuthenticatedUser endpoint_authenticated_user = null;
 
-        
+
         public ServerEndpoint(ServerContext service, RobotRaconteurNode node)
             : base(node)
         {
@@ -1979,7 +1981,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        public string AuthenticatedUsername 
+        public string AuthenticatedUsername
         {
             get
             {
@@ -2004,7 +2006,7 @@ namespace RobotRaconteurWeb
             LastMessageReceivedTime = DateTime.UtcNow;
             m_CurrentEndpoint = this;
             m_CurrentAuthenticatedUser = endpoint_authenticated_user;
-            if (endpoint_authenticated_user!=null) endpoint_authenticated_user.UpdateLastAccess();
+            if (endpoint_authenticated_user != null) endpoint_authenticated_user.UpdateLastAccess();
             service.MessageReceived(m, this);
             m_CurrentEndpoint = null;
             m_CurrentAuthenticatedUser = null;
@@ -2012,7 +2014,7 @@ namespace RobotRaconteurWeb
 
         public void AuthenticateUser(string username, Dictionary<string, object> credentials)
         {
-            AuthenticatedUser u=service.AuthenticateUser(username, credentials);
+            AuthenticatedUser u = service.AuthenticateUser(username, credentials);
             endpoint_authenticated_user = u;
             m_CurrentAuthenticatedUser = u;
         }
@@ -2023,7 +2025,7 @@ namespace RobotRaconteurWeb
             m_CurrentAuthenticatedUser = null;
         }
 
-       
+
         public void PeriodicCleanupTask()
         {
             if ((DateTime.UtcNow - LastMessageReceivedTime).TotalMilliseconds > node.EndpointInactivityTimeout)
@@ -2090,7 +2092,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public interface IRobotRaconteurMonitorObject
     {
         /**
@@ -2102,14 +2104,14 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter();
-                /**
-        <summary>
-        Request a thread-exclusive lock with timeout. May block until lock can be established,
-        up to the specified timeout.
-        </summary>
-        <remarks>Dispose of the returned object to release</remarks>
-        <param name="timeout">Lock request timeout in milliseconds</param>
-        */
+        /**
+<summary>
+Request a thread-exclusive lock with timeout. May block until lock can be established,
+up to the specified timeout.
+</summary>
+<remarks>Dispose of the returned object to release</remarks>
+<param name="timeout">Lock request timeout in milliseconds</param>
+*/
 
         [PublicApi]
         Task<IDisposable> RobotRaconteurMonitorEnter(int timeout);

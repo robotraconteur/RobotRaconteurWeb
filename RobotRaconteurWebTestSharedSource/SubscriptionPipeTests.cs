@@ -15,7 +15,7 @@ namespace RobotRaconteurSubTest.Pipes
     {
         public testobj2_impl subobj = new testobj2_impl();
         public List<double> recv_packets = new List<double>();
-               
+
         public override Task<testobj2> get_subobj(CancellationToken cancel = default)
         {
             return Task.FromResult((testobj2)subobj);
@@ -23,7 +23,7 @@ namespace RobotRaconteurSubTest.Pipes
 
         public void RRServiceObjectInit(ServerContext context, string servicePath)
         {
-            testpipe2.PipeConnectCallback += delegate(Pipe<double>.PipeEndpoint pipe_ep)
+            testpipe2.PipeConnectCallback += delegate (Pipe<double>.PipeEndpoint pipe_ep)
             {
                 pipe_ep.PacketReceivedEvent += delegate (Pipe<double>.PipeEndpoint pipe_ep2)
                 {
@@ -32,7 +32,7 @@ namespace RobotRaconteurSubTest.Pipes
                         recv_packets.Add(pipe_ep2.ReceivePacket());
                     }
                 };
-            };           
+            };
         }
 
         public async Task TestPipe1SendPacket(double v)
@@ -70,7 +70,7 @@ namespace RobotRaconteurSubTest.Pipes
         }
 
         public void Dispose()
-        {            
+        {
             nodeSetup?.Dispose();
 
             nodeSetup = null;

@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+// Copyright 2011-2019 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ namespace RobotRaconteurTest
                         break;
                     }
                 case "subscriptioncitests":
-                {
+                    {
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
@@ -83,7 +83,7 @@ namespace RobotRaconteurTest
                         Console.WriteLine("Done!");
 
                         break;
-                }
+                    }
                 case "citests":
                     {
                         await ServiceTests.RunIntraLoopback();

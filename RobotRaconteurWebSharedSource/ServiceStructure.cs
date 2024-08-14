@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -25,11 +25,11 @@ using RobotRaconteurWeb.Extensions;
 #pragma warning disable 1591
 
 namespace RobotRaconteurWeb
-{    
+{
     public interface IStructureStub
     {
         MessageElementNestedElementList PackStructure(Object s);
-                
+
         T UnpackStructure<T>(MessageElementNestedElementList m);
     }
 
@@ -77,7 +77,7 @@ namespace RobotRaconteurWeb
             MessageElementUtil.AddMessageElement(l, "dims", s3.Dims);
             var s4 = PackPodArray((T[])s3.pod_array);
             MessageElementUtil.AddMessageElement(l, "array", s4);
-            return new MessageElementNestedElementList(DataTypes.pod_multidimarray_t,TypeName, l);
+            return new MessageElementNestedElementList(DataTypes.pod_multidimarray_t, TypeName, l);
         }
 
         public virtual T UnpackPodFromArray(MessageElementNestedElementList s2)
@@ -117,7 +117,7 @@ namespace RobotRaconteurWeb
             {
                 o.Dims = (MessageElementUtil.FindElementAndCast<uint[]>(marrayElements, "dims"));
                 var s2 = (MessageElementUtil.FindElementAndCast<MessageElementNestedElementList>(marrayElements, "array"));
-                o.pod_array = UnpackPodArray(s2);                
+                o.pod_array = UnpackPodArray(s2);
             }
             return o;
         }
@@ -149,11 +149,11 @@ namespace RobotRaconteurWeb
             /*var m2 = m as MessageElementPod;
             if (m2 != null)
             {
-                
-                return UnpackPod(m2);           
+
+                return UnpackPod(m2);
             }*/
             var m2 = (MessageElementNestedElementList)m;
-            
+
             if (m2.Type == DataTypes.pod_array_t)
             {
                 return UnpackPodArray(m2);
@@ -175,7 +175,7 @@ namespace RobotRaconteurWeb
     {
         public RobotRaconteurServicePod(string rr_type)
         {
-            RRType = rr_type;            
+            RRType = rr_type;
         }
 
         public string RRType { get; }
@@ -316,17 +316,17 @@ namespace RobotRaconteurWeb
             /*var m2 = m as MessageElementPod;
             if (m2 != null)
             {
-                
-                return UnpackPod(m2);           
+
+                return UnpackPod(m2);
             }*/
             var m2 = (MessageElementNestedElementList)m;
-            
-            if (m2.Type ==DataTypes.namedarray_array_t)
+
+            if (m2.Type == DataTypes.namedarray_array_t)
             {
                 return UnpackNamedArray(m2);
             }
 
-            if (m2.Type == DataTypes.namedarray_multidimarray_t)                
+            if (m2.Type == DataTypes.namedarray_multidimarray_t)
             {
                 return UnpackNamedMultiDimArray(m2);
             }

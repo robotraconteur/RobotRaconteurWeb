@@ -111,7 +111,7 @@ namespace RobotRaconteurSubTest.Manager
 
                 var sub3 = sub_manager.GetSubscription("sub1");
                 var c3 = await sub3.GetDefaultClientWait<testobj>(cancel.Token);
-                RRAssert.AreEqual(await c3.add_two_numbers(1,2),3);
+                RRAssert.AreEqual(await c3.add_two_numbers(1, 2), 3);
 
                 Console.WriteLine(string.Join(",", sub_manager.SubscriptionNames));
 

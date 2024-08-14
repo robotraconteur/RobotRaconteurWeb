@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using RobotRaconteurWeb.Extensions;
 
 #pragma warning disable 1591
@@ -24,17 +24,18 @@ namespace RobotRaconteurWeb
 {
     public class ArrayBinaryWriter : BinaryWriter
     {
-        const int bufsize=60000;
+        const int bufsize = 60000;
         private byte[] abuffer = new byte[bufsize];
 
-        private bool memstream=false;
+        private bool memstream = false;
         private MemoryStream s_memstream;
         private byte[] membuf;
 
-        public  ArrayBinaryWriter(Stream s, int length) : base(s) {
+        public ArrayBinaryWriter(Stream s, int length) : base(s)
+        {
 
             limits.Push((uint)length);
-              memstream = false;
+            memstream = false;
         }
 
         public ArrayBinaryWriter(MemoryStream s, byte[] membuf1, int length) : base(s)
@@ -47,18 +48,20 @@ namespace RobotRaconteurWeb
 
         public void WriteArray(Array a)
         {
-            
-            if (a != null) {
-                if (a.Length > 0) {
+
+            if (a != null)
+            {
+                if (a.Length > 0)
+                {
 
                     if (a is CDouble[])
                     {
                         var a1 = (CDouble[])a;
-                        var a2 = new double[a1.Length*2];
-                        for (int i=0; i<a1.Length; i++)
+                        var a2 = new double[a1.Length * 2];
+                        for (int i = 0; i < a1.Length; i++)
                         {
                             a2[i * 2] = a1[i].Real;
-                            a2[i * 2+1] = a1[i].Imag;
+                            a2[i * 2 + 1] = a1[i].Imag;
                         }
                         WriteArray(a2);
                         return;
@@ -67,7 +70,7 @@ namespace RobotRaconteurWeb
                     if (a is CSingle[])
                     {
                         var a1 = (CSingle[])a;
-                        var a2 = new float[a1.Length*2];
+                        var a2 = new float[a1.Length * 2];
                         for (int i = 0; i < a1.Length; i++)
                         {
                             a2[i * 2] = a1[i].Real;
@@ -137,15 +140,15 @@ namespace RobotRaconteurWeb
 
         public void WriteString8(String s)
         {
-            
-            byte[] b=UTF8Encoding.UTF8.GetBytes(s);
+
+            byte[] b = UTF8Encoding.UTF8.GetBytes(s);
             if (b.Length + Position > CurrentLimit) throw new IOException("Message write error");
             Write(b);
             m_Position += (uint)b.Length;
 
         }
 
-       
+
         public void WriteNumber(Object n, DataTypes t)
         {
             switch (t)
@@ -181,7 +184,7 @@ namespace RobotRaconteurWeb
                 case DataTypes.uint64_t:
                     Write((ulong)n);
                     return;
-                    
+
             }
 
             throw new DataTypeException("Unknown data type to write");
@@ -337,11 +340,12 @@ namespace RobotRaconteurWeb
 
         private byte[] membuf;
 
-        public  ArrayBinaryReader(Stream s, int length) : base(s) {
-          
-          memstream = false;
+        public ArrayBinaryReader(Stream s, int length) : base(s)
+        {
 
-          limits.Push((uint)length);
+            memstream = false;
+
+            limits.Push((uint)length);
         }
 
         public ArrayBinaryReader(MemoryStream s, byte[] membuf1, int length) : base(s)
@@ -355,7 +359,7 @@ namespace RobotRaconteurWeb
         public void ReadArray(Array a)
         {
 
-            
+
             if (a != null)
             {
                 if (a.Length > 0)
@@ -363,19 +367,19 @@ namespace RobotRaconteurWeb
                     if (a is CDouble[])
                     {
                         var a1 = (CDouble[])a;
-                        var a2 = new double[a1.Length*2];
+                        var a2 = new double[a1.Length * 2];
                         ReadArray(a2);
                         for (int i = 0; i < a1.Length; i++)
                         {
-                            a1[i] = new CDouble(a2[i * 2], a2[i * 2+1]);                            
-                        }                        
+                            a1[i] = new CDouble(a2[i * 2], a2[i * 2 + 1]);
+                        }
                         return;
                     }
 
                     if (a is CSingle[])
                     {
                         var a1 = (CSingle[])a;
-                        var a2 = new float[a1.Length*2];
+                        var a2 = new float[a1.Length * 2];
                         ReadArray(a2);
                         for (int i = 0; i < a1.Length; i++)
                         {
@@ -387,7 +391,7 @@ namespace RobotRaconteurWeb
                     int l = a.Length;
                     int bl = Buffer.ByteLength(a);
 
-                    
+
                     if (memstream)
                     {
                         if (Position + bl > CurrentLimit) throw new IOException("Message read error");
@@ -442,22 +446,22 @@ namespace RobotRaconteurWeb
         {
             byte[] b = new byte[l];
             if (Position + b.Length > CurrentLimit) throw new IOException("Message read error");
-            int n=Read(b,0,b.Length);
-            
-             string s=UTF8Encoding.UTF8.GetString(b);
-             if (s.Contains("\0"))
-             {
-                 Console.WriteLine("null");
-             }
+            int n = Read(b, 0, b.Length);
 
-             m_Position += (uint)b.Length;
-             return s;
+            string s = UTF8Encoding.UTF8.GetString(b);
+            if (s.Contains("\0"))
+            {
+                Console.WriteLine("null");
+            }
+
+            m_Position += (uint)b.Length;
+            return s;
 
         }
 
         public Object ReadNumber(DataTypes t)
         {
-            
+
             switch (t)
             {
 
@@ -489,7 +493,7 @@ namespace RobotRaconteurWeb
         public override int Read()
         {
             if (Position + 1 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.Read();
+            var i = base.Read();
             //m_Position += 1;
             return i;
         }
@@ -497,7 +501,7 @@ namespace RobotRaconteurWeb
         public override int Read(byte[] buffer, int index, int count)
         {
             if (Position + count > CurrentLimit) throw new IOException("Message read error");
-            var i=base.Read(buffer, index, count);
+            var i = base.Read(buffer, index, count);
             //m_Position += (uint)i;
             return i;
         }
@@ -513,7 +517,7 @@ namespace RobotRaconteurWeb
         public override float ReadSingle()
         {
             if (Position + 4 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadSingle();
+            var i = base.ReadSingle();
             m_Position += 4;
             return i;
         }
@@ -521,7 +525,7 @@ namespace RobotRaconteurWeb
         public override sbyte ReadSByte()
         {
             if (Position + 1 > CurrentLimit) throw new IOException("Message read error");
-            var i=base.ReadSByte();
+            var i = base.ReadSByte();
             m_Position += 1;
             return i;
         }
@@ -529,7 +533,7 @@ namespace RobotRaconteurWeb
         public override byte ReadByte()
         {
             if (Position + 1 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadByte();
+            var i = base.ReadByte();
             m_Position += 1;
             return i;
         }
@@ -537,7 +541,7 @@ namespace RobotRaconteurWeb
         public override short ReadInt16()
         {
             if (Position + 2 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadInt16();
+            var i = base.ReadInt16();
             m_Position += 2;
             return i;
         }
@@ -545,7 +549,7 @@ namespace RobotRaconteurWeb
         public override ushort ReadUInt16()
         {
             if (Position + 2 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadUInt16();
+            var i = base.ReadUInt16();
             m_Position += 2;
             return i;
         }
@@ -553,7 +557,7 @@ namespace RobotRaconteurWeb
         public override int ReadInt32()
         {
             if (Position + 4 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadInt32();
+            var i = base.ReadInt32();
             m_Position += 4;
             return i;
         }
@@ -561,7 +565,7 @@ namespace RobotRaconteurWeb
         public override uint ReadUInt32()
         {
             if (Position + 4 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadUInt32();
+            var i = base.ReadUInt32();
             m_Position += 4;
             return i;
         }
@@ -569,7 +573,7 @@ namespace RobotRaconteurWeb
         public override long ReadInt64()
         {
             if (Position + 8 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadInt64();
+            var i = base.ReadInt64();
             m_Position += 8;
             return i;
         }
@@ -577,7 +581,7 @@ namespace RobotRaconteurWeb
         public override ulong ReadUInt64()
         {
             if (Position + 8 > CurrentLimit) throw new IOException("Message read error");
-            var i= base.ReadUInt64();
+            var i = base.ReadUInt64();
             m_Position += 8;
             return i;
         }
@@ -592,7 +596,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        protected uint m_Position=0;
+        protected uint m_Position = 0;
 
         public uint Position
         {

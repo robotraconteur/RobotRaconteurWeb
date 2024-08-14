@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Text;
-using System.IO;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 #pragma warning disable 1591
 
@@ -34,7 +34,7 @@ namespace RobotRaconteurWeb
         public uint tweak;
 
         public ServiceDefinitionParseInfo ParseInfo;
-                
+
         public RobotRaconteurVersion(uint major, uint minor, uint patch = 0, uint tweak = 0)
         {
             this.major = major;
@@ -109,7 +109,7 @@ namespace RobotRaconteurWeb
             return false;
         }
 
-        public static bool operator>=(RobotRaconteurVersion v1, RobotRaconteurVersion v2)
+        public static bool operator >=(RobotRaconteurVersion v1, RobotRaconteurVersion v2)
         {
             if ((v1.major == v2.major) && (v1.minor == v2.minor) && (v1.patch == v2.patch) && (v1.tweak == v2.tweak))
             {
@@ -276,7 +276,7 @@ namespace RobotRaconteurWeb
                         if (r_end_match.Groups[1].Success)
                         {
 
-                            if (stdver >= new RobotRaconteurVersion(0,9,2))
+                            if (stdver >= new RobotRaconteurVersion(0, 9, 2))
                             {
                                 throw new ServiceDefinitionParseException("end keyword must be only keyword on line in stdver 0.9.2 and greater", parse_info);
                             }
@@ -382,7 +382,7 @@ namespace RobotRaconteurWeb
             {
                 o.WriteLine("option {0}", option);
             }
-            if (Options.Count!=0)
+            if (Options.Count != 0)
             {
                 o.WriteLine();
             }
@@ -443,14 +443,14 @@ namespace RobotRaconteurWeb
             ToWriter(w);
             return w.ToString();
         }
-                
+
         public void CheckVersion(RobotRaconteurVersion ver = default(RobotRaconteurVersion))
         {
-            
+
             if (!(bool)StdVer)
                 return;
 
-            if (ver == new RobotRaconteurVersion(0,0))
+            if (ver == new RobotRaconteurVersion(0, 0))
             {
                 ver = new RobotRaconteurVersion(RobotRaconteurNode.Version);
             }
@@ -577,7 +577,7 @@ namespace RobotRaconteurWeb
                         case 3:
                             {
                                 Options.Add(r_entry_match_remaining.Value);
-                                if (stdver_version < new RobotRaconteurVersion(0,9,2))
+                                if (stdver_version < new RobotRaconteurVersion(0, 9, 2))
                                 {
                                     warnings.Add(new ServiceDefinitionParseException("option keyword is deprecated", working_info));
                                 }
@@ -688,7 +688,7 @@ namespace RobotRaconteurWeb
                                 struct_def.FromString(block.ToString(), ref warnings, init_info);
                                 if (stdver_version >= new RobotRaconteurVersion(0, 9, 2) && struct_def.Options.Count != 0)
                                     throw new ServiceDefinitionParseException("option keyword is not support in stdver 0.9.2 or greater", working_info);
-                                NamedArrays.Add(struct_def.Name,struct_def);
+                                NamedArrays.Add(struct_def.Name, struct_def);
                                 entry_key_max = 9;
                                 continue;
                             }
@@ -704,10 +704,10 @@ namespace RobotRaconteurWeb
                     StdVer = stdver_version;
                     version_found = true;
                 }
-                foreach(var so in Options)
+                foreach (var so in Options)
 
                 {
-                    var r_version= new Regex("^[ \\t]*version[ \\t]+(?:(\\d+(?:\\.\\d+)*)|[ -~\\t]*)$");
+                    var r_version = new Regex("^[ \\t]*version[ \\t]+(?:(\\d+(?:\\.\\d+)*)|[ -~\\t]*)$");
                     var r_version_match = r_version.Match(so);
                     if (r_version_match.Success)
                     {
@@ -760,7 +760,7 @@ namespace RobotRaconteurWeb
 
 
     public class ServiceEntryDefinition : NamedTypeDefinition
-    {   
+    {
 
         public Dictionary<string, MemberDefinition> Members = new Dictionary<string, MemberDefinition>();
 
@@ -1183,11 +1183,11 @@ namespace RobotRaconteurWeb
         }
 
         public override string ResolveQualifiedName()
-        { 
+        {
             return ServiceDefinition.Name + "." + Name;
         }
 
-        
+
     }
 
     /// <summary>
@@ -1208,7 +1208,7 @@ namespace RobotRaconteurWeb
         writeonly,
 
         /// <summary>Member supports both read and write</summary>
-        [PublicApi] 
+        [PublicApi]
         both
     }
 
@@ -1306,8 +1306,8 @@ namespace RobotRaconteurWeb
             if (res.Count > 0)
             {
                 var r_modifier = new Regex("^[ \\t]*" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + "(?:\\([ \\t]*(?:" + detail.ServiceDefinitionUtil.RR_NUMBER_REGEX + "|" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + ")[ \\t]*(?:,[ \\t]*(?:" + detail.ServiceDefinitionUtil.RR_NUMBER_REGEX + "|" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + "))*[ \\t]*\\))?");
-                foreach(var s2 in res)
-			    {
+                foreach (var s2 in res)
+                {
                     if (!r_modifier.IsMatch(s2))
                     {
                         return false;
@@ -1449,7 +1449,7 @@ namespace RobotRaconteurWeb
             var params2 = new List<string>();
             foreach (var p in params_)
             {
-                TypeDefinition p2=new TypeDefinition();
+                TypeDefinition p2 = new TypeDefinition();
                 p.CopyTo(ref p2);
                 p2.UnqualifyTypeStringWithUsing();
                 params2.Add(p2.ToString());
@@ -1482,7 +1482,7 @@ namespace RobotRaconteurWeb
 
         internal static string MemberDefinition_ToStringFormat2(string member_type, MemberDefinition def, TypeDefinition return_type, List<TypeDefinition> params_)
         {
-            TypeDefinition t=new TypeDefinition(def);
+            TypeDefinition t = new TypeDefinition(def);
             return_type.CopyTo(ref t);
             t.Rename(def.Name);
             t.UnqualifyTypeStringWithUsing();
@@ -1848,7 +1848,7 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                if (Modifiers.Count(x => x=="unreliable") != 0)
+                if (Modifiers.Count(x => x == "unreliable") != 0)
                 {
                     return true;
                 }
@@ -2455,7 +2455,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        public NamedTypeDefinition ResolveNamedType(Dictionary<string, ServiceDefinition> imported_defs=null, RobotRaconteurNode node = null, object client = null)
+        public NamedTypeDefinition ResolveNamedType(Dictionary<string, ServiceDefinition> imported_defs = null, RobotRaconteurNode node = null, object client = null)
         {
             NamedTypeDefinition o = ResolveNamedType_cache;
             if (o != null)
@@ -2581,7 +2581,7 @@ namespace RobotRaconteurWeb
                 ParseInfo = parse_info.Value;
             }
 
-            var r = new Regex("^[ \\t]*using[ \\t]+(" + detail.ServiceDefinitionUtil.RR_QUALIFIED_TYPE_REGEX + ")(?:[ \\t]+as[ \\t](" + detail.ServiceDefinitionUtil.RR_NAME_REGEX +  "))?[ \\t]*$");
+            var r = new Regex("^[ \\t]*using[ \\t]+(" + detail.ServiceDefinitionUtil.RR_QUALIFIED_TYPE_REGEX + ")(?:[ \\t]+as[ \\t](" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + "))?[ \\t]*$");
 
             var r_match = r.Match(s);
             if (!r_match.Success)
@@ -2593,7 +2593,7 @@ namespace RobotRaconteurWeb
             {
                 this.QualifiedName = r_match.Groups[1].Value;
                 var s2 = ServiceDefinitionUtil.SplitQualifiedName(r_match.Groups[1].Value);
-                this.UnqualifiedName = s2.Item2;                
+                this.UnqualifiedName = s2.Item2;
             }
             else
             {
@@ -2640,7 +2640,7 @@ namespace RobotRaconteurWeb
         {
             Reset();
 
-            var r = new Regex("^[ \\t]*constant[ \\t]+(" + detail.ServiceDefinitionUtil.RR_TYPE2_REGEX + ")[ \\t]+(" +  detail.ServiceDefinitionUtil.RR_NAME_REGEX + ")[ \\t]+([^\\s](?:[ -~\\t]*[^\\s])?)[ \\t]*$");
+            var r = new Regex("^[ \\t]*constant[ \\t]+(" + detail.ServiceDefinitionUtil.RR_TYPE2_REGEX + ")[ \\t]+(" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + ")[ \\t]+([^\\s](?:[ -~\\t]*[^\\s])?)[ \\t]*$");
             var r_match = r.Match(s);
             if (!r_match.Success)
             {
@@ -2682,7 +2682,7 @@ namespace RobotRaconteurWeb
                     b = 16;
                 }
                 switch (t)
-                {                    
+                {
                     case DataTypes.uint8_t:
                         Convert.ToByte(val, b);
                         return true;
@@ -2692,7 +2692,7 @@ namespace RobotRaconteurWeb
                     case DataTypes.uint32_t:
                         Convert.ToUInt32(val, b);
                         return true;
-                   case DataTypes.uint64_t:
+                    case DataTypes.uint64_t:
                         Convert.ToUInt64(val, b);
                         return true;
                     default:
@@ -2707,7 +2707,7 @@ namespace RobotRaconteurWeb
                     case DataTypes.int8_t:
                         min_value = sbyte.MinValue;
                         max_value = sbyte.MaxValue;
-                        break;                        
+                        break;
                     case DataTypes.int16_t:
                         min_value = short.MinValue;
                         max_value = short.MaxValue;
@@ -2849,20 +2849,20 @@ namespace RobotRaconteurWeb
             Type = null;
             Value = null;
         }
-               
+
         public T ValueToScalar<T>()
         {
             return (T)Convert.ChangeType(Value.Trim(), typeof(T));
         }
 
-        
+
         public T[] ValueToArray<T>()
         {
             string value1 = Value.Trim(' ', '\t', '{', '}').Trim();
             if (value1.Length == 0)
                 return new T[0];
 
-            return value1.Split(',').Select(x=> (T)Convert.ChangeType(x.Trim(), typeof(T))).ToArray();
+            return value1.Split(',').Select(x => (T)Convert.ChangeType(x.Trim(), typeof(T))).ToArray();
         }
 
         public string ValueToString()
@@ -2940,7 +2940,7 @@ namespace RobotRaconteurWeb
         public static string EscapeString(string in_)
         {
             var r_replace = new Regex("(\"|\\\\|\\/|[\\x00-\\x1F]|\\x7F|[\\x80-\\xFF]+)");
-            return r_replace.Replace(in_, ConstantDefinition_EscapeString_Formatter);            
+            return r_replace.Replace(in_, ConstantDefinition_EscapeString_Formatter);
         }
 
         public List<ConstantDefinition_StructField> ValueToStructFields()
@@ -3141,10 +3141,10 @@ namespace RobotRaconteurWeb
             }
 
 
-            for (int i=0; i<Values.Count-1; i++)
+            for (int i = 0; i < Values.Count - 1; i++)
             {
-                var e = Values[i];                
-                for (int j = i+1; j<Values.Count; j++)
+                var e = Values[i];
+                for (int j = i + 1; j < Values.Count; j++)
                 {
                     var e2 = Values[j];
                     if (e.Value == e2.Value)
@@ -3162,7 +3162,7 @@ namespace RobotRaconteurWeb
         }
 
         public override string ResolveQualifiedName()
-        {                        
+        {
             return service.Name + "." + Name;
         }
     }
@@ -3204,7 +3204,7 @@ namespace RobotRaconteurWeb
             ShortMessage = e;
         }
         public ServiceDefinitionParseException(string e, ServiceDefinitionParseInfo info)
-            : base(CreateString(e,info))
+            : base(CreateString(e, info))
         {
             ShortMessage = e;
             ParseInfo = info;
@@ -3290,7 +3290,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Utility functions for service definitions
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public static class ServiceDefinitionUtil
     {
         /**
@@ -3440,7 +3440,7 @@ namespace RobotRaconteurWeb
         {
             if (!e.VerifyValues())
             {
-                throw new ServiceDefinitionVerifyException("Error in constant in enum" + e.Name , e.ParseInfo);
+                throw new ServiceDefinitionVerifyException("Error in constant in enum" + e.Name, e.ParseInfo);
             }
 
             VerifyName(e.Name, def, e.ParseInfo);
@@ -3463,7 +3463,7 @@ namespace RobotRaconteurWeb
             return o;
         }
 
-        internal static void VerifyUsing(UsingDefinition e, ServiceDefinition def, Dictionary<string,ServiceDefinition> importeddefs)
+        internal static void VerifyUsing(UsingDefinition e, ServiceDefinition def, Dictionary<string, ServiceDefinition> importeddefs)
         {
             VerifyName(e.UnqualifiedName, def, e.ParseInfo);
             var r = new Regex(detail.ServiceDefinitionUtil.RR_QUALIFIED_TYPE_REGEX);
@@ -3491,7 +3491,7 @@ namespace RobotRaconteurWeb
             throw new ServiceDefinitionVerifyException("Using \"" + e.QualifiedName + "\" is invalid", e.ParseInfo);
         }
 
-        internal static NamedTypeDefinition VerifyResolveNamedType(TypeDefinition tdef, Dictionary<string,ServiceDefinition> imported_defs)
+        internal static NamedTypeDefinition VerifyResolveNamedType(TypeDefinition tdef, Dictionary<string, ServiceDefinition> imported_defs)
         {
             try
             {
@@ -3540,7 +3540,7 @@ namespace RobotRaconteurWeb
             if (t.Type == DataTypes.vector_t || t.Type == DataTypes.dictionary_t || t.Type == DataTypes.object_t || t.Type == DataTypes.varvalue_t || t.Type == DataTypes.varobject_t || t.Type == DataTypes.multidimarray_t) return;
             if (t.Type == DataTypes.namedtype_t)
             {
-                var nt = VerifyResolveNamedType(t,defs);
+                var nt = VerifyResolveNamedType(t, defs);
                 DataTypes nt_type = nt.RRDataType;
                 if ((nt_type != DataTypes.pod_t && nt_type != DataTypes.namedarray_t) && t.ArrayType != DataTypes_ArrayTypes.none) throw new ServiceDefinitionVerifyException("Invalid Robot Raconteur data type \"" + t.ToString() + "\"", t.ParseInfo);
                 if (nt_type != DataTypes.structure_t && nt_type != DataTypes.pod_t && nt_type != DataTypes.namedarray_t && nt_type != DataTypes.enum_t) throw new ServiceDefinitionVerifyException("Invalid Robot Raconteur data type \"" + t.ToString() + "\"", t.ParseInfo);
@@ -3728,7 +3728,7 @@ namespace RobotRaconteurWeb
                 warnings.Add(new ServiceDefinitionParseException("Unknown member modifier: [" + s + "]", m.ParseInfo));
             }
         }
-        
+
         internal static string VerifyMember(MemberDefinition m, ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, ref List<Exception> warnings)
         {
             VerifyName(m.Name, def, m.ParseInfo);
@@ -3768,7 +3768,7 @@ namespace RobotRaconteurWeb
                         var ret2 = f.ReturnType.Clone();
                         ret2.RemoveContainers();
                         VerifyType(ret2, def, defs);
-                        if (f.ReturnType.Type == DataTypes.namedtype_t) VerifyResolveNamedType(f.ReturnType,defs);
+                        if (f.ReturnType.Type == DataTypes.namedtype_t) VerifyResolveNamedType(f.ReturnType, defs);
                         generator_found = true;
                     }
                     else
@@ -3887,7 +3887,7 @@ namespace RobotRaconteurWeb
                     {
                         throw new ServiceDefinitionVerifyException("Memory member must be numeric, pod, or namedarray", m2.ParseInfo);
                     }
-                    var nt = VerifyResolveNamedType(m2.Type,defs);
+                    var nt = VerifyResolveNamedType(m2.Type, defs);
                     if (nt.RRDataType != DataTypes.pod_t && nt.RRDataType != DataTypes.namedarray_t)
                     {
                         throw new ServiceDefinitionVerifyException("Memory member must be numeric, pod, or namedarray", m2.ParseInfo);
@@ -4229,7 +4229,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        internal static void VerifyStructure_check_recursion(ServiceEntryDefinition strut, Dictionary<string,ServiceDefinition> defs, ref HashSet<string>  names, DataTypes entry_type)
+        internal static void VerifyStructure_check_recursion(ServiceEntryDefinition strut, Dictionary<string, ServiceDefinition> defs, ref HashSet<string> names, DataTypes entry_type)
         {
             if (strut.EntryType != entry_type && strut.EntryType != DataTypes.namedarray_t)
             {
@@ -4246,7 +4246,7 @@ namespace RobotRaconteurWeb
 
                 if (p.Type.Type == DataTypes.namedtype_t)
                 {
-                    var nt_def = VerifyResolveNamedType(p.Type,defs);
+                    var nt_def = VerifyResolveNamedType(p.Type, defs);
                     var et_def = nt_def as ServiceEntryDefinition;
                     if (et_def == null) throw new InternalErrorException("");
                     if (et_def.EntryType != entry_type && et_def.EntryType != DataTypes.namedarray_t) throw new InternalErrorException("");
@@ -4262,38 +4262,38 @@ namespace RobotRaconteurWeb
             }
         }
 
-        internal static void VerifyStructure_common(ServiceEntryDefinition strut, ServiceDefinition def, Dictionary<string,ServiceDefinition> defs, ref List<Exception> warnings, DataTypes entry_type)
+        internal static void VerifyStructure_common(ServiceEntryDefinition strut, ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, ref List<Exception> warnings, DataTypes entry_type)
         {
             if (strut.EntryType != entry_type) throw new ServiceDefinitionVerifyException("Invalid EntryType in " + strut.Name, strut.ParseInfo);
 
             VerifyName(strut.Name, def, strut.ParseInfo);
             var membernames = new List<string>();
 
-            foreach(var e in strut.Options)
+            foreach (var e in strut.Options)
 
-        {
-                var s1 = e.Split((string[])null, StringSplitOptions.RemoveEmptyEntries);                
+            {
+                var s1 = e.Split((string[])null, StringSplitOptions.RemoveEmptyEntries);
                 if (s1[0] == "constant")
                 {
                     var membername = VerifyConstant(e, def, strut.ParseInfo);
-                    if (membernames.Contains( membername)) throw new ServiceDefinitionVerifyException("Structure \"" + strut.Name +  "\" contains multiple members named \"" + membername + "\"", strut.ParseInfo);
+                    if (membernames.Contains(membername)) throw new ServiceDefinitionVerifyException("Structure \"" + strut.Name + "\" contains multiple members named \"" + membername + "\"", strut.ParseInfo);
                     membernames.Add(membername);
                 }
             }
 
-            foreach(var e in strut.Constants.Values)
+            foreach (var e in strut.Constants.Values)
 
-        {
+            {
                 string membername = VerifyConstant(e, def, strut.Constants);
-                if (membernames.Contains(membername)) throw new ServiceDefinitionVerifyException("Struct \"" + strut.Name +  "\" contains multiple members named \"" + membername + "\"", strut.ParseInfo);
+                if (membernames.Contains(membername)) throw new ServiceDefinitionVerifyException("Struct \"" + strut.Name + "\" contains multiple members named \"" + membername + "\"", strut.ParseInfo);
                 membernames.Add(membername);
             }
 
             DataTypes namedarray_element_type = DataTypes.void_t;
 
-            foreach(var e in strut.Members.Values)
+            foreach (var e in strut.Members.Values)
 
-        {
+            {
                 var p = e as PropertyDefinition;
                 if (p == null) throw new ServiceDefinitionVerifyException("Structure \"" + strut.Name + "\" must only contain fields", e.ParseInfo);
 
@@ -4309,7 +4309,7 @@ namespace RobotRaconteurWeb
 
                     if (t.Type == DataTypes.namedtype_t)
                     {
-                        NamedTypeDefinition tt = VerifyResolveNamedType(t,defs);
+                        NamedTypeDefinition tt = VerifyResolveNamedType(t, defs);
                         if (tt.RRDataType != DataTypes.pod_t && tt.RRDataType != DataTypes.namedarray_t)
                         {
                             throw new ServiceDefinitionVerifyException("Pods must only contain numeric, custruct, pod types", e.ParseInfo);
@@ -4322,10 +4322,10 @@ namespace RobotRaconteurWeb
                     }
 
                     if (t.ArrayLength.Contains(0)
-                        || (t.ArrayType == DataTypes_ArrayTypes.multidimarray && t.ArrayLength.Count==0))
+                        || (t.ArrayType == DataTypes_ArrayTypes.multidimarray && t.ArrayLength.Count == 0))
                     {
                         throw new ServiceDefinitionVerifyException("Pods must have fixed or finite length arrays", e.ParseInfo);
-                    }                    
+                    }
                 }
 
                 if (entry_type == DataTypes.namedarray_t)
@@ -4359,11 +4359,11 @@ namespace RobotRaconteurWeb
                             break;
                         default:
                             throw new ServiceDefinitionVerifyException("NamedArray fields must be scalars or fixed arrays", e.ParseInfo);
-                    }                 
-                    
+                    }
+
                 }
 
-                if (membernames.Contains(membername)) throw new ServiceDefinitionVerifyException("Structure \"" + strut.Name +  "\" contains multiple members named \"" + membername + "\"", e.ParseInfo);
+                if (membernames.Contains(membername)) throw new ServiceDefinitionVerifyException("Structure \"" + strut.Name + "\" contains multiple members named \"" + membername + "\"", e.ParseInfo);
                 membernames.Add(membername);
             }
 
@@ -4386,7 +4386,7 @@ namespace RobotRaconteurWeb
             }
         }
 
-        internal static void VerifyStructure(ServiceEntryDefinition strut, ServiceDefinition def, Dictionary<string,ServiceDefinition> defs, ref List<Exception> warnings)
+        internal static void VerifyStructure(ServiceEntryDefinition strut, ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, ref List<Exception> warnings)
         {
             VerifyStructure_common(strut, def, defs, ref warnings, DataTypes.structure_t);
         }
@@ -4404,7 +4404,7 @@ namespace RobotRaconteurWeb
         internal class rrimports
         {
             public ServiceDefinition def;
-            public List<rrimports> imported=new List<rrimports>();
+            public List<rrimports> imported = new List<rrimports>();
         };
 
         internal static rrimports get_imports(ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, ServiceDefinition rootdef = null)
@@ -4418,7 +4418,7 @@ namespace RobotRaconteurWeb
             foreach (var e in def.Imports)
 
             {
-                ServiceDefinition def2;                
+                ServiceDefinition def2;
                 if (!defs.TryGetValue(e, out def2)) throw new ServiceDefinitionVerifyException("Service definition \"" + e + "\" not found", def.ParseInfo);
                 if (def2.Name == rootdef.Name) throw new ServiceDefinitionVerifyException("Recursive imports between \"" + def.Name + "\" and \"" + rootdef.Name + "\"", def.ParseInfo);
                 rrimports imp2 = get_imports(def2, defs, rootdef);
@@ -4428,7 +4428,7 @@ namespace RobotRaconteurWeb
             return out_;
         }
 
-        internal static void VerifyImports(ServiceDefinition def, Dictionary<string,ServiceDefinition> defs)
+        internal static void VerifyImports(ServiceDefinition def, Dictionary<string, ServiceDefinition> defs)
         {
             rrimports c = get_imports(def, defs);
         }
@@ -4577,7 +4577,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        public static void VerifyServiceDefinitions(Dictionary<string,ServiceDefinition> def)
+        public static void VerifyServiceDefinitions(Dictionary<string, ServiceDefinition> def)
         {
             var warnings = new List<Exception>();
             VerifyServiceDefinitions(def, ref warnings);
@@ -4696,13 +4696,13 @@ namespace RobotRaconteurWeb
             return true;
         }
 
-        public static int EstimatePodPackedElementSize(ServiceEntryDefinition def, Dictionary<string,ServiceDefinition> other_defs=null, RobotRaconteurNode node = null, object client = null)
+        public static int EstimatePodPackedElementSize(ServiceEntryDefinition def, Dictionary<string, ServiceDefinition> other_defs = null, RobotRaconteurNode node = null, object client = null)
         {
             int s = 16;
             s += ArrayBinaryWriter.GetStringByteCount8(def.Name);
-            foreach( var m in def.Members.Values)
+            foreach (var m in def.Members.Values)
 
-        {
+            {
                 var p = m as PropertyDefinition;
                 if (DataTypeUtil.IsNumber(p.Type.Type))
                 {
@@ -4715,7 +4715,7 @@ namespace RobotRaconteurWeb
                     }
                     else
                     {
-                        array_count = (int)p.Type.ArrayLength.Aggregate(1, (x, y) => x * y);;
+                        array_count = (int)p.Type.ArrayLength.Aggregate(1, (x, y) => x * y); ;
                     }
                     s += (int)DataTypeUtil.size(p.Type.Type) * array_count;
                 }
@@ -4732,7 +4732,7 @@ namespace RobotRaconteurWeb
                     }
                     else
                     {
-                        array_count = (int)p.Type.ArrayLength.Aggregate(1,(x,y) => x*y);
+                        array_count = (int)p.Type.ArrayLength.Aggregate(1, (x, y) => x * y);
                     }
                     s += EstimatePodPackedElementSize(nt, other_defs, node, client) * array_count;
                 }
@@ -4740,7 +4740,7 @@ namespace RobotRaconteurWeb
             return s;
         }
 
-        public static Tuple<DataTypes, int> GetNamedArrayElementTypeAndCount(ServiceEntryDefinition def, Dictionary<string,ServiceDefinition> other_defs=null, RobotRaconteurNode node = null, object client = null, HashSet<string> n = null)
+        public static Tuple<DataTypes, int> GetNamedArrayElementTypeAndCount(ServiceEntryDefinition def, Dictionary<string, ServiceDefinition> other_defs = null, RobotRaconteurNode node = null, object client = null, HashSet<string> n = null)
         {
             if (n == null) n = new HashSet<string>();
 
@@ -4754,14 +4754,14 @@ namespace RobotRaconteurWeb
             DataTypes element_type = DataTypes.void_t;
             int element_count = 0;
 
-            if (def.Members.Count==0)
+            if (def.Members.Count == 0)
             {
                 throw new ServiceDefinitionException("namedarray must not be empty");
             }
 
-            foreach(var e in def.Members.Values)
-    
-        {
+            foreach (var e in def.Members.Values)
+
+            {
                 int field_element_count = 1;
 
                 var p = e as PropertyDefinition;

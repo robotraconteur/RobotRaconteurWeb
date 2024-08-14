@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Microsoft.CSharp;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.CSharp;
 
 #pragma warning disable 1591
 
@@ -737,7 +737,7 @@ namespace RobotRaconteurWeb
                             var t9 = ServiceDefinitionUtil.GetNamedArrayElementTypeAndCount(e2);
                             int e2_count = m.Type.ArrayType == DataTypes_ArrayTypes.none ? 1 : t7.ArrayLength[0];
 
-                            w2.WriteLine("    var a" + i + " = new ArraySegment<" + t6.cs_type + ">(a.Array, a.Offset + " + i + ", " + t9.Item2 * e2_count +");");
+                            w2.WriteLine("    var a" + i + " = new ArraySegment<" + t6.cs_type + ">(a.Array, a.Offset + " + i + ", " + t9.Item2 * e2_count + ");");
                             w2.WriteLine("    this." + t8.name + ".AssignFromNumericArray(ref a" + i + ");");
                             i += t9.Item2 * e2_count;
 
@@ -1297,7 +1297,7 @@ namespace RobotRaconteurWeb
                 w2.WriteLine("    s." + FixName(t.name) + " =" + str_unpack_message_element("MessageElement.FindElement(m.Elements,\"" + t.name + "\")", t2) + ";");
             }
             w2.WriteLine("    return s;");
-            w2.WriteLine("    }");            
+            w2.WriteLine("    }");
             w2.WriteLine("    public override string TypeName { get { return \"" + e.ServiceDefinition.Name + "." + e.Name + "\"; } }");
             w2.WriteLine("}");
         }
@@ -1433,7 +1433,7 @@ namespace RobotRaconteurWeb
                     switch (m.Type.ArrayType)
                     {
                         case DataTypes_ArrayTypes.array:
-                            w2.WriteLine("    rr_" + FixName(m.Name) + "=new ArrayMemoryClient<" + t.cs_type + ">(\"" + m.Name + "\",this, " + DirectionStr(m.Direction) +  ");");
+                            w2.WriteLine("    rr_" + FixName(m.Name) + "=new ArrayMemoryClient<" + t.cs_type + ">(\"" + m.Name + "\",this, " + DirectionStr(m.Direction) + ");");
                             break;
                         case DataTypes_ArrayTypes.multidimarray:
                             w2.WriteLine("    rr_" + FixName(m.Name) + "=new MultiDimArrayMemoryClient<" + t.cs_type + ">(\"" + m.Name + "\",this," + DirectionStr(m.Direction) + ");");
@@ -1460,7 +1460,7 @@ namespace RobotRaconteurWeb
                     switch (m.Type.ArrayType)
                     {
                         case DataTypes_ArrayTypes.array:
-                            w2.WriteLine("    rr_" + FixName(m.Name) + "=new " + c + "ArrayMemoryClient<" + t.cs_type + ">(\"" + m.Name + "\",this," + elem_size + ","  + DirectionStr(m.Direction) + ");");
+                            w2.WriteLine("    rr_" + FixName(m.Name) + "=new " + c + "ArrayMemoryClient<" + t.cs_type + ">(\"" + m.Name + "\",this," + elem_size + "," + DirectionStr(m.Direction) + ");");
                             break;
                         case DataTypes_ArrayTypes.multidimarray:
                             w2.WriteLine("    rr_" + FixName(m.Name) + "=new " + c + "MultiDimArrayMemoryClient<" + t.cs_type + ">(\"" + m.Name + "\",this," + elem_size + "," + DirectionStr(m.Direction) + ");");
@@ -1822,7 +1822,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("public class " + FixName(e.Name) + "_skel : ServiceSkel {");
             w2.WriteLine("    protected " + FixName(e.Name) + " obj;");
             w2.WriteLine("    public " + e.Name + "_skel(string p," + FixName(e.Name) + " o,ServerContext c) : base(p,o,c) { obj=(" + FixName(e.Name) + ")o; }");
-            w2.WriteLine("    public override void ReleaseCastObject() { ");            
+            w2.WriteLine("    public override void ReleaseCastObject() { ");
             w2.WriteLine("    }");
 
             w2.WriteLine("    public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {");
@@ -1900,7 +1900,7 @@ namespace RobotRaconteurWeb
                     }
                     if (m.ReturnType.Type == DataTypes.void_t)
                     {
-                        w2.WriteLine("    await this.obj." + FixName(m.Name) + "(" + params_  + ").ConfigureAwait(false);");
+                        w2.WriteLine("    await this.obj." + FixName(m.Name) + "(" + params_ + ").ConfigureAwait(false);");
                         w2.WriteLine("    rr_mr.AddElement(\"return\",(int)0);");
                     }
                     else
@@ -1928,7 +1928,7 @@ namespace RobotRaconteurWeb
                     w2.WriteLine("    " + t4.generator_csharp_type + " rr_ret=await this.obj." + FixName(m.Name) + "(" + params_ + ").ConfigureAwait(false);");
                     w2.WriteLine("    lock(generators) {");
                     w2.WriteLine("    int rr_index = GetNewGeneratorIndex();");
-                    w2.WriteLine("    generators.Add(rr_index, new " + t4.generator_csharp_base_type + "Server<" + t4.generator_csharp_template_params + ">(rr_ret,\""  + m.Name + "\",rr_index, this, rr_ep));");
+                    w2.WriteLine("    generators.Add(rr_index, new " + t4.generator_csharp_base_type + "Server<" + t4.generator_csharp_template_params + ">(rr_ret,\"" + m.Name + "\",rr_index, this, rr_ep));");
                     w2.WriteLine("    rr_mr.AddElement(\"index\",rr_index);");
                     w2.WriteLine("    }");
                     w2.WriteLine("    break;");
@@ -2056,7 +2056,7 @@ namespace RobotRaconteurWeb
             {
                 var t = convert_type(m.Type);
                 t.name = FixName(m.Name);
-                w2.WriteLine(String.Format("    private PipeServer<{0}{1}> rr_{2};", t.cs_type,t.cs_arr_type, t.name));
+                w2.WriteLine(String.Format("    private PipeServer<{0}{1}> rr_{2};", t.cs_type, t.cs_arr_type, t.name));
             }
 
             foreach (var m in MemberIter<WireDefinition>(e))
@@ -2087,7 +2087,7 @@ namespace RobotRaconteurWeb
                 w2.WriteLine(String.Format("    this.rr_{2}=new WireServer<{0}{1}>(\"" + m.Name + "\",this);", t.cs_type, t.cs_arr_type, t.name));
             }
 
-            foreach(var m in MemberIter<PipeDefinition>(e))
+            foreach (var m in MemberIter<PipeDefinition>(e))
             {
                 var t = convert_type(m.Type);
                 t.name = FixName(m.Name);
@@ -2118,16 +2118,16 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    string ename=m.MemberName;");
             w2.WriteLine("    switch (ename) {");
             foreach (var m in MemberIter<PipeDefinition>(e))
-            {                
+            {
                 w2.WriteLine("    case \"" + m.Name + "\":");
                 w2.WriteLine("    return await this.rr_" + FixName(m.Name) + ".PipeCommand(m,e).ConfigureAwait(false);");
             }
-                
+
             w2.WriteLine("    default:");
             w2.WriteLine("    throw new MemberNotFoundException(\"Member not found\");");
             w2.WriteLine("    }");
             w2.WriteLine("    }");
-                        
+
             w2.WriteLine("    public override async Task<MessageEntry> CallWireFunction(MessageEntry m,Endpoint e) {");
             w2.WriteLine("    string ename=m.MemberName;");
             w2.WriteLine("    switch (ename) {");
@@ -2154,7 +2154,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    throw new MemberNotFoundException(\"Member not found\");");
             w2.WriteLine("    }");
             w2.WriteLine("    }");
-            
+
             w2.WriteLine("    public override void DispatchWireMessage(MessageEntry m, Endpoint e)");
             w2.WriteLine("    {");
             w2.WriteLine("    switch (m.MemberName) {");
@@ -2211,7 +2211,7 @@ namespace RobotRaconteurWeb
 
                     if (m.Type.ArrayType == DataTypes_ArrayTypes.array)
                     {
-                        w2.WriteLine(String.Format("     return await (new " + c +  "ArrayMemoryServiceSkel<{1}>(\"{0}\",this," + elem_size + "," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2}).ConfigureAwait(false);", m.Name, t.cs_type, t.name));
+                        w2.WriteLine(String.Format("     return await (new " + c + "ArrayMemoryServiceSkel<{1}>(\"{0}\",this," + elem_size + "," + DirectionStr(m.Direction) + ")).CallMemoryFunction(m,e,obj.{2}).ConfigureAwait(false);", m.Name, t.cs_type, t.name));
                     }
                     else
                     {
@@ -2227,7 +2227,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    }");
 
             w2.WriteLine("    public override bool IsRequestNoLock(MessageEntry m) {");
-            
+
             foreach (var m in MemberIter<MemberDefinition>(e))
             {
                 if (m.NoLock == MemberDefinition_NoLock.all)
@@ -2261,7 +2261,7 @@ namespace RobotRaconteurWeb
             foreach (var m in MemberIter<CallbackDefinition>(e))
             {
 
-                w2.WriteLine("    protected Callback<" + str_pack_delegate(m.Parameters, m.ReturnType,true) + "> rrvar_" + FixName(m.Name) + ";");
+                w2.WriteLine("    protected Callback<" + str_pack_delegate(m.Parameters, m.ReturnType, true) + "> rrvar_" + FixName(m.Name) + ";");
             }
 
 
@@ -2846,12 +2846,12 @@ namespace RobotRaconteurWeb
         public static void GenerateFiles(ServiceDefinition d, string servicedef, string path)
         {
 
-            string fname = Path.Combine(path,  d.Name + ".cs");
+            string fname = Path.Combine(path, d.Name + ".cs");
             using (var f1 = new StreamWriter(fname))
             {
                 GenerateInterfaceFile(d, f1, false);
             }
-            
+
 
             string fname2 = Path.Combine(path, d.Name + "_stubskel.cs");
             using (var f2 = new StreamWriter(fname2))

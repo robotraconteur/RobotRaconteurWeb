@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 
 #pragma warning disable 1591
@@ -58,7 +58,7 @@ namespace RobotRaconteurWeb
 
         protected internal readonly RobotRaconteurNode node;
 
-        protected Transport(RobotRaconteurNode node=null)
+        protected Transport(RobotRaconteurNode node = null)
         {
             if (node != null)
             {
@@ -86,12 +86,12 @@ namespace RobotRaconteurWeb
 
         public abstract bool CanConnectService(string url);
 
-        
+
         public abstract Task<ITransportConnection> CreateTransportConnection(string url, Endpoint e, CancellationToken cancel);
 
         public abstract Task CloseTransportConnection(Endpoint e, CancellationToken cancel);
 
-        
+
 
         public virtual Task SendMessage(Message m, CancellationToken cancel)
         {

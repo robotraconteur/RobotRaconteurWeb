@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Text.RegularExpressions;
-using RobotRaconteurWeb.Extensions;
-using System.Linq.Expressions;
-
-using static RobotRaconteurWeb.RRLogFuncs;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using RobotRaconteurWeb.Extensions;
+using static RobotRaconteurWeb.RRLogFuncs;
 
 namespace RobotRaconteurWeb
 {
@@ -161,7 +160,7 @@ namespace RobotRaconteurWeb
             get
             {
                 if (m_NodeName == null)
-                { 
+                {
                     m_NodeName = "";
                     LogInfo(string.Format("RobotRaconteurNode NodeName configured with {0}", m_NodeName), this, component: RobotRaconteur_LogComponent.Node);
                 }
@@ -304,7 +303,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Construct a new RobotRaconteurNode instance
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         public RobotRaconteurNode()
         {
             serviceindexer = new ServiceIndexer(this);
@@ -1644,10 +1643,10 @@ namespace RobotRaconteurWeb
             catch (Exception exp)
             {
                 //Debug log exception
-                #if RR_LOG_DEBUG
+#if RR_LOG_DEBUG
                 LogDebug(string.Format("Error connecting service: {0}", exp), this,
                                        component: RobotRaconteur_LogComponent.Node);
-                #endif
+#endif
 
 
                 throw;
@@ -1742,7 +1741,8 @@ namespace RobotRaconteurWeb
                                     {
                                         try
                                         {
-                                            Task.Run( delegate() {
+                                            Task.Run(delegate ()
+                                            {
                                                 try
                                                 {
                                                     ((ServiceStub)x.Result).RRContext.Close().IgnoreResult();
@@ -1984,10 +1984,10 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Returns the currently detected nodes from discovery
         /// </summary>
-        /// <remarks>This is raw information from listening to multicast packtes. 
-        /// These nodes are not validated and may not be reachable</remarks> 
+        /// <remarks>This is raw information from listening to multicast packtes.
+        /// These nodes are not validated and may not be reachable</remarks>
         /// <value></value>
-        [PublicApi] 
+        [PublicApi]
         public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_Discovery.DiscoveredNodes; } }
 
         internal Discovery m_Discovery;
@@ -2094,7 +2094,7 @@ namespace RobotRaconteurWeb
                             throw e;
 
                     }
-                
+
                 };
 
                 urlsl.RemoveAll(x => (x == url));
@@ -2208,7 +2208,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="name">The NodeName to find</param>
         <param name="schemes">A list of transport types to search, ie `rr+tcp`, `rr+local`, `rrs+tcp`,
-        etc</param> 
+        etc</param>
         <returns>The detected nodes</returns>
         */
         [PublicApi]
@@ -2446,7 +2446,7 @@ namespace RobotRaconteurWeb
         </remarks>
         <param name="frequency">Frequency of loop in Hz</param>
         <returns>The new Rate object</returns>
-        */    
+        */
         [PublicApi]
         public IRate CreateRate(double frequency)
         {
@@ -2458,7 +2458,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="count">Length of string</param>
         /// <returns>The random string</returns>
-        [PublicApi] 
+        [PublicApi]
         public string GetRandomString(int count)
         {
             string o = "";
@@ -2560,7 +2560,7 @@ namespace RobotRaconteurWeb
         <param name="credentials">Optional credentials for authentication</param>
         <param name="objecttype">The desired root object proxy type. Optional but highly recommended.</param>
         <returns>The active subscription</returns>
-        */        
+        */
         [PublicApi]
         public ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
         {
@@ -2577,7 +2577,7 @@ namespace RobotRaconteurWeb
         </remarks>
         */
         [PublicApi]
-        public RobotRaconteur_LogLevel LogLevel 
+        public RobotRaconteur_LogLevel LogLevel
         {
             get; set;
         } = RobotRaconteur_LogLevel.Warning;
@@ -2773,7 +2773,7 @@ namespace RobotRaconteurWeb
         /// The NodeDirectories controls where the node searches for local transport connections,
         /// stores node information, searches for configuration information,
         /// and other node specific directories. The NodeDirectories cannot be modified after
-        /// it has been configured. A default configuration is used if not set.</remarks> 
+        /// it has been configured. A default configuration is used if not set.</remarks>
         /// <value></value>
         [PublicApi]
         public NodeDirectories NodeDirectories
@@ -2828,7 +2828,7 @@ namespace RobotRaconteurWeb
         <remarks>
             Only the current client connection will have access
             to the locked object
-        </remarks>  
+        </remarks>
         */
         [PublicApi]
         CLIENT_LOCK

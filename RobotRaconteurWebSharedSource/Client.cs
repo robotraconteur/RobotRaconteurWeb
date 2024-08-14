@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -629,9 +629,9 @@ namespace RobotRaconteurWeb
 
             ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionConnected, null);
 
-            c.TransportListeners+= delegate(Transport _, TransportListenerEventType evt, object param)
+            c.TransportListeners += delegate (Transport _, TransportListenerEventType evt, object param)
             {
-                if (evt == TransportListenerEventType.TransportConnectionClosed &&  ((uint)param) == LocalEndpoint )
+                if (evt == TransportListenerEventType.TransportConnectionClosed && ((uint)param) == LocalEndpoint)
                 {
                     Task.Run(() => ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionClosed, null));
                 }
@@ -724,8 +724,8 @@ namespace RobotRaconteurWeb
 
 
             /*}
-            catch { 
-                return null; 
+            catch {
+                return null;
             }*/
         }
 
@@ -1172,25 +1172,25 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// client has been closed
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         ClientClosed = 1,
 
         /// <summary>
         /// client connection has timed out
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         ClientConnectionTimeout,
 
         /// <summary>
         /// client transport has been connected
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         TransportConnectionConnected,
 
         /// <summary>
         /// client transport connection has been closed or lost
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         TransportConnectionClosed,
 
         /// <summary>

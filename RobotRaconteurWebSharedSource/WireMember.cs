@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -53,7 +53,7 @@ namespace RobotRaconteurWeb
     <para>
     Wire clients may also optionally "peek" and "poke" the wire without forming a streaming
     connection. This is useful if the client needs to read the InValue or set the OutValue
-    instantaniously, but does not need continuous updating. PeekInValue() 
+    instantaniously, but does not need continuous updating. PeekInValue()
     will retrieve the client's current InValue. PokeOutValue()
     will send a new client OutValue to the service.
     PeekOutValue() or will retrieve the last client OutValue received by
@@ -88,44 +88,44 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The value data type</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public abstract class Wire<T>
     {
 
-            /**
-            <summary>
-            Wire connection used to transmit "most recent" values
-            </summary>
-            <remarks>
-            <para>
-            Wire connections are used to transmit "most recent" values between connected
-            wire members. See Wire for more information on wire members.
-            </para>
-            <para>
-            Wire connections are created by clients using the Wire::Connect() or Wire::AsyncConnect()
-            functions. Services receive incoming wire connection requests through a
-            callback function specified using the Wire.WireConnectCallback property. Services
-            may also use the WireBroadcaster class to automate managing wire connection lifecycles and
-            sending values to all connected clients, or use WireUnicastReceiver to receive an incoming
-            value from the most recently connected client.
-            </para>
-            <para>
-            Wire connections are used to transmit "most recent" values between clients and services. Connection
-            the wire creates a connection pair, one in the client, and one in the service. Each wire connection
-            object has an InValue and an OutValue. Setting the OutValue of one will cause the specified value to
-            be transmitted to the InValue of the peer. See Wire for more information.
-            </para>
-            <para>
-            Values can optionally be specified to have a finite lifespan using InValueLifespan and
-            OutValueLifespan. Lifespans can be used to prevent using old values that have
-            not been recently updated.
-            </para>
-            <para>
-            This class is instantiated by the Wire class. It should not be instantiated
-            by the user.
-            </para>
-            </remarks>
-            */
+        /**
+        <summary>
+        Wire connection used to transmit "most recent" values
+        </summary>
+        <remarks>
+        <para>
+        Wire connections are used to transmit "most recent" values between connected
+        wire members. See Wire for more information on wire members.
+        </para>
+        <para>
+        Wire connections are created by clients using the Wire::Connect() or Wire::AsyncConnect()
+        functions. Services receive incoming wire connection requests through a
+        callback function specified using the Wire.WireConnectCallback property. Services
+        may also use the WireBroadcaster class to automate managing wire connection lifecycles and
+        sending values to all connected clients, or use WireUnicastReceiver to receive an incoming
+        value from the most recently connected client.
+        </para>
+        <para>
+        Wire connections are used to transmit "most recent" values between clients and services. Connection
+        the wire creates a connection pair, one in the client, and one in the service. Each wire connection
+        object has an InValue and an OutValue. Setting the OutValue of one will cause the specified value to
+        be transmitted to the InValue of the peer. See Wire for more information.
+        </para>
+        <para>
+        Values can optionally be specified to have a finite lifespan using InValueLifespan and
+        OutValueLifespan. Lifespans can be used to prevent using old values that have
+        not been recently updated.
+        </para>
+        <para>
+        This class is instantiated by the Wire class. It should not be instantiated
+        by the user.
+        </para>
+        </remarks>
+        */
 
 
         [PublicApi]
@@ -138,7 +138,7 @@ namespace RobotRaconteurWeb
              * <summary>The LocalEndpoint ID of the endpoint that owns this wire connection</summary>
              * <remarks>None</remarks>
              */
-             [PublicApi] 
+            [PublicApi]
             public uint Endpoint { get { return endpoint.LocalEndpoint; } }
 #pragma warning disable 1591
             protected T inval;
@@ -177,7 +177,7 @@ namespace RobotRaconteurWeb
                         throw new ValueNotSetException("Value not set");
                     }
                     return inval;
-                }               
+                }
             }
             /**
             <summary>
@@ -191,7 +191,7 @@ namespace RobotRaconteurWeb
             <returns>true if the value is valid, otherwise false</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public bool TryGetInValue(out T value)
             {
                 value = default;
@@ -205,7 +205,7 @@ namespace RobotRaconteurWeb
             }
 #pragma warning disable 1591
             protected T outval;
-            protected bool outval_valid=false;
+            protected bool outval_valid = false;
             protected TimeSpec lasttime_send;
             protected DateTime lasttime_send_local;
             protected bool send_closed = false;
@@ -258,7 +258,7 @@ namespace RobotRaconteurWeb
             <returns>true if the value is valid, otherwise false</returns>
             */
 
-        [PublicApi]
+            [PublicApi]
             public bool TryGetOutValue(out T value)
             {
                 value = default;
@@ -310,7 +310,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public virtual TimeSpec LastValueReceivedTime
             {
                 get
@@ -328,7 +328,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public virtual TimeSpec LastValueSentTime
             {
                 get
@@ -348,10 +348,10 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public virtual Task Close()
             {
-                lock(sendlock)
+                lock (sendlock)
                 {
                     send_closed = true;
                 }
@@ -368,7 +368,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public event WireValueChangedFunction WireValueChanged;
 
             private object recv_lock = new object();
@@ -422,7 +422,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public WireDisconnectCallbackFunction WireCloseCallback
             {
                 get { return close_callback; }
@@ -478,7 +478,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public int InValueLifespan { get; set; } = -1;
             /**
             <summary>
@@ -501,7 +501,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public int OutValueLifespan { get; set; } = -1;
 
             /// <summary>
@@ -510,16 +510,16 @@ namespace RobotRaconteurWeb
             [PublicApi]
             public const int RR_VALUE_LIFESPAN_INFINITE = -1;
 
-            internal static bool IsValueExpired(DateTime recv_time,int lifespan)
+            internal static bool IsValueExpired(DateTime recv_time, int lifespan)
             {
-                if (lifespan< 0)
+                if (lifespan < 0)
                 {
                     return false;
                 }
                 var expire_time = recv_time.AddMilliseconds(lifespan);
                 var now_time = DateTime.UtcNow;
-                 
-                if ( expire_time < now_time)
+
+                if (expire_time < now_time)
                 {
                     return true;
                 }
@@ -589,8 +589,8 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
-            public bool InValueValid {  get { return inval_valid && !IsValueExpired(lasttime_recv_local, InValueLifespan); } }
+            [PublicApi]
+            public bool InValueValid { get { return inval_valid && !IsValueExpired(lasttime_recv_local, InValueLifespan); } }
             /**
             <summary>
             Get if the OutValue is valid
@@ -601,7 +601,7 @@ namespace RobotRaconteurWeb
             </remarks>
             */
 
-        [PublicApi]
+            [PublicApi]
             public bool OutValueValid { get { return outval_valid && !IsValueExpired(lasttime_send_local, OutValueLifespan); } }
         }
 
@@ -730,10 +730,10 @@ namespace RobotRaconteurWeb
         }
 
         protected void DispatchPacket(List<MessageElement> me, WireConnection e)
-        {            
+        {
             TimeSpec timespec;
             var data = UnpackPacket(me, out timespec);
-            
+
             e.WirePacketReceived(timespec, (T)data);
         }
         protected List<MessageElement> PackPacket(T data, TimeSpec time)
@@ -767,7 +767,7 @@ namespace RobotRaconteurWeb
 
         public abstract void WirePacketReceived(MessageEntry m, Endpoint e = null);
 
-        protected abstract Task Close(WireConnection c, Endpoint e = null, CancellationToken cancel=default(CancellationToken));
+        protected abstract Task Close(WireConnection c, Endpoint e = null, CancellationToken cancel = default(CancellationToken));
 
         public abstract void Shutdown();
 
@@ -977,29 +977,29 @@ namespace RobotRaconteurWeb
 
         protected internal object connect_lock = new object();
 
-        public async override Task<WireConnection> Connect(CancellationToken cancel=default(CancellationToken))
+        public async override Task<WireConnection> Connect(CancellationToken cancel = default(CancellationToken))
         {
-            
-                try
+
+            try
+            {
+                lock (connect_lock)
                 {
-                    lock (connect_lock)
-                    {
-                        if (connection != null) throw new InvalidOperationException("Already connected");
-                        connection = new WireConnection(this);
-                        
-                    }
-                    MessageEntry m = new MessageEntry(MessageEntryType.WireConnectReq, MemberName);
-                    MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
+                    if (connection != null) throw new InvalidOperationException("Already connected");
+                    connection = new WireConnection(this);
+
+                }
+                MessageEntry m = new MessageEntry(MessageEntryType.WireConnectReq, MemberName);
+                MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
 
 
-                    return connection;
-                }
-                catch (Exception e)
-                {
-                    connection = null;
-                    throw e;
-                }
-            
+                return connection;
+            }
+            catch (Exception e)
+            {
+                connection = null;
+                throw e;
+            }
+
         }
 
         private AsyncMutex Close_mutex = new AsyncMutex();
@@ -1096,7 +1096,7 @@ namespace RobotRaconteurWeb
             var m = new MessageEntry(MessageEntryType.WirePeekInValueReq, MemberName);
             var mr = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
             TimeSpec ts;
-            var data =  UnpackPacket(mr.elements, out ts);
+            var data = UnpackPacket(mr.elements, out ts);
             return Tuple.Create(data, ts);
         }
 
@@ -1113,7 +1113,7 @@ namespace RobotRaconteurWeb
         {
             var m = new MessageEntry(MessageEntryType.WirePokeOutValueReq, MemberName);
             m.elements = PackPacket(value, TimeSpec.Now);
-            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);            
+            await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
         }
     }
 
@@ -1154,7 +1154,7 @@ namespace RobotRaconteurWeb
         public override void WirePacketReceived(MessageEntry m, Endpoint e = null)
         {
             if (m.EntryType == MessageEntryType.WirePacket)
-            {                
+            {
                 try
                 {
                     WireConnection c1;
@@ -1162,7 +1162,7 @@ namespace RobotRaconteurWeb
                     {
                         c1 = connections[e.LocalEndpoint];
                     }
-                    DispatchPacket(m.elements, c1); 
+                    DispatchPacket(m.elements, c1);
                 }
                 catch { }
 
@@ -1220,8 +1220,8 @@ namespace RobotRaconteurWeb
                                 throw new ReadOnlyMemberException("Read only member");
                             TimeSpec ts;
                             var value = UnpackPacket(m.elements, out ts);
-                            PokeOutValueCallback(value, ts, e.LocalEndpoint);                            
-                            var mr = new MessageEntry(MessageEntryType.WirePokeOutValueRet, MemberName);                            
+                            PokeOutValueCallback(value, ts, e.LocalEndpoint);
+                            var mr = new MessageEntry(MessageEntryType.WirePokeOutValueRet, MemberName);
                             return Task.FromResult(mr);
                         }
                     default:
@@ -1384,7 +1384,7 @@ namespace RobotRaconteurWeb
             lock (connected_wires_lock)
             {
                 connected_connection c = new connected_connection(ep);
-                ep.WireCloseCallback = delegate(Wire<T>.WireConnection w2) { ConnectionClosed(c); };
+                ep.WireCloseCallback = delegate (Wire<T>.WireConnection w2) { ConnectionClosed(c); };
                 connected_wires.Add(c);
             }
 
@@ -1445,7 +1445,7 @@ namespace RobotRaconteurWeb
                     }
 
                     foreach (connected_connection ee in ceps)
-                    {                        
+                    {
                         try
                         {
                             Wire<T>.WireConnection c = ee.connection as Wire<T>.WireConnection;
@@ -1463,7 +1463,7 @@ namespace RobotRaconteurWeb
                                     continue;
                                 }
                             }
-                            c.SendOutValue(value).ContinueWith(delegate(Task t)
+                            c.SendOutValue(value).ContinueWith(delegate (Task t)
                             {
                                 if (t.IsFaulted)
                                 {
@@ -1479,7 +1479,8 @@ namespace RobotRaconteurWeb
                             );
 
                         }
-                        catch (Exception exp) {
+                        catch (Exception exp)
+                        {
                             ee.connection = null;
                         }
                     }
@@ -1574,7 +1575,7 @@ namespace RobotRaconteurWeb
     <typeparam name="T">The value type</typeparam>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class WireUnicastReceiver<T>
     {
 #pragma warning disable 1591
@@ -1589,7 +1590,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        connected_connection active_connection = null;        
+        connected_connection active_connection = null;
         protected Wire<T> wire;
 
         T in_value;
@@ -1634,7 +1635,7 @@ namespace RobotRaconteurWeb
 
                 connected_connection c = new connected_connection(ep);
                 ep.WireCloseCallback = delegate (Wire<T>.WireConnection w2) { ConnectionClosed(c); };
-                ep.WireValueChanged += (c1,value,time) => ClientPokeOutValue(value, time, c1.Endpoint);
+                ep.WireValueChanged += (c1, value, time) => ClientPokeOutValue(value, time, c1.Endpoint);
                 active_connection = c;
             }
 
@@ -1675,9 +1676,9 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public T GetInValue(out TimeSpec ts, out uint ep)
         {
-            lock(this)
+            lock (this)
             {
-                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan)) 
+                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan))
                     throw new InvalidOperationException("Value not set");
                 ts = in_value_ts;
                 ep = in_value_ep;
@@ -1727,14 +1728,14 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                if (!in_value_valid) throw new InvalidOperationException("Value not set");               
+                if (!in_value_valid) throw new InvalidOperationException("Value not set");
                 return in_value;
             }
         }
 
         protected void ClientPokeOutValue(T v, TimeSpec ts, uint c)
         {
-            lock(this)
+            lock (this)
             {
                 in_value = v;
                 in_value_ts = ts;
@@ -1744,7 +1745,7 @@ namespace RobotRaconteurWeb
                 inval_waiter.NotifyAll(true);
             }
 
-            if (InValueChanged!=null) InValueChanged(v, ts, c);
+            if (InValueChanged != null) InValueChanged(v, ts, c);
         }
 #pragma warning restore 1591
         /**
@@ -1758,7 +1759,7 @@ namespace RobotRaconteurWeb
         */
 
         [PublicApi]
-        public event Action<T, TimeSpec, uint>  InValueChanged;
+        public event Action<T, TimeSpec, uint> InValueChanged;
         /// <summary>
         /// Wait for the InValue to be valid
         /// </summary>
@@ -1766,7 +1767,7 @@ namespace RobotRaconteurWeb
         /// <param name="timeout">Timeout in milliseconds</param>
         /// <param name="token">The cancellation token for the operation</param>
         /// <returns>True if valid at timeout</returns>
-        [PublicApi] 
+        [PublicApi]
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken token = default)
         {
             var waiter = inval_waiter.CreateWaiterTask(timeout, token);

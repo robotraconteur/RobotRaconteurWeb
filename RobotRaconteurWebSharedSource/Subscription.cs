@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 using static RobotRaconteurWeb.RRLogFuncs;
-using System.Text.RegularExpressions;
-using System.IO;
 
 namespace RobotRaconteurWeb
 {
@@ -32,13 +32,13 @@ namespace RobotRaconteurWeb
     <remarks>
     Specify a node by NodeID and/or NodeName. Also allows specifying
     username and password.
-    
+
     When using username and credentials, secure transports and specified NodeID should
     be used. Using username and credentials without a transport that verifies the
     NodeID could result in credentials being leaked.
     </remarks>
     */
-        [PublicApi]
+    [PublicApi]
 
     public class ServiceSubscriptionFilterNode
     {
@@ -91,7 +91,7 @@ namespace RobotRaconteurWeb
     the filter before connecting.
     </remarks>
     */
-        [PublicApi]
+    [PublicApi]
 
     public class ServiceSubscriptionFilter
     {
@@ -250,7 +250,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(string value)
         {
             if (!string.IsNullOrEmpty(Name))
@@ -273,7 +273,7 @@ namespace RobotRaconteurWeb
         /// <param name="name">The name to compare</param>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(string name, string value)
         {
             if (!string.IsNullOrEmpty(Name) && Name != name)
@@ -295,7 +295,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(List<string> values)
         {
             foreach (string e in values)
@@ -313,7 +313,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(List<object> values)
         {
             if (values == null)
@@ -335,7 +335,7 @@ namespace RobotRaconteurWeb
                     continue;
                 }
 
-               
+
                 if (IsMatch(s))
                 {
                     return true;
@@ -349,7 +349,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(Dictionary<string, object> values)
         {
             if (values == null)
@@ -371,7 +371,7 @@ namespace RobotRaconteurWeb
                     continue;
                 }
 
-                
+
                 if (IsMatch(e.Key, s))
                 {
                     return true;
@@ -385,7 +385,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(Dictionary<string, string> values)
         {
             foreach (KeyValuePair<string, string> e in values)
@@ -408,8 +408,8 @@ namespace RobotRaconteurWeb
         /**
          * <summary>Create a ServiceSubscriptionFilterAttribute from a regex string</summary>
          *
-         * <param name="regexValue">The regex string to compile</param> 
-         * 
+         * <param name="regexValue">The regex string to compile</param>
+         *
          */
         [PublicApi]
         public static ServiceSubscriptionFilterAttribute CreateServiceSubscriptionFilterAttributeRegex(string regexValue)
@@ -601,22 +601,22 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// OR operation
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         Or,
         /// <summary>
         /// AND operation
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         And,
         /// <summary>
         /// NOR operation. Also used for NOT
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         Nor,
         /// <summary>
         /// NAND operation
         /// </summary>
-        [PublicApi] 
+        [PublicApi]
         Nand
     }
     /**
@@ -667,7 +667,7 @@ namespace RobotRaconteurWeb
          * <param name="operation">The operation to use for matching the attributes and groups</param>
          * <param name="attributes">The attributes in the group</param>
          */
-         [PublicApi] 
+        [PublicApi]
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttribute> attributes)
         {
             Operation = operation;
@@ -679,7 +679,7 @@ namespace RobotRaconteurWeb
          * <param name="operation">The operation to use for matching the attributes and groups</param>
          * <param name="groups">The nested groups in the group</param>
          */
-         [PublicApi] 
+        [PublicApi]
         public ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation operation, List<ServiceSubscriptionFilterAttributeGroup> groups)
         {
             Operation = operation;
@@ -759,7 +759,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(string value)
         {
             if (!SplitStringAttribute)
@@ -780,7 +780,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(List<string> values)
         {
             return ServiceSubscriptionFilterAttributeGroupDoFilter<string>(Operation, Attributes, Groups, values.Select(x => (object)x).ToList());
@@ -791,7 +791,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="values">The values to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(List<object> values)
         {
             return ServiceSubscriptionFilterAttributeGroupDoFilter<object>(Operation, Attributes, Groups, values);
@@ -814,7 +814,7 @@ namespace RobotRaconteurWeb
         /// </summary>
         /// <param name="value">The value to compare</param>
         /// <returns></returns>
-        [PublicApi] 
+        [PublicApi]
         public bool IsMatch(object value)
         {
             if (value == null)
@@ -832,7 +832,7 @@ namespace RobotRaconteurWeb
             List<object> a1 = value as List<object>;
             if (a1 != null)
             {
-                return IsMatch(a1);            
+                return IsMatch(a1);
             }
 
             List<string> a2 = value as List<string>;
@@ -853,7 +853,7 @@ namespace RobotRaconteurWeb
     and ServiceName of a connected service.
     </remarks>
     */
-        [PublicApi]
+    [PublicApi]
 
     public struct ServiceSubscriptionClientID
     {
@@ -1008,13 +1008,14 @@ namespace RobotRaconteurWeb
                     {
                         foreach (var scheme1 in filter.TransportSchemes)
                         {
-                            if (url1.StartsWith(scheme1 + "://")) {
+                            if (url1.StartsWith(scheme1 + "://"))
+                            {
                                 urls.Add(url1);
                             }
                         }
                     }
 
-                    if (urls.Count == 0 && storage!=null)
+                    if (urls.Count == 0 && storage != null)
                     {
                         // We didn't find a match with the ServiceInfo2 urls, attempt to use NodeDiscoveryInfo
                         // TODO: test this....
@@ -1041,7 +1042,7 @@ namespace RobotRaconteurWeb
                     }
                 }
 
-                if (filter.Attributes!=null && filter.Attributes.Any())
+                if (filter.Attributes != null && filter.Attributes.Any())
                 {
                     List<bool> attrMatches = new List<bool>();
 
@@ -1082,7 +1083,7 @@ namespace RobotRaconteurWeb
                             break;
                     }
                 }
-               
+
                 if (filter.Predicate != null)
                 {
                     if (!filter.Predicate(info))
@@ -1131,7 +1132,7 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
-        [PublicApi]
+    [PublicApi]
 
     public class ServiceInfo2Subscription : IServiceSubscription
     {
@@ -1241,7 +1242,7 @@ namespace RobotRaconteurWeb
                             !new HashSet<string>(info.RootObjectImplements).SetEquals(new HashSet<string>(info2.RootObjectImplements)))
                         {
                             e.service_info2 = info;
-                            Task.Run(()=>ServiceDetected?.Invoke(this, k, info));
+                            Task.Run(() => ServiceDetected?.Invoke(this, k, info));
                         }
                         e.last_node_update = DateTime.UtcNow;
                         return;
@@ -1256,7 +1257,7 @@ namespace RobotRaconteurWeb
                         continue;
                     }
 
-                    if (e==null)
+                    if (e == null)
                     {
                         var c2 = new ServiceInfo2Subscription_client();
                         c2.nodeid = info.NodeID;
@@ -1284,7 +1285,7 @@ namespace RobotRaconteurWeb
                     {
                         if (info.Name == k.ServiceName)
                         {
-                            found = true; 
+                            found = true;
                             break;
                         }
                     }
@@ -1329,7 +1330,7 @@ namespace RobotRaconteurWeb
         <remarks>
         The returned dictionary contains the detected nodes as ServiceInfo2. The map
         is keyed with ServiceSubscriptionClientID.
-        
+
         This function does not block.
         </remarks>
         <returns>The detected services</returns>
@@ -1395,8 +1396,8 @@ namespace RobotRaconteurWeb
     </para>
     </remarks>
     */
-        [PublicApi]
-    
+    [PublicApi]
+
     public class ServiceSubscription : IServiceSubscription
     {
 #pragma warning disable 1591
@@ -1651,17 +1652,17 @@ namespace RobotRaconteurWeb
                     ((ServiceStub)o).RRContext.ClientServiceListener += delegate (ClientContext context, ClientServiceListenerEventType evt, object param)
                     {
                         // TODO: ClientConnectionTimeout and TransportConnectionClosed
-                        if (evt == ClientServiceListenerEventType.ClientClosed 
+                        if (evt == ClientServiceListenerEventType.ClientClosed
                             || evt == ClientServiceListenerEventType.ClientConnectionTimeout
                             || evt == ClientServiceListenerEventType.TransportConnectionClosed)
                         {
-                            
+
                             try
                             {
 
-                                if(client.erase)
+                                if (client.erase)
                                 {
-                                    lock(this)
+                                    lock (this)
                                     {
                                         clients.Remove(new ServiceSubscriptionClientID(client.nodeid, client.service_name));
                                     }
@@ -1692,7 +1693,7 @@ namespace RobotRaconteurWeb
                     }
                     catch (Exception ex)
                     {
-                        LogDebug(string.Format("Error in ServiceSubscription.ClientConnected callback {0}",ex), node, RobotRaconteur_LogComponent.Subscription);
+                        LogDebug(string.Format("Error in ServiceSubscription.ClientConnected callback {0}", ex), node, RobotRaconteur_LogComponent.Subscription);
                     }
 
                     lock (connect_waiter)
@@ -1717,12 +1718,12 @@ namespace RobotRaconteurWeb
                         await wait_task.Task.ConfigureAwait(false);
                     }
                     catch { }
-                   
+
 
                     client.client = null;
 
                     try
-                    {                        
+                    {
                         _ = Task.Run(delegate ()
                         {
                             try
@@ -1734,7 +1735,7 @@ namespace RobotRaconteurWeb
                     }
                     catch { }
 
-                    
+
                     lock (this)
                     {
                         foreach (var p in pipe_subscriptions)
@@ -1747,7 +1748,7 @@ namespace RobotRaconteurWeb
                             w.ClientDisconnected(new ServiceSubscriptionClientID(client.nodeid, client.service_name), o);
                         }
                     }
-                    
+
 
                     await Task.Delay((int)ConnectRetryDelay, cancel.Token).IgnoreResult().ConfigureAwait(false);
                 }
@@ -1784,7 +1785,8 @@ namespace RobotRaconteurWeb
                 if (storage.info == null)
                     return;
 
-                foreach (var info in storage.services) {
+                foreach (var info in storage.services)
+                {
                     var k = new ServiceSubscriptionClientID(storage.info.NodeID, info.Name);
 
                     if (clients.TryGetValue(k, out var e))
@@ -1835,7 +1837,7 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
-            
+
         }
 #pragma warning restore 1591
         /**
@@ -2048,26 +2050,26 @@ namespace RobotRaconteurWeb
         }
 
         AsyncValueWaiter<object> connect_waiter = new AsyncValueWaiter<object>();
-                /**
-        <summary>
-        Get the "default client" connection, waiting with timeout if not connected
-        </summary>
-        <remarks>
-        <para>
-        The "default client" is the "first" client returned from the connected clients map. This is effectively
-        default, and is only useful if only a single client connection is expected. This is normally true
-        for RobotRaconteurNode.SubscribeService()
-        </para>
-        <para>
-        Clients using GetDefaultClient() should not store a reference to the client. It should instead
-        call GetDefaultClient() right before using the client to make sure the most recently connection
-        is being used. If possible, SubscribePipe() or SubscribeWire() should be used so the lifecycle
-        of pipes and wires can be managed automatically.
-        </para>
-        </remarks>
-        <param name="cancel">Cancellation token</param>
-        <returns>The client connection. Cast to expected object type</returns>
-        */
+        /**
+<summary>
+Get the "default client" connection, waiting with timeout if not connected
+</summary>
+<remarks>
+<para>
+The "default client" is the "first" client returned from the connected clients map. This is effectively
+default, and is only useful if only a single client connection is expected. This is normally true
+for RobotRaconteurNode.SubscribeService()
+</para>
+<para>
+Clients using GetDefaultClient() should not store a reference to the client. It should instead
+call GetDefaultClient() right before using the client to make sure the most recently connection
+is being used. If possible, SubscribePipe() or SubscribeWire() should be used so the lifecycle
+of pipes and wires can be managed automatically.
+</para>
+</remarks>
+<param name="cancel">Cancellation token</param>
+<returns>The client connection. Cast to expected object type</returns>
+*/
         [PublicApi]
 
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel = default)
@@ -2096,7 +2098,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel = default)
+        public async Task<Tuple<bool, T>> TryGetDefaultClientWait<T>(CancellationToken cancel = default)
         {
             var waiter = connect_waiter.CreateWaiterTask(-1, cancel);
             using (waiter)
@@ -2281,7 +2283,7 @@ namespace RobotRaconteurWeb
 
                         c.erase = true;
 
-                        
+
                         Discovery_nodestorage node_storage = new Discovery_nodestorage();
 
                         bool connect = SubscriptionFilterUtil.FilterService(service_types, this.filter, node_storage, info, out var filter_res_urls, out var filter_res, out var filter_node);
@@ -2300,7 +2302,7 @@ namespace RobotRaconteurWeb
                                 });
                             }
                             catch { }
-                            
+
                         }
 
                     }
@@ -2451,7 +2453,7 @@ namespace RobotRaconteurWeb
 
         internal void WireSubscriptionClosed(WireSubscriptionBase s)
         {
-            lock(this)
+            lock (this)
             {
                 wire_subscriptions.Remove(s);
             }
@@ -2483,8 +2485,8 @@ namespace RobotRaconteurWeb
          * <param name="object_type"> Optional object type to use for the sub object</param>
          * <return>The sub object subscription</return>
          */
-         [PublicApi] 
-        public SubObjectSubscription SubscribeSubObject(string service_path, string object_type=null)
+        [PublicApi]
+        public SubObjectSubscription SubscribeSubObject(string service_path, string object_type = null)
         {
             var o = new SubObjectSubscription(this, service_path, object_type);
             return o;
@@ -2515,7 +2517,7 @@ namespace RobotRaconteurWeb
         protected internal DateTime in_value_time_local;
         protected internal bool in_value_valid;
         protected internal object in_value_connection;
-        
+
         protected internal AsyncValueWaiter<object> in_value_waiter = new AsyncValueWaiter<object>();
 
         protected internal string membername;
@@ -2593,15 +2595,15 @@ namespace RobotRaconteurWeb
          *
          * Awaitable task until value is received or timeout
          *
-         * <param name="timeout">The timeout in milliseconds</param> 
+         * <param name="timeout">The timeout in milliseconds</param>
          * <param name="cancel">A cancellation token for the operation</param>
          * <return>true if a value was received within the specified timeout</return>
          */
-         [PublicApi] 
+        [PublicApi]
         public async Task<bool> WaitInValueValid(int timeout = -1, CancellationToken cancel = default)
         {
             AsyncValueWaiter<object>.AsyncValueWaiterTask waiter = null;
-            lock(this)
+            lock (this)
             {
                 if (in_value_valid)
                 {
@@ -2616,12 +2618,12 @@ namespace RobotRaconteurWeb
                 if (timeout == 0)
                     return in_value_valid;
                 waiter = in_value_waiter.CreateWaiterTask(timeout, cancel);
-          
+
             }
             using (waiter)
-            { 
+            {
                 await waiter.Task.ConfigureAwait(false); ;
-                return (waiter.TaskCompleted);              
+                return (waiter.TaskCompleted);
             }
         }
         /**
@@ -2632,10 +2634,11 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public uint ActiveWireConnectionCount {
+        public uint ActiveWireConnectionCount
+        {
             get
             {
-                lock(this)
+                lock (this)
                 {
                     return (uint)connections.Count(x => x.Value.connection != null);
                 }
@@ -2680,7 +2683,7 @@ namespace RobotRaconteurWeb
 
         internal void ClientDisconnected(ServiceSubscriptionClientID id, object client)
         {
-            lock(this)
+            lock (this)
             {
                 if (connections.TryGetValue(id, out var conn))
                 {
@@ -2720,12 +2723,12 @@ namespace RobotRaconteurWeb
     </remarks>
     <typeparam name="T">The value type used by the wire</typeparam>
     */
-        [PublicApi]
+    [PublicApi]
 
     public class WireSubscription<T> : WireSubscriptionBase
     {
 #pragma warning disable 1591
-        public WireSubscription(ServiceSubscription parent, string membernname, string servicepath) 
+        public WireSubscription(ServiceSubscription parent, string membernname, string servicepath)
             : base(parent, membernname, servicepath)
         {
         }
@@ -2787,9 +2790,9 @@ namespace RobotRaconteurWeb
 
                         wait_task.AttachCancellationToken(c.cancel.Token);
 
-                        Wire<T>.WireValueChangedFunction wire_changed_ev = delegate (Wire<T>.WireConnection ev_c, T ev_v, TimeSpec ev_t) 
+                        Wire<T>.WireValueChangedFunction wire_changed_ev = delegate (Wire<T>.WireConnection ev_c, T ev_v, TimeSpec ev_t)
                         {
-                            lock(this)
+                            lock (this)
                             {
                                 if (IgnoreInValue)
                                 {
@@ -2802,9 +2805,9 @@ namespace RobotRaconteurWeb
                                 in_value_valid = true;
                                 in_value_time_local = DateTime.UtcNow;
                                 in_value_waiter.NotifyAll(ev_v);
-                                
+
                                 WireValueChanged?.Invoke(this, ev_v, ev_t);
-                                
+
                             }
                         };
                         Wire<T>.WireDisconnectCallbackFunction wire_closed_ev = delegate (Wire<T>.WireConnection ev_c)
@@ -2842,8 +2845,8 @@ namespace RobotRaconteurWeb
                         await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false);
                     }
                     catch { }
-                }                
-               
+                }
+
             }
             finally
             {
@@ -2873,7 +2876,7 @@ namespace RobotRaconteurWeb
                     {
                         throw new ValueNotSetException("InValue is not valid");
                     }
-                    if (Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local,this.InValueLifespan))
+                    if (Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local, this.InValueLifespan))
                     {
                         throw new ValueNotSetException("InValue is expired");
                     }
@@ -2897,7 +2900,7 @@ namespace RobotRaconteurWeb
 
         public T GetInValue(out TimeSpec ts, out Wire<T>.WireConnection connection)
         {
-            lock(this)
+            lock (this)
             {
                 if (!in_value_valid)
                 {
@@ -2912,19 +2915,19 @@ namespace RobotRaconteurWeb
                 return (T)in_value;
             }
         }
-                /**
-        <summary>
-        Try getting the current InValue and metadata
-        </summary>
-        <remarks>
-        Same as GetInValue(), but returns a bool for success or failure instead of throwing
-        an exception.
-        </remarks>
-        <param name="val">[out] the current InValue</param>
-        <param name="ts">[out] the LastValueReceivedTime of the InValue</param>
-        <param name="connection">[out] the WireConnection of the InValue</param>
-        <returns>true if value is valid, otherwise false</returns>
-        */
+        /**
+<summary>
+Try getting the current InValue and metadata
+</summary>
+<remarks>
+Same as GetInValue(), but returns a bool for success or failure instead of throwing
+an exception.
+</remarks>
+<param name="val">[out] the current InValue</param>
+<param name="ts">[out] the LastValueReceivedTime of the InValue</param>
+<param name="connection">[out] the WireConnection of the InValue</param>
+<returns>true if value is valid, otherwise false</returns>
+*/
         [PublicApi]
 
         public bool TryGetInValue(out T val, out TimeSpec ts, out Wire<T>.WireConnection connection)
@@ -2940,7 +2943,7 @@ namespace RobotRaconteurWeb
                 }
                 ts = in_value_time;
                 connection = (Wire<T>.WireConnection)in_value_connection;
-                val=(T)in_value;
+                val = (T)in_value;
                 return true;
             }
         }
@@ -2964,7 +2967,7 @@ namespace RobotRaconteurWeb
             {
                 if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(this.in_value_time_local, this.InValueLifespan))
                 {
-                    val = default;                    
+                    val = default;
                     return false;
                 }
                 val = (T)in_value;
@@ -2985,9 +2988,9 @@ namespace RobotRaconteurWeb
 
         public void SetOutValueAll(T value)
         {
-            lock(this)
+            lock (this)
             {
-                foreach(var c in connections.Values)
+                foreach (var c in connections.Values)
                 {
                     try
                     {
@@ -3075,13 +3078,13 @@ namespace RobotRaconteurWeb
             }
         }
 
-        internal protected async Task<Tuple<bool,object,object>> TryReceivedPacketWaitBase(int timeout=-1, bool peek=false)
+        internal protected async Task<Tuple<bool, object, object>> TryReceivedPacketWaitBase(int timeout = -1, bool peek = false)
         {
             lock (this)
             {
                 if (recv_packets.Count > 0)
                 {
-                    Tuple<object,object> q;
+                    Tuple<object, object> q;
                     if (!peek)
                     {
                         q = recv_packets.Dequeue();
@@ -3090,7 +3093,7 @@ namespace RobotRaconteurWeb
                     {
                         q = recv_packets.Peek();
                     }
-                    return Tuple.Create(true,q.Item1,q.Item2);
+                    return Tuple.Create(true, q.Item1, q.Item2);
                 }
 
                 if (timeout == 0 || closed)
@@ -3131,8 +3134,10 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public uint Available { 
-            get { 
+        public uint Available
+        {
+            get
+            {
                 lock (this)
                 {
                     return (uint)recv_packets.Count;
@@ -3147,12 +3152,13 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public uint ActivePipeEndpointCount {
+        public uint ActivePipeEndpointCount
+        {
             get
             {
                 lock (this)
                 {
-                    return (uint)connections.Count(x=>x.Value.endpoint!=null);
+                    return (uint)connections.Count(x => x.Value.endpoint != null);
                 }
             }
         }
@@ -3166,14 +3172,14 @@ namespace RobotRaconteurWeb
 
         public bool IgnoreReceived { get; set; }
 #pragma warning disable 1591
-        internal protected PipeSubscriptionBase(ServiceSubscription parent, string membername, string servicepath="", int max_recv_packets = -1, int max_send_backlog = 5)
+        internal protected PipeSubscriptionBase(ServiceSubscription parent, string membername, string servicepath = "", int max_recv_packets = -1, int max_send_backlog = 5)
         {
             this.parent = parent;
             this.node = parent.node;
             this.membername = membername;
             this.servicepath = servicepath;
-            this.max_recv_packets=max_recv_packets; 
-            this.max_send_backlog=max_send_backlog;
+            this.max_recv_packets = max_recv_packets;
+            this.max_send_backlog = max_send_backlog;
         }
 
         internal void ClientConnected(ServiceSubscriptionClientID id, object client)
@@ -3195,7 +3201,7 @@ namespace RobotRaconteurWeb
         }
 
         internal Dictionary<ServiceSubscriptionClientID, PipeSubscription_connection> connections = new Dictionary<ServiceSubscriptionClientID, PipeSubscription_connection>();
-        
+
         protected internal bool closed = false;
 
         protected internal ServiceSubscription parent;
@@ -3249,7 +3255,7 @@ namespace RobotRaconteurWeb
     public class PipeSubscription<T> : PipeSubscriptionBase
     {
 #pragma warning disable 1591
-        protected internal PipeSubscription(ServiceSubscription parent, string membername, string servicepath = "", int max_recv_packets = -1, int max_send_backlog = 5) 
+        protected internal PipeSubscription(ServiceSubscription parent, string membername, string servicepath = "", int max_recv_packets = -1, int max_send_backlog = 5)
             : base(parent, membername, servicepath, max_recv_packets, max_send_backlog)
         {
         }
@@ -3307,7 +3313,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
 
-        public async Task<Tuple<bool,T, Pipe<T>.PipeEndpoint>> TryReceivePacketWait(int timeout= -1, bool peek=false)
+        public async Task<Tuple<bool, T, Pipe<T>.PipeEndpoint>> TryReceivePacketWait(int timeout = -1, bool peek = false)
         {
             var r = await TryReceivedPacketWaitBase(timeout, peek).ConfigureAwait(false);
             if (!r.Item1)
@@ -3331,7 +3337,7 @@ namespace RobotRaconteurWeb
 
         public void AsyncSendPacketAll(T packet)
         {
-            
+
             lock (this)
             {
                 foreach (var c in connections.Values)
@@ -3339,12 +3345,13 @@ namespace RobotRaconteurWeb
                     if (c.active_send_count < this.max_send_backlog)
                     {
                         var ep = c.endpoint as Pipe<T>.PipeEndpoint;
-                        if (ep!=null) {
+                        if (ep != null)
+                        {
                             ep.SendPacket(packet, cancel.Token).ContinueWith((t) =>
                             {
                                 if (t.Status == TaskStatus.RanToCompletion)
                                 {
-                                    lock(this)
+                                    lock (this)
                                     {
                                         c.active_sends.Add(t.Result);
                                         c.active_send_count = (uint)c.active_sends.Count;
@@ -3355,9 +3362,9 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
-            
+
         }
-        
+
         internal override async Task RunConnection(ServiceSubscriptionClientID id, object client)
         {
             var c = new PipeSubscription_connection()
@@ -3411,7 +3418,7 @@ namespace RobotRaconteurWeb
                         Pipe<T>.PipeEndpoint cc = await w.Connect(-1).ConfigureAwait(false);
                         if (IgnoreReceived)
                         {
-                            
+
                             // TODO: ignore in value
                         }
 
@@ -3435,7 +3442,7 @@ namespace RobotRaconteurWeb
 
                                 recv_packets_waiter.NotifyAll(true);
 
-                                
+
                                 PipePacketReceived?.Invoke(this);
 
                             }
@@ -3448,7 +3455,7 @@ namespace RobotRaconteurWeb
 
                         Pipe<T>.PipePacketAckReceivedCallbackFunction pipe_ack_ev = delegate (Pipe<T>.PipeEndpoint ev_ep, uint packetnum)
                         {
-                            lock(this)
+                            lock (this)
                             {
                                 c.active_sends.Remove(packetnum);
                                 c.active_send_count = (uint)c.active_sends.Count;
@@ -3460,7 +3467,7 @@ namespace RobotRaconteurWeb
                         cc.PacketAckReceivedEvent += pipe_ack_ev;
 
                         try
-                        {                            
+                        {
                             await wait_task.Task.ConfigureAwait(false);
                         }
                         finally
@@ -3550,17 +3557,17 @@ namespace RobotRaconteurWeb
          *
          * Clients using GetDefaultClient() should not store a reference to the client. Call GetDefaultClient()
          * each time the client is needed.
-         * </remarks>         
+         * </remarks>
          * <typeparam name="T">The type of the sub object</typeparam>
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>The default client</returns>
          */
         [PublicApi]
-        public async  Task<T> GetDefaultClient<T>(CancellationToken cancel = default)
+        public async Task<T> GetDefaultClient<T>(CancellationToken cancel = default)
         {
             var client = (ServiceStub)parent.GetDefaultClient<object>();
 
-            return await GetObjFromRoot<T>(client, cancel);         
+            return await GetObjFromRoot<T>(client, cancel);
         }
 
         /**
@@ -3568,13 +3575,13 @@ namespace RobotRaconteurWeb
          * <remarks>
          * Same as GetDefaultClient(), but returns a bool for success or failure instead of throwing
          * an exception on failure.
-         * </remarks>         
+         * </remarks>
          * <typeparam name="T">The type of the sub object</typeparam>
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>Success and the default client as tuple</returns>
          */
-         [PublicApi] 
-        public async Task<Tuple<bool,T>> TryGetDefaultClient<T>(CancellationToken cancel = default)
+        [PublicApi]
+        public async Task<Tuple<bool, T>> TryGetDefaultClient<T>(CancellationToken cancel = default)
         {
             try
             {
@@ -3591,15 +3598,15 @@ namespace RobotRaconteurWeb
          * <summary>Get the "default client" sub object and wait if not available</summary>
          * <remarks>
          * Same as GetDefaultClient() but waits for a client to be available
-         * </remarks>         
+         * </remarks>
          * <typeparam name="T">The type of the sub object</typeparam>
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>The default client</returns>
          */
-         [PublicApi] 
+        [PublicApi]
         public async Task<T> GetDefaultClientWait<T>(CancellationToken cancel)
         {
-            var client = (ServiceStub) await parent.GetDefaultClientWait<object>(cancel);
+            var client = (ServiceStub)await parent.GetDefaultClientWait<object>(cancel);
 
             return await GetObjFromRoot<T>(client, cancel);
         }
@@ -3607,13 +3614,13 @@ namespace RobotRaconteurWeb
          * <summary>Try getting the "default client" sub object aind wait if not available</summary>
          * <remarks>
          * Same as TryGetDefaultClient() but waits for a client to be available
-         * </remarks>         
+         * </remarks>
          * <typeparam name="T">The type of the sub object</typeparam>
          * <param name="cancel">The cancellation token for the operation</param>
          * <returns>Success and the default client as tuple</returns>
          */
-         [PublicApi] 
-        public async Task<Tuple<bool,T>> TryGetDefaultClientWait<T>(CancellationToken cancel)
+        [PublicApi]
+        public async Task<Tuple<bool, T>> TryGetDefaultClientWait<T>(CancellationToken cancel)
         {
             try
             {
@@ -3633,7 +3640,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void Close()
         {
-            
+
         }
 
 #pragma warning disable 1591
@@ -3661,13 +3668,13 @@ namespace RobotRaconteurWeb
     public enum ServiceSubscriptionManagerConnectionMethod
     {
         /** <summary>Implicitly select between URL and service types</summary> */
-        [PublicApi] 
+        [PublicApi]
         Default = 0,
         /** <summary>Use URLs types for subscription</summary> */
-        [PublicApi] 
+        [PublicApi]
         Url,
         /** <summary>Use service types for subscription</summary> */
-        [PublicApi] 
+        [PublicApi]
         Type
     }
 
@@ -3704,7 +3711,7 @@ namespace RobotRaconteurWeb
         public ServiceSubscriptionFilter Filter;
         /** <summary>If the subscription is enabled</summary> */
         [PublicApi]
-        public bool Enabled=true;
+        public bool Enabled = true;
     }
 
     /**
@@ -3735,12 +3742,12 @@ namespace RobotRaconteurWeb
             {
                 this.node = RobotRaconteurNode.s;
             }
-            else 
-            { 
+            else
+            {
                 this.node = node;
             }
         }
-        
+
         internal ServiceSubscription CreateSubscription(ServiceSubscriptionManagerDetails details)
         {
             switch (details.ConnectionMethod)
@@ -3749,13 +3756,13 @@ namespace RobotRaconteurWeb
                 case ServiceSubscriptionManagerConnectionMethod.Url:
                     break;
                 case ServiceSubscriptionManagerConnectionMethod.Type:
-                {
-                    if (details.ServiceTypes == null || details.ServiceTypes.Length == 0)
                     {
-                        throw new ArgumentException("ServiceTypes must be specified for ServiceSubscriptionManager connection method type");
+                        if (details.ServiceTypes == null || details.ServiceTypes.Length == 0)
+                        {
+                            throw new ArgumentException("ServiceTypes must be specified for ServiceSubscriptionManager connection method type");
+                        }
+                        break;
                     }
-                    break;
-                }
                 default:
                     throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
             }
@@ -3764,27 +3771,27 @@ namespace RobotRaconteurWeb
 
             ServiceSubscription sub;
 
-            if ((!(details.Urls?.Length >0) && !(details.ServiceTypes?.Length > 0)) || !details.Enabled)
+            if ((!(details.Urls?.Length > 0) && !(details.ServiceTypes?.Length > 0)) || !details.Enabled)
             {
                 sub = new ServiceSubscription(d);
 
                 switch (details.ConnectionMethod)
                 {
                     case ServiceSubscriptionManagerConnectionMethod.Default:
-                    {
-                        if (details.Urls?.Length>0)
+                        {
+                            if (details.Urls?.Length > 0)
+                            {
+                                sub.use_service_url = true;
+                            }
+                            break;
+                        }
+                    case ServiceSubscriptionManagerConnectionMethod.Url:
                         {
                             sub.use_service_url = true;
+                            break;
                         }
+                    default:
                         break;
-                    }
-                case ServiceSubscriptionManagerConnectionMethod.Url:
-                    {
-                        sub.use_service_url = true;
-                        break;
-                    }
-                default:
-                    break;
                 }
             }
             else
@@ -3792,161 +3799,161 @@ namespace RobotRaconteurWeb
                 switch (details.ConnectionMethod)
                 {
                     case ServiceSubscriptionManagerConnectionMethod.Default:
-                    {
-                        if (details.Urls?.Length > 0)
                         {
-                            sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
+                            if (details.Urls?.Length > 0)
+                            {
+                                sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
+                            }
+                            else
+                            {
+                                sub = d.SubscribeServiceByType(details.ServiceTypes, details.Filter);
+                            }
+                            break;
                         }
-                        else
+                    case ServiceSubscriptionManagerConnectionMethod.Type:
                         {
                             sub = d.SubscribeServiceByType(details.ServiceTypes, details.Filter);
+                            break;
                         }
-                        break;
-                    }
-                case ServiceSubscriptionManagerConnectionMethod.Type:
-                    {
-                        sub = d.SubscribeServiceByType(details.ServiceTypes, details.Filter);
-                        break;
-                    }
-                case ServiceSubscriptionManagerConnectionMethod.Url:
-                    {
-                        sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
-                        break;
-                    }
-                default:
-                    throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
+                    case ServiceSubscriptionManagerConnectionMethod.Url:
+                        {
+                            sub = d.SubscribeService(details.Urls, details.UrlUsername, details.UrlCredentials);
+                            break;
+                        }
+                    default:
+                        throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
                 }
             }
 
-            return sub;          
+            return sub;
         }
 
         internal void UpdateSubscription(ServiceSubscriptionManager_subscription sub, ServiceSubscriptionManagerDetails details, bool close)
         {
-           // CALL LOCKED!
+            // CALL LOCKED!
 
-           if (string.IsNullOrEmpty(details.Name))
-           {
-               throw new ArgumentException("Name must be specified for ServiceSubscriptionManagerDetails");
-           }
-
-           switch (details.ConnectionMethod)
-           {
-            case ServiceSubscriptionManagerConnectionMethod.Default:
-            case ServiceSubscriptionManagerConnectionMethod.Url:
-            break;
-            case ServiceSubscriptionManagerConnectionMethod.Type:
+            if (string.IsNullOrEmpty(details.Name))
             {
-                if (!(details.ServiceTypes?.Length > 0))
-                {
-                    throw new ArgumentException("ServiceTypes must be specified for ServiceSubscriptionManager connection method type");
-                }
-                break;
+                throw new ArgumentException("Name must be specified for ServiceSubscriptionManagerDetails");
             }
-            default:
-                throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
-           }
 
-           Discovery d = node.m_Discovery;
+            switch (details.ConnectionMethod)
+            {
+                case ServiceSubscriptionManagerConnectionMethod.Default:
+                case ServiceSubscriptionManagerConnectionMethod.Url:
+                    break;
+                case ServiceSubscriptionManagerConnectionMethod.Type:
+                    {
+                        if (!(details.ServiceTypes?.Length > 0))
+                        {
+                            throw new ArgumentException("ServiceTypes must be specified for ServiceSubscriptionManager connection method type");
+                        }
+                        break;
+                    }
+                default:
+                    throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
+            }
 
-           var old_details = sub.details;
-           sub.details = details;
+            Discovery d = node.m_Discovery;
 
-           if (sub.details.Enabled && sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Url && !(sub.details.Urls?.Length > 0))
-           {
-                sub.details.Enabled = false;
-           }
+            var old_details = sub.details;
+            sub.details = details;
 
-           if (sub.details.Enabled &&
-                ((sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default) &&
-                (!(sub.details.Urls?.Length >0) && !(sub.details.ServiceTypes?.Length > 0))))
+            if (sub.details.Enabled && sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Url && !(sub.details.Urls?.Length > 0))
             {
                 sub.details.Enabled = false;
             }
 
-           bool sub_running = false;
-           lock(this)
-           {
+            if (sub.details.Enabled &&
+                 ((sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default) &&
+                 (!(sub.details.Urls?.Length > 0) && !(sub.details.ServiceTypes?.Length > 0))))
+            {
+                sub.details.Enabled = false;
+            }
+
+            bool sub_running = false;
+            lock (this)
+            {
                 sub_running = !(sub.sub.use_service_url) || (sub.sub.use_service_url && (sub.sub.service_url?.Length > 0));
-           }
+            }
 
-           if (sub_running && !sub.details.Enabled)
-           {
+            if (sub_running && !sub.details.Enabled)
+            {
                 if (close)
                 {
-                sub.sub.SoftClose();
+                    sub.sub.SoftClose();
                 }
-               return;
-           }
-
-           if (((old_details.ConnectionMethod != sub.details.ConnectionMethod) || (old_details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default
-           || sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default)) || !sub_running)
-           {
-            if (sub_running)
-            {
-                sub.sub.SoftClose();
+                return;
             }
 
-            switch (sub.details.ConnectionMethod)
+            if (((old_details.ConnectionMethod != sub.details.ConnectionMethod) || (old_details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default
+            || sub.details.ConnectionMethod == ServiceSubscriptionManagerConnectionMethod.Default)) || !sub_running)
             {
-                case ServiceSubscriptionManagerConnectionMethod.Default:
+                if (sub_running)
                 {
-                    if (sub.details.Urls?.Length >0)
-                    {
-                        sub.sub.InitServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
-                    }
-                    else
-                    {
-                        sub.sub.Init(sub.details.ServiceTypes, sub.details.Filter);
-                    }
-                    break;
+                    sub.sub.SoftClose();
                 }
-                case ServiceSubscriptionManagerConnectionMethod.Url:
-                {
-                    sub.sub.InitServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
-                    break;
-                }
-                case ServiceSubscriptionManagerConnectionMethod.Type:
-                {
-                    sub.sub.Init(sub.details.ServiceTypes, sub.details.Filter);
-                    break;
-                }
-                default:
-                    throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
-            }
-           }
-           else
-           {
-            switch (sub.details.ConnectionMethod)
-            {
-                case ServiceSubscriptionManagerConnectionMethod.Default:
-                {
-                    if (sub.details.Urls?.Length >0)
-                    {
-                        sub.sub.UpdateServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
-                    }
-                    else
-                    {
-                        sub.sub.UpdateServiceByType(sub.details.ServiceTypes, sub.details.Filter);
-                    }
-                    break;
-                }
-                case ServiceSubscriptionManagerConnectionMethod.Url:
-                {
-                    sub.sub.UpdateServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
-                    break;
-                }
-                case ServiceSubscriptionManagerConnectionMethod.Type:
-                {
-                    sub.sub.UpdateServiceByType(sub.details.ServiceTypes, sub.details.Filter);
-                    break;
-                }
-                default:
-                    throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
-            }
-           }
 
-           Task.Run(() => d.DoUpdateAllDetectedServices(sub.sub)).IgnoreResult();
+                switch (sub.details.ConnectionMethod)
+                {
+                    case ServiceSubscriptionManagerConnectionMethod.Default:
+                        {
+                            if (sub.details.Urls?.Length > 0)
+                            {
+                                sub.sub.InitServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
+                            }
+                            else
+                            {
+                                sub.sub.Init(sub.details.ServiceTypes, sub.details.Filter);
+                            }
+                            break;
+                        }
+                    case ServiceSubscriptionManagerConnectionMethod.Url:
+                        {
+                            sub.sub.InitServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
+                            break;
+                        }
+                    case ServiceSubscriptionManagerConnectionMethod.Type:
+                        {
+                            sub.sub.Init(sub.details.ServiceTypes, sub.details.Filter);
+                            break;
+                        }
+                    default:
+                        throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
+                }
+            }
+            else
+            {
+                switch (sub.details.ConnectionMethod)
+                {
+                    case ServiceSubscriptionManagerConnectionMethod.Default:
+                        {
+                            if (sub.details.Urls?.Length > 0)
+                            {
+                                sub.sub.UpdateServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
+                            }
+                            else
+                            {
+                                sub.sub.UpdateServiceByType(sub.details.ServiceTypes, sub.details.Filter);
+                            }
+                            break;
+                        }
+                    case ServiceSubscriptionManagerConnectionMethod.Url:
+                        {
+                            sub.sub.UpdateServiceURL(sub.details.Urls, sub.details.UrlUsername, sub.details.UrlCredentials, null);
+                            break;
+                        }
+                    case ServiceSubscriptionManagerConnectionMethod.Type:
+                        {
+                            sub.sub.UpdateServiceByType(sub.details.ServiceTypes, sub.details.Filter);
+                            break;
+                        }
+                    default:
+                        throw new ArgumentException("Invalid ServiceSubscriptionManagerConnectionMethod");
+                }
+            }
+
+            Task.Run(() => d.DoUpdateAllDetectedServices(sub.sub)).IgnoreResult();
         }
 
         /**
@@ -3957,9 +3964,9 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void Init(ServiceSubscriptionManagerDetails[] details)
         {
-            lock(this)
+            lock (this)
             {
-                foreach(var e in details)
+                foreach (var e in details)
                 {
                     var s = new ServiceSubscriptionManager_subscription()
                     {
@@ -3968,7 +3975,7 @@ namespace RobotRaconteurWeb
                     };
                     subscriptions.Add(e.Name, s);
                 }
-                
+
             }
         }
 
@@ -3980,7 +3987,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void AddSubscription(ServiceSubscriptionManagerDetails details)
         {
-            lock(this)
+            lock (this)
             {
                 if (subscriptions.ContainsKey(details.Name))
                 {
@@ -4003,9 +4010,9 @@ namespace RobotRaconteurWeb
          * <param name="close">If true, close the subscription. Default true</param>
          */
         [PublicApi]
-        public void RemoveSubscription(string name, bool close=true)
+        public void RemoveSubscription(string name, bool close = true)
         {
-            lock(this)
+            lock (this)
             {
                 if (!subscriptions.TryGetValue(name, out var s))
                 {
@@ -4019,11 +4026,12 @@ namespace RobotRaconteurWeb
                     {
                         s.sub.Close();
                     }
-                    catch {
+                    catch
+                    {
                         LogDebug("ServiceSubscriptionManager RemoveSubscription close failed", node, RobotRaconteur_LogComponent.Subscription);
                     }
                 }
-               
+
             }
         }
 
@@ -4035,7 +4043,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void EnableSubscription(string name)
         {
-            lock(this)
+            lock (this)
             {
                 if (!subscriptions.TryGetValue(name, out var s))
                 {
@@ -4058,9 +4066,9 @@ namespace RobotRaconteurWeb
          * <param name="close">If true, close subscription if connected. Default true</param>
          */
         [PublicApi]
-        public void DisableSubscription(string name, bool close=true)
+        public void DisableSubscription(string name, bool close = true)
         {
-            lock(this)
+            lock (this)
             {
                 if (!subscriptions.TryGetValue(name, out var s))
                 {
@@ -4087,7 +4095,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public ServiceSubscription GetSubscription(string name, bool force_create = false)
         {
-            lock(this)
+            lock (this)
             {
                 if (subscriptions.TryGetValue(name, out var s))
                 {
@@ -4126,7 +4134,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public bool IsConnected(string name)
         {
-            return GetSubscription(name)?.TryGetDefaultClient<object>(out var a) ?? false;        
+            return GetSubscription(name)?.TryGetDefaultClient<object>(out var a) ?? false;
         }
 
         /**
@@ -4135,10 +4143,10 @@ namespace RobotRaconteurWeb
          * <param name="name">The local name of the subscription</param>
          * <return>True if the subscription is enabled</return>
          */
-         [PublicApi] 
+        [PublicApi]
         public bool IsEnabled(string name)
         {
-            lock(this)
+            lock (this)
             {
                 if (!subscriptions.TryGetValue(name, out var s))
                 {
@@ -4158,7 +4166,7 @@ namespace RobotRaconteurWeb
         public void Close(bool close_subscriptions = true)
         {
             Dictionary<string, ServiceSubscriptionManager_subscription> subs2;
-            lock(this)
+            lock (this)
             {
                 subs2 = new Dictionary<string, ServiceSubscriptionManager_subscription>(subscriptions);
                 subscriptions.Clear();
@@ -4189,7 +4197,7 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                lock(this)
+                lock (this)
                 {
                     return subscriptions.Keys.ToArray();
                 }
@@ -4204,12 +4212,12 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                lock(this)
+                lock (this)
                 {
                     return subscriptions.Values.Select(x => x.details).ToArray();
                 }
             }
-        }        
+        }
     }
 
     class ServiceSubscriptionManager_subscription

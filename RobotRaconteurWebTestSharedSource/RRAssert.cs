@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RobotRaconteurWeb;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
 {
@@ -25,7 +25,7 @@ namespace RobotRaconteurTest
         public static void AreEqual(string a, string b, [CallerFilePath] string sourceFilePath = "",
                                        [CallerLineNumber] int sourceLineNumber = 0)
         {
-            if (a!=b)
+            if (a != b)
             {
                 RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");
@@ -55,7 +55,7 @@ namespace RobotRaconteurTest
         public static void AreEqual(CSingle a, CSingle b, [CallerFilePath] string sourceFilePath = "",
                                        [CallerLineNumber] int sourceLineNumber = 0)
         {
-            if (Math.Abs(a.Real - b.Real) >1e-2 || Math.Abs(a.Imag - b.Imag) >1e-2)
+            if (Math.Abs(a.Real - b.Real) > 1e-2 || Math.Abs(a.Imag - b.Imag) > 1e-2)
             {
                 RRWebTest.WriteLine("Failure: {0} does not equal {1} at {2}:{3}", a, b, sourceFilePath, sourceLineNumber);
                 throw new Exception("Unit test failure");

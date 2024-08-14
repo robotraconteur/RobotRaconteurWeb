@@ -41,7 +41,7 @@ apiRules:
     type: Member
 - include:
     uidRegex: "^RobotRaconteurWeb.ServiceSubscriptionFilterAttributeGroupOperation"
-    type: Member   
+    type: Member
 - exclude:
     type: Member
 - include:

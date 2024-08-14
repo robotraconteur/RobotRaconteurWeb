@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using RobotRaconteurWeb.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RobotRaconteurWeb.Extensions;
 
 #pragma warning disable 1591
 
@@ -26,7 +26,7 @@ namespace RobotRaconteurWeb
 {
     public class AsyncMutex
     {
-        Queue<TaskCompletionSource<int>> waiting_tasks=new Queue<TaskCompletionSource<int>>();
+        Queue<TaskCompletionSource<int>> waiting_tasks = new Queue<TaskCompletionSource<int>>();
         Task current = null;
 
 
@@ -39,7 +39,7 @@ namespace RobotRaconteurWeb
                 this.task = task;
                 this.owner = owner;
             }
-            
+
             public void Dispose()
             {
                 owner.Exit(task);
@@ -49,14 +49,14 @@ namespace RobotRaconteurWeb
 
         public async Task<IDisposable> Lock()
         {
-            var t =Enter();
+            var t = Enter();
             await t.ConfigureAwait(false);
             return new LockHandle(this, t);
         }
 
         public async Task<IDisposable> LockWithTimeout(int timeout)
         {
-            Task t = null;            
+            Task t = null;
             t = Enter();
             await Task.WhenAny(t, Task.Delay(timeout)).ConfigureAwait(false);
             if (t.IsCompleted || t.IsFaulted || t.IsCanceled)
@@ -65,9 +65,9 @@ namespace RobotRaconteurWeb
                 return new LockHandle(this, t);
             }
 
-            Task noop=t.ContinueWith(delegate(Task x)
+            Task noop = t.ContinueWith(delegate (Task x)
             {
-                var e=x.Exception;
+                var e = x.Exception;
                 try
                 {
                     Exit(x);
@@ -76,7 +76,7 @@ namespace RobotRaconteurWeb
             });
 
             throw new TimeoutException("Timeout wating for mutex lock");
-            
+
         }
 
         public Task Enter()
@@ -101,10 +101,10 @@ namespace RobotRaconteurWeb
 
         public void Exit(Task t)
         {
-            TaskCompletionSource<int> c=null;
+            TaskCompletionSource<int> c = null;
             lock (this)
             {
-                if (! Object.ReferenceEquals(t, current))
+                if (!Object.ReferenceEquals(t, current))
                 {
                     throw new InvalidOperationException("Invalid task to release mutex");
                 }
@@ -126,14 +126,14 @@ namespace RobotRaconteurWeb
 
         public void CancelAll()
         {
-            var c2= new Queue<TaskCompletionSource<int>>();
+            var c2 = new Queue<TaskCompletionSource<int>>();
             lock (this)
             {
                 while (waiting_tasks.Count > 0)
                 {
                     c2.Enqueue(waiting_tasks.Dequeue());
                 }
-                
+
             }
 
             while (c2.Count > 0)
@@ -152,18 +152,20 @@ namespace RobotRaconteurWeb
             internal AsyncValueWaiter<T> owner;
             internal int timeout;
 
-            public Task Task { 
-                get {
+            public Task Task
+            {
+                get
+                {
                     if (timeout < 0)
                     {
                         return tcs.Task;
-                    }                    
+                    }
                     if (timeout > 0)
                     {
                         return Task.WhenAny(tcs.Task, Task.Delay(timeout));
-                    }                    
-                    return Task.Delay(0);                    
-                } 
+                    }
+                    return Task.Delay(0);
+                }
             }
 
             public bool TaskCompleted { get { return tcs.Task.IsCompleted; } }
@@ -172,7 +174,7 @@ namespace RobotRaconteurWeb
 
             public void Dispose()
             {
-                lock(owner)
+                lock (owner)
                 {
                     owner.wait_tasks.Remove(tcs);
                 }
@@ -194,7 +196,7 @@ namespace RobotRaconteurWeb
 
             foreach (var t in wait_tasks2)
             {
-                Task.Run(()=>t.TrySetResult(res));
+                Task.Run(() => t.TrySetResult(res));
             }
         }
 

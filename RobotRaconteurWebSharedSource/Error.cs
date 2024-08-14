@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that is thrown when a connection-related error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ConnectionException : RobotRaconteurException
     {
         /// <summary>
@@ -115,7 +115,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that is thrown when a protocol-related error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ProtocolException : RobotRaconteurException
     {
         /// <summary>
@@ -132,7 +132,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that is thrown when a requested service is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ServiceNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -149,7 +149,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that is thrown when a requested object is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ObjectNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -166,7 +166,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that is thrown when an invalid endpoint is encountered.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class InvalidEndpointException : RobotRaconteurException
     {
         /// <summary>
@@ -183,7 +183,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that indicates a fatal error occurred during endpoint communication.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class EndpointCommunicationFatalException : RobotRaconteurException
     {
         /// <summary>
@@ -200,7 +200,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// Represents an exception that is thrown when a requested node is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class NodeNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -217,7 +217,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a service error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ServiceException : RobotRaconteurException
     {
         /// <summary>
@@ -234,7 +234,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a member is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class MemberNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -251,7 +251,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a member format does not match.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class MemberFormatMismatchException : RobotRaconteurException
     {
         /// <summary>
@@ -268,7 +268,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a data type does not match.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class DataTypeMismatchException : RobotRaconteurException
     {
         /// <summary>
@@ -285,7 +285,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a data type is invalid.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class DataTypeException : RobotRaconteurException
     {
         /// <summary>
@@ -302,7 +302,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a data serialization error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class DataSerializationException : RobotRaconteurException
     {
         /// <summary>
@@ -319,7 +319,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a message entry is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class MessageEntryNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -336,7 +336,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a message element is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class MessageElementNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -353,7 +353,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an unknown error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class UnknownException : RobotRaconteurException
     {
         /// <summary>
@@ -371,7 +371,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an operation fails.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class OperationFailedException : RobotRaconteurException
     {
         /// <summary>
@@ -388,7 +388,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an internal error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class InternalErrorException : RobotRaconteurException
     {
         /// <summary>
@@ -405,7 +405,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a system resource permission is denied.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class SystemResourcePermissionDeniedException : RobotRaconteurException
     {
         /// <summary>
@@ -421,7 +421,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when the system runs out of a critical resource.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class OutOfSystemResourceException : RobotRaconteurException
     {
         /// <summary>
@@ -438,7 +438,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a system resource error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class SystemResourceException : RobotRaconteurException
     {
         /// <summary>
@@ -455,7 +455,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a requested resource is not found.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ResourceNotFoundException : RobotRaconteurException
     {
         /// <summary>
@@ -472,7 +472,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a buffer limit violation occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class BufferLimitViolationException : RobotRaconteurException
     {
         /// <summary>
@@ -489,7 +489,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a service definition error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ServiceDefinitionException : RobotRaconteurException
     {
         /// <summary>
@@ -506,7 +506,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a remote error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class RobotRaconteurRemoteException : RobotRaconteurException
     {
         /// <summary>
@@ -524,7 +524,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a request times out.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class RequestTimeoutException : RobotRaconteurException
     {
         /// <summary>
@@ -541,7 +541,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a read-only member is modified.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ReadOnlyMemberException : RobotRaconteurException
     {
         /// <summary>
@@ -558,7 +558,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a write-only member is accessed.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class WriteOnlyMemberException : RobotRaconteurException
     {
         /// <summary>
@@ -575,7 +575,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a member is busy.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class MemberBusyException : RobotRaconteurException
     {
         /// <summary>
@@ -592,7 +592,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when a value is not set.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ValueNotSetException : RobotRaconteurException
     {
         /// <summary>
@@ -609,7 +609,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an authentication error occurs.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class AuthenticationException : RobotRaconteurException
     {
         /// <summary>
@@ -625,7 +625,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an object is locked.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class ObjectLockedException : RobotRaconteurException
     {
         /// <summary>
@@ -642,7 +642,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when permission is denied.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class PermissionDeniedException : RobotRaconteurException
     {
         /// <summary>
@@ -659,7 +659,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an operation is aborted.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class AbortOperationException : RobotRaconteurException
     {
         /// <summary>
@@ -676,7 +676,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an operation is aborted.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class OperationAbortedException : RobotRaconteurException
     {
         /// <summary>
@@ -693,7 +693,7 @@ namespace RobotRaconteurWeb
     /// <summary>
     /// The exception that is thrown when an iteration is stopped.
     /// </summary>
-        [PublicApi]
+    [PublicApi]
     public class StopIterationException : RobotRaconteurException
     {
         /// <summary>

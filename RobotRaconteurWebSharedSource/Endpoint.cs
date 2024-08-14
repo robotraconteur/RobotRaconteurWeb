@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ namespace RobotRaconteurWeb
         }
 
         public virtual async Task SendMessage(Message m, CancellationToken cancel)
-        {                       
+        {
             if (m.header == null) m.header = new MessageHeader();
 
             if (m.entries.Count == 1 && (int)m.entries[0].EntryType <= 500)
@@ -91,7 +91,7 @@ namespace RobotRaconteurWeb
 
 
         public abstract void MessageReceived(Message m);
-              
+
 
         protected virtual void CheckEndpointCapabilityMessage(Message m)
         {
@@ -131,7 +131,7 @@ namespace RobotRaconteurWeb
 
             }
 
-            SendMessage(ret,default(CancellationToken)).IgnoreResult();
+            SendMessage(ret, default(CancellationToken)).IgnoreResult();
 
 
         }

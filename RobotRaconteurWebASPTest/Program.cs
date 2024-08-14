@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2019 Wason Technology, LLC
+// Copyright 2011-2019 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using RobotRaconteurWeb;
 using RobotRaconteurTest;
+using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTestNETStandard
 {
     class Program
     {
-       
+
         async void DoHttp()
         {
 

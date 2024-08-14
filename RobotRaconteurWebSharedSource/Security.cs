@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
@@ -56,7 +56,7 @@ namespace RobotRaconteurWeb
     also be "true"</term>
     </item>
     </list>
-    
+
     <para>
     The security policy is passed as a parameter to RobotRaconteurNode.RegisterService().
     </para>
@@ -65,27 +65,27 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class ServiceSecurityPolicy
     {
         /**
          * <summary>The user authentication</summary>
          * <remarks>None</remarks>
          */
-         [PublicApi] 
+        [PublicApi]
         public UserAuthenticator Authenticator;
         /**
          * <summary>The security policies</summary>
          * <remarks>None</remarks>
          */
-         [PublicApi] 
+        [PublicApi]
         public Dictionary<string, string> Policies;
 
         /**
          * <summary>Construct a new empty security policy</summary>
          * <remarks>None</remarks>
          */
-         [PublicApi] 
+        [PublicApi]
         public ServiceSecurityPolicy()
         {
             Authenticator = null;
@@ -122,7 +122,7 @@ namespace RobotRaconteurWeb
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class AuthenticatedUser
     {
         private string m_Username;
@@ -194,10 +194,10 @@ namespace RobotRaconteurWeb
         /// <remarks>
         /// Throw AuthenticationException if authentication fails. Return a populated AuthenticatedUser
         /// on success.
-        /// 
+        ///
         /// Authenticators may use any combination of credentials. Example credentials
         /// include passwords, tokens, OTP, etc.
-        /// 
+        ///
         /// AuthenticationException may contain additional fields to return a challenge to the
         /// client.
         /// </remarks>
@@ -211,7 +211,7 @@ namespace RobotRaconteurWeb
 #if !ROBOTRACONTEUR_H5
     /**
     <summary>
-    
+
     Simple authenticator using a list of username, password hash, and privileges stored in a
     file or string
     </summary>
@@ -227,8 +227,8 @@ namespace RobotRaconteurWeb
     user2 309825a0951b3cf1f25e27b61cee8243 objectlock
     superuser1 11e5dfc68422e697563a4253ba360615 objectlock,objectlockoverride
     </code>
-    
-    
+
+
     <para>
     The password is md5 hashed. This hash can be generated using the ``--md5passwordhash``
     command in the "RobotRaconteurGen" utility.

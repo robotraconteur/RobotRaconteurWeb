@@ -1,11 +1,11 @@
-﻿using RobotRaconteurTest;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RobotRaconteurTest;
 using RobotRaconteurWeb;
-using System.Linq;
 
 namespace RobotRaconteurWebTest
 {
@@ -29,7 +29,7 @@ namespace RobotRaconteurWebTest
             this.urls = urls.ToList();
             this.auth_urls = auth_urls.ToList();
             this.urls2 = urls2.ToList();
-            
+
         }
         public async Task LoopbackTest()
         {
@@ -105,7 +105,7 @@ namespace RobotRaconteurWebTest
                 await test.LoopbackTest();
                 await test.LoopbackTest2();
             }
-            
+
         }
 
         public static async Task RunServiceTest(string[] args)
@@ -134,7 +134,8 @@ namespace RobotRaconteurWebTest
     public class TestServer : IDisposable
     {
         public TestNodeConfig node_config { get; set; }
-        public TestServer(string nodename = "testprog", bool enable_tcp_transport=true, bool enable_local_transport=true, bool enable_intra_transport=true, int tcp_port=0) {
+        public TestServer(string nodename = "testprog", bool enable_tcp_transport = true, bool enable_local_transport = true, bool enable_intra_transport = true, int tcp_port = 0)
+        {
             node_config = new TestNodeConfig(nodename, enable_tcp_transport, enable_local_transport, enable_intra_transport, true, tcp_port);
         }
         public void Dispose()

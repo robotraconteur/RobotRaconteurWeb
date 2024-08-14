@@ -15,8 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
@@ -100,7 +100,7 @@ namespace RobotRaconteurWeb
         /// Construct an empty ServiceInfo2
         /// </summary>
         /// <remarks>None</remarks>
-        [PublicApi] 
+        [PublicApi]
         public ServiceInfo2() { }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace RobotRaconteurWeb
         /// <remarks>None</remarks>
         /// <param name="info">ServiceInfo structure returned by node service index</param>
         /// <param name="ninfo">NodeInfo from discovery</param>
-        [PublicApi] 
+        [PublicApi]
         public ServiceInfo2(RobotRaconteurServiceIndex.ServiceInfo info, RobotRaconteurServiceIndex.NodeInfo ninfo)
         {
             Name = info.Name;
@@ -173,7 +173,7 @@ namespace RobotRaconteurWeb
     }
 
 
-    
+
 
     class Discovery_nodestorage
     {
@@ -242,30 +242,30 @@ namespace RobotRaconteurWeb
          * <remarks>
          * Candidate URLs typically expire after one minute. If all
          * candidate URLs expire, the node is considered lost.
-         * </remarks> 
+         * </remarks>
         */
         [PublicApi]
         public DateTime LastAnnounceTime;
     }
 
-    
-    #pragma warning disable 1591
+
+#pragma warning disable 1591
     public class Discovery
     {
         internal Dictionary<string, Discovery_nodestorage> m_DiscoveredNodes = new Dictionary<string, Discovery_nodestorage>();
 
-        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_DiscoveredNodes.ToDictionary(x=>x.Key,x=>x.Value.info); } }
+        public Dictionary<string, NodeDiscoveryInfo> DiscoveredNodes { get { return m_DiscoveredNodes.ToDictionary(x => x.Key, x => x.Value.info); } }
 
         internal RobotRaconteurNode node;
         internal Task cleandiscoverednodes_task;
         private CancellationTokenSource shutdown_token = new CancellationTokenSource();
 
-        uint NodeDiscoveryMaxCacheCount {get; set;} = 1000;
+        uint NodeDiscoveryMaxCacheCount { get; set; } = 1000;
 
         public Discovery(RobotRaconteurNode node)
         {
             this.node = node;
-            cleandiscoverednodes_task =  PeriodicTask.Run(CleanDiscoveredNodes, TimeSpan.FromSeconds(5), shutdown_token.Token);
+            cleandiscoverednodes_task = PeriodicTask.Run(CleanDiscoveredNodes, TimeSpan.FromSeconds(5), shutdown_token.Token);
         }
 
         public void Shutdown()
@@ -273,13 +273,13 @@ namespace RobotRaconteurWeb
             shutdown_token.Cancel();
 
             IServiceSubscription[] subs;
-            lock(subscriptions)
+            lock (subscriptions)
             {
                 subs = subscriptions.ToArray();
                 subscriptions.Clear();
             }
 
-            foreach(var s in subs)
+            foreach (var s in subs)
             {
                 Task.Run(() => s.Close()).IgnoreResult();
             }
@@ -303,7 +303,7 @@ namespace RobotRaconteurWeb
                         string nodename = idline[1];
                         string url = lines[2];
                         //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
-                        
+
                         NodeDiscoveryInfo i = new NodeDiscoveryInfo();
                         i.NodeID = nodeid;
                         i.NodeName = nodename;
@@ -314,10 +314,10 @@ namespace RobotRaconteurWeb
 
                         NodeDetected(i);
 
-                    //RobotRaconteurNode.s.NodeAnnouncePacketReceived(packet);
-                }
+                        //RobotRaconteurNode.s.NodeAnnouncePacketReceived(packet);
+                    }
 
-            }
+                }
             }
             catch { };
 
@@ -352,19 +352,19 @@ namespace RobotRaconteurWeb
                                 // Parse the url and check if it is valid
                                 try
                                 {
-                                var uu = TransportUtil.ParseConnectionUrl(url.URL);
-                                if (uu.nodeid != i.NodeID)
-                                {
-                                    continue;
-                                }
+                                    var uu = TransportUtil.ParseConnectionUrl(url.URL);
+                                    if (uu.nodeid != i.NodeID)
+                                    {
+                                        continue;
+                                    }
                                 }
                                 catch
                                 {
                                     // TODO: log error
                                     continue;
                                 }
-                                    
-                                
+
+
                                 NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
                                 u.URL = url.URL;
                                 u.LastAnnounceTime = DateTime.UtcNow;
@@ -384,7 +384,7 @@ namespace RobotRaconteurWeb
 
                         if (!string.IsNullOrEmpty(n.ServiceStateNonce))
                         {
-                            if(e1.recent_service_nonce.Contains(n.ServiceStateNonce))
+                            if (e1.recent_service_nonce.Contains(n.ServiceStateNonce))
                             {
                                 return;
                             }
@@ -475,7 +475,7 @@ namespace RobotRaconteurWeb
                             {
                                 lock (subscriptions)
                                 {
-                                    foreach(var s in subscriptions)
+                                    foreach (var s in subscriptions)
                                     {
                                         Task.Run(() =>
                                         {
@@ -792,9 +792,9 @@ namespace RobotRaconteurWeb
             return o.ToArray();
         }
 
-        internal async Task<Tuple<bool,ServiceInfo2[]>> DoUpdateServiceInfo(Discovery_nodestorage storage, string nonce, int extra_backoff, CancellationToken cancel)
+        internal async Task<Tuple<bool, ServiceInfo2[]>> DoUpdateServiceInfo(Discovery_nodestorage storage, string nonce, int extra_backoff, CancellationToken cancel)
         {
-            lock(storage)
+            lock (storage)
             {
                 if (storage.service_info_updating)
                 {
@@ -823,7 +823,7 @@ namespace RobotRaconteurWeb
                     remote_nodeid = c.rr_context.RemoteNodeID;
                     remote_nodename = c.rr_context.RemoteNodeName;
 
-                    if (remote_nodeid != storage.info.NodeID || (!String.IsNullOrEmpty(storage.info.NodeName) && 
+                    if (remote_nodeid != storage.info.NodeID || (!String.IsNullOrEmpty(storage.info.NodeName) &&
                         remote_nodename != storage.info.NodeName))
                     {
                         throw new InvalidOperationException("NodeID or NodeName mismatch");
@@ -855,7 +855,7 @@ namespace RobotRaconteurWeb
                     throw new InvalidOperationException("GetLocalNodeServices response too large");
                 }
 
-                var service_list = (Dictionary<int,RobotRaconteurServiceIndex.ServiceInfo>)node.UnpackMapType<int,RobotRaconteurServiceIndex.ServiceInfo>(me.CastDataToNestedList(DataTypes.vector_t), null);
+                var service_list = (Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>)node.UnpackMapType<int, RobotRaconteurServiceIndex.ServiceInfo>(me.CastDataToNestedList(DataTypes.vector_t), null);
 
                 if (service_list != null)
                 {
@@ -904,7 +904,7 @@ namespace RobotRaconteurWeb
             var retry_count = storage.retry_count++;
 
             var r = new Random();
-            var backoff = r.Next(100,600);
+            var backoff = r.Next(100, 600);
             if (retry_count > 3)
             {
                 backoff = r.Next(2000, 2500);
@@ -946,15 +946,15 @@ namespace RobotRaconteurWeb
 
         internal void EndUpdateServiceInfo(Discovery_nodestorage storage, string nonce, ServiceInfo2[] service_info)
         {
-            lock(m_DiscoveredNodes)
+            lock (m_DiscoveredNodes)
             {
-                lock(storage)
+                lock (storage)
                 {
                     storage.services = service_info;
                     storage.last_update_time = DateTime.UtcNow;
                     storage.last_update_nonce = nonce;
 
-                    if(storage.last_update_nonce != storage.info.ServiceStateNonce)
+                    if (storage.last_update_nonce != storage.info.ServiceStateNonce)
                     {
                         // We missed an update, do another refresh but delay 5 seconds to prevent flooding
                         Task.Run(async () =>
@@ -967,20 +967,20 @@ namespace RobotRaconteurWeb
                     {
                         storage.retry_count = 0;
                     }
-                }                
+                }
 
                 // TODO: RobotRaconteurNode.FireNodeDetected
             }
 
-            lock(subscriptions)
+            lock (subscriptions)
             {
-                foreach(var s in subscriptions)
+                foreach (var s in subscriptions)
                 {
                     Task.Run(() => s.NodeUpdated(storage)).IgnoreResult();
                 }
             }
 
-            
+
         }
 
         void CallUpdateServiceInfo(Discovery_nodestorage storage, string nonce)
@@ -1001,7 +1001,7 @@ namespace RobotRaconteurWeb
 
         internal void SubscriptionClosed(IServiceSubscription sub)
         {
-            lock(subscriptions)
+            lock (subscriptions)
             {
                 subscriptions.Remove(sub);
             }
@@ -1009,7 +1009,7 @@ namespace RobotRaconteurWeb
 
         List<IServiceSubscription> subscriptions = new List<IServiceSubscription>();
 
-        internal ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string,object> credentials = null, string objecttype=null)
+        internal ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
         {
             var s = new ServiceSubscription(this);
             s.InitServiceURL(url, username, credentials, objecttype);
@@ -1045,12 +1045,12 @@ namespace RobotRaconteurWeb
         internal void DoUpdateAllDetectedServices(IServiceSubscription s)
         {
             Discovery_nodestorage[] d;
-            lock(m_DiscoveredNodes)
+            lock (m_DiscoveredNodes)
             {
                 d = m_DiscoveredNodes.Values.ToArray();
             }
 
-            foreach(Discovery_nodestorage n in d)
+            foreach (Discovery_nodestorage n in d)
             {
                 if (n.last_update_nonce != n.info.ServiceStateNonce || string.IsNullOrEmpty(n.info.ServiceStateNonce))
                 {

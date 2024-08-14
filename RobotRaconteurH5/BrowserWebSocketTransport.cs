@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Net.WebSockets;
-using RobotRaconteurWeb.Extensions;
 using System.IO;
+using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using RobotRaconteurWeb.Extensions;
 
 namespace RobotRaconteurWeb
 {
@@ -43,7 +43,7 @@ namespace RobotRaconteurWeb
 
         public bool AcceptWebSockets { get; set; }
 
-        public override string[] UrlSchemeString { get { return new string[] { "tcp", "rr+tcp", "rr+ws", "rr+wss"}; } }
+        public override string[] UrlSchemeString { get { return new string[] { "tcp", "rr+tcp", "rr+ws", "rr+wss" }; } }
 
         private int m_HeartbeatPeriod = 5000;
 
@@ -59,14 +59,14 @@ namespace RobotRaconteurWeb
                 m_HeartbeatPeriod = value;
             }
         }
-                
+
 
         public BrowserWebSocketTransport(RobotRaconteurNode node = null) : base(node)
         {
             DefaultReceiveTimeout = 15000;
             DefaultConnectTimeout = 2500;
             parent_adapter = new AsyncStreamTransportParentImpl(this);
-            
+
         }
 
 
@@ -161,7 +161,7 @@ namespace RobotRaconteurWeb
                 throw new ConnectionException("Transport not connected");
             }
         }
-                
+
         internal void RemoveTransportConnection(uint e)
         {
             TransportConnections.Remove(e);
@@ -209,7 +209,7 @@ namespace RobotRaconteurWeb
                 {
                     parent.RemoveTransportConnection(transport.LocalEndpoint);
                 }
-            }           
+            }
         }
 
         internal readonly AsyncStreamTransportParent parent_adapter;
@@ -217,8 +217,8 @@ namespace RobotRaconteurWeb
         public override string[] ServerListenUrls
         {
             get
-            {                
-               return new string[0];                
+            {
+                return new string[0];
             }
         }
 
@@ -250,7 +250,7 @@ namespace RobotRaconteurWeb
             var u = TransportUtil.ParseConnectionUrl(url);
 
             if (u.host == "") throw new ConnectionException("Invalid connection URL for TCP");
-            
+
             await ConnectWebsocketTransport(url, e, cancel);
             return;
         }
@@ -259,7 +259,7 @@ namespace RobotRaconteurWeb
         {
             var u = TransportUtil.ParseConnectionUrl(url);
             /*Uri u = new Uri(url);
-                        
+
             string ap = Uri.UnescapeDataString(u.AbsolutePath);
             if (ap[0] == '/')
                 ap = ap.Remove(0, 1);
@@ -270,7 +270,7 @@ namespace RobotRaconteurWeb
             if (u.scheme.EndsWith("wss"))
             {
                 http_scheme = "wss";
-            }            
+            }
 
             var u2 = new Uri(url.ReplaceFirst(u.scheme + "://", http_scheme + "://"));
 
@@ -366,7 +366,7 @@ namespace RobotRaconteurWeb
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            return DoBeginRead(buffer, offset, count).AsApm(callback,state);
+            return DoBeginRead(buffer, offset, count).AsApm(callback, state);
         }
 
         public override int EndRead(IAsyncResult asyncResult)
@@ -430,7 +430,7 @@ namespace RobotRaconteurWeb
         {
             throw new InvalidOperationException("Invalid for browser");
         }
-        
+
         public override void Close()
         {
             websock.CloseAsync(WebSocketCloseStatus.NormalClosure, "", default(CancellationToken)).IgnoreResult();

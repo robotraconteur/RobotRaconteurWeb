@@ -1,4 +1,4 @@
-﻿// Copyright 2011-2024 Wason Technology, LLC
+// Copyright 2011-2024 Wason Technology, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
+using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
-using System.Text.RegularExpressions;
-using System.Security.Principal;
-using System.Security.AccessControl;
-using System.IO.Pipes;
-using System.Security.Cryptography.X509Certificates;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 namespace RobotRaconteurWeb
 {
@@ -298,9 +298,9 @@ namespace RobotRaconteurWeb
 
             var node_dirs = node.NodeDirectories;
 
-            lock(this)
+            lock (this)
             {
-                var p = NodeDirectoriesUtil.GetUuidForNameAndLock(node_dirs, name, new string[] {"nodeids"});
+                var p = NodeDirectoriesUtil.GetUuidForNameAndLock(node_dirs, name, new string[] { "nodeids" });
 
                 try
                 {
@@ -312,7 +312,7 @@ namespace RobotRaconteurWeb
                     {
                         p.Dispose();
                         throw;
-                    }                        
+                    }
                 }
 
                 fds.h_nodename_s = p.fd;
@@ -333,7 +333,7 @@ namespace RobotRaconteurWeb
         {
             get
             {
-                if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     try
                     {
@@ -375,7 +375,7 @@ namespace RobotRaconteurWeb
         the account owner can access the server. Defaults to false.</param>
         */
         [PublicApi]
-        public void StartServerAsNodeName(string name, bool public_= false)
+        public void StartServerAsNodeName(string name, bool public_ = false)
         {
             lock (this)
             {
@@ -400,7 +400,7 @@ namespace RobotRaconteurWeb
             NodeDirectoriesFD h_info_name_s = null;
 
             Socket socket = null;
-            UnixDomainSocketEndPoint  ep = null;
+            UnixDomainSocketEndPoint ep = null;
 
             var node_dirs = node.NodeDirectories;
 
@@ -413,7 +413,7 @@ namespace RobotRaconteurWeb
                     throw new NodeNameAlreadyInUse();
                 }
 
-                nodeid1 = NodeDirectoriesUtil.GetUuidForNameAndLock(node_dirs, name, new string[] {"nodeids"});
+                nodeid1 = NodeDirectoriesUtil.GetUuidForNameAndLock(node_dirs, name, new string[] { "nodeids" });
 
                 NodeID nodeid = nodeid1.uuid;
 
@@ -442,7 +442,7 @@ namespace RobotRaconteurWeb
 
                 int tries = 0;
                 var random = new Random(Guid.NewGuid().GetHashCode());
-                
+
                 do
                 {
 
@@ -458,11 +458,11 @@ namespace RobotRaconteurWeb
                     }
 
                     pipename = Path.Combine(pipename, result + ".sock");
-                                        
+
                     try
                     {
                         socket = null;
-                        ep = new UnixDomainSocketEndPoint (pipename);
+                        ep = new UnixDomainSocketEndPoint(pipename);
                         socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                         socket.Bind(ep);
                         socket.Listen(16);
@@ -536,7 +536,7 @@ namespace RobotRaconteurWeb
             }
             catch (Exception)
             {
-                
+
 
                 nodename_lock?.Dispose();
                 nodeid1?.fd?.Dispose();
@@ -552,7 +552,7 @@ namespace RobotRaconteurWeb
         }
         /**
         <summary>
-        
+
         The LocalTransport will listen on a UNIX domain socket for incoming clients,
         using information files and inodes on the local filesystem. This function
         leaves the NodeName blank, so clients must use NodeID to identify the node.
@@ -576,8 +576,8 @@ namespace RobotRaconteurWeb
 
         }
 
-        
-        private async Task DoListen(Socket socket, string socket_fname, UnixDomainSocketEndPoint  ep)
+
+        private async Task DoListen(Socket socket, string socket_fname, UnixDomainSocketEndPoint ep)
         {
             lock (this)
             {
@@ -588,9 +588,9 @@ namespace RobotRaconteurWeb
 
             try
             {
-               
+
                 while (!close_token.IsCancellationRequested)
-                {                    
+                {
                     var s2 = await socket.AcceptAsync().ConfigureAwait(false);
 
                     ClientConnected(new NetworkStream(s2, true));
@@ -673,7 +673,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        
+
         protected internal override void MessageReceived(Message m)
         {
             node.MessageReceived(m);
@@ -746,7 +746,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        
+
         public override uint TransportCapability(string name)
         {
             return base.TransportCapability(name);
@@ -789,7 +789,7 @@ namespace RobotRaconteurWeb
         }
 #pragma warning restore 1591
         LocalTransportDiscovery discovery;
-        
+
         /// <summary>
         /// Enable discovery listening for nodes using the LocalTransport
         /// </summary>
@@ -797,7 +797,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void EnableNodeDiscoveryListening()
         {
-            lock(this)
+            lock (this)
             {
                 if (discovery != null)
                 {
@@ -815,7 +815,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void DisableNodeDiscoveryListening()
         {
-            lock(this)
+            lock (this)
             {
                 discovery?.Dispose();
             }
@@ -885,7 +885,7 @@ namespace RobotRaconteurWeb
     }
 
 
-      
+
     sealed class LocalClientTransport : AsyncStreamTransport
     {
 
@@ -913,7 +913,7 @@ namespace RobotRaconteurWeb
 
         string connecturl;
 
-        
+
         public async Task Connect(Stream s, string connecturl, Endpoint e, CancellationToken cancel = default(CancellationToken))
         {
             //LocalEndpoint = e.LocalEndpoint;
@@ -936,7 +936,7 @@ namespace RobotRaconteurWeb
     }
 
 
-  
+
     sealed class LocalServerTransport : AsyncStreamTransport
     {
 
@@ -946,7 +946,7 @@ namespace RobotRaconteurWeb
         private DateTime LastMessageReceivedTime = DateTime.UtcNow;
 
 
-   
+
         public LocalServerTransport(LocalTransport c)
             : base(c.node, c.parent_adapter)
         {
@@ -977,9 +977,9 @@ namespace RobotRaconteurWeb
 
     static class LocalTransportUtil
     {
-       
 
-       
+
+
         public static string GetTransportPrivateSocketPath(NodeDirectories node_dirs)
         {
             try
@@ -1115,7 +1115,7 @@ namespace RobotRaconteurWeb
 
             string search_id = Path.Combine(path, "by-nodeid");
             string search_name = Path.Combine(path, "by-nodename");
-            foreach(var f in Directory.EnumerateFiles(search_id))
+            foreach (var f in Directory.EnumerateFiles(search_id))
             {
                 try
                 {
@@ -1208,12 +1208,12 @@ namespace RobotRaconteurWeb
                     NodeID nodeid = new NodeID(info["nodeid"]);
                     string nodename1 = info["nodename"];
 
-                    if (nodename1 != Path.ChangeExtension(Path.GetFileName(f),""))
+                    if (nodename1 != Path.ChangeExtension(Path.GetFileName(f), ""))
                     {
                         continue;
                     }
 
-                    foreach(var e1 in o)
+                    foreach (var e1 in o)
                     {
                         if (e1.NodeID == nodeid && String.IsNullOrEmpty(e1.NodeName))
                         {
@@ -1269,7 +1269,7 @@ namespace RobotRaconteurWeb
 
                         string socket1;
                         string socket2;
-                        if (!info_data.TryGetValue("socket", out socket1) 
+                        if (!info_data.TryGetValue("socket", out socket1)
                             || !info_data2.TryGetValue("socket", out socket2))
                         {
                             continue;
@@ -1302,7 +1302,7 @@ namespace RobotRaconteurWeb
                 try
                 {
                     socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
-                    var ep = new UnixDomainSocketEndPoint (pipename);
+                    var ep = new UnixDomainSocketEndPoint(pipename);
                     socket.Connect(ep);
 
                     //TODO: Check user on unix
@@ -1318,14 +1318,14 @@ namespace RobotRaconteurWeb
         }
 
     }
-    
+
     class LocalTransportNodeLock<T> : IDisposable
     {
         static HashSet<T> nodeids = new HashSet<T>();
 
         public static LocalTransportNodeLock<T> Lock(T id)
         {
-            if(!nodeids.Add(id))
+            if (!nodeids.Add(id))
             {
                 return null;
             }
@@ -1340,7 +1340,7 @@ namespace RobotRaconteurWeb
 
         public void Dispose()
         {
-            lock(nodeids)
+            lock (nodeids)
             {
                 nodeids.Remove(release_id);
             }
@@ -1356,7 +1356,7 @@ namespace RobotRaconteurWeb
         public NodeDirectoriesFD h_info_name_s;
         public LocalTransportNodeLock<NodeID> nodeid_lock;
         public LocalTransportNodeLock<string> nodename_lock;
-        
+
         public void Dispose()
         {
             h_nodename_s?.Dispose();
@@ -1380,7 +1380,7 @@ namespace RobotRaconteurWeb
             this.node = node;
             this.transport = transport;
             node_dirs = node.NodeDirectories;
-            
+
         }
 
         public async Task Refresh(CancellationToken token)
@@ -1421,7 +1421,7 @@ namespace RobotRaconteurWeb
             w.Created += OnChanged;
             w.Deleted += OnChanged;
             w.Renamed += OnRenamed;
-            
+
             return w;
         }
 
@@ -1457,19 +1457,19 @@ namespace RobotRaconteurWeb
     /// Exception thrown when a node ID is already in use
     /// </summary>
     /// <remarks>None</remarks>
-    [PublicApi] 
+    [PublicApi]
     public class NodeIDAlreadyInUse : IOException
     {
         /// <summary>
         /// Construct a new NodeIDAlreadyInUse
         /// </summary>
         /// <remarks>None</remarks>
-        [PublicApi] 
+        [PublicApi]
         public NodeIDAlreadyInUse() : base("NodeID already in use") { }
         /// <summary>
         /// Construct a new NodeIDAlreadyInUse with a message
         /// </summary>
-        /// <remarks>None</remarks> 
+        /// <remarks>None</remarks>
         /// <param name="message">Message for exception</param>
         [PublicApi]
         public NodeIDAlreadyInUse(string message) : base(message) { }
@@ -1485,12 +1485,12 @@ namespace RobotRaconteurWeb
         /// Construct a new NodeNameAlreadyInUse
         /// </summary>
         /// <remarks>None</remarks>
-        [PublicApi] 
+        [PublicApi]
         public NodeNameAlreadyInUse() : base("NodeName already in use") { }
         /// <summary>
         /// Construct a new NodeNameAlreadyInUse with a message
         /// </summary>
-        /// <remarks>None</remarks> 
+        /// <remarks>None</remarks>
         /// <param name="message">Message for exception</param>
         [PublicApi]
         public NodeNameAlreadyInUse(string message) : base(message) { }
