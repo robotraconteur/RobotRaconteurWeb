@@ -15,6 +15,7 @@ repos:
   - id: debug-statements
   - id: end-of-file-fixer
   - id: mixed-line-ending
+    exclude: (^.*\.cs$|^.*\.csproj$|^.*\.sln$)
   - id: trailing-whitespace
   - id: fix-byte-order-marker
   - id: check-executables-have-shebangs
