@@ -577,7 +577,7 @@ namespace RobotRaconteurWeb
     /// Flags for MessageFlags entry in MessageHeader
     /// </summary>
     [Flags, PublicApi]
-    public enum MessageFlags
+    public enum MessageFlags : byte
     {
         /** <summary> Message contains ROUTING_INFO section </summary> */
         RoutingInfo = 0x01,
@@ -605,7 +605,7 @@ namespace RobotRaconteurWeb
     /// Flags for EntryFlags in MessageEntry
     /// </summary>
     [Flags, PublicApi]
-    public enum MessageEntryFlags
+    public enum MessageEntryFlags : byte
     {
         /** <summary>MessageEntry contains SERVICE_PATH_STR section</summary> */
         ServicePathStr = 0x01,
@@ -634,7 +634,7 @@ namespace RobotRaconteurWeb
     /// Flags for ElementFlags in MessageElement
     /// </summary>
     [Flags, PublicApi]
-    public enum MessageElementFlags
+    public enum MessageElementFlags : byte
     {
         /** <summary>MessageElement contains ELEMENT_NAME_STR section</summary> */
         ElementNameStr = 0x01,
@@ -1313,7 +1313,8 @@ namespace RobotRaconteurWeb
             uint s = header.ComputeSize();
             foreach (MessageEntry e in entries)
             {
-                s += e.ComputeSize();
+                e.UpdateData();
+                s += e.EntrySize;
             }
             return s;
         }
@@ -1383,6 +1384,7 @@ namespace RobotRaconteurWeb
     public class MessageHeader
     {
         public ushort HeaderLength;
+        public byte MessageFlags_ = (byte)MessageFlags.Version2Compat;
         public uint SenderEndpoint;
         public uint ReceiverEndpoint;
         public string SenderNodeName = "";
@@ -1396,14 +1398,33 @@ namespace RobotRaconteurWeb
         public ushort MessageResID;
 
         public uint MessageSize;
+        public ushort Priority;
+        public byte[] Extended;
 
         public ushort ComputeSize()
         {
-            return (ushort)(64 + ArrayBinaryWriter.GetStringByteCount8(SenderNodeName) + ArrayBinaryWriter.GetStringByteCount8(ReceiverNodeName) + ArrayBinaryWriter.GetStringByteCount8(MetaData));
+            uint s1 = (uint)ArrayBinaryWriter.GetStringByteCount8(SenderNodeName);
+            uint s2 = (uint)ArrayBinaryWriter.GetStringByteCount8(ReceiverNodeName);
+            uint s3 = (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+
+            if (s1 > UInt16.MaxValue) throw new DataTypeException("SenderNodeName exceeds maximum length");
+            if (s2 > UInt16.MaxValue) throw new DataTypeException("ReceiverNodeName exceeds maximum length");
+            if (s3 > UInt16.MaxValue) throw new DataTypeException("MessageHeader MetaData exceeds maximum length");
+
+            uint s = 64 + s1 + s2 + s3;
+
+            if (s > UInt16.MaxValue) throw new DataTypeException("MessageHeader exceeds maximum length");
+
+            return (ushort)s;
         }
 
         public void UpdateHeader(uint message_size, ushort entry_count)
         {
+            if (MessageFlags_ != (byte)MessageFlags.Version2Compat)
+            {
+                throw new DataTypeException("Invalid message flags for Version 2 message");
+            }
+
             HeaderLength = ComputeSize();
             MessageSize = message_size;
             EntryCount = entry_count;
@@ -1415,6 +1436,8 @@ namespace RobotRaconteurWeb
             w.WriteString8("RRAC");
             w.Write(MessageSize);
             w.Write((ushort)2);
+
+            if (HeaderLength > UInt16.MaxValue) throw new DataTypeException("MessageHeader exceeds maximum length");
 
             w.Write(HeaderLength);
 
@@ -1436,7 +1459,6 @@ namespace RobotRaconteurWeb
 
             if (w.DistanceFromLimit != 0) throw new IOException("Message write error");
             w.PopLimit();
-
         }
 
         public void Read(ArrayBinaryReader r)
@@ -1481,18 +1503,22 @@ namespace RobotRaconteurWeb
     public class MessageEntry
     {
         public uint EntrySize;
+        public byte EntryFlags = (byte)MessageEntryFlags.Version2Compat;
 
         public MessageEntryType EntryType;
 
         public string ServicePath = "";
+        public uint ServicePathCode;
 
         public string MemberName = "";
+        public uint MemberNameCode;
 
         public uint RequestID;
 
         public MessageErrorType Error;
 
         public string MetaData = "";
+        public byte[] Extended;
 
         public List<MessageElement> elements;
 
@@ -1513,14 +1539,31 @@ namespace RobotRaconteurWeb
             uint s = 22;
             foreach (MessageElement e in elements)
             {
-                s += e.ComputeSize();
+                e.UpdateData();
+                s += e.ElementSize;
             }
 
-            s += (uint)ArrayBinaryWriter.GetStringByteCount8(ServicePath);
-            s += (uint)ArrayBinaryWriter.GetStringByteCount8(MemberName);
-            s += (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+            uint s1 = (uint)ArrayBinaryWriter.GetStringByteCount8(ServicePath);
+            uint s2 = (uint)ArrayBinaryWriter.GetStringByteCount8(MemberName);
+            uint s3 = (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+
+            if (s1 > UInt16.MaxValue) throw new DataTypeException("ServicePath exceeds maximum length");
+            if (s2 > UInt16.MaxValue) throw new DataTypeException("MemberName exceeds maximum length");
+            if (s3 > UInt16.MaxValue) throw new DataTypeException("MessageEntry MetaData exceeds maximum length");
+
+            s += s1 + s2 + s3;
 
             return s;
+        }
+
+        public void UpdateData()
+        {
+            if (EntryFlags != (byte)MessageEntryFlags.Version2Compat)
+            {
+                throw new DataTypeException("Invalid message entry flags for Version 2 message");
+            }
+
+            EntrySize = ComputeSize();
         }
 
         public MessageElement FindElement(string name)
@@ -1645,14 +1688,19 @@ namespace RobotRaconteurWeb
     public class MessageElement
     {
         public uint ElementSize;
+        public byte ElementFlags = (byte)MessageElementFlags.Version2Compat;
 
         public string ElementName = "";
+        public uint ElementNamedCode;
+        public int ElementNumber;
 
         public DataTypes ElementType;
 
         public string ElementTypeName = "";
+        public uint ElementTypeNameCode;
 
         public string MetaData = "";
+        public byte[] Extended;
 
         public uint DataCount;
 
@@ -1687,7 +1735,16 @@ namespace RobotRaconteurWeb
 
         public uint ComputeSize()
         {
-            uint s = 16 + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName) + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName) + (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+            uint s = 16;
+            uint s1 = (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName);
+            uint s2 = (uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName);
+            uint s3 = (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+
+            if (s1 > UInt16.MaxValue) throw new DataTypeException("ElementName exceeds maximum length");
+            if (s2 > UInt16.MaxValue) throw new DataTypeException("ElementTypeName exceeds maximum length");
+            if (s3 > UInt16.MaxValue) throw new DataTypeException("MessageElement MetaData exceeds maximum length");
+
+            s += s1 + s2 + s3;
 
             switch (ElementType)
             {
@@ -1709,7 +1766,8 @@ namespace RobotRaconteurWeb
 
                         foreach (MessageElement e in d.Elements)
                         {
-                            s += e.ComputeSize();
+                            e.UpdateData();
+                            s += e.ElementSize;
                         }
                     }
                     break;
@@ -1726,6 +1784,19 @@ namespace RobotRaconteurWeb
 
         public void UpdateData()
         {
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0 && (ElementFlags & (byte)MessageElementFlags.ElementNameStr) == 0)
+            {
+                ElementName = ElementNumber.ToString();
+                ElementFlags &= (byte)~MessageElementFlags.ElementNumber;
+                ElementFlags |= (byte)MessageElementFlags.ElementNameStr;
+            }
+
+            if (ElementFlags != (byte)MessageElementFlags.Version2Compat)
+            {
+                throw new ProtocolException("Invalid message flags for Version 2 message");
+            }
+
             if (dat == null)
             {
                 ElementType = DataTypes.void_t;
