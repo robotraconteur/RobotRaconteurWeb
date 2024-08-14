@@ -573,7 +573,119 @@ namespace RobotRaconteurWeb
         PermissionDenied
     }
 
+    /// <summary>
+    /// Flags for MessageFlags entry in MessageHeader
+    /// </summary>
+    [Flags, PublicApi]
+    public enum MessageFlags
+    {
+        /** <summary> Message contains ROUTING_INFO section </summary> */
+        RoutingInfo = 0x01,
+        /** <summary>Message contains ENDPOINT_INFO section</summary> */
+        EndpointInfo = 0x02,
+        /** <summary> Message contains PRIORITY section</summary> */
+        Priority = 0x04,
+        /** <summary>Message is unreliable and may be dropped</summary> */
+        Unreliable = 0x08,
+        /** <summary>Message contains META_INFO section </summary> */
+        MetaInfo = 0x10,
+        /** <summary> Message contains STRING_TABLE section</summary> */
+        StringTable = 0x20,
+        /** <summary>Message contains MULTIPLE_ENTRIES section. If unset, message contains one entry</summary> */
+        MultipleEntries = 0x40,
+        /** <summary>Message contains EXTENDED section</summary> */
+        Extended = 0x80,
 
+        /** <summary>Message flags for compatibility with Message Format Version 2 </summary>*/
+        Version2Compat =
+            RoutingInfo | EndpointInfo | MetaInfo | MultipleEntries
+    }
+
+    /// <summary>
+    /// Flags for EntryFlags in MessageEntry
+    /// </summary>
+    [Flags, PublicApi]
+    public enum MessageEntryFlags
+    {
+        /** <summary>MessageEntry contains SERVICE_PATH_STR section</summary> */
+        ServicePathStr = 0x01,
+        /** <summary>MessageEntry contains SERVICE_PATH_CODE section</summary> */
+        ServicePathCode = 0x02,
+        /** <summary>MessageEntry contains MEMBER_NAME_STR section</summary> */
+        MemberNameStr = 0x04,
+        /** <summary>MessageEntry contains MEMBER_NAME_CODE section</summary> */
+        MemberNameCode = 0x08,
+        /** <summary>MessageEntry contains REQUEST_ID section</summary> */
+        RequestID = 0x10,
+        /** <summary>MessageEntry contains ERROR section</summary> */
+        Error = 0x20,
+        /** <summary>MessageEntry contains META_INFO section</summary> */
+        MetaInfo = 0x40,
+        /** <summary>MessageEntry contains EXTENDED section</summary> */
+        Extended = 0x80,
+
+        /** <summary>MessageEntry flags for compatibility with Message Format Version 2</summary> */
+        Version2Compat = ServicePathStr |
+                                                         MemberNameStr | RequestID |
+                                                         Error | MetaInfo
+    }
+
+    ///<summary>
+    /// Flags for ElementFlags in MessageElement
+    /// </summary>
+    [Flags, PublicApi]
+    public enum MessageElementFlags
+    {
+        /** <summary>MessageElement contains ELEMENT_NAME_STR section</summary> */
+        ElementNameStr = 0x01,
+        /** <summary>MessageElement contains ELEMENT_NAME_CODE section</summary> */
+        ElementNameCode = 0x02,
+        /** <summary>MessageElement contains ELEMENT_NUMBER section</summary> */
+        ElementNumber = 0x04,
+        /** <summary>MessageElement contains ELEMENT_TYPE_NAME_STR section</summary> */
+        ElementTypeNameStr = 0x08,
+        /** <summary>MessageElement contains ELEMENT_TYPE_NAME_CODE section</summary> */
+        ElementTypeNameCode = 0x10,
+        /** <summary>MessageElement contains META_INFO section</summary> */
+        MetaInfo = 0x20,
+        /** <summary>MessageElement contains EXTENDED section</summary> */
+        Extended = 0x80,
+
+        /** <summary>MessageElement flags for compatibility with Message Format Version 2</summary> */
+        Version2Compat =
+            ElementNameStr | ElementTypeNameStr | MetaInfo
+    }
+
+
+    /// <summary>
+    /// Transport capability codes
+    /// </summary>
+    [Flags, PublicApi]
+    public enum TransportCapabilityCode : uint
+    {
+        /** <summary>Page mask for transport capability code</summary> */
+        PageMask = 0xFFF00000,
+        /** <summary>Message Version 2 transport capability page code</summar> */
+        Message2BasicPage = 0x02000000,
+        /** <summary>Enable Message Version 2 transport capability flag</summary> */
+        Message2BasicEnable = 0x00000001,
+        /** <summary>Enable Message Version 2 connect combined transport capability flag</summary> */
+        Message2BasicConnectCombined = 0x00000002,
+        /** <summary>Message Version 4 transport capability page code</summary> */
+        Message4BasicPage = 0x04000000,
+        /** <summary>Enable Message Version 4 transport capability flag</summary> */
+        Message4BasicEnable = 0x00000001,
+        /** <summary>Enable Message Version 4 connect combine transport capability flag</summary> */
+        Message4BasicConnectCombined = 0x00000002,
+        /** <summary>Message Version 4 String Table capability page code</summary> */
+        Message4StringTablePage = 0x04100000,
+        /** <summary>Enable Message Version 4 String Table transport capability code</summary> */
+        Message4StringTableEnable = 0x00000001,
+        /** <summary>Enable Message Version 4 local String Table capability code</summary> */
+        Message4StringTableMessageLocal = 0x00000002,
+        /** <summary>Enable Message Version 4 standard String Table capability code</summary> */
+        Message4StringTableStandardTable = 0x00000004
+    }
     /// <summary>
     /// Represents a complex number using double precision.
     /// </summary>
