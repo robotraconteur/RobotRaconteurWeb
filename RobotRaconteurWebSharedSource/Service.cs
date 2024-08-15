@@ -41,9 +41,47 @@ namespace RobotRaconteurWeb
 
             rr_node = c.node;
 
+            string object_type_q = GetObjectType();
+
+            (var object_def, var object_type) = ServiceDefinitionUtil.SplitQualifiedName(object_type_q);
+
             RegisterEvents(o);
             InitPipeServers(o);
             InitCallbackServers(o);
+
+            var d = rr_node.GetServiceType(object_def).ServiceDef();
+            object_type_ver.Add(Tuple.Create(d.StdVer, object_type_q));
+            if ((bool)d.StdVer)
+            {
+
+                if (d.Objects.TryGetValue(object_type, out var e))
+                {
+                    var found_defs = new HashSet<string>();
+                    var found_versions = new HashSet<RobotRaconteurVersion>();
+                    foreach (var s1 in e.Implements)
+                    {
+                        if (!s1.Contains("."))
+                            continue;
+
+
+                        var implement_def = ServiceDefinitionUtil.SplitQualifiedName(s1).Item1;
+                        var implement_def_b = found_defs.Add(implement_def);
+                        if (!implement_def_b)
+                            continue;
+
+                        var d2 = rr_node.GetServiceType(implement_def).ServiceDef();
+
+                        var version_b = found_versions.Add(d2.StdVer);
+                        if (!version_b)
+                            continue;
+
+                        object_type_ver.Add(Tuple.Create(d2.StdVer, s));
+
+                        if (!(bool)d2.StdVer)
+                            break;
+                    }
+                }
+            }
 
             var init_obj = o as IRRServiceObject;
             if (init_obj != null)
@@ -51,6 +89,8 @@ namespace RobotRaconteurWeb
                 init_obj.RRServiceObjectInit(c, s);
             }
         }
+
+        List<Tuple<RobotRaconteurVersion, string>> object_type_ver = new List<Tuple<RobotRaconteurVersion, string>>();
 
         protected internal RobotRaconteurNode rr_node;
         protected internal readonly ClientContext rr_context = null;
@@ -222,13 +262,38 @@ namespace RobotRaconteurWeb
             }
             return await gen.CallNext(m).ConfigureAwait(false);
         }
+
+        public virtual string GetObjectType()
+        {
+            return Regex.Replace(GetType().ToString(), "_skel", "");
+        }
+
+        public string GetObjectType(RobotRaconteurVersion client_version)
+        {
+            if (!(bool)client_version)
+            {
+                return GetObjectType();
+            }
+
+
+            foreach (var e in object_type_ver)
+            {
+                if (!(bool)e.Item1)
+                {
+                    return e.Item2;
+                }
+
+                if (e.Item1 <= client_version)
+                {
+
+                    return e.Item2;
+                }
+            }
+
+            throw new ObjectNotFoundException("Service requires newer client version");
+        }
     }
 
-    public interface ServiceSkelDynamic
-    {
-        string GetObjectType();
-
-    }
     /**
     <summary>
     Context for services registered in a node for use by clients
@@ -309,9 +374,9 @@ namespace RobotRaconteurWeb
 
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
 
-        public ServiceFactory GetRootObjectServiceDef()
+        public async Task<ServiceFactory> GetRootObjectServiceDef(RobotRaconteurVersion client_version)
         {
-            string root_object_type = RootObjectType;
+            string root_object_type = await GetRootObjectType(client_version);
 
             var root_object_def = ServiceDefinitionUtil.SplitQualifiedName(root_object_type).Item1;
             return node.GetServiceType(root_object_def);
@@ -577,20 +642,6 @@ namespace RobotRaconteurWeb
 
         }
 
-        public virtual async Task<string> GetObjectType(string servicepath)
-        {
-
-            ServiceSkel s = await GetObjectSkel(servicepath).ConfigureAwait(false);
-
-            if (s is ServiceSkelDynamic)
-            {
-                return ((ServiceSkelDynamic)s).GetObjectType();
-            }
-            return Regex.Replace(s.GetType().ToString(), "_skel", "");
-
-
-
-        }
         /**
         <summary>
         Get the current ServerContext
@@ -756,6 +807,19 @@ namespace RobotRaconteurWeb
                     check_lock(skel, m);
                     ret = await skel.CallGeneratorNext(m, c).ConfigureAwait(false);
                     noreturn = true;
+                }
+                if (m.EntryType == MessageEntryType.ObjectTypeName)
+                {
+                    RobotRaconteurVersion v = default;
+                    if (m.TryFindElement("clientversion", out var m_ver))
+                    {
+                        v.FromString(m_ver.CastDataToString());
+
+                    }
+
+                    ret = new MessageEntry(MessageEntryType.ObjectTypeNameRet, m.MemberName);
+                    string objtype = await GetObjectType(m.ServicePath, v);
+                    ret.AddElement("objecttype", objtype);
                 }
 
             }
@@ -1881,6 +1945,39 @@ namespace RobotRaconteurWeb
             }
 
         }
+#pragma warning disable 1591
+        public async Task<string> GetRootObjectType(RobotRaconteurVersion client_version)
+        {
+            return await GetObjectType(m_ServiceName, client_version);
+        }
+
+        public async Task<string> GetObjectType(string servicepath, RobotRaconteurVersion client_version)
+        {
+            try
+            {
+                // TODO: check client_version
+                if (servicepath != ServiceName)
+                {
+                    if (RequireValidUser)
+                    {
+                        if (ServerEndpoint.CurrentAuthenticatedUser == null)
+                            throw new PermissionDeniedException("User must authenticate before accessing this service");
+                    }
+                }
+
+                var s = await GetObjectSkel(servicepath);
+
+                return s.GetObjectType(client_version);
+            }
+            catch (Exception exp)
+            {
+#if RR_LOG_DEBUG
+                RRLogFuncs.LogDebug("GetObjectType failed: " + exp.Message, node, RobotRaconteur_LogComponent.Service, service_path: ServiceName);
+#endif
+                throw;
+            }
+        }
+#pragma warning restore 1591
     }
 
     /// <summary>
