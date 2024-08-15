@@ -255,6 +255,9 @@ namespace RobotRaconteurWeb
                 case DataTypes.uint64_t:
                     Write((ulong)n);
                     return;
+                case DataTypes.bool_t:
+                    Write((byte)((bool)n ? 1 : 0));
+                    return;
 
             }
 

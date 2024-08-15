@@ -38,6 +38,8 @@ namespace RobotRaconteurWeb
         uint RemoteEndpoint { get; }
 
         NodeID RemoteNodeID { get; }
+
+        bool CheckCapabilityActive(uint capability);
     }
 
 

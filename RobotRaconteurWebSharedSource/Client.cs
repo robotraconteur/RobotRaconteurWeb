@@ -176,6 +176,7 @@ namespace RobotRaconteurWeb
             MessageEntry e = new MessageEntry(MessageEntryType.ObjectTypeName, "");
             //MessageElement m = e.AddElement("ObjectPath", path);
             e.ServicePath = path;
+            e.AddElement("clientversion", RobotRaconteurNode.Version);
             MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
             string objecttype2 = ret.FindElement("objecttype").CastData<string>();
 
@@ -390,7 +391,7 @@ namespace RobotRaconteurWeb
             LastMessageReceivedTime = DateTime.UtcNow;
             if (m.entries.Count >= 1)
             {
-                if (m.entries[0].EntryType == MessageEntryType.ConnectClientRet)
+                if (m.entries[0].EntryType == MessageEntryType.ConnectClientRet || m.entries[0].EntryType == MessageEntryType.ConnectClientCombinedRet)
                 {
                     m_RemoteEndpoint = m.header.SenderEndpoint;
                     m_RemoteNodeID = m.header.SenderNodeID;
@@ -437,7 +438,7 @@ namespace RobotRaconteurWeb
                         Task.Run(a).IgnoreResult();
                     }
                 }
-                else if (m.EntryType == MessageEntryType.PropertyGetRes || m.EntryType == MessageEntryType.PropertySetRes || m.EntryType == MessageEntryType.FunctionCallRes || m.EntryType == MessageEntryType.ObjectTypeNameRet || m.EntryType == MessageEntryType.ConnectClientRet || m.EntryType == MessageEntryType.DisconnectClientRet || m.EntryType == MessageEntryType.GetServiceDescRet || (m.EntryType >= MessageEntryType.PipeConnectReq && m.EntryType <= MessageEntryType.PipeDisconnectRet) || m.EntryType == MessageEntryType.ClientSessionOpRet || m.EntryType == MessageEntryType.WireConnectRet || m.EntryType == MessageEntryType.WireDisconnectRet || m.EntryType == MessageEntryType.MemoryReadRet || m.EntryType == MessageEntryType.MemoryWriteRet || m.EntryType == MessageEntryType.MemoryGetParamRet || m.EntryType == MessageEntryType.WirePeekInValueRet || m.EntryType == MessageEntryType.WirePeekOutValueRet || m.EntryType == MessageEntryType.WirePokeOutValueRet || m.EntryType == MessageEntryType.GeneratorNextRes)
+                else if (m.EntryType == MessageEntryType.PropertyGetRes || m.EntryType == MessageEntryType.PropertySetRes || m.EntryType == MessageEntryType.FunctionCallRes || m.EntryType == MessageEntryType.ObjectTypeNameRet || m.EntryType == MessageEntryType.ConnectClientRet || m.EntryType == MessageEntryType.ConnectClientCombinedRet || m.EntryType == MessageEntryType.DisconnectClientRet || m.EntryType == MessageEntryType.GetServiceDescRet || (m.EntryType >= MessageEntryType.PipeConnectReq && m.EntryType <= MessageEntryType.PipeDisconnectRet) || m.EntryType == MessageEntryType.ClientSessionOpRet || m.EntryType == MessageEntryType.WireConnectRet || m.EntryType == MessageEntryType.WireDisconnectRet || m.EntryType == MessageEntryType.MemoryReadRet || m.EntryType == MessageEntryType.MemoryWriteRet || m.EntryType == MessageEntryType.MemoryGetParamRet || m.EntryType == MessageEntryType.WirePeekInValueRet || m.EntryType == MessageEntryType.WirePeekOutValueRet || m.EntryType == MessageEntryType.WirePokeOutValueRet || m.EntryType == MessageEntryType.GeneratorNextRes)
                 {
                     // Console.WriteLine("Got " + m.TransactionID + " " + m.EntryType + " " + m.MemberName);
                     TaskCompletionSource<MessageEntry> r = null;
@@ -642,66 +643,196 @@ namespace RobotRaconteurWeb
                 transport = c.TransportID;
                 m_RemoteEndpoint = 0;
 
-                ServiceDefinition[] d = await PullServiceDefinitionAndImports(null, cancel: cancel).ConfigureAwait(false);
+                bool use_message4_ = TransportConnection.CheckCapabilityActive((uint)(TransportCapabilityCode.Message4BasicPage |
+                                                       TransportCapabilityCode.Message4BasicEnable));
 
-                lock (pulled_service_defs)
-                {
-                    foreach (var d2 in d)
-                    {
-                        if (!pulled_service_defs.ContainsKey(d2.Name))
-                        {
-                            pulled_service_defs.Add(d2.Name, d2);
-                        }
-                    }
-                }
+                bool use_combined_connection = false;
 
-                if (!UsePulledServiceTypes)
+                if (!use_message4_)
                 {
-                    m_ServiceDef = node.GetServiceType(d[0].Name);
+                    use_combined_connection = TransportConnection.CheckCapabilityActive((uint)
+                        (TransportCapabilityCode.Message2BasicPage | TransportCapabilityCode.Message2BasicConnectCombined));
                 }
                 else
                 {
-                    var f = DynamicServiceFactory_.CreateServiceFactories(d.Select(x => x.ToString()).ToArray(), this);
+                    use_combined_connection = TransportConnection.CheckCapabilityActive((uint)
+                        (TransportCapabilityCode.Message4BasicPage | TransportCapabilityCode.Message4BasicConnectCombined));
+                }
+
+                string type;
+
+                if (use_combined_connection)
+                {
+                    MessageEntry e = new MessageEntry(MessageEntryType.ConnectClientCombined, "");
+                    //e.AddElement("servicepath", ServiceName);
+                    e.ServicePath = ServiceName;
+                    e.AddElement("clientversion", RobotRaconteurNode.Version);
+                    e.AddElement("returnservicedefs", "true");
+                    if (!string.IsNullOrEmpty(username))
+                    {
+                        e.AddElement("username", username);
+                    }
+
+                    if (credentials != null)
+                    {
+                        if (credentials is Dictionary<string, object>)
+                        {
+                            e.AddElement("credentials", node.PackMapType<string, object>(credentials, this));
+                        }
+                        else if (credentials is MessageElement)
+                        {
+                            MessageElement mcredentials = (MessageElement)credentials;
+                            mcredentials.ElementName = "credentials";
+                            e.AddElement(mcredentials);
+                        }
+                    }
+
+                    MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
+
+                    if (!ret.TryFindElement("servicedefs", out var m_servicedefs))
+                    {
+                        throw new ServiceException("servicedefs cannot be null on connect");
+                    }
+
+                    var l_servicedefs = m_servicedefs.CastDataToNestedList(DataTypes.list_t);
+
+                    foreach (var l1 in l_servicedefs.Elements)
+                    {
+                        var d1 = new ServiceDefinition();
+                        d1.FromString(l1.CastDataToString());
+                        pulled_service_defs.Add(d1.Name, d1);
+                    }
+
+                    type = ret.FindElement("objecttype").CastDataToString();
+
+                    if (string.IsNullOrEmpty(type))
+                    {
+                        throw new ObjectNotFoundException("Could not find object type");
+                    }
+
+                    if (!string.IsNullOrEmpty(objecttype) && type != objecttype)
+                    {
+                        bool found = false;
+
+                        if (ret.TryFindElement("objectimplements", out var objectimplements_m))
+                        {
+                            var objectimplements =
+                                (List<string>)node.UnpackListType<string>(
+                                    objectimplements_m.CastDataToNestedList(DataTypes.list_t), this);
+                            if (objectimplements.Contains(objecttype))
+                            {
+                                type = objecttype;
+                                found = true;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            VerifyObjectImplements(type, objecttype);
+                            type = objecttype;
+                        }
+                    }
+
+                    try
+                    {
+                        if (UsePulledServiceTypes)
+                        {
+                            lock (pulled_service_defs)
+                            {
+                                var pulleddefs_str = pulled_service_defs.Select(x => x.ToString()).ToArray();
+
+                                var di2 =
+                                    node.DynamicServiceFactory.CreateServiceFactories(pulleddefs_str, this);
+
+                                for (int i = 0; i < pulleddefs_str.Length; i++)
+                                {
+                                    //di2[i].Node = node;
+                                    lock (pulled_service_types)
+                                    {
+                                        pulled_service_types.Add(di2[i].GetServiceName(), di2[i]);
+                                    }
+                                }
+
+                                m_ServiceDef = GetPulledServiceType(ServiceDefinitionUtil.SplitQualifiedName(type).Item1);
+                            }
+                        }
+                        else
+                        {
+                            m_ServiceDef = node.GetServiceType(ServiceDefinitionUtil.SplitQualifiedName(type).Item1);
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+                        throw new ServiceException("Could not find correct service factory for remote service");
+                    }
+
+                }
+                else
+                {
+
+                    ServiceDefinition[] d = await PullServiceDefinitionAndImports(null, cancel: cancel).ConfigureAwait(false);
+
                     lock (pulled_service_defs)
                     {
-                        foreach (var f2 in f)
+                        foreach (var d2 in d)
                         {
-                            if (!pulled_service_types.ContainsKey(f2.GetServiceName()))
+                            if (!pulled_service_defs.ContainsKey(d2.Name))
                             {
-                                pulled_service_types.Add(f2.GetServiceName(), f2);
+                                pulled_service_defs.Add(d2.Name, d2);
                             }
                         }
                     }
-                    m_ServiceDef = GetPulledServiceType(d[0].Name);
+
+                    if (!UsePulledServiceTypes)
+                    {
+                        m_ServiceDef = node.GetServiceType(d[0].Name);
+                    }
+                    else
+                    {
+                        var f = DynamicServiceFactory_.CreateServiceFactories(d.Select(x => x.ToString()).ToArray(), this);
+                        lock (pulled_service_defs)
+                        {
+                            foreach (var f2 in f)
+                            {
+                                if (!pulled_service_types.ContainsKey(f2.GetServiceName()))
+                                {
+                                    pulled_service_types.Add(f2.GetServiceName(), f2);
+                                }
+                            }
+                        }
+                        m_ServiceDef = GetPulledServiceType(d[0].Name);
+                    }
+
+                    MessageEntry e = new MessageEntry(MessageEntryType.ObjectTypeName, "");
+                    //e.AddElement("servicepath", ServiceName);
+                    e.ServicePath = ServiceName;
+                    e.AddElement("clientversion", RobotRaconteurNode.Version);
+
+                    MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
+                    if (ret.Error != MessageErrorType.None) return null;
+                    type = ret.FindElement("objecttype").CastData<string>();
+                    if (type == "") return new ObjectNotFoundException("Could not find object type"); ;
+
+
+                    if (objecttype != null)
+                    {
+                        VerifyObjectImplements(type, objecttype);
+                        type = objecttype;
+                        var type_ns = ServiceDefinitionUtil.SplitQualifiedName(type);
+                        await PullServiceDefinitionAndImports(type_ns.Item1, cancel).ConfigureAwait(false);
+                    }
+
+
+                    MessageEntry e2 = new MessageEntry();
+                    e2.ServicePath = ServiceName;
+                    e2.MemberName = "registerclient";
+                    e2.EntryType = MessageEntryType.ConnectClient;
+                    await ProcessRequest(e2, cancel).ConfigureAwait(false);
+
+                    if (username != null)
+                        await AuthenticateUser(username, credentials, cancel).ConfigureAwait(false);
                 }
-
-                MessageEntry e = new MessageEntry(MessageEntryType.ObjectTypeName, "");
-                //e.AddElement("servicepath", ServiceName);
-                e.ServicePath = ServiceName;
-
-                MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
-                if (ret.Error != MessageErrorType.None) return null;
-                string type = ret.FindElement("objecttype").CastData<string>();
-                if (type == "") return new ObjectNotFoundException("Could not find object type"); ;
-
-
-                if (objecttype != null)
-                {
-                    VerifyObjectImplements(type, objecttype);
-                    type = objecttype;
-                    var type_ns = ServiceDefinitionUtil.SplitQualifiedName(type);
-                    await PullServiceDefinitionAndImports(type_ns.Item1, cancel).ConfigureAwait(false);
-                }
-
-
-                MessageEntry e2 = new MessageEntry();
-                e2.ServicePath = ServiceName;
-                e2.MemberName = "registerclient";
-                e2.EntryType = MessageEntryType.ConnectClient;
-                await ProcessRequest(e2, cancel).ConfigureAwait(false);
-
-                if (username != null)
-                    await AuthenticateUser(username, credentials, cancel).ConfigureAwait(false);
 
                 ServiceStub stub = ServiceDef.CreateStub(type, ServiceName, this);
                 stubs.Add(ServiceName, stub);
@@ -1079,6 +1210,7 @@ namespace RobotRaconteurWeb
             {
                 e3.AddElement("ServiceType", servicetype);
             }
+            e3.AddElement("clientversion", RobotRaconteurNode.Version);
 
             var res = await ProcessRequest(e3, cancel).ConfigureAwait(false);
 

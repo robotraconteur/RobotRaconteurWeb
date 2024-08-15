@@ -657,7 +657,7 @@ namespace RobotRaconteurWeb
                             }
                         }
 
-                        if ((ret.entries[0].EntryType == MessageEntryType.ConnectClientRet || ret.entries[0].EntryType == MessageEntryType.ReconnectClient) && ret.entries[0].Error == MessageErrorType.None)
+                        if ((ret.entries[0].EntryType == MessageEntryType.ConnectClientRet || ret.entries[0].EntryType == MessageEntryType.ConnectClientCombinedRet || ret.entries[0].EntryType == MessageEntryType.ReconnectClient) && ret.entries[0].Error == MessageErrorType.None)
                         {
                             if (ret.header.SenderNodeID == node.NodeID)
                             {
@@ -696,7 +696,7 @@ namespace RobotRaconteurWeb
 
                 if (mes.entries.Count == 1)
                 {
-                    if (mes.entries[0].EntryType == MessageEntryType.ConnectClientRet && remote_ep == 0)
+                    if ((mes.entries[0].EntryType == MessageEntryType.ConnectClientRet || mes.entries[0].EntryType == MessageEntryType.ConnectClientCombinedRet) && remote_ep == 0)
                     {
                         lock (this)
                         {
@@ -847,6 +847,10 @@ namespace RobotRaconteurWeb
             }
         }
 
+        public bool CheckCapabilityActive(uint capability)
+        {
+            return false;
+        }
     }
 
 }

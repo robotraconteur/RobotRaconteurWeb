@@ -1642,6 +1642,244 @@ namespace RobotRaconteurWeb
                     case MessageEntryType.ServiceClosed:
                     case MessageEntryType.ServiceClosedRet:
                         return null;
+                    case MessageEntryType.ConnectClientCombined:
+                        {
+                            var name = e.ServicePath;
+
+                            ServerContext c;
+
+                            var v = new RobotRaconteurVersion();
+
+                            if (e.TryFindElement("clientversion", out var m_ver))
+                            {
+                                v.FromString(m_ver.CastDataToString());
+                            }
+
+                            try
+                            {
+                                c = GetService(name);
+                                var objtype = c.RootObjectType;
+                                eret.AddElement("objecttype", objtype);
+
+                                var objtype_s = ServiceDefinitionUtil.SplitQualifiedName(objtype);
+
+                                if (!GetServiceType(objtype_s.Item1).ServiceDef().Objects.TryGetValue(objtype_s.Item2, out var def))
+                                {
+                                    throw new ServiceException("Invalid service object");
+                                }
+
+                                if (def.Implements.Any())
+                                {
+                                    var implements = def.Implements;
+                                    eret.AddElement("objectimplements", PackListType<string>(implements, null));
+                                }
+                            }
+                            catch (Exception exp)
+                            {
+                                RRLogFuncs.LogDebug(string.Format("Error connecting client: {0}", exp.Message), this, RobotRaconteur_LogComponent.Node,
+                                            endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
+                                                                        member: e.MemberName);
+                                eret.elements.Clear();
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorstring", "Service not found");
+                                eret.Error = MessageErrorType.ServiceNotFound;
+                                break;
+                            }
+
+                            try
+                            {
+                                bool returnservicedef = true;
+
+                                try
+                                {
+
+                                    if (e.TryFindElement("returnservicedefs", out var returnservicedefs_el))
+                                    {
+                                        var returnservicedef_str = returnservicedefs_el.CastDataToString();
+                                        returnservicedef_str = returnservicedef_str.Trim();
+                                        if (returnservicedef_str.ToLower() == "false" || returnservicedef_str == "0")
+                                        {
+                                            returnservicedef = false;
+                                        }
+                                    }
+                                }
+                                catch (Exception)
+                                { }
+
+                                if (returnservicedef)
+                                {
+                                    if (c == null)
+                                    {
+                                        throw new ServiceException("Service not found");
+                                    }
+                                    var servicedef1 = c.GetRootObjectServiceDef();
+                                    var defs = new Dictionary<string, ServiceFactory>();
+                                    defs.Add(servicedef1.GetServiceName(), servicedef1);
+
+                                    //var extra_imports = c.ExtraImports;
+                                    /*foreach(var e in extra_imports)
+                                    {
+                                        if (defs.find(e) == defs.end())
+                                        {
+                                            defs.insert(std::make_pair(e, GetServiceType(e)));
+                                        }
+                                    }*/
+
+                                    while (true)
+                                    {
+                                        bool new_found = false;
+
+                                        foreach (var e3 in defs.Keys.ToArray())
+                                        {
+                                            var d1 = defs[e3];
+                                            foreach (string e2 in d1.ServiceDef().Imports)
+                                            {
+                                                if (!defs.ContainsKey(e2))
+                                                {
+                                                    var d2 = GetServiceType(e2);
+                                                    defs.Add(d2.GetServiceName(), d2);
+                                                    new_found = true;
+                                                }
+                                            }
+                                        }
+
+                                        if (!new_found)
+                                            break;
+                                    }
+
+                                    uint n = 0;
+
+                                    var servicedef_list = new List<MessageElement>();
+                                    foreach (var d in defs.Values)
+                                    {
+                                        var e1 = new MessageElement((int)n, d.DefString());
+                                        servicedef_list.Add(e1);
+                                        n++;
+                                    }
+
+                                    eret.AddElement("servicedefs", new MessageElementNestedElementList(DataTypes.list_t, "",
+                                                                                                          servicedef_list));
+                                }
+                            }
+                            catch (Exception exp)
+                            {
+                                RRLogFuncs.LogDebug(string.Format("Error connecting client: {0}", exp.Message), this, RobotRaconteur_LogComponent.Node,
+                                            endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
+                                                                        member: e.MemberName);
+                                eret.elements.Clear();
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorstring", "Service factory configuraiton error");
+                                eret.Error = MessageErrorType.ServiceNotFound;
+                                break;
+                            }
+
+                            ServerEndpoint se = null;
+
+                            try
+                            {
+                                if (c == null)
+                                {
+                                    throw new ServiceException("Service not found");
+                                }
+
+                                se = new ServerEndpoint(c, this);
+
+                                se.m_RemoteEndpoint = m.header.SenderEndpoint;
+                                se.m_RemoteNodeID = m.header.SenderNodeID;
+                                RegisterEndpoint(se);
+
+                                se.transport = transportid;
+
+                                c.AddClient(se);
+
+                                ret.header.SenderEndpoint = se.LocalEndpoint;
+
+                            }
+                            catch (Exception exp)
+                            {
+                                if (se != null)
+                                {
+                                    try
+                                    {
+                                        DeleteEndpoint(se);
+                                    }
+                                    catch
+                                    { }
+                                }
+                                RRLogFuncs.LogDebug(string.Format("Error connecting client: {0}", exp.Message), this, RobotRaconteur_LogComponent.Node,
+                                        endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
+                                                                    member: e.MemberName);
+                                eret.elements.Clear();
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorstring", "Service not found");
+                                eret.Error = MessageErrorType.ServiceNotFound;
+                                break;
+
+
+                            }
+
+                            try
+                            {
+                                if (c == null)
+                                {
+                                    throw new ServiceException("Service not found");
+                                }
+                                if (c.RequireValidUser)
+                                {
+                                    if (!e.TryFindElement("username", out var username_el))
+                                    {
+                                        throw new AuthenticationException("Username not provided");
+                                    }
+
+                                    if (!e.TryFindElement("credentials", out var credentials_el))
+                                    {
+                                        throw new AuthenticationException("Credentials not provided");
+                                    }
+
+                                    var credentials =
+                                        (Dictionary<string, object>)(UnpackMapType<string, object>(
+                                            credentials_el.CastDataToNestedList(DataTypes.dictionary_t), null));
+                                    if (credentials == null)
+                                    {
+                                        throw new AuthenticationException("Credentials cannot be null");
+                                    }
+                                    var username = username_el.CastDataToString();
+
+                                    se.AuthenticateUser(username, credentials);
+                                }
+                                else
+                                {
+
+                                    if (e.TryFindElement("username", out var username_el) && e.TryFindElement("credentials", out var credentials_el))
+                                    {
+                                        throw new AuthenticationException("Authentication not enabled for service");
+                                    }
+                                }
+                            }
+                            catch (Exception exp)
+                            {
+                                RRLogFuncs.LogDebug(string.Format("Error authenticating client: {0}", exp.Message), this,
+                                    RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
+                                                                        member: e.MemberName);
+                                try
+                                {
+                                    if (c != null && se != null)
+                                    {
+                                        c.RemoveClient(se);
+                                        DeleteEndpoint(se);
+                                    }
+                                }
+                                catch (Exception)
+                                { }
+
+                                eret.elements.Clear();
+                                eret.AddElement("errorname", "RobotRaconteur.AuthenticationError");
+                                eret.AddElement("errorstring", ("Authentication Failed"));
+                                eret.Error = MessageErrorType.AuthenticationError;
+                                break;
+                            }
+                        }
+                        break;
 
                     default:
 #if RR_LOG_DEBUG
@@ -1890,7 +2128,10 @@ namespace RobotRaconteurWeb
         public async Task DisconnectService(object obj, CancellationToken cancel = default(CancellationToken))
         {
             ServiceStub stub = (ServiceStub)obj;
-            await stub.RRContext.Close(cancel).ConfigureAwait(false);
+            if (stub != null)
+            {
+                await stub.RRContext.Close(cancel).ConfigureAwait(false);
+            }
 
         }
         /**
