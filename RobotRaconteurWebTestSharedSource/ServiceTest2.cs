@@ -25,7 +25,7 @@ using RobotRaconteurWeb;
 namespace RobotRaconteurTest
 {
 
-
+#if !ROBOTRACONTEUR_H5
     public class RobotRaconteurTestServiceSupport2
     {
 
@@ -490,6 +490,7 @@ namespace RobotRaconteurTest
             return Task.FromResult(0);
         }
     }
+#endif
     class ServiceTest2_test_sequence_gen
     {
         private uint counter;

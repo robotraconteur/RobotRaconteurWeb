@@ -11,6 +11,7 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurSubTest.Pipes
 {
+#if !ROBOTRACONTEUR_H5
     public class testobj_impl : testobj_default_impl, IRRServiceObject
     {
         public testobj2_impl subobj = new testobj2_impl();
@@ -170,5 +171,5 @@ namespace RobotRaconteurSubTest.Pipes
         }
 
     }
-
+#endif
 }
