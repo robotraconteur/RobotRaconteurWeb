@@ -151,8 +151,8 @@ namespace RobotRaconteurWeb
         public void WriteString8WithXLen(string s)
         {
             byte[] b = UTF8Encoding.UTF8.GetBytes(s);
-            if (b.Length + Position > CurrentLimit) throw new IOException("Message write error");
             WriteUintX((uint)b.Length);
+            if (b.Length + Position > CurrentLimit) throw new IOException("Message write error");
             Write(b);
             m_Position += (uint)b.Length;
         }

@@ -1379,83 +1379,7 @@ namespace RobotRaconteurWeb
             r.PopLimit();
 
         }
-        /*
-        uint32_t Message::ComputeSize4()
-        {
-            header->EntryCount = boost::numeric_cast<uint16_t>(entries.size());
-            uint64_t s = 0;
-            BOOST_FOREACH (RR_INTRUSIVE_PTR<MessageEntry>& e, entries)
-            {
-                e->UpdateData4();
-                s += e->EntrySize;
-            }
 
-            if (s > std::numeric_limits<uint32_t>::max())
-                throw ProtocolException("Message exceeds maximum length");
-
-            header->UpdateHeader4(boost::numeric_cast<uint32_t>(s), boost::numeric_cast<uint16_t>(entries.size()));
-
-            uint32_t s1 = header->MessageSize;
-
-            if (s1 > std::numeric_limits<uint32_t>::max())
-                throw ProtocolException("Message exceeds maximum length");
-            return boost::numeric_cast<uint32_t>(s1);
-        }
-
-        void Message::Write4(ArrayBinaryWriter& w)
-        {
-
-            uint32_t s = ComputeSize4();
-
-            w.PushRelativeLimit(s);
-
-            header->Write4(w);
-            BOOST_FOREACH (RR_INTRUSIVE_PTR<MessageEntry>& e, entries)
-            {
-                e->Write4(w);
-            }
-
-            w.PopLimit();
-            // if (w.DistanceFromLimit()!=0) throw ProtocolException("Error in message format");
-        }
-
-        void Message::Read4(ArrayBinaryReader& r)
-        {
-            header = CreateMessageHeader();
-            header->Read4(r);
-
-            r.PushRelativeLimit(header->MessageSize - header->HeaderSize);
-
-            uint16_t s = header->EntryCount;
-            entries.clear();
-            for (int32_t i = 0; i < s; i++)
-            {
-                RR_INTRUSIVE_PTR<MessageEntry> e = CreateMessageEntry();
-                e->Read4(r);
-                entries.push_back(e);
-            }
-        }
-
-        uint16_t MessageHeader::ComputeSize() // NOLINT(readability-make-member-function-const)
-        {
-            uint32_t s1 = boost::numeric_cast<uint32_t>(ArrayBinaryWriter::GetStringByteCount8(SenderNodeName));
-            uint32_t s2 = boost::numeric_cast<uint32_t>(ArrayBinaryWriter::GetStringByteCount8(ReceiverNodeName));
-            uint32_t s3 = boost::numeric_cast<uint32_t>(ArrayBinaryWriter::GetStringByteCount8(MetaData));
-
-            if (s1 > std::numeric_limits<uint16_t>::max())
-                throw ProtocolException("SenderNodeName exceeds maximum length");
-            if (s2 > std::numeric_limits<uint16_t>::max())
-                throw ProtocolException("ReceiverNodeName exceeds maximum length");
-            if (s3 > std::numeric_limits<uint16_t>::max())
-                throw ProtocolException("Header MetaData exceeds maximum length");
-
-            uint32_t s = 64 + s1 + s2 + s3;
-
-            if (s > std::numeric_limits<uint16_t>::max())
-                throw ProtocolException("MessageHeader exceeds maximum length");
-
-            return boost::numeric_cast<uint16_t>(s);
-        }*/
         public uint ComputeSize4()
         {
             header.EntryCount = (ushort)entries.Count;
@@ -1475,7 +1399,7 @@ namespace RobotRaconteurWeb
 
             if (s1 > UInt32.MaxValue) throw new ProtocolException("Message exceeds maximum length");
 
-            return (uint)s;
+            return (uint)s1;
         }
 
         public void Write4(ArrayBinaryWriter w)
@@ -1765,7 +1689,7 @@ namespace RobotRaconteurWeb
                 w.WriteUintX((uint)Extended.Length);
                 if (Extended.Length > 0)
                 {
-                    w.Write(Extended);
+                    w.WriteArray(Extended);
                 }
             }
 
@@ -1851,10 +1775,11 @@ namespace RobotRaconteurWeb
             if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
             {
                 uint l = r.ReadUintX();
-                Extended = new byte[l];
                 if (l != 0)
                 {
-                    r.Read(Extended, 0, (int)l);
+                    Extended = new byte[l];
+                    for (int i = 0; i < Extended.Length; i++)
+                        Extended[i] = r.ReadByte();
                 }
             }
 
@@ -2052,7 +1977,7 @@ namespace RobotRaconteurWeb
             uint s = 3;
             foreach (MessageElement e in elements)
             {
-                e.UpdateData();
+                e.UpdateData4();
                 s += e.ElementSize;
             }
 
@@ -2191,7 +2116,7 @@ namespace RobotRaconteurWeb
                 w.WriteUintX((uint)Extended.Length);
                 if (Extended.Length > 0)
                 {
-                    w.Write(Extended, 0, Extended.Length);
+                    w.WriteArray(Extended);
                 }
             }
 
@@ -2244,6 +2169,11 @@ namespace RobotRaconteurWeb
                 RequestID = r.ReadUintX();
             }
 
+            if ((EntryFlags & (byte)MessageEntryFlags.Error) != 0)
+            {
+                Error = (MessageErrorType)r.ReadUInt16();
+            }
+
             if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
             {
                 uint metadata_s = r.ReadUintX();
@@ -2253,10 +2183,11 @@ namespace RobotRaconteurWeb
             if ((EntryFlags & (byte)MessageEntryFlags.Extended) != 0)
             {
                 uint l = r.ReadUintX();
-                Extended = new byte[l];
                 if (l != 0)
                 {
-                    r.Read(Extended, 0, (int)l);
+                    Extended = new byte[l];
+                    for (int i = 0; i < Extended.Length; i++)
+                        Extended[i] = r.ReadByte();
                 }
             }
 
@@ -2281,7 +2212,7 @@ namespace RobotRaconteurWeb
         public byte ElementFlags = (byte)MessageElementFlags.Version2Compat;
 
         public string ElementName = "";
-        public uint ElementNamedCode;
+        public uint ElementNameCode;
         public int ElementNumber;
 
         public DataTypes ElementType;
@@ -2317,7 +2248,7 @@ namespace RobotRaconteurWeb
             {
                 dat = value;
 
-                UpdateData();
+                //UpdateData();
             }
 
         }
@@ -2553,7 +2484,7 @@ namespace RobotRaconteurWeb
             }
             if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
             {
-                s += ArrayBinaryWriter.GetUintXByteCount(ElementNamedCode);
+                s += ArrayBinaryWriter.GetUintXByteCount(ElementNameCode);
             }
 
             if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
@@ -2667,7 +2598,7 @@ namespace RobotRaconteurWeb
                 throw new ProtocolException("Cannot set both element name and number");
             }
 
-            if (ElementTypeName.Length != 0)
+            if (ElementTypeName?.Length > 0)
             {
                 ElementFlags |= (byte)MessageElementFlags.ElementTypeNameStr;
             }
@@ -2709,7 +2640,7 @@ namespace RobotRaconteurWeb
             }
             if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
             {
-                w.WriteUintX(ElementNamedCode);
+                w.WriteUintX(ElementNameCode);
             }
             if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
             {
@@ -2733,7 +2664,7 @@ namespace RobotRaconteurWeb
                 w.WriteUintX((uint)Extended.Length);
                 if (Extended.Length != 0)
                 {
-                    w.Write(Extended, 0, Extended.Length);
+                    w.WriteArray(Extended);
                 }
             }
             w.WriteUintX(DataCount);
@@ -2779,7 +2710,7 @@ namespace RobotRaconteurWeb
 
             if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
             {
-                ElementNamedCode = r.ReadUintX();
+                ElementNameCode = r.ReadUintX();
             }
 
             if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
@@ -2812,7 +2743,9 @@ namespace RobotRaconteurWeb
                 Extended = new byte[l];
                 if (l != 0)
                 {
-                    r.Read(Extended, 0, (int)l);
+                    Extended = new byte[l];
+                    for (int i = 0; i < Extended.Length; i++)
+                        Extended[i] = r.ReadByte();
                 }
             }
 
