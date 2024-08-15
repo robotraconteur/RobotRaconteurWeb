@@ -43,7 +43,9 @@ namespace RobotRaconteurWeb
 
             string object_type_q = GetObjectType();
 
-            (var object_def, var object_type) = ServiceDefinitionUtil.SplitQualifiedName(object_type_q);
+            var object_type_q_s = ServiceDefinitionUtil.SplitQualifiedName(object_type_q);
+            var object_def = object_type_q_s.Item1;
+            var object_type = object_type_q_s.Item2;
 
             RegisterEvents(o);
             InitPipeServers(o);
