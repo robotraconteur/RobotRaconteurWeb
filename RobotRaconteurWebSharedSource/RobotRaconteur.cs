@@ -1439,6 +1439,13 @@ namespace RobotRaconteurWeb
                 return GenerateErrorReturnMessage(m, MessageErrorType.NodeNotFound, "RobotRaconteur.NodeNotFound", "Could not find route to remote node");
             }
 
+            if (m.header.ReceiverEndpoint != 0 && m.entries.Count == 1 &&
+            m.entries[0].EntryType == MessageEntryType.ObjectTypeName)
+            {
+                // Workaround for security of getting object types
+                MessageReceived(m);
+                return null;
+            }
 
             Message ret = new Message();
             ret.header = new MessageHeader();
@@ -1469,14 +1476,33 @@ namespace RobotRaconteurWeb
                         {
                             string path = (string)e.ServicePath;
                             string[] s1 = path.Split(new char[] { '.' }, 2);
+
+                            RobotRaconteurVersion v = default;
+                            if (e.TryFindElement("clientversion", out var m_ver))
+                            {
+                                v = new RobotRaconteurVersion();
+                                v.FromString(m_ver.CastDataToString());
+                            }
+
                             try
                             {
                                 ServerContext s;
 
                                 s = GetService(s1[0]);
 
-                                string objtype = await s.GetObjectType(path).ConfigureAwait(false);
+                                var objtype = await s.GetObjectType(path, v);
                                 eret.AddElement("objecttype", objtype);
+
+                                var objtype_s = ServiceDefinitionUtil.SplitQualifiedName(objtype);
+
+                                if (!GetServiceType(objtype_s.Item1).ServiceDef().Objects.TryGetValue(objtype_s.Item2, out var def))
+                                    throw new ServiceException("Invalid service object");
+
+                                if (def.Implements.Any())
+                                {
+                                    var implements = def.Implements.ToList();
+                                    eret.AddElement("objectimplements", PackListType<string>(implements, null));
+                                }
                             }
                             catch
                             {
@@ -1664,7 +1690,7 @@ namespace RobotRaconteurWeb
                             try
                             {
                                 c = GetService(name);
-                                var objtype = c.RootObjectType;
+                                var objtype = await c.GetRootObjectType(v);
                                 eret.AddElement("objecttype", objtype);
 
                                 var objtype_s = ServiceDefinitionUtil.SplitQualifiedName(objtype);
@@ -1718,7 +1744,7 @@ namespace RobotRaconteurWeb
                                     {
                                         throw new ServiceException("Service not found");
                                     }
-                                    var servicedef1 = c.GetRootObjectServiceDef();
+                                    var servicedef1 = await c.GetRootObjectServiceDef(v);
                                     var defs = new Dictionary<string, ServiceFactory>();
                                     defs.Add(servicedef1.GetServiceName(), servicedef1);
 
