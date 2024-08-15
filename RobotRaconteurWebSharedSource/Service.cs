@@ -1978,6 +1978,69 @@ namespace RobotRaconteurWeb
             }
         }
 #pragma warning restore 1591
+
+        private List<string> extra_imports = new List<string>();
+
+        /// <summary>
+        /// Get the current extra service definition imports
+        /// </summary>
+        [PublicApi]
+        public string[] ExtraImports
+        {
+            get
+            {
+                return extra_imports.ToArray();
+            }
+        }
+
+        /** <summary>
+            Add an extra service definition import
+            </summary>
+            <remarks>
+            Clients using dynamic typing will not automatically pull service definitions unless
+            imported by the root object or an objref. If new `struct`, `pod`, or `namedarray` types
+            are introduced in a new service definition type without a corresponding object, an error will
+            occur. Use AddExtraImport() to add the name of the new service definition to add it to the
+            list of service definitions the client will pull.
+            Service definition must have been registered using RobotRaconteurNode::RegisterServiceType()
+            </remarks>
+            <param name="import_">The service type to add</param>
+        */
+        [PublicApi]
+        public void AddExtraImport(string import_)
+        {
+            node.GetServiceType(import_);
+
+            lock (extra_imports)
+            {
+
+                if (extra_imports.Contains(import_))
+                {
+
+                    RRLogFuncs.LogDebug("Extra import \"" + import_ + "\" already added", node, RobotRaconteur_LogComponent.Service, endpoint: -1, service_path: ServiceName);
+                    throw new ArgumentException("Extra import already added");
+                }
+
+                extra_imports.Add(import_);
+            }
+        }
+
+        /// <summary>
+        /// Removes an extra import service definition registered with AddExtraImport()
+        /// </summary>
+        /// <param name="import_">The service type to remove</param>
+        [PublicApi]
+        public bool RemoveExtraImport(string import_)
+        {
+            lock (extra_imports)
+            {
+                extra_imports.Remove(import_);
+
+                return true;
+            }
+        }
+
+
     }
 
     /// <summary>
