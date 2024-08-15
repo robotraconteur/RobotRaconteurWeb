@@ -146,6 +146,12 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public bool DisableMessage4 { get; set; }
 
+        /// <summary>
+        /// The maxmimum message size in bytes
+        /// </summary>
+        [PublicApi]
+        public uint MaxMessageSize { get; set; }
+
         /**
         <summary>
         Construct a new LocalTransport for a non-default node. Must be registered with node using
@@ -161,6 +167,7 @@ namespace RobotRaconteurWeb
             DefaultReceiveTimeout = 600000;
             DefaultConnectTimeout = 2500;
             DisableMessage4 = false;
+            MaxMessageSize = 12 * 1024 * 1024;
             parent_adapter = new AsyncStreamTransportParentImpl(this);
         }
 
@@ -916,6 +923,7 @@ namespace RobotRaconteurWeb
         {
             parenttransport = c;
             disable_message4 = parenttransport.DisableMessage4;
+            max_message_size = parenttransport.MaxMessageSize;
 
         }
 
@@ -960,6 +968,7 @@ namespace RobotRaconteurWeb
         {
             parenttransport = c;
             disable_message4 = parenttransport.DisableMessage4;
+            max_message_size = parenttransport.MaxMessageSize;
 
         }
 

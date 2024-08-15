@@ -96,6 +96,7 @@ namespace RobotRaconteurWeb
         protected internal bool send_version4 = false;
         protected internal uint active_capabilities_message2_basic;
         protected internal uint active_capabilities_message4_basic;
+        protected internal uint max_message_size = 12 * 1024 * 1024;
 
 
 
@@ -250,6 +251,20 @@ namespace RobotRaconteurWeb
                         recbuf = newbuf;
                         mread = new MemoryStream(recbuf, 0, recbuf.Length, true);
                         sreader = new ArrayBinaryReader(mread, recbuf, recbuf.Length);
+                    }
+
+                    if (meslength < 8)
+                    {
+                        RRLogFuncs.LogDebug("Received too small a message", node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                        throw new ProtocolException("Received too small a message");
+                    }
+
+                    if (meslength > (max_message_size))
+                    {
+                        RRLogFuncs.LogDebug(string.Format("Received too large a message {0} but max allowed {1}", meslength, max_message_size),
+                            node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+
+                        throw new ProtocolException("Received too large a message");
                     }
 
                     while (mempos < meslength)
@@ -766,6 +781,13 @@ namespace RobotRaconteurWeb
                 {
                     uint meslength = m.ComputeSize();
 
+                    if (meslength > (max_message_size - 100))
+                    {
+                        RRLogFuncs.LogDebug(string.Format("Attempt to send message size {0} when max is {1}",
+                                                 meslength, max_message_size - 100), node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                        throw new ProtocolException("Message larger than maximum message size");
+                    }
+
                     if (meslength > sendbuf.Length)
                     {
                         sendbuf = new byte[(int)(meslength * 1.2)];
@@ -792,6 +814,13 @@ namespace RobotRaconteurWeb
                     }
 
                     uint meslength = m.ComputeSize4();
+
+                    if (meslength > (max_message_size - 100))
+                    {
+                        RRLogFuncs.LogDebug(string.Format("Attempt to send message size {0} when max is {1}",
+                                                 meslength, max_message_size - 100), node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                        throw new ProtocolException("Message larger than maximum message size");
+                    }
 
                     if (meslength > sendbuf.Length)
                     {

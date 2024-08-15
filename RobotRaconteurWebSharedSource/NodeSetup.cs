@@ -956,10 +956,10 @@ namespace RobotRaconteurWeb
                     local_transport.SetDisableStringTable(true);
                 }*/
 
-                /*if (config.GetOptionOrDefaultAsBool("jumbo-message"))
+                if (config.GetOptionOrDefaultAsBool("jumbo-message"))
                 {
                     local_transport.MaxMessageSize = (100 * 1024 * 1024);
-                }*/
+                }
 
                 node.RegisterTransport(local_transport);
             }
@@ -1018,10 +1018,10 @@ namespace RobotRaconteurWeb
                     tcp_transport.SetDisableStringTable(true);
                 }*/
 
-                /*if (config.GetOptionOrDefaultAsBool("jumbo-message"))
+                if (config.GetOptionOrDefaultAsBool("jumbo-message"))
                 {
-                    tcp_transport.SetMaxMessageSize(100 * 1024 * 1024);
-                }*/
+                    tcp_transport.MaxMessageSize = (100 * 1024 * 1024);
+                }
 
                 if (config.GetOptionOrDefaultAsBool("discovery-listening-enable"))
                 {
