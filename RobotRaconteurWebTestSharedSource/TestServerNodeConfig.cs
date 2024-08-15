@@ -73,7 +73,13 @@ namespace RobotRaconteurTest
                         }
                         else
                         {
-                            int tcp_port_i = (int)tcp_port;
+
+                            int tcp_port_i = 0;
+                            if (tcp_port != null)
+                            {
+                                tcp_port_i = (int)tcp_port;
+                            }
+
                             t2.StartServer(tcp_port_i);
                         }
 
