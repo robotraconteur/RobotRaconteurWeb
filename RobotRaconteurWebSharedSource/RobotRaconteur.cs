@@ -84,7 +84,7 @@ namespace RobotRaconteurWeb
          * <remarks>None</remarks>
          */
         [PublicApi]
-        public const string Version = "0.18.0";
+        public const string Version = "0.20.0";
 
         private NodeID m_NodeID;
         /**
