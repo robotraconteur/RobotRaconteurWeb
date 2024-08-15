@@ -346,8 +346,9 @@ namespace RobotRaconteurWeb
         /// Start the TcpTransport service listening on the specified TCP port
         /// </summary>
         /// <param name="porte">The TCP port to listen on</param>
+        /// <param name="localhost_only">Only accept connections from localhost</param>
         [PublicApi]
-        public void StartServer(int porte)
+        public void StartServer(int porte, bool localhost_only = false)
         {
             //sProgramName = progname;
             lock (this)
@@ -360,7 +361,7 @@ namespace RobotRaconteurWeb
             //conthread = new Thread(WaitForConnections);
             //conthread.Start();
 
-            StartWaitForConnections();
+            StartWaitForConnections(localhost_only);
         }
 
         TcpTransportPortSharerClient port_sharer_client = null;
@@ -397,12 +398,20 @@ namespace RobotRaconteurWeb
         private List<TcpListener> listeners = new List<TcpListener>();
 
 
-        private void StartWaitForConnections()
+        private void StartWaitForConnections(bool localhost_only)
         {
             List<IPEndPoint> listener_endpoints = new List<IPEndPoint>();
 
-            listener_endpoints.Add(new IPEndPoint(IPAddress.Any, m_Port));
-            listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Any, m_Port));
+            if (!localhost_only)
+            {
+                listener_endpoints.Add(new IPEndPoint(IPAddress.Any, m_Port));
+                listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Any, m_Port));
+            }
+            else
+            {
+                listener_endpoints.Add(new IPEndPoint(IPAddress.Loopback, m_Port));
+                listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Loopback, m_Port));
+            }
 
             int count = 0;
 

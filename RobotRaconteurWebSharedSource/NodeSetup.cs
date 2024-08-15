@@ -571,9 +571,9 @@ namespace RobotRaconteurWeb
                 {"local-server-public", RobotRaconteurNodeSetupFlags.LocalTransportServerPublic},
                 {"tcp-start-server", RobotRaconteurNodeSetupFlags.TcpTransportStartServer},
                 {"tcp-start-server-sharer", RobotRaconteurNodeSetupFlags.TcpTransportStartServerPortSharer},
-                //{"tcp-listen-localhost", RobotRaconteurNodeSetupFlags.TcpTransportListenLocalhost},
-                //{"tcp-ipv4-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIPv4Discovery},
-                //{"tcp-ipv6-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIPv6Discovery},
+                {"tcp-listen-localhost", RobotRaconteurNodeSetupFlags.TcpTransportListenLocalHost},
+                {"tcp-ipv4-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIpv4Discovery},
+                {"tcp-ipv6-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIpv6Discovery},
                 {"intra-start-server", RobotRaconteurNodeSetupFlags.IntraTransportStartServer},
                 //{"disable-timeouts", RobotRaconteurNodeSetupFlags.DisableTimeouts},
                 {"disable-message4", RobotRaconteurNodeSetupFlags.DisableMessage4},
@@ -683,8 +683,8 @@ namespace RobotRaconteurWeb
                 RobotRaconteurNodeSetupFlags.LocalTransportServerPublic);
             h.Add<bool>("tcp-start-server", "start TCP server listening",
                 RobotRaconteurNodeSetupFlags.TcpTransportStartServer);
-            /*h.Add<bool>("tcp-listen-localhost", "TCP server listen on localhost only",
-                RobotRaconteurNodeSetupFlags.TcpTransportListenLocalhost);*/
+            h.Add<bool>("tcp-listen-localhost", "TCP server listen on localhost only",
+                RobotRaconteurNodeSetupFlags.TcpTransportListenLocalHost);
             h.Add<string>("tcp-ws-add-origins", "add websocket origins (comma separated)",
                 RobotRaconteurNodeSetupFlags.TcpWebSocketOriginOverride);
             h.Add<string>("tcp-ws-remove-origins", "remove websocket origins (comma separated)",
@@ -1003,10 +1003,9 @@ namespace RobotRaconteurWeb
                 }
                 if (config.GetOptionOrDefaultAsBool("tcp-start-server"))
                 {
-                            //bool localhostOnly = config.GetOptionOrDefaultAsBool("tcp-listen-localhost");
-                            //tcp_transport.StartServer(tcpPort, localhostOnly);
-                            tcp_transport.StartServer(tcpPort);
-                        }
+                    bool localhostOnly = config.GetOptionOrDefaultAsBool("tcp-listen-localhost");
+                    tcp_transport.StartServer(tcpPort, localhostOnly);
+                }
 
                 if (config.GetOptionOrDefaultAsBool("disable-message4"))
                 {
