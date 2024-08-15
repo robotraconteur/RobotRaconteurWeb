@@ -1379,11 +1379,142 @@ namespace RobotRaconteurWeb
             r.PopLimit();
 
         }
+        /*
+        uint32_t Message::ComputeSize4()
+        {
+            header->EntryCount = boost::numeric_cast<uint16_t>(entries.size());
+            uint64_t s = 0;
+            BOOST_FOREACH (RR_INTRUSIVE_PTR<MessageEntry>& e, entries)
+            {
+                e->UpdateData4();
+                s += e->EntrySize;
+            }
+
+            if (s > std::numeric_limits<uint32_t>::max())
+                throw ProtocolException("Message exceeds maximum length");
+
+            header->UpdateHeader4(boost::numeric_cast<uint32_t>(s), boost::numeric_cast<uint16_t>(entries.size()));
+
+            uint32_t s1 = header->MessageSize;
+
+            if (s1 > std::numeric_limits<uint32_t>::max())
+                throw ProtocolException("Message exceeds maximum length");
+            return boost::numeric_cast<uint32_t>(s1);
+        }
+
+        void Message::Write4(ArrayBinaryWriter& w)
+        {
+
+            uint32_t s = ComputeSize4();
+
+            w.PushRelativeLimit(s);
+
+            header->Write4(w);
+            BOOST_FOREACH (RR_INTRUSIVE_PTR<MessageEntry>& e, entries)
+            {
+                e->Write4(w);
+            }
+
+            w.PopLimit();
+            // if (w.DistanceFromLimit()!=0) throw ProtocolException("Error in message format");
+        }
+
+        void Message::Read4(ArrayBinaryReader& r)
+        {
+            header = CreateMessageHeader();
+            header->Read4(r);
+
+            r.PushRelativeLimit(header->MessageSize - header->HeaderSize);
+
+            uint16_t s = header->EntryCount;
+            entries.clear();
+            for (int32_t i = 0; i < s; i++)
+            {
+                RR_INTRUSIVE_PTR<MessageEntry> e = CreateMessageEntry();
+                e->Read4(r);
+                entries.push_back(e);
+            }
+        }
+
+        uint16_t MessageHeader::ComputeSize() // NOLINT(readability-make-member-function-const)
+        {
+            uint32_t s1 = boost::numeric_cast<uint32_t>(ArrayBinaryWriter::GetStringByteCount8(SenderNodeName));
+            uint32_t s2 = boost::numeric_cast<uint32_t>(ArrayBinaryWriter::GetStringByteCount8(ReceiverNodeName));
+            uint32_t s3 = boost::numeric_cast<uint32_t>(ArrayBinaryWriter::GetStringByteCount8(MetaData));
+
+            if (s1 > std::numeric_limits<uint16_t>::max())
+                throw ProtocolException("SenderNodeName exceeds maximum length");
+            if (s2 > std::numeric_limits<uint16_t>::max())
+                throw ProtocolException("ReceiverNodeName exceeds maximum length");
+            if (s3 > std::numeric_limits<uint16_t>::max())
+                throw ProtocolException("Header MetaData exceeds maximum length");
+
+            uint32_t s = 64 + s1 + s2 + s3;
+
+            if (s > std::numeric_limits<uint16_t>::max())
+                throw ProtocolException("MessageHeader exceeds maximum length");
+
+            return boost::numeric_cast<uint16_t>(s);
+        }*/
+        public uint ComputeSize4()
+        {
+            header.EntryCount = (ushort)entries.Count;
+            ulong s = 0;
+
+            foreach (MessageEntry e in entries)
+            {
+                e.UpdateData4();
+                s += e.EntrySize;
+            }
+
+            if (s > UInt32.MaxValue) throw new ProtocolException("Message exceeds maximum length");
+
+            header.UpdateHeader4((uint)s, (ushort)entries.Count);
+
+            uint s1 = header.MessageSize;
+
+            if (s1 > UInt32.MaxValue) throw new ProtocolException("Message exceeds maximum length");
+
+            return (uint)s;
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            uint s = ComputeSize4();
+            w.PushRelativeLimit(s);
+            header.Write4(w);
+            foreach (MessageEntry e in entries)
+            {
+                e.Write4(w);
+            }
+            //if (w.DistanceFromLimit != 0) throw new DataSerializationException("Message write error");
+            w.PopLimit();
+
+        }
+
+        public void Read4(ArrayBinaryReader r)
+        {
+            header = new MessageHeader();
+            header.Read4(r);
+
+            r.PushRelativeLimit(header.MessageSize - header.HeaderLength);
+
+            ushort s = header.EntryCount;
+            entries = new List<MessageEntry>(s);
+            for (int i = 0; i < s; i++)
+            {
+                MessageEntry e = new MessageEntry();
+                e.Read4(r);
+                entries.Add(e);
+            }
+
+            r.PopLimit();
+        }
     }
 
     public class MessageHeader
     {
-        public ushort HeaderLength;
+        public uint HeaderLength;
         public byte MessageFlags_ = (byte)MessageFlags.Version2Compat;
         public uint SenderEndpoint;
         public uint ReceiverEndpoint;
@@ -1439,7 +1570,7 @@ namespace RobotRaconteurWeb
 
             if (HeaderLength > UInt16.MaxValue) throw new DataTypeException("MessageHeader exceeds maximum length");
 
-            w.Write(HeaderLength);
+            w.Write((ushort)HeaderLength);
 
             byte[] bSenderNodeID = SenderNodeID.ToByteArray();
             byte[] bReceiverNodeID = ReceiverNodeID.ToByteArray();
@@ -1496,6 +1627,240 @@ namespace RobotRaconteurWeb
             if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
             r.PopLimit();
 
+        }
+
+        public uint ComputeSize4()
+        {
+            uint s = 11;
+
+            if ((MessageFlags_ & (byte)MessageFlags.RoutingInfo) != 0)
+            {
+                s += 32;
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(SenderNodeName);
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ReceiverNodeName);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.EndpointInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount(SenderEndpoint);
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount(ReceiverEndpoint);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Priority) != 0)
+            {
+                s += 2;
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MetaInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MetaData);
+                s += 4;
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
+            {
+                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount(EntryCount);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount((uint)Extended.Length);
+                s += (uint)Extended.Length;
+            }
+
+            s = (uint)ArrayBinaryWriter.GetSizePlusUintX(s);
+
+            return s;
+        }
+
+        public void UpdateHeader4(uint message_size, ushort entry_count)
+        {
+            if (entry_count == 1)
+            {
+                MessageFlags_ &= (byte)~MessageFlags.MultipleEntries;
+            }
+            else
+            {
+                MessageFlags_ |= (byte)MessageFlags.MultipleEntries;
+            }
+
+            if (!(MetaData?.Length > 0) && MessageID == 0 && MessageResID == 0)
+            {
+                MessageFlags_ &= (byte)~MessageFlags.MetaInfo;
+            }
+            else
+            {
+                MessageFlags_ |= (byte)MessageFlags.MetaInfo;
+            }
+
+            if (!(Extended?.Length > 0))
+            {
+                MessageFlags_ &= (byte)~MessageFlags.Extended;
+            }
+            else
+            {
+                MessageFlags_ |= (byte)MessageFlags.Extended;
+            }
+
+            EntryCount = entry_count;
+            HeaderLength = ComputeSize4();
+            MessageSize = message_size + HeaderLength;
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            w.PushRelativeLimit(HeaderLength);
+            w.WriteString8("RRAC");
+            w.Write(MessageSize);
+            w.Write((ushort)4);
+
+            w.WriteUintX(HeaderLength);
+            w.Write(MessageFlags_);
+
+            if ((MessageFlags_ & (byte)MessageFlags.RoutingInfo) != 0)
+            {
+                byte[] bSenderNodeID = SenderNodeID.ToByteArray();
+                byte[] bReceiverNodeID = ReceiverNodeID.ToByteArray();
+                for (int i = 0; i < 16; i++) { w.Write(bSenderNodeID[i]); };
+                for (int i = 0; i < 16; i++) { w.Write(bReceiverNodeID[i]); };
+                w.WriteString8WithXLen(SenderNodeName);
+                w.WriteString8WithXLen(ReceiverNodeName);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.EndpointInfo) != 0)
+            {
+                w.WriteUintX(SenderEndpoint);
+                w.WriteUintX(ReceiverEndpoint);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Priority) != 0)
+            {
+                w.Write(Priority);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MetaInfo) != 0)
+            {
+                w.WriteString8WithXLen(MetaData);
+                w.Write(MessageID);
+                w.Write(MessageResID);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
+            {
+                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
+            {
+                w.WriteUintX(EntryCount);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
+            {
+                w.WriteUintX((uint)Extended.Length);
+                if (Extended.Length > 0)
+                {
+                    w.Write(Extended);
+                }
+            }
+
+            if (w.DistanceFromLimit != 0) throw new DataSerializationException("Message write error");
+            w.PopLimit();
+        }
+
+        public void Read4(ArrayBinaryReader r)
+        {
+            string magic = r.ReadString8(4);
+            if (magic != "RRAC")
+                throw new ProtocolException("Incorrect message magic");
+            MessageSize = r.ReadUInt32();
+            ushort version = r.ReadUInt16();
+            if (version != 4)
+                throw new ProtocolException("Unknown protocol version");
+
+            HeaderLength = r.ReadUintX();
+
+            r.PushRelativeLimit(HeaderLength - 10 - ArrayBinaryWriter.GetUintXByteCount(HeaderLength));
+
+            MessageFlags_ = r.ReadByte();
+
+            if ((MessageFlags_ & (byte)MessageFlags.RoutingInfo) != 0)
+            {
+
+                byte[] bSenderNodeID = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    bSenderNodeID[i] = r.ReadByte();
+                };
+                SenderNodeID = new NodeID(bSenderNodeID);
+
+                byte[] bReceiverNodeID = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    bReceiverNodeID[i] = r.ReadByte();
+                };
+                ReceiverNodeID = new NodeID(bReceiverNodeID);
+
+                uint pname_s = r.ReadUintX();
+                SenderNodeName = r.ReadString8(pname_s);
+                uint pname_r = r.ReadUintX();
+                ReceiverNodeName = r.ReadString8(pname_r);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.EndpointInfo) != 0)
+            {
+                SenderEndpoint = r.ReadUintX();
+                ReceiverEndpoint = r.ReadUintX();
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Priority) != 0)
+            {
+                Priority = r.ReadUInt16();
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MetaInfo) != 0)
+            {
+                uint meta_s = r.ReadUintX();
+                MetaData = r.ReadString8(meta_s);
+                MessageID = r.ReadUInt16();
+                MessageResID = r.ReadUInt16();
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
+            {
+                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
+            {
+                uint c = r.ReadUintX();
+                if (c > UInt16.MaxValue)
+                    throw new ProtocolException("Too many entries in message");
+                EntryCount = (ushort)c;
+            }
+            else
+            {
+                EntryCount = 1;
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
+            {
+                uint l = r.ReadUintX();
+                Extended = new byte[l];
+                if (l != 0)
+                {
+                    r.Read(Extended, 0, (int)l);
+                }
+            }
+
+            if (r.DistanceFromLimit != 0)
+                throw new DataSerializationException("Error in message format");
+            r.PopLimit();
         }
     }
 
@@ -1682,7 +2047,232 @@ namespace RobotRaconteurWeb
 
         }
 
+        public uint ComputeSize4()
+        {
+            uint s = 3;
+            foreach (MessageElement e in elements)
+            {
+                e.UpdateData();
+                s += e.ElementSize;
+            }
 
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ServicePath);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(ServicePathCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MemberName);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(MemberNameCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.RequestID) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(RequestID);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Error) != 0)
+            {
+                s += 2;
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MetaData);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Extended) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount((uint)Extended.Length);
+                s += (uint)Extended.Length;
+            }
+
+            s += ArrayBinaryWriter.GetUintXByteCount((uint)elements.Count);
+
+            s = ArrayBinaryWriter.GetSizePlusUintX(s);
+
+            return s;
+        }
+
+        public void UpdateData4()
+        {
+            if (RequestID != 0)
+            {
+                EntryFlags |= (byte)MessageEntryFlags.RequestID;
+            }
+            else
+            {
+                EntryFlags &= (byte)~MessageEntryFlags.RequestID;
+            }
+
+            if (Error != 0)
+            {
+                EntryFlags |= (byte)MessageEntryFlags.Error;
+            }
+            else
+            {
+                EntryFlags &= (byte)~MessageEntryFlags.Error;
+            }
+
+            if (MetaData?.Length > 0)
+            {
+                EntryFlags |= (byte)MessageEntryFlags.MetaInfo;
+            }
+            else
+            {
+                EntryFlags &= (byte)~MessageEntryFlags.MetaInfo;
+            }
+
+            if (!(Extended?.Length > 0))
+            {
+                EntryFlags &= (byte)~MessageFlags.Extended;
+            }
+            else
+            {
+                EntryFlags |= (byte)MessageFlags.Extended;
+            }
+
+            EntrySize = ComputeSize4();
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            UpdateData4();
+
+            w.PushRelativeLimit(EntrySize);
+
+            w.WriteUintX(EntrySize);
+            w.Write(EntryFlags);
+            w.Write((ushort)EntryType);
+
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathStr) != 0)
+            {
+                w.WriteString8WithXLen(ServicePath);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathCode) != 0)
+            {
+                w.WriteUintX(ServicePathCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameStr) != 0)
+            {
+                w.WriteString8WithXLen(MemberName);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameCode) != 0)
+            {
+                w.WriteUintX(MemberNameCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.RequestID) != 0)
+            {
+                w.WriteUintX(RequestID);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Error) != 0)
+            {
+                w.Write((ushort)Error);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
+            {
+                w.WriteString8WithXLen(MetaData);
+            }
+
+            if ((EntryFlags & (byte)MessageFlags.Extended) != 0)
+            {
+                w.WriteUintX((uint)Extended.Length);
+                if (Extended.Length > 0)
+                {
+                    w.Write(Extended, 0, Extended.Length);
+                }
+            }
+
+            w.WriteUintX((uint)elements.Count);
+
+            foreach (MessageElement e in elements)
+            {
+                e.Write4(w);
+            }
+
+            if (w.DistanceFromLimit != 0)
+                throw new DataSerializationException("Error in message format");
+
+            w.PopLimit();
+        }
+
+        public void Read4(ArrayBinaryReader r)
+        {
+            EntrySize = r.ReadUintX();
+
+            r.PushRelativeLimit(EntrySize - ArrayBinaryWriter.GetUintXByteCount(EntrySize));
+
+            EntryFlags = r.ReadByte();
+            EntryType = (MessageEntryType)r.ReadUInt16();
+
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathStr) != 0)
+            {
+                uint sname_s = r.ReadUintX();
+                ServicePath = r.ReadString8(sname_s);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathCode) != 0)
+            {
+                ServicePathCode = r.ReadUintX();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameStr) != 0)
+            {
+                uint mname_s = r.ReadUintX();
+                MemberName = r.ReadString8(mname_s);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameCode) != 0)
+            {
+                MemberNameCode = r.ReadUintX();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.RequestID) != 0)
+            {
+                RequestID = r.ReadUintX();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
+            {
+                uint metadata_s = r.ReadUintX();
+                MetaData = r.ReadString8(metadata_s);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Extended) != 0)
+            {
+                uint l = r.ReadUintX();
+                Extended = new byte[l];
+                if (l != 0)
+                {
+                    r.Read(Extended, 0, (int)l);
+                }
+            }
+
+            uint ecount = r.ReadUintX();
+
+            elements = new List<MessageElement>((int)ecount);
+            for (int i = 0; i < ecount; i++)
+            {
+                MessageElement e = new MessageElement();
+                e.Read4(r);
+                elements.Add(e);
+            }
+
+            if (r.DistanceFromLimit != 0) throw new DataSerializationException("Error reading message");
+            r.PopLimit();
+        }
     }
 
     public class MessageElement
@@ -1951,6 +2541,343 @@ namespace RobotRaconteurWeb
             if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
             r.PopLimit();
 
+        }
+
+        public uint ComputeSize4()
+        {
+            uint s = 3;
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ElementName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(ElementNamedCode);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                s += ArrayBinaryWriter.GetIntXByteCount(ElementNumber);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ElementTypeName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(ElementTypeNameCode);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.MetaInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MetaData);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount((uint)Extended.Length);
+                s += (uint)Extended.Length;
+            }
+
+            switch (ElementType)
+            {
+                case DataTypes.void_t:
+                    break;
+                case DataTypes.structure_t:
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                case DataTypes.multidimarray_t:
+                case DataTypes.list_t:
+                case DataTypes.pod_t:
+                case DataTypes.pod_array_t:
+                case DataTypes.pod_multidimarray_t:
+                case DataTypes.namedarray_array_t:
+                case DataTypes.namedarray_multidimarray_t:
+                    {
+                        MessageElementNestedElementList d = (MessageElementNestedElementList)Data;
+
+
+                        foreach (MessageElement e in d.Elements)
+                        {
+                            e.UpdateData4();
+                            s += e.ElementSize;
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        s += DataCount * DataTypeUtil.size(ElementType);
+                        break;
+                    }
+            }
+
+            s += ArrayBinaryWriter.GetUintXByteCount(DataCount);
+            s = ArrayBinaryWriter.GetSizePlusUintX(s);
+
+            return s;
+        }
+
+
+        public void UpdateData4()
+        {
+            if (dat == null)
+            {
+                ElementType = DataTypes.void_t;
+                DataCount = 0;
+            }
+            else if (dat is Array)
+            {
+                string datatype = dat.GetType().GetElementType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
+                DataCount = (uint)((Array)dat).Length;
+            }
+            else if (dat is MessageElementNestedElementList)
+            {
+                var dat2 = (MessageElementNestedElementList)dat;
+                DataCount = (uint)dat2.Elements.Count;
+                if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) == 0)
+                {
+                    ElementTypeName = dat2.TypeName ?? "";
+                }
+                ElementType = dat2.Type;
+            }
+            else if (dat is string)
+            {
+                ElementType = DataTypes.string_t;
+                DataCount = (uint)UTF8Encoding.UTF8.GetByteCount((string)dat);
+
+            }
+            else
+            {
+                DataCount = 1;
+                string datatype = dat.GetType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
+            }
+
+            if (ElementType != DataTypes.void_t && ElementType < DataTypes.string_t && !(dat is Array))
+            {
+                dat = DataTypeUtil.ArrayFromScalar(dat);
+            }
+
+            if ((ElementFlags & (byte)(MessageElementFlags.ElementNameStr | MessageElementFlags.ElementNameCode)) != 0 &&
+                (ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                throw new ProtocolException("Cannot set both element name and number");
+            }
+
+            if (ElementTypeName.Length != 0)
+            {
+                ElementFlags |= (byte)MessageElementFlags.ElementTypeNameStr;
+            }
+            else
+            {
+                ElementFlags &= (byte)~MessageElementFlags.ElementTypeNameStr;
+            }
+
+            if (MetaData?.Length > 0)
+            {
+                ElementFlags |= (byte)MessageElementFlags.MetaInfo;
+            }
+            else
+            {
+                ElementFlags &= (byte)~MessageElementFlags.MetaInfo;
+            }
+
+            if (!(Extended?.Length > 0))
+            {
+                ElementFlags &= (byte)~MessageElementFlags.Extended;
+            }
+            else
+            {
+                ElementFlags |= (byte)MessageElementFlags.Extended;
+            }
+
+            ElementSize = ComputeSize4();
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            UpdateData4();
+            w.PushRelativeLimit(ElementSize);
+            w.WriteUintX(ElementSize);
+            w.Write(ElementFlags);
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameStr) != 0)
+            {
+                w.WriteString8WithXLen(ElementName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
+            {
+                w.WriteUintX(ElementNamedCode);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                w.WriteIntX(ElementNumber);
+            }
+            w.Write((ushort)ElementType);
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameStr) != 0)
+            {
+                w.WriteString8WithXLen(ElementTypeName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) != 0)
+            {
+                w.WriteUintX(ElementTypeNameCode);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.MetaInfo) != 0)
+            {
+                w.WriteString8WithXLen(MetaData);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
+            {
+                w.WriteUintX((uint)Extended.Length);
+                if (Extended.Length != 0)
+                {
+                    w.Write(Extended, 0, Extended.Length);
+                }
+            }
+            w.WriteUintX(DataCount);
+
+            if (dat == null)
+            {
+
+            }
+            else if (dat.GetType().IsArray)
+            {
+                w.WriteArray((Array)dat);
+            }
+            else if (dat is MessageElementNestedElementList)
+            {
+                List<MessageElement> l = ((MessageElementNestedElementList)dat).Elements;
+                foreach (MessageElement e in l) e.Write4(w);
+            }
+            else if (dat is string)
+            {
+                w.WriteString8((string)dat);
+            }
+            else
+            {
+                w.WriteNumber(dat, ElementType);
+            }
+
+            if (w.DistanceFromLimit != 0) throw new IOException("Message write error");
+            w.PopLimit();
+
+        }
+        public void Read4(ArrayBinaryReader r)
+        {
+            ElementSize = r.ReadUintX();
+            r.PushRelativeLimit(ElementSize - ArrayBinaryWriter.GetUintXByteCount(ElementSize));
+
+            ElementFlags = r.ReadByte();
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameStr) != 0)
+            {
+                uint name_s = r.ReadUintX();
+                ElementName = r.ReadString8(name_s);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
+            {
+                ElementNamedCode = r.ReadUintX();
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                ElementNumber = r.ReadIntX();
+            }
+
+            ElementType = (DataTypes)r.ReadUInt16();
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameStr) != 0)
+            {
+                uint nametype_s = r.ReadUintX();
+                ElementTypeName = r.ReadString8(nametype_s);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) != 0)
+            {
+                ElementTypeNameCode = r.ReadUintX();
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.MetaInfo) != 0)
+            {
+                uint metadata_s = r.ReadUintX();
+                MetaData = r.ReadString8(metadata_s);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
+            {
+                uint l = r.ReadUintX();
+                Extended = new byte[l];
+                if (l != 0)
+                {
+                    r.Read(Extended, 0, (int)l);
+                }
+            }
+
+            DataCount = r.ReadUintX();
+
+            switch (ElementType)
+            {
+                case DataTypes.void_t:
+                    break;
+                case DataTypes.structure_t:
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                case DataTypes.multidimarray_t:
+                case DataTypes.list_t:
+                case DataTypes.pod_t:
+                case DataTypes.pod_array_t:
+                case DataTypes.pod_multidimarray_t:
+                case DataTypes.namedarray_array_t:
+                case DataTypes.namedarray_multidimarray_t:
+                    {
+                        List<MessageElement> l = new List<MessageElement>((int)DataCount);
+                        for (int i = 0; i < DataCount; i++)
+                        {
+                            MessageElement m = new MessageElement();
+                            m.Read4(r);
+                            l.Add(m);
+                        }
+
+                        dat = new MessageElementNestedElementList(ElementType, ElementTypeName, l);
+                        break;
+                    }
+
+                case DataTypes.double_t:
+                case DataTypes.single_t:
+                case DataTypes.int8_t:
+                case DataTypes.uint8_t:
+                case DataTypes.int16_t:
+                case DataTypes.uint16_t:
+                case DataTypes.int32_t:
+                case DataTypes.uint32_t:
+                case DataTypes.int64_t:
+                case DataTypes.uint64_t:
+                case DataTypes.cdouble_t:
+                case DataTypes.csingle_t:
+                case DataTypes.bool_t:
+                    {
+                        if (DataCount * DataTypeUtil.size(ElementType) > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        Array d = DataTypeUtil.ArrayFromDataType(ElementType, DataCount);
+                        r.ReadArray(d);
+                        dat = (Object)d;
+                    }
+                    break;
+                case DataTypes.string_t:
+                    {
+                        if (DataCount > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        dat = r.ReadString8(DataCount);
+                        break;
+                    }
+                default:
+                    throw new DataTypeException("Unknown data type");
+            }
+
+
+            if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
+            r.PopLimit();
         }
 
         public static MessageElement FindElement(List<MessageElement> m, string name)
