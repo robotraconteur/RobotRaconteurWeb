@@ -2637,7 +2637,7 @@ namespace RobotRaconteurWeb
                             sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastTimeToLive, 32);
                             try
                             {
-                            sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, 32);
+                                sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, 32);
                             }
                             catch { }
                             sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IpTimeToLive, 32);
@@ -3466,7 +3466,7 @@ namespace RobotRaconteurWeb
 
                             socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                             {
-                                await Task.Run(() =>socket.Connect(new UnixDomainSocketEndPoint(fname)));
+                                await Task.Run(() => socket.Connect(new UnixDomainSocketEndPoint(fname)));
                                 //localSocket = new NetworkStream(socket, true);
                             }
                         }
@@ -3498,15 +3498,15 @@ namespace RobotRaconteurWeb
                                 var inData = new byte[4096];
                                 int nread;
                                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            {
-                                nread = await localSocket.ReadAsync(inData, 0, inData.Length, cancel);
-                            }
-                            else
-                            {
-                                nread = await Task.Run(() => socket.Receive(inData), cancel);
-                                if (nread > 2)
-                                    nread -= 1;
-                            }
+                                {
+                                    nread = await localSocket.ReadAsync(inData, 0, inData.Length, cancel);
+                                }
+                                else
+                                {
+                                    nread = await Task.Run(() => socket.Receive(inData), cancel);
+                                    if (nread > 2)
+                                        nread -= 1;
+                                }
 
                                 if (nread == 0)
                                     throw new InvalidOperationException("Connection closed");
@@ -3571,7 +3571,7 @@ namespace RobotRaconteurWeb
                                     if (sock < 0)
                                         continue;
 
-                                    // Use reflection to get SafeSocketHandle type                                    
+                                    // Use reflection to get SafeSocketHandle type
                                     var safe_socket_handle_type = typeof(Socket).Assembly.GetType("System.Net.Sockets.SafeSocketHandle");
                                     var safe_socket_handle = Activator.CreateInstance(safe_socket_handle_type, new object[] { new IntPtr(sock), true });
                                     var sock1 = (Socket)Activator.CreateInstance(typeof(Socket), new object[] { safe_socket_handle, }, null);
@@ -3586,7 +3586,7 @@ namespace RobotRaconteurWeb
                         {
                             socket?.Close();
                         }
-                        catch {}
+                        catch { }
                     }
                     catch (Exception exp)
                     {
@@ -3666,75 +3666,75 @@ namespace RobotRaconteurWeb
         }
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack=1)]
-	struct IOVector
-	{
-		public IntPtr Base;
-		public UIntPtr Length;
-	}
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct IOVector
+    {
+        public IntPtr Base;
+        public UIntPtr Length;
+    }
 
-	[StructLayout(LayoutKind.Sequential, Pack=1)]
-	struct msghdr
-	{
-		public IntPtr msg_name; //optional address
-		public UIntPtr msg_namelen; //size of address
-		public IntPtr msg_iov; //scatter/gather array
-		public UIntPtr msg_iovlen; //# elements in msg_iov
-		public IntPtr msg_control; //ancillary data, see below
-		public UIntPtr msg_controllen; //ancillary data buffer len
-		public int msg_flags; //flags on received message
-	}
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct msghdr
+    {
+        public IntPtr msg_name; //optional address
+        public UIntPtr msg_namelen; //size of address
+        public IntPtr msg_iov; //scatter/gather array
+        public UIntPtr msg_iovlen; //# elements in msg_iov
+        public IntPtr msg_control; //ancillary data, see below
+        public UIntPtr msg_controllen; //ancillary data buffer len
+        public int msg_flags; //flags on received message
+    }
 
-	[StructLayout(LayoutKind.Sequential, Pack=1)]
-	struct cmsghdr2
-	{
-		public UIntPtr cmsg_len; //data byte count, including header
-		public int cmsg_level; //originating protocol
-		public int cmsg_type; //protocol-specific type
-		public int fd;
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct cmsghdr2
+    {
+        public UIntPtr cmsg_len; //data byte count, including header
+        public int cmsg_level; //originating protocol
+        public int cmsg_type; //protocol-specific type
+        public int fd;
 
         public uint pad;
         public uint pad2;
         public uint pad3;
         public uint pad4;
-	}
+    }
     static class TcpTransportUtil
     {
-        
+
         [DllImport("libc", SetLastError = true)]
-		public static extern int recvmsg(int s, IntPtr msg, int flags);
+        public static extern int recvmsg(int s, IntPtr msg, int flags);
 
         public static bool ReadFd(int localSocket, byte[] buf, out int sock)
         {
             sock = -1;
 
-            IntPtr iovdat_buf=Marshal.AllocHGlobal(4096);
+            IntPtr iovdat_buf = Marshal.AllocHGlobal(4096);
 
-            IOVector iov=new IOVector();
-            iov.Base=iovdat_buf;
-            iov.Length=(UIntPtr)4096;
+            IOVector iov = new IOVector();
+            iov.Base = iovdat_buf;
+            iov.Length = (UIntPtr)4096;
 
 
-            IntPtr iov_buf=Marshal.AllocHGlobal(Marshal.SizeOf<IOVector>());
+            IntPtr iov_buf = Marshal.AllocHGlobal(Marshal.SizeOf<IOVector>());
             Marshal.StructureToPtr(iov, iov_buf, false);
 
-            cmsghdr2 cm2=new cmsghdr2();
-            cm2.cmsg_len=(UIntPtr)Marshal.SizeOf<cmsghdr2>();
+            cmsghdr2 cm2 = new cmsghdr2();
+            cm2.cmsg_len = (UIntPtr)Marshal.SizeOf<cmsghdr2>();
 
-            IntPtr cm2_buf=Marshal.AllocHGlobal(Marshal.SizeOf<cmsghdr2>());
-            Marshal.StructureToPtr(cm2,cm2_buf,false);
+            IntPtr cm2_buf = Marshal.AllocHGlobal(Marshal.SizeOf<cmsghdr2>());
+            Marshal.StructureToPtr(cm2, cm2_buf, false);
 
-            msghdr mh=new msghdr();
-            mh.msg_control=cm2_buf;
-            mh.msg_controllen=cm2.cmsg_len;
-            mh.msg_name=IntPtr.Zero;
-            mh.msg_namelen=(UIntPtr)0;
+            msghdr mh = new msghdr();
+            mh.msg_control = cm2_buf;
+            mh.msg_controllen = cm2.cmsg_len;
+            mh.msg_name = IntPtr.Zero;
+            mh.msg_namelen = (UIntPtr)0;
 
-            mh.msg_iov=iov_buf;
-            mh.msg_iovlen=(UIntPtr)1;
+            mh.msg_iov = iov_buf;
+            mh.msg_iovlen = (UIntPtr)1;
 
-            IntPtr mh_buf=Marshal.AllocHGlobal(Marshal.SizeOf<msghdr>());
-            Marshal.StructureToPtr(mh, mh_buf, false);	
+            IntPtr mh_buf = Marshal.AllocHGlobal(Marshal.SizeOf<msghdr>());
+            Marshal.StructureToPtr(mh, mh_buf, false);
 
 
             int read = recvmsg(localSocket, mh_buf, 0);
@@ -3744,18 +3744,18 @@ namespace RobotRaconteurWeb
                 Marshal.FreeHGlobal(iov_buf);
                 Marshal.FreeHGlobal(iovdat_buf);
                 Marshal.FreeHGlobal(cm2_buf);
-				Marshal.FreeHGlobal(mh_buf);
+                Marshal.FreeHGlobal(mh_buf);
 
                 return false;
             }
 
             cm2 = Marshal.PtrToStructure<cmsghdr2>(cm2_buf);
 
-            
-            if(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
 
-                if (cm2.cmsg_level!=1)
+                if (cm2.cmsg_level != 1)
                 {
                     Marshal.FreeHGlobal(iov_buf);
                     Marshal.FreeHGlobal(iovdat_buf);
@@ -3766,7 +3766,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                if (cm2.cmsg_level!=0xffff)
+                if (cm2.cmsg_level != 0xffff)
                 {
                     Marshal.FreeHGlobal(iov_buf);
                     Marshal.FreeHGlobal(iovdat_buf);
@@ -3775,14 +3775,14 @@ namespace RobotRaconteurWeb
                     return false;
                 }
             }
-            
 
-            sock = cm2.fd;            
 
-            if(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            sock = cm2.fd;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
 
-                if (cm2.cmsg_level!=1)
+                if (cm2.cmsg_level != 1)
                 {
                     Marshal.FreeHGlobal(iov_buf);
                     Marshal.FreeHGlobal(iovdat_buf);
@@ -3793,7 +3793,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                if (cm2.cmsg_level!=0xffff)
+                if (cm2.cmsg_level != 0xffff)
                 {
                     Marshal.FreeHGlobal(iov_buf);
                     Marshal.FreeHGlobal(iovdat_buf);
@@ -3804,7 +3804,7 @@ namespace RobotRaconteurWeb
             }
 
             sock = cm2.fd;
-            
+
             Marshal.FreeHGlobal(iov_buf);
             Marshal.FreeHGlobal(iovdat_buf);
             Marshal.FreeHGlobal(cm2_buf);
