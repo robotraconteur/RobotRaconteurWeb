@@ -634,7 +634,15 @@ namespace RobotRaconteurWeb
 
         protected bool DispatchPacket(MessageElement me, PipeEndpoint e, out uint packetnumber)
         {
-            int index = Int32.Parse(me.ElementName);
+            int index;
+            if ((me.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                index = me.ElementNumber;
+            }
+            else
+            {
+                index = Int32.Parse(me.ElementName);
+            }
             List<MessageElement> elems = (me.CastDataToNestedList()).Elements;
             packetnumber = (MessageElement.FindElement(elems, "packetnumber").CastData<uint[]>())[0];
             object data;
@@ -671,7 +679,7 @@ namespace RobotRaconteurWeb
 
             var delems = new MessageElementNestedElementList(DataTypes.dictionary_t, "", elems);
 
-            MessageElement me = new MessageElement(index.ToString(), delems);
+            MessageElement me = new MessageElement(index, delems);
 
             return me;
         }
@@ -796,7 +804,15 @@ namespace RobotRaconteurWeb
                     try
                     {
 
-                        int index = Int32.Parse(me.ElementName);
+                        int index;
+                        if ((me.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+                        {
+                            index = me.ElementNumber;
+                        }
+                        else
+                        {
+                            index = Int32.Parse(me.ElementName);
+                        }
                         uint pnum;
 
                         PipeEndpoint p = null;
@@ -827,7 +843,7 @@ namespace RobotRaconteurWeb
                         if (p == null) continue;
                         if (DispatchPacket(me, p, out pnum))
                         {
-                            ack.Add(new MessageElement(me.ElementName, new uint[] { pnum }));
+                            ack.Add(new MessageElement(index, new uint[] { pnum }));
                         }
                     }
                     catch (Exception)
@@ -852,7 +868,15 @@ namespace RobotRaconteurWeb
                 {
                     foreach (MessageElement me in m.elements)
                     {
-                        int index = Int32.Parse(me.ElementName);
+                        int index;
+                        if ((me.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+                        {
+                            index = me.ElementNumber;
+                        }
+                        else
+                        {
+                            index = Int32.Parse(me.ElementName);
+                        }
                         DispatchPacketAck(me, pipeendpoints[index]);
                     }
                 }
@@ -966,7 +990,16 @@ namespace RobotRaconteurWeb
                 {
                     try
                     {
-                        int index = Int32.Parse(me.ElementName);
+                        int index;
+                        if ((me.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+                        {
+                            index = me.ElementNumber;
+                        }
+                        else
+                        {
+                            index = Int32.Parse(me.ElementName);
+                        }
+
                         PipeEndpoint pe1;
                         lock (pipeendpointlock)
                         {
@@ -975,7 +1008,7 @@ namespace RobotRaconteurWeb
                         uint pnum;
                         if (DispatchPacket(me, pe1, out pnum))
                         {
-                            ack.Add(new MessageElement(me.ElementName, new uint[] { pnum }));
+                            ack.Add(new MessageElement(index, new uint[] { pnum }));
                         }
                     }
                     catch (Exception)
@@ -1003,7 +1036,15 @@ namespace RobotRaconteurWeb
                 {
                     foreach (MessageElement me in m.elements)
                     {
-                        int index = Int32.Parse(me.ElementName);
+                        int index;
+                        if ((me.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+                        {
+                            index = me.ElementNumber;
+                        }
+                        else
+                        {
+                            index = Int32.Parse(me.ElementName);
+                        }
                         PipeEndpoint pe1;
                         lock (pipeendpointlock)
                         {

@@ -2231,10 +2231,19 @@ namespace RobotRaconteurWeb
         {
         }
 
-        public MessageElement(String name, Object datin)
+        public MessageElement(String name, object datin)
         {
             ElementName = name;
             Data = datin;
+            //UpdateData();
+        }
+
+        public MessageElement(int number, object datin)
+        {
+            ElementNumber = number;
+            Data = datin;
+            ElementFlags &= (byte)~MessageElementFlags.ElementNameStr;
+            ElementFlags |= (byte)MessageElementFlags.ElementNumber;
             //UpdateData();
         }
 
@@ -2886,9 +2895,7 @@ namespace RobotRaconteurWeb
     {
         public static MessageElement NewMessageElement(string name, object data)
         {
-            var m = new MessageElement();
-            m.ElementName = name;
-            m.Data = data;
+            var m = new MessageElement(name, data);
             return m;
         }
 
@@ -2906,9 +2913,7 @@ namespace RobotRaconteurWeb
 
         public static MessageElement NewMessageElement(int i, object data)
         {
-            var m = new MessageElement();
-            m.ElementName = i.ToString();
-            m.Data = data;
+            var m = new MessageElement(i, data);
             return m;
         }
 
@@ -2974,6 +2979,12 @@ namespace RobotRaconteurWeb
         public static int GetMessageElementNumber(MessageElement e)
         {
             int res;
+
+            if ((e.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                return e.ElementNumber;
+            }
+
             if (!Int32.TryParse(e.ElementName, out res))
             {
                 throw new ProtocolException("Could not determine Element Number");
