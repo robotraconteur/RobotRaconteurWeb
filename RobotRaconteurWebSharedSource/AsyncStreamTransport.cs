@@ -443,7 +443,7 @@ namespace RobotRaconteurWeb
                             }
                         }
 
-                        if ((ret.entries[0].EntryType == MessageEntryType.ConnectClientRet || ret.entries[0].EntryType == MessageEntryType.ReconnectClient) && ret.entries[0].Error == MessageErrorType.None)
+                        if ((ret.entries[0].EntryType == MessageEntryType.ConnectClientRet || ret.entries[0].EntryType == MessageEntryType.ConnectClientCombinedRet || ret.entries[0].EntryType == MessageEntryType.ReconnectClient) && ret.entries[0].Error == MessageErrorType.None)
                         {
                             if (ret.header.SenderNodeID == node.NodeID)
                             {
@@ -499,7 +499,7 @@ namespace RobotRaconteurWeb
 
                 if (mes.entries.Count == 1)
                 {
-                    if (mes.entries[0].EntryType == MessageEntryType.ConnectClientRet && remote_ep == 0)
+                    if ((mes.entries[0].EntryType == MessageEntryType.ConnectClientRet || mes.entries[0].EntryType == MessageEntryType.ConnectClientCombinedRet) && remote_ep == 0)
                     {
                         lock (this)
                         {
@@ -1097,7 +1097,7 @@ namespace RobotRaconteurWeb
                                         throw new ProtocolException("Transport must support Message Version 2");
                                     }
 
-                                    if ((cap_value & (uint)~(TransportCapabilityCode.Message2BasicEnable)) != 0)
+                                    if ((cap_value & (uint)~(TransportCapabilityCode.Message2BasicEnable | TransportCapabilityCode.Message2BasicConnectCombined)) != 0)
                                     {
                                         RRLogFuncs.LogDebug("CreateConnection invalid version 2 message caps returned by server",
                                             node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint
@@ -1133,7 +1133,7 @@ namespace RobotRaconteurWeb
                                         }
                                         else
                                         {
-                                            if ((cap_value & (uint)~(TransportCapabilityCode.Message4BasicEnable)) != 0)
+                                            if ((cap_value & (uint)~(TransportCapabilityCode.Message4BasicEnable | TransportCapabilityCode.Message4BasicConnectCombined)) != 0)
                                             {
                                                 RRLogFuncs.LogDebug("CreateConnection invalid version 4 message caps returned by server",
                                                     node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
@@ -1195,12 +1195,12 @@ namespace RobotRaconteurWeb
                                         uint cap_value = cap & (uint)~TransportCapabilityCode.PageMask;
                                         if (cap_page == (uint)TransportCapabilityCode.Message2BasicPage)
                                         {
-                                            message2_basic_caps = cap_value & (uint)TransportCapabilityCode.Message2BasicEnable;
+                                            message2_basic_caps = cap_value & (uint)(TransportCapabilityCode.Message2BasicEnable | TransportCapabilityCode.Message2BasicConnectCombined);
                                         }
 
                                         if (cap_page == (uint)TransportCapabilityCode.Message4BasicPage)
                                         {
-                                            message4_basic_caps = cap_value & (uint)TransportCapabilityCode.Message4BasicEnable;
+                                            message4_basic_caps = cap_value & (uint)(TransportCapabilityCode.Message4BasicEnable | TransportCapabilityCode.Message4BasicConnectCombined);
                                         }
                                     }
 
@@ -1319,10 +1319,10 @@ namespace RobotRaconteurWeb
                     m.header.ReceiverNodeName = a.Item2;
                     MessageEntry mm = new MessageEntry(MessageEntryType.StreamOp, command);
                     var caps = new List<uint>();
-                    caps.Add((uint)(TransportCapabilityCode.Message2BasicPage | TransportCapabilityCode.Message2BasicEnable));
+                    caps.Add((uint)(TransportCapabilityCode.Message2BasicPage | TransportCapabilityCode.Message2BasicEnable | TransportCapabilityCode.Message2BasicConnectCombined));
                     if (!disable_message4)
                     {
-                        caps.Add((uint)(TransportCapabilityCode.Message4BasicPage | TransportCapabilityCode.Message4BasicEnable));
+                        caps.Add((uint)(TransportCapabilityCode.Message4BasicPage | TransportCapabilityCode.Message4BasicEnable | TransportCapabilityCode.Message4BasicConnectCombined));
                     }
                     mm.AddElement("capabilities", caps.ToArray());
                     m.entries.Add(mm);
@@ -1502,6 +1502,24 @@ namespace RobotRaconteurWeb
         public virtual uint StreamCapabilities(string name)
         {
             return 0;
+        }
+
+        public bool CheckCapabilityActive(uint cap)
+        {
+            uint cap_page = cap & (uint)TransportCapabilityCode.PageMask;
+            uint cap_value = cap & (uint)(~TransportCapabilityCode.PageMask);
+
+            if (cap_page == (uint)TransportCapabilityCode.Message2BasicPage)
+            {
+                return (cap_value & (active_capabilities_message2_basic & (uint)(~TransportCapabilityCode.PageMask))) != 0;
+            }
+
+            if (cap_page == (uint)TransportCapabilityCode.Message4BasicPage)
+            {
+                return (cap_value & (active_capabilities_message4_basic & (uint)(~TransportCapabilityCode.PageMask))) != 0;
+            }
+
+            return false;
         }
 #if !ROBOTRACONTEUR_H5
     protected async Task DoServerTlsHandshake(Message m)

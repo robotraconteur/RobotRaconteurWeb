@@ -309,6 +309,14 @@ namespace RobotRaconteurWeb
 
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
 
+        public ServiceFactory GetRootObjectServiceDef()
+        {
+            string root_object_type = RootObjectType;
+
+            var root_object_def = ServiceDefinitionUtil.SplitQualifiedName(root_object_type).Item1;
+            return node.GetServiceType(root_object_def);
+        }
+
         protected ServiceFactory m_ServiceDef;
 
         public string ServiceName { get { return m_ServiceName; } }
@@ -994,8 +1002,8 @@ namespace RobotRaconteurWeb
         private UserAuthenticator user_authenticator;
         private Dictionary<string, string> security_policies;
 
-        private bool RequireValidUser = false;
-        private bool AllowObjectLock = false;
+        public bool RequireValidUser { get; private set; } = false;
+        public bool AllowObjectLock { get; private set; } = false;
 
         private async Task<MessageEntry> ClientSessionOp(MessageEntry m, ServerEndpoint e)
         {
