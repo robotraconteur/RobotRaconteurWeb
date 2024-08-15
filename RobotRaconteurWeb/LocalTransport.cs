@@ -140,6 +140,12 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public override string[] UrlSchemeString { get { return new string[] { "rr+local" }; } }
 
+        /// <summary>
+        /// Disable message version 4
+        /// </summary>
+        [PublicApi]
+        public bool DisableMessage4 { get; set; }
+
         /**
         <summary>
         Construct a new LocalTransport for a non-default node. Must be registered with node using
@@ -154,6 +160,7 @@ namespace RobotRaconteurWeb
         {
             DefaultReceiveTimeout = 600000;
             DefaultConnectTimeout = 2500;
+            DisableMessage4 = false;
             parent_adapter = new AsyncStreamTransportParentImpl(this);
         }
 
@@ -908,6 +915,7 @@ namespace RobotRaconteurWeb
             : base(c.node, c.parent_adapter)
         {
             parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
 
         }
 
@@ -951,6 +959,7 @@ namespace RobotRaconteurWeb
             : base(c.node, c.parent_adapter)
         {
             parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
 
         }
 

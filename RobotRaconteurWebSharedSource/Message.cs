@@ -1880,7 +1880,7 @@ namespace RobotRaconteurWeb
                     if (m1.ElementName == name)
                     {
                         m = m1;
-                        return false;
+                        return true;
                     }
                 }
             }

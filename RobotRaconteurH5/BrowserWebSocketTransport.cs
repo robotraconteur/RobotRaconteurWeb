@@ -60,6 +60,8 @@ namespace RobotRaconteurWeb
             }
         }
 
+        public bool DisableMessage4 { get; set; }
+
 
         public BrowserWebSocketTransport(RobotRaconteurNode node = null) : base(node)
         {
@@ -239,6 +241,7 @@ namespace RobotRaconteurWeb
         public BrowserWebSocketClientTransport(BrowserWebSocketTransport c) : base(c.node, c.parent_adapter)
         {
             parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
         }
 
         private string connecturl = null;

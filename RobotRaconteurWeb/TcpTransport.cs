@@ -221,6 +221,12 @@ namespace RobotRaconteurWeb
         public bool AcceptWebSockets { get; set; }
 
         /// <summary>
+        /// Disable message version 4
+        /// </summary>
+        [PublicApi]
+        public bool DisableMessage4 { get; set; }
+
+        /// <summary>
         /// The supported URL transport schemes
         /// </summary>
         [PublicApi]
@@ -281,6 +287,7 @@ namespace RobotRaconteurWeb
             DefaultConnectTimeout = 2500;
             parent_adapter = new AsyncStreamTransportParentImpl(this);
             AcceptWebSockets = true;
+            DisableMessage4 = false;
 
             allowed_websocket_origins.Add("null"); //Why firefox??
             allowed_websocket_origins.Add("file://");
@@ -1506,6 +1513,7 @@ namespace RobotRaconteurWeb
         public TcpClientTransport(TcpTransport c) : base(c.node, c.parent_adapter)
         {
             parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
         }
 
         private string connecturl = null;
@@ -1935,6 +1943,7 @@ namespace RobotRaconteurWeb
         public TcpServerTransport(TcpTransport c) : base(c.node, c.parent_adapter)
         {
             parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
         }
 
         public async Task Connect(TcpClient s, CancellationToken cancel = default(CancellationToken))
