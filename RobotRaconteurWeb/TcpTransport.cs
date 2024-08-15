@@ -14,14 +14,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -269,6 +274,14 @@ namespace RobotRaconteurWeb
         {
             get
             {
+                if (port_sharer_client != null)
+                {
+                    int port = port_sharer_client.ListenPort;
+                    if (port != 0)
+                    {
+                        return new List<IPEndPoint>() { new IPEndPoint(IPAddress.Any, port), new IPEndPoint(IPAddress.IPv6Any, port) };
+                    }
+                }
                 List<IPEndPoint> eps = new List<IPEndPoint>();
                 foreach (TcpListener l in listeners)
                 {
@@ -349,6 +362,38 @@ namespace RobotRaconteurWeb
 
             StartWaitForConnections();
         }
+
+        TcpTransportPortSharerClient port_sharer_client = null;
+
+        /// <summary>
+        /// Listen for incoming connections using the port sharer
+        /// </summary>
+        [PublicApi]
+        public void StartServerUsingPortSharer()
+        {
+            lock (this)
+            {
+                if (listen_started) throw new InvalidOperationException("TcpTransport server already started");
+
+                port_sharer_client = new TcpTransportPortSharerClient(this);
+                port_sharer_client.Start();
+                listen_started = true;
+                transportopen = true;
+            }
+
+        }
+
+        /// <summary>
+        /// Check if the port sharer is being used
+        /// </summary>
+        public bool IsPortSharerRunning
+        {
+            get
+            {
+                return port_sharer_client != null;
+            }
+        }
+
         private List<TcpListener> listeners = new List<TcpListener>();
 
 
@@ -390,7 +435,7 @@ namespace RobotRaconteurWeb
                 }
                 catch (Exception ee)
                 {
-                    Console.WriteLine(ee.ToString());
+                    RRLogFuncs.LogWarning(ee.ToString());
                 }
 
             }
@@ -424,6 +469,11 @@ namespace RobotRaconteurWeb
             {
             }
 
+        }
+
+        internal void AcceptSocket(TcpClient tcpc)
+        {
+            ClientConnected2(tcpc).IgnoreResult();
         }
 
         private async Task ClientConnected2(TcpClient tcpc)
@@ -851,6 +901,12 @@ namespace RobotRaconteurWeb
                 DisableNodeAnnounce();
             }
             catch { };
+
+            try
+            {
+                port_sharer_client?.Close();
+            }
+            catch { }
 
             base.Close();
 
@@ -2449,7 +2505,7 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                List<IPEndPoint> eps = parent.ListeningEndpoints;
+                List<IPEndPoint> eps = parent.ResolvedListenerEndpoints.ToList();
 
                 //Return if there is nothing to send
                 if (eps.Count >= 0)
@@ -2579,7 +2635,11 @@ namespace RobotRaconteurWeb
 
                             sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastInterface, sid);
                             sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastTimeToLive, 32);
-                            sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, 32);
+                            try
+                            {
+                                sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, 32);
+                            }
+                            catch { }
                             sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IpTimeToLive, 32);
 
                             IPAddress ips = new IPAddress(binfo.AdapterEndPoint.Address.GetAddressBytes());
@@ -3284,5 +3344,473 @@ namespace RobotRaconteurWeb
         pong = 0xA
     }
 
+    internal class TcpTransportPortSharerClient
+    {
+        private readonly object thisLock = new object();
+        private bool open = false;
+        private Stream localSocket;
+        private int port;
+        private bool sharerConnected;
+        private readonly ManualResetEvent delayEvent = new ManualResetEvent(false);
 
+        private TcpTransport parent;
+
+        private CancellationTokenSource cancelSource;
+
+        internal TcpTransportPortSharerClient(TcpTransport parent)
+        {
+            this.parent = parent;
+        }
+
+        internal void Start()
+        {
+            lock (this)
+            {
+                if (open)
+                {
+                    throw new InvalidOperationException("Port sharer client already started");
+                }
+                open = true;
+                cancelSource = new CancellationTokenSource();
+                Task.Factory.StartNew(() => ClientThread(cancelSource.Token), cancelSource.Token);
+            }
+        }
+
+        internal void Close()
+        {
+            lock (thisLock)
+            {
+                if (!open)
+                    return;
+                open = false;
+                cancelSource.Cancel();
+            }
+        }
+
+        internal int ListenPort
+        {
+            get
+            {
+                lock (thisLock)
+                {
+                    return port;
+                }
+            }
+        }
+
+        internal async Task ClientThread(CancellationToken cancel)
+        {
+            try
+            {
+                RRLogFuncs.LogDebug("TcpTransport port sharer client started");
+
+                NodeDirectories nodeDirs = null;
+                bool nodeDirsInit = false;
+
+                while (!cancel.IsCancellationRequested)
+                {
+                    Socket socket = null;
+                    lock (thisLock)
+                    {
+                        if (!open)
+                            break;
+                        localSocket = null;
+                    }
+
+                    try
+                    {
+                        NodeID nodeId;
+                        string nodeName;
+                        {
+                            var node = parent.node;
+                            nodeId = node.NodeID;
+                            nodeName = node.NodeName;
+                        }
+
+                        if (nodeId.IsAnyNode)
+                            throw new InvalidOperationException("Internal error");
+
+                        string outData = $"{nodeId} {nodeName}".Trim();
+
+                        if (!nodeDirsInit)
+                        {
+                            nodeDirs = parent.node.NodeDirectories;
+                            nodeDirsInit = true;
+                        }
+
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            string fname = FindPortSharerInfoFile(nodeDirs);
+
+                            if (string.IsNullOrEmpty(fname))
+                            {
+                                await Task.Delay(1000, cancel);
+                                continue;
+                            }
+
+                            RRLogFuncs.LogDebug($"TcpTransport port sharer connecting named pipe to: \"{fname}\"");
+                            string fname2 = fname.Split("\\").Last();
+
+                            var pipeClient = new NamedPipeClientStream(".", fname2, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.Identification);
+
+                            {
+                                pipeClient.Connect(2000);
+                                pipeClient.ReadMode = PipeTransmissionMode.Message;
+                                localSocket = pipeClient;
+                            }
+                        }
+                        else
+                        {
+                            string fname = "/var/run/robotraconteur/transport/tcp/portsharer/portsharer.sock";
+                            RRLogFuncs.LogDebug($"TcpTransport port sharer connecting named pipe to: \"{fname}\"");
+
+                            socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                            {
+                                await Task.Run(() => socket.Connect(new UnixDomainSocketEndPoint(fname)));
+                                //localSocket = new NetworkStream(socket, true);
+                            }
+                        }
+
+                        if (localSocket == null && socket == null)
+                        {
+                            await Task.Delay(1000, cancel);
+                            continue;
+                        }
+                        using (localSocket)
+                        using (socket)
+                        {
+
+                            RRLogFuncs.LogInfo("TcpTransport port sharer successfully connected");
+
+                            var outDataBytes = Encoding.UTF8.GetBytes(outData);
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                await localSocket.WriteAsync(outDataBytes, 0, outDataBytes.Length, cancel);
+                            }
+                            else
+                            {
+                                await Task.Run(() => socket.Send(outDataBytes), cancel);
+                            }
+
+                            int port1 = 0;
+
+                            {
+                                var inData = new byte[4096];
+                                int nread;
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    nread = await localSocket.ReadAsync(inData, 0, inData.Length, cancel);
+                                }
+                                else
+                                {
+                                    nread = await Task.Run(() => socket.Receive(inData), cancel);
+                                    if (nread > 2)
+                                        nread -= 1;
+                                }
+
+                                if (nread == 0)
+                                    throw new InvalidOperationException("Connection closed");
+
+                                string inDataStr = Encoding.UTF8.GetString(inData, 0, nread).Trim();
+
+                                if (!inDataStr.StartsWith("OK"))
+                                    throw new InvalidOperationException("Return error");
+
+                                var inDataParts = inDataStr.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (inDataParts.Length != 2)
+                                    throw new InvalidOperationException("Return error");
+
+                                port1 = int.Parse(inDataParts[1]);
+
+                                lock (thisLock)
+                                {
+                                    port = port1;
+                                }
+                            }
+
+                            while (true)
+                            {
+                                lock (thisLock)
+                                {
+                                    if (!open)
+                                        break;
+                                    sharerConnected = true;
+                                }
+
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    var buf = new byte[4096];
+                                    int bytesRead = await localSocket.ReadAsync(buf, 0, buf.Length, cancel);
+
+                                    var buf2 = new byte[bytesRead];
+                                    Array.Copy(buf, buf2, bytesRead);
+
+                                    SocketInformation socketInfo = new SocketInformation
+                                    {
+                                        ProtocolInformation = buf2
+                                    };
+
+                                    socketInfo.Options = SocketInformationOptions.Connected | SocketInformationOptions.UseOnlyOverlappedIO;
+
+                                    var sock = new Socket(socketInfo);
+
+                                    IncomingSocket(sock);
+
+                                }
+                                else
+                                {
+                                    var buf = new byte[1024];
+                                    int sock = 0;
+
+                                    // TODO: receive fd from unix socket
+                                    if (!TcpTransportUtil.ReadFd(socket.Handle.ToInt32(), buf, out sock))
+                                        break;
+
+                                    if (sock == 0)
+                                        break;
+                                    if (sock < 0)
+                                        continue;
+
+                                    // Use reflection to get SafeSocketHandle type
+                                    var safe_socket_handle_type = typeof(Socket).Assembly.GetType("System.Net.Sockets.SafeSocketHandle");
+                                    var safe_socket_handle = Activator.CreateInstance(safe_socket_handle_type, new object[] { new IntPtr(sock), true });
+                                    var sock1 = (Socket)Activator.CreateInstance(typeof(Socket), new object[] { safe_socket_handle, }, null);
+
+                                    IncomingSocket(sock1);
+                                }
+                            }
+                        }
+                        localSocket = null;
+                        socket = null;
+                        try
+                        {
+                            socket?.Close();
+                        }
+                        catch { }
+                    }
+                    catch (Exception exp)
+                    {
+                        RRLogFuncs.LogWarning($"TcpTransport port sharer connect failed: {exp.Message}");
+                    }
+
+                    lock (thisLock)
+                    {
+                        RRLogFuncs.LogInfo("TcpTransport port sharer disconnected");
+                        sharerConnected = false;
+                        localSocket?.Dispose();
+                        localSocket = null;
+                        port = 0;
+                    }
+
+                    await Task.Delay(1000, cancel);
+                }
+
+                lock (thisLock)
+                {
+                    localSocket?.Dispose();
+                    localSocket = null;
+                    port = 0;
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        public void IncomingSocket(Socket socket)
+        {
+            RRLogFuncs.LogInfo($"TcpTransport port sharer accepted socket");
+
+            var parent1 = parent;
+            try
+            {
+                socket.LingerState = new LingerOption(true, 5);
+
+                // Use reflection to access internal constructor
+                var sock = (TcpClient)Activator.CreateInstance(typeof(TcpClient), System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { socket }, null);
+
+                parent.AcceptSocket(sock);
+            }
+            catch (Exception exp)
+            {
+                RRLogFuncs.LogWarning(string.Format("Failed to accept incoming socket {0}", exp.Message));
+            }
+        }
+
+        public bool IsPortSharerConnected()
+        {
+            lock (thisLock)
+            {
+                return sharerConnected;
+            }
+        }
+
+        public string FindPortSharerInfoFile(NodeDirectories nodeDirs)
+        {
+            string fname = null;
+            if (nodeDirs.system_run_dir != null)
+            {
+                string p1 = Path.Combine(nodeDirs.system_run_dir, "transport", "tcp", "portsharer", "portsharer.info");
+                p1 = Path.GetFullPath(p1);
+
+                RRLogFuncs.LogDebug($"Looking for portsharer.info in {p1}");
+
+                bool infoFileFound = NodeDirectoriesUtil.ReadInfoFile(p1, out var info);
+                if (infoFileFound)
+                {
+                    if (info.TryGetValue("socket", out string socket))
+                    {
+                        fname = socket;
+                    }
+                }
+            }
+            return fname.Trim();
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct IOVector
+    {
+        public IntPtr Base;
+        public UIntPtr Length;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct msghdr
+    {
+        public IntPtr msg_name; //optional address
+        public UIntPtr msg_namelen; //size of address
+        public IntPtr msg_iov; //scatter/gather array
+        public UIntPtr msg_iovlen; //# elements in msg_iov
+        public IntPtr msg_control; //ancillary data, see below
+        public UIntPtr msg_controllen; //ancillary data buffer len
+        public int msg_flags; //flags on received message
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct cmsghdr2
+    {
+        public UIntPtr cmsg_len; //data byte count, including header
+        public int cmsg_level; //originating protocol
+        public int cmsg_type; //protocol-specific type
+        public int fd;
+
+        public uint pad;
+        public uint pad2;
+        public uint pad3;
+        public uint pad4;
+    }
+    static class TcpTransportUtil
+    {
+
+        [DllImport("libc", SetLastError = true)]
+        public static extern int recvmsg(int s, IntPtr msg, int flags);
+
+        public static bool ReadFd(int localSocket, byte[] buf, out int sock)
+        {
+            sock = -1;
+
+            IntPtr iovdat_buf = Marshal.AllocHGlobal(4096);
+
+            IOVector iov = new IOVector();
+            iov.Base = iovdat_buf;
+            iov.Length = (UIntPtr)4096;
+
+
+            IntPtr iov_buf = Marshal.AllocHGlobal(Marshal.SizeOf<IOVector>());
+            Marshal.StructureToPtr(iov, iov_buf, false);
+
+            cmsghdr2 cm2 = new cmsghdr2();
+            cm2.cmsg_len = (UIntPtr)Marshal.SizeOf<cmsghdr2>();
+
+            IntPtr cm2_buf = Marshal.AllocHGlobal(Marshal.SizeOf<cmsghdr2>());
+            Marshal.StructureToPtr(cm2, cm2_buf, false);
+
+            msghdr mh = new msghdr();
+            mh.msg_control = cm2_buf;
+            mh.msg_controllen = cm2.cmsg_len;
+            mh.msg_name = IntPtr.Zero;
+            mh.msg_namelen = (UIntPtr)0;
+
+            mh.msg_iov = iov_buf;
+            mh.msg_iovlen = (UIntPtr)1;
+
+            IntPtr mh_buf = Marshal.AllocHGlobal(Marshal.SizeOf<msghdr>());
+            Marshal.StructureToPtr(mh, mh_buf, false);
+
+
+            int read = recvmsg(localSocket, mh_buf, 0);
+
+            if (read <= 0)
+            {
+                Marshal.FreeHGlobal(iov_buf);
+                Marshal.FreeHGlobal(iovdat_buf);
+                Marshal.FreeHGlobal(cm2_buf);
+                Marshal.FreeHGlobal(mh_buf);
+
+                return false;
+            }
+
+            cm2 = Marshal.PtrToStructure<cmsghdr2>(cm2_buf);
+
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+
+                if (cm2.cmsg_level != 1)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+            else
+            {
+                if (cm2.cmsg_level != 0xffff)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+
+
+            sock = cm2.fd;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+
+                if (cm2.cmsg_level != 1)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+            else
+            {
+                if (cm2.cmsg_level != 0xffff)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+
+            sock = cm2.fd;
+
+            Marshal.FreeHGlobal(iov_buf);
+            Marshal.FreeHGlobal(iovdat_buf);
+            Marshal.FreeHGlobal(cm2_buf);
+            Marshal.FreeHGlobal(mh_buf);
+
+            return true;
+        }
+    }
 }

@@ -86,7 +86,7 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         TcpTransportStartServer = 0x80,
-        // TcpTransportStartServerPortSharer = 0x100,
+        TcpTransportStartServerPortSharer = 0x100,
         /**
          * <summary>Disable Message Version 4</summary>
          */
@@ -227,7 +227,7 @@ namespace RobotRaconteurWeb
         | TcpPortOverride
         | TcpWebSocketOriginOverride
         | LocalTransportServerPublic
-        // | TcpTransportStartServerPortSharer
+        | TcpTransportStartServerPortSharer
         | JumboMessage
         | TcpTransportListenLocalHost,
 
@@ -268,7 +268,7 @@ namespace RobotRaconteurWeb
         | TcpPortOverride
         | TcpWebSocketOriginOverride
         | LocalTransportServerPublic
-        //| TcpTransportStartServerPortSharer
+        | TcpTransportStartServerPortSharer
         | JumboMessage
         | TcpTransportListenLocalHost
     }
@@ -570,7 +570,7 @@ namespace RobotRaconteurWeb
                 {"local-start-client", RobotRaconteurNodeSetupFlags.LocalTransportStartClient},
                 {"local-server-public", RobotRaconteurNodeSetupFlags.LocalTransportServerPublic},
                 {"tcp-start-server", RobotRaconteurNodeSetupFlags.TcpTransportStartServer},
-                //{"tcp-start-server-sharer", RobotRaconteurNodeSetupFlags.TcpTransportStartServerPortSharer},
+                {"tcp-start-server-sharer", RobotRaconteurNodeSetupFlags.TcpTransportStartServerPortSharer},
                 //{"tcp-listen-localhost", RobotRaconteurNodeSetupFlags.TcpTransportListenLocalhost},
                 //{"tcp-ipv4-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIPv4Discovery},
                 //{"tcp-ipv6-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIPv6Discovery},
@@ -689,8 +689,8 @@ namespace RobotRaconteurWeb
                 RobotRaconteurNodeSetupFlags.TcpWebSocketOriginOverride);
             h.Add<string>("tcp-ws-remove-origins", "remove websocket origins (comma separated)",
                 RobotRaconteurNodeSetupFlags.TcpWebSocketOriginOverride);
-            /*h.Add<bool>("tcp-start-server-sharer", "start TCP server listening using port sharer",
-                RobotRaconteurNodeSetupFlags.TcpTransportStartServerPortSharer);*/
+            h.Add<bool>("tcp-start-server-sharer", "start TCP server listening using port sharer",
+                RobotRaconteurNodeSetupFlags.TcpTransportStartServerPortSharer);
             h.Add<bool>("tcp-ipv4-discovery", "use IPv4 for discovery",
                 RobotRaconteurNodeSetupFlags.TcpTransportIpv4Discovery);
             h.Add<bool>("tcp-ipv6-discovery", "use IPv6 for discovery",
@@ -997,10 +997,10 @@ namespace RobotRaconteurWeb
             if (config.GetOptionOrDefaultAsBool("tcp-enable"))
             {
                 tcp_transport = new TcpTransport(node);
-                /*if (config.GetOptionOrDefaultAsBool("tcp-start-server-sharer"))
+                if (config.GetOptionOrDefaultAsBool("tcp-start-server-sharer"))
                 {
                     tcp_transport.StartServerUsingPortSharer();
-                }*/
+                }
                 if (config.GetOptionOrDefaultAsBool("tcp-start-server"))
                 {
                             //bool localhostOnly = config.GetOptionOrDefaultAsBool("tcp-listen-localhost");

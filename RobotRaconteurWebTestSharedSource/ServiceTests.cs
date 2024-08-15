@@ -138,12 +138,17 @@ namespace RobotRaconteurWebTest
         {
             node_config = new TestNodeConfig(nodename, enable_tcp_transport, enable_local_transport, enable_intra_transport, true, tcp_port);
         }
+
+        public TestServer(string nodename = "testprog", bool enable_tcp_transport = true, bool enable_local_transport = true, bool enable_intra_transport = true, string tcp_port = null)
+        {
+            node_config = new TestNodeConfig(nodename, enable_tcp_transport, enable_local_transport, enable_intra_transport, true, tcp_port);
+        }
         public void Dispose()
         {
             node_config.Dispose();
         }
 
-        public static async Task RunServer(string nodename = "testprog", int tcp_port = 0)
+        public static async Task RunServer(string nodename = "testprog", string tcp_port = null)
         {
             using (var server = new TestServer(nodename, tcp_port: tcp_port))
             {

@@ -41,7 +41,7 @@ namespace RobotRaconteurTest
                     await ServiceTests.RunServiceTest(args);
                     break;
                 case "server":
-                    await TestServer.RunServer(args[2], int.Parse(args[1]));
+                    await TestServer.RunServer(args[2], args[1]);
                     break;
                 case "findservicebytype":
                 case "findnodebyid":

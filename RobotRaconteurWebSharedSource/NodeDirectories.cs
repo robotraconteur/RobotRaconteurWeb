@@ -549,7 +549,7 @@ namespace RobotRaconteurWeb
                     string p_lock = node_dirs.user_run_dir;
                     foreach(var s in scope)
                     {
-                        p_lock = Path.Combine(p, s);
+                        p_lock = Path.Combine(p_lock, s);
                     }
 
                     Directory.CreateDirectory(p_lock);
@@ -559,7 +559,7 @@ namespace RobotRaconteurWeb
                     string p_state = node_dirs.user_state_dir;
                     foreach(var s in scope)
                     {
-                        p_state = Path.Combine(p, s);
+                        p_state = Path.Combine(p_state, s);
                     }
 
                     Directory.CreateDirectory (p_state);
