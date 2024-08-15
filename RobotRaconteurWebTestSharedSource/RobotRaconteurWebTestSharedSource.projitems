@@ -28,6 +28,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionWireTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestServerNodeConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)thunksource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageTestUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LFSRSeqGen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MessageSerializationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.robdef" />

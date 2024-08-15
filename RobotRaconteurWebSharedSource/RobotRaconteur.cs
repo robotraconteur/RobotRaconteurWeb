@@ -573,7 +573,101 @@ namespace RobotRaconteurWeb
 
         private MessageElement PackAnyType<T>(int num, ref T data, ClientContext context)
         {
-            return PackAnyType(num.ToString(), ref data, context);
+            Type t = typeof(T);
+
+            if (t == typeof(object))
+            {
+                return MessageElementUtil.NewMessageElement(num, PackVarType((object)data, context));
+            }
+
+            bool is_array = t.IsArray;
+            if (!(t.IsValueType || !EqualityComparer<T>.Default.Equals(data, default(T))))
+            {
+                return MessageElementUtil.NewMessageElement(num, null);
+            }
+
+            if (t.IsPrimitive)
+            {
+                return MessageElementUtil.NewMessageElement(num, new T[] { data });
+            }
+
+            if (is_array && t.GetElementType().IsPrimitive)
+            {
+                return MessageElementUtil.NewMessageElement(num, data);
+            }
+
+            if (t == typeof(string))
+            {
+                return MessageElementUtil.NewMessageElement(num, data);
+            }
+
+            if (t == typeof(CDouble) || t == typeof(CSingle))
+            {
+                return MessageElementUtil.NewMessageElement(num, data);
+            }
+
+            if (is_array)
+            {
+                var t2 = t.GetElementType();
+                if (t2 == typeof(CDouble) || t2 == typeof(CSingle))
+                {
+                    return MessageElementUtil.NewMessageElement(num, data);
+                }
+            }
+
+            if (t == typeof(MultiDimArray))
+            {
+                return MessageElementUtil.NewMessageElement(num, PackMultiDimArray((MultiDimArray)(object)data));
+            }
+
+            if (t == typeof(PodMultiDimArray))
+            {
+                return MessageElementUtil.NewMessageElement(num, PackPod((object)data, context));
+            }
+
+            if (t == typeof(NamedMultiDimArray))
+            {
+                return MessageElementUtil.NewMessageElement(num, PackNamedArray((object)data, context));
+            }
+
+            if (t.IsGenericType)
+            {
+                if (t.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                {
+                    var method = typeof(RobotRaconteurNode).GetMethod("PackMapType");
+                    var dict_params = t.GetGenericArguments();
+                    var generic = method.MakeGenericMethod(dict_params);
+                    var packed_map = generic.Invoke(this, new object[] { data, context });
+                    return MessageElementUtil.NewMessageElement(num, packed_map);
+                }
+                if (t.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    var method = typeof(RobotRaconteurNode).GetMethod("PackListType");
+                    var list_params = t.GetGenericArguments();
+                    var generic = method.MakeGenericMethod(list_params);
+                    var packed_list = generic.Invoke(this, new object[] { data, context });
+                    return MessageElementUtil.NewMessageElement(num, packed_list);
+                }
+                throw new DataTypeException("Invalid Robot Raconteur container value type");
+            }
+
+            if (!t.IsValueType && !is_array && t != typeof(PodMultiDimArray) && t != typeof(NamedMultiDimArray))
+            {
+                return MessageElementUtil.NewMessageElement(num, PackStructure(data, context));
+            }
+            else
+            {
+                Type t2 = t;
+                if (t.IsArray) t2 = t.GetElementType();
+                if (t2.GetCustomAttributes(typeof(RobotRaconteurNamedArrayElementTypeAndCount), false).Length > 0)
+                {
+                    return MessageElementUtil.NewMessageElement(num, PackNamedArray(data, context));
+                }
+                else
+                {
+                    return MessageElementUtil.NewMessageElement(num, PackPod(data, context));
+                }
+            }
         }
 
         public T UnpackAnyType<T>(MessageElement e, ClientContext context = null)

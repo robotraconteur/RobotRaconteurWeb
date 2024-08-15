@@ -148,6 +148,77 @@ namespace RobotRaconteurWeb
 
         }
 
+        public void WriteString8WithXLen(string s)
+        {
+            byte[] b = UTF8Encoding.UTF8.GetBytes(s);
+            WriteUintX((uint)b.Length);
+            if (b.Length + Position > CurrentLimit) throw new IOException("Message write error");
+            Write(b);
+            m_Position += (uint)b.Length;
+        }
+
+        public void WriteUintX(uint v)
+        {
+            if (v <= 252)
+            {
+                Write((byte)(v));
+                return;
+            }
+            if (v <= UInt16.MaxValue)
+            {
+                Write((byte)(253));
+                Write((ushort)v);
+                return;
+            }
+
+            Write((byte)254);
+            Write(v);
+        }
+
+        public void WriteUintX2(ulong v)
+        {
+            if (v <= UInt32.MaxValue)
+            {
+                WriteUintX((uint)v);
+            }
+            else
+            {
+                Write((byte)255);
+                Write(v);
+            }
+        }
+
+        public void WriteIntX(int v)
+        {
+            if (v >= SByte.MinValue && v <= 124)
+            {
+                Write((sbyte)v);
+                return;
+            }
+            if (v >= Int16.MinValue && v <= Int16.MaxValue)
+            {
+                Write((sbyte)125);
+                Write((short)v);
+                return;
+            }
+
+            Write((sbyte)126);
+            Write(v);
+        }
+
+        public void WriteIntX2(long v)
+        {
+            if (v >= Int32.MinValue && v <= Int32.MaxValue)
+            {
+                WriteIntX((int)v);
+            }
+            else
+            {
+                Write((sbyte)127);
+                Write(v);
+            }
+        }
+
 
         public void WriteNumber(Object n, DataTypes t)
         {
@@ -327,6 +398,63 @@ namespace RobotRaconteurWeb
             m_Position = 0;
         }
 
+        public static uint GetStringByteCount8WithXLen(string str)
+        {
+            uint a = (uint)GetStringByteCount8(str);
+            a += GetUintXByteCount(a);
+            return a;
+        }
+
+        public static uint GetUintXByteCount(uint v)
+        {
+            if (v <= 252)
+                return 1;
+            if (v <= UInt16.MaxValue)
+                return 3;
+            return 5;
+        }
+
+        public static uint GetUintX2ByteCount(ulong v)
+        {
+            if (v <= 252)
+                return 1;
+            if (v <= UInt16.MaxValue)
+                return 3;
+            if (v <= UInt32.MaxValue)
+                return 5;
+            return 9;
+        }
+
+        public static uint GetIntXByteCount(int v)
+        {
+            if (v >= SByte.MinValue && v <= 124)
+                return 1;
+            if (v >= Int16.MinValue && v <= Int16.MaxValue)
+                return 3;
+            return 5;
+        }
+
+        public static uint GetIntX2ByteCount(long v)
+        {
+            if (v >= SByte.MinValue && v <= 124)
+                return 1;
+            if (v >= Int16.MinValue && v <= Int16.MaxValue)
+                return 3;
+            if (v >= Int32.MinValue && v <= Int32.MaxValue)
+                return 5;
+            return 9;
+        }
+
+        public static uint GetSizePlusUintX(ulong s)
+        {
+            if (s <= 251)
+                return (uint)s + 1;
+            if (s <= (uint)(UInt16.MaxValue - 3))
+                return (uint)s + 3;
+            if (s > (uint)(UInt32.MaxValue - 5))
+                throw new BufferLimitViolationException("Message too large");
+            return (uint)s + 5;
+        }
     }
 
     // <summary>
@@ -488,6 +616,91 @@ namespace RobotRaconteurWeb
             }
 
             throw new DataTypeException("Unknown data type to read");
+        }
+
+        public uint ReadUintX()
+        {
+            byte a = ReadByte();
+            if (a <= 252)
+            {
+                return a;
+            }
+
+            if (a == 253)
+            {
+                return ReadUInt16();
+            }
+
+            if (a == 254)
+            {
+                return ReadUInt32();
+            }
+
+            throw new ArgumentException("Invalid number size");
+        }
+
+        public ulong ReadUintX2()
+        {
+            byte a = ReadByte();
+            if (a <= 252)
+            {
+                return a;
+            }
+
+            if (a == 253)
+            {
+                return ReadUInt16();
+            }
+
+            if (a == 254)
+            {
+                return ReadUInt32();
+            }
+
+            return ReadUInt64();
+        }
+
+        public int ReadIntX()
+        {
+            sbyte a = ReadSByte();
+            if (a <= 124)
+            {
+                return a;
+            }
+
+            if (a == 125)
+            {
+                return ReadInt16();
+            }
+
+            if (a == 126)
+            {
+                return ReadInt32();
+            }
+
+            throw new ArgumentException("Invalid number size");
+        }
+
+
+        public long ReadIntX2()
+        {
+            sbyte a = ReadSByte();
+            if (a <= 124)
+            {
+                return a;
+            }
+
+            if (a == 125)
+            {
+                return ReadInt16();
+            }
+
+            if (a == 126)
+            {
+                return ReadInt32();
+            }
+
+            return ReadInt64();
         }
 
         public override int Read()

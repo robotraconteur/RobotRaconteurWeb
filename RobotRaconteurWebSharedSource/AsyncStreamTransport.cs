@@ -92,6 +92,12 @@ namespace RobotRaconteurWeb
         protected bool m_IsTls = false;
         public bool IsTls { get { return m_IsTls; } }
 
+        protected internal bool disable_message4 = false;
+        protected internal bool send_version4 = false;
+        protected internal uint active_capabilities_message2_basic;
+        protected internal uint active_capabilities_message4_basic;
+        protected internal uint max_message_size = 12 * 1024 * 1024;
+
 
 
         protected async Task ConnectStream(Stream s, bool is_server, NodeID target_nodeid, string target_nodename, bool starttls, bool requiretls, int heartbeat_period, CancellationToken cancel)
@@ -221,9 +227,9 @@ namespace RobotRaconteurWeb
                     }
 
                     int mempos = 0;
-                    while (mempos < 8)
+                    while (mempos < 16)
                     {
-                        int n = await basestream.ReadAsync(recbuf, mempos, 8 - mempos).ConfigureAwait(false);
+                        int n = await basestream.ReadAsync(recbuf, mempos, 16 - mempos).ConfigureAwait(false);
                         if (n == 0)
                         {
                             Close();
@@ -233,17 +239,32 @@ namespace RobotRaconteurWeb
                     }
 
                     string seed = ASCIIEncoding.ASCII.GetString(recbuf, 0, 4);
-                    if (seed != "RRAC") throw new IOException("Invalid seed");
+                    if (seed != "RRAC") throw new IOException("Invalid magic");
 
                     int meslength = (int)BitConverter.ToUInt32(recbuf, 4);
+                    ushort message_version = BitConverter.ToUInt16(recbuf, 8);
 
                     if (recbuf.Length < meslength)
                     {
                         byte[] newbuf = new byte[(int)(meslength * 1.2)];
-                        Buffer.BlockCopy(recbuf, 0, newbuf, 0, 8);
+                        Buffer.BlockCopy(recbuf, 0, newbuf, 0, mempos);
                         recbuf = newbuf;
                         mread = new MemoryStream(recbuf, 0, recbuf.Length, true);
                         sreader = new ArrayBinaryReader(mread, recbuf, recbuf.Length);
+                    }
+
+                    if (meslength < 8)
+                    {
+                        RRLogFuncs.LogDebug("Received too small a message", node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                        throw new ProtocolException("Received too small a message");
+                    }
+
+                    if (meslength > (max_message_size))
+                    {
+                        RRLogFuncs.LogDebug(string.Format("Received too large a message {0} but max allowed {1}", meslength, max_message_size),
+                            node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+
+                        throw new ProtocolException("Received too large a message");
                     }
 
                     while (mempos < meslength)
@@ -265,7 +286,27 @@ namespace RobotRaconteurWeb
                             mread.Position = 0;
                             sreader.Reset(meslength);
                             Message mes = new Message();
-                            mes.Read(sreader);
+                            if (message_version == 4)
+                            {
+                                mes.Read4(sreader);
+
+                                var flags = mes.header.MessageFlags_;
+                                if ((flags & (byte)MessageFlags.RoutingInfo) == 0)
+                                {
+                                    mes.header.SenderNodeID = RemoteNodeID;
+                                    mes.header.ReceiverNodeID = node.NodeID;
+                                }
+
+                                if ((flags & (byte)MessageFlags.EndpointInfo) == 0)
+                                {
+                                    mes.header.SenderEndpoint = RemoteEndpoint;
+                                    mes.header.ReceiverEndpoint = LocalEndpoint;
+                                }
+                            }
+                            else
+                            {
+                                mes.Read(sreader);
+                            }
 
                             if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                             {
@@ -736,18 +777,62 @@ namespace RobotRaconteurWeb
 
             try
             {
-                uint meslength = m.ComputeSize();
-
-                if (meslength > sendbuf.Length)
+                if (!send_version4)
                 {
-                    sendbuf = new byte[(int)(meslength * 1.2)];
-                    mwrite = new MemoryStream(sendbuf, 0, sendbuf.Length, true);
-                    swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
-                }
+                    uint meslength = m.ComputeSize();
 
-                mwrite.Position = 0;
-                swriter.Reset((int)meslength);
-                m.Write(swriter);
+                    if (meslength > (max_message_size - 100))
+                    {
+                        RRLogFuncs.LogDebug(string.Format("Attempt to send message size {0} when max is {1}",
+                                                 meslength, max_message_size - 100), node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                        throw new ProtocolException("Message larger than maximum message size");
+                    }
+
+                    if (meslength > sendbuf.Length)
+                    {
+                        sendbuf = new byte[(int)(meslength * 1.2)];
+                        mwrite = new MemoryStream(sendbuf, 0, sendbuf.Length, true);
+                        swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
+                    }
+
+                    mwrite.Position = 0;
+                    swriter.Reset((int)meslength);
+                    m.Write(swriter);
+                }
+                else
+                {
+                    if (!RemoteNodeID.IsAnyNode && RemoteEndpoint != 0)
+                    {
+                        if (m.header.SenderNodeID == node.NodeID && m.header.ReceiverNodeID == RemoteNodeID &&
+                            m.header.SenderEndpoint == LocalEndpoint && m.header.ReceiverEndpoint == RemoteEndpoint)
+                        {
+                            if (!(m.entries.Count == 1 && ((uint)m.entries[0].EntryType) < 500))
+                            {
+                                m.header.MessageFlags_ &= (byte)~(MessageFlags.RoutingInfo | MessageFlags.EndpointInfo);
+                            }
+                        }
+                    }
+
+                    uint meslength = m.ComputeSize4();
+
+                    if (meslength > (max_message_size - 100))
+                    {
+                        RRLogFuncs.LogDebug(string.Format("Attempt to send message size {0} when max is {1}",
+                                                 meslength, max_message_size - 100), node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                        throw new ProtocolException("Message larger than maximum message size");
+                    }
+
+                    if (meslength > sendbuf.Length)
+                    {
+                        sendbuf = new byte[(int)(meslength * 1.2)];
+                        mwrite = new MemoryStream(sendbuf, 0, sendbuf.Length, true);
+                        swriter = new ArrayBinaryWriter(mwrite, sendbuf, sendbuf.Length);
+                    }
+
+                    mwrite.Position = 0;
+                    swriter.Reset((int)meslength);
+                    m.Write4(swriter);
+                }
 
                 tlastsend = DateTime.UtcNow;
                 await basestream.WriteAsync(sendbuf, 0, (int)mwrite.Position, cancel).ConfigureAwait(false);
@@ -990,6 +1075,86 @@ namespace RobotRaconteurWeb
                             }
                         }
 
+                        if (response.TryFindElement("capabilities", out var elem_caps))
+                        {
+                            uint message2_basic_caps = (uint)TransportCapabilityCode.Message2BasicEnable;
+                            uint message4_basic_caps = 0;
+
+                            var caps_arrays = elem_caps.CastData<uint[]>();
+
+                            for (int i = 0; i < caps_arrays.Length; i++)
+                            {
+                                uint cap = caps_arrays[i];
+                                uint cap_page = cap & (uint)TransportCapabilityCode.PageMask;
+                                uint cap_value = cap & (uint)~TransportCapabilityCode.PageMask;
+                                if (cap_page == (uint)TransportCapabilityCode.Message2BasicPage)
+                                {
+                                    if ((cap_value & (uint)TransportCapabilityCode.Message2BasicEnable) == 0)
+                                    {
+                                        RRLogFuncs.LogDebug("CreateConnection server transport must support message version 2",
+                                            node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint
+                                            );
+                                        throw new ProtocolException("Transport must support Message Version 2");
+                                    }
+
+                                    if ((cap_value & (uint)~(TransportCapabilityCode.Message2BasicEnable)) != 0)
+                                    {
+                                        RRLogFuncs.LogDebug("CreateConnection invalid version 2 message caps returned by server",
+                                            node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint
+                                            );
+                                        throw new ProtocolException("Invalid Message Version 2 capabilities");
+                                    }
+
+                                    message2_basic_caps = cap_value;
+                                }
+
+                                if (cap_page == (uint)TransportCapabilityCode.Message4BasicPage)
+                                {
+                                    if (disable_message4)
+                                    {
+                                        if (cap_value != 0)
+                                        {
+                                            RRLogFuncs.LogDebug("CreateConnection invalid version 4 message caps returned by server",
+                                                node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                                            throw new ProtocolException("Invalid Message Version 4 capabilities");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if ((cap_value & (uint)TransportCapabilityCode.Message4BasicEnable) == 0)
+                                        {
+                                            if (cap_value != 0)
+                                            {
+                                                RRLogFuncs.LogDebug("CreateConnection invalid version 4 message caps returned by server",
+                                                    node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+
+                                                throw new ProtocolException("Invalid Message Version 4 capabilities");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if ((cap_value & (uint)~(TransportCapabilityCode.Message4BasicEnable)) != 0)
+                                            {
+                                                RRLogFuncs.LogDebug("CreateConnection invalid version 4 message caps returned by server",
+                                                    node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                                                throw new ProtocolException("Invalid Message Version 4 capabilities");
+                                            }
+
+                                            message4_basic_caps = cap_value;
+                                        }
+                                    }
+                                }
+                            }
+                            active_capabilities_message2_basic = message2_basic_caps | (uint)TransportCapabilityCode.Message2BasicPage;
+
+                            if (message4_basic_caps != 0)
+                            {
+                                active_capabilities_message4_basic = message4_basic_caps | (uint)TransportCapabilityCode.Message4BasicPage;
+                                send_version4 = true;
+                            }
+                        }
+
+
                         NodeID n = header.SenderNodeID;
                         return Task.FromResult<object>(n);
                     }
@@ -1014,6 +1179,57 @@ namespace RobotRaconteurWeb
                         {
                             lock (this)
                             {
+
+                                if (request.TryFindElement("capabilities", out var elem_caps))
+                                {
+                                    uint message2_basic_caps = (uint)TransportCapabilityCode.Message2BasicEnable;
+                                    uint message4_basic_caps = 0;
+
+                                    List<uint> ret_caps = new List<uint>();
+
+                                    var caps_array = elem_caps.CastData<uint[]>();
+                                    for (int i = 0; i < caps_array.Length; i++)
+                                    {
+                                        uint cap = caps_array[i];
+                                        uint cap_page = cap & (uint)TransportCapabilityCode.PageMask;
+                                        uint cap_value = cap & (uint)~TransportCapabilityCode.PageMask;
+                                        if (cap_page == (uint)TransportCapabilityCode.Message2BasicPage)
+                                        {
+                                            message2_basic_caps = cap_value & (uint)TransportCapabilityCode.Message2BasicEnable;
+                                        }
+
+                                        if (cap_page == (uint)TransportCapabilityCode.Message4BasicPage)
+                                        {
+                                            message4_basic_caps = cap_value & (uint)TransportCapabilityCode.Message4BasicEnable;
+                                        }
+                                    }
+
+                                    if ((message2_basic_caps & (uint)TransportCapabilityCode.Message2BasicEnable) == 0)
+                                    {
+                                        RRLogFuncs.LogDebug("CreateConnection client transport must support message version 2",
+                                            node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint
+                                            );
+                                        throw new ProtocolException("Transport must support Message Version 2");
+                                    }
+                                    else
+                                    {
+                                        message2_basic_caps |= (uint)TransportCapabilityCode.Message2BasicPage;
+                                        ret_caps.Add(message2_basic_caps);
+                                        active_capabilities_message2_basic = message2_basic_caps;
+                                    }
+
+                                    if ((message4_basic_caps & (uint)TransportCapabilityCode.Message4BasicEnable) != 0 && !disable_message4)
+                                    {
+                                        send_version4 = true;
+                                        message4_basic_caps |= (uint)TransportCapabilityCode.Message4BasicPage;
+                                        ret_caps.Add(message4_basic_caps);
+                                        active_capabilities_message4_basic = message4_basic_caps;
+
+                                    }
+
+                                    mmret.AddElement("capabilities", ret_caps.ToArray());
+                                }
+
                                 if (header.ReceiverNodeID.IsAnyNode && header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName)
                                 {
                                     m_RemoteNodeID = header.SenderNodeID;
@@ -1102,6 +1318,13 @@ namespace RobotRaconteurWeb
                     m.header.ReceiverNodeID = a.Item1;
                     m.header.ReceiverNodeName = a.Item2;
                     MessageEntry mm = new MessageEntry(MessageEntryType.StreamOp, command);
+                    var caps = new List<uint>();
+                    caps.Add((uint)(TransportCapabilityCode.Message2BasicPage | TransportCapabilityCode.Message2BasicEnable));
+                    if (!disable_message4)
+                    {
+                        caps.Add((uint)(TransportCapabilityCode.Message4BasicPage | TransportCapabilityCode.Message4BasicEnable));
+                    }
+                    mm.AddElement("capabilities", caps.ToArray());
                     m.entries.Add(mm);
                 }
                 else

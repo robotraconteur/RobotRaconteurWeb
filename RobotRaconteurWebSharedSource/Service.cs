@@ -1033,6 +1033,7 @@ namespace RobotRaconteurWeb
                     {
 
                         await ClientLockOp(m, ret).ConfigureAwait(false);
+                        ret.AddElement("return", "OK");
                         return ret;
                     }
 

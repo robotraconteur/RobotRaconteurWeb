@@ -573,7 +573,119 @@ namespace RobotRaconteurWeb
         PermissionDenied
     }
 
+    /// <summary>
+    /// Flags for MessageFlags entry in MessageHeader
+    /// </summary>
+    [Flags, PublicApi]
+    public enum MessageFlags : byte
+    {
+        /** <summary> Message contains ROUTING_INFO section </summary> */
+        RoutingInfo = 0x01,
+        /** <summary>Message contains ENDPOINT_INFO section</summary> */
+        EndpointInfo = 0x02,
+        /** <summary> Message contains PRIORITY section</summary> */
+        Priority = 0x04,
+        /** <summary>Message is unreliable and may be dropped</summary> */
+        Unreliable = 0x08,
+        /** <summary>Message contains META_INFO section </summary> */
+        MetaInfo = 0x10,
+        /** <summary> Message contains STRING_TABLE section</summary> */
+        StringTable = 0x20,
+        /** <summary>Message contains MULTIPLE_ENTRIES section. If unset, message contains one entry</summary> */
+        MultipleEntries = 0x40,
+        /** <summary>Message contains EXTENDED section</summary> */
+        Extended = 0x80,
 
+        /** <summary>Message flags for compatibility with Message Format Version 2 </summary>*/
+        Version2Compat =
+            RoutingInfo | EndpointInfo | MetaInfo | MultipleEntries
+    }
+
+    /// <summary>
+    /// Flags for EntryFlags in MessageEntry
+    /// </summary>
+    [Flags, PublicApi]
+    public enum MessageEntryFlags : byte
+    {
+        /** <summary>MessageEntry contains SERVICE_PATH_STR section</summary> */
+        ServicePathStr = 0x01,
+        /** <summary>MessageEntry contains SERVICE_PATH_CODE section</summary> */
+        ServicePathCode = 0x02,
+        /** <summary>MessageEntry contains MEMBER_NAME_STR section</summary> */
+        MemberNameStr = 0x04,
+        /** <summary>MessageEntry contains MEMBER_NAME_CODE section</summary> */
+        MemberNameCode = 0x08,
+        /** <summary>MessageEntry contains REQUEST_ID section</summary> */
+        RequestID = 0x10,
+        /** <summary>MessageEntry contains ERROR section</summary> */
+        Error = 0x20,
+        /** <summary>MessageEntry contains META_INFO section</summary> */
+        MetaInfo = 0x40,
+        /** <summary>MessageEntry contains EXTENDED section</summary> */
+        Extended = 0x80,
+
+        /** <summary>MessageEntry flags for compatibility with Message Format Version 2</summary> */
+        Version2Compat = ServicePathStr |
+                                                         MemberNameStr | RequestID |
+                                                         Error | MetaInfo
+    }
+
+    ///<summary>
+    /// Flags for ElementFlags in MessageElement
+    /// </summary>
+    [Flags, PublicApi]
+    public enum MessageElementFlags : byte
+    {
+        /** <summary>MessageElement contains ELEMENT_NAME_STR section</summary> */
+        ElementNameStr = 0x01,
+        /** <summary>MessageElement contains ELEMENT_NAME_CODE section</summary> */
+        ElementNameCode = 0x02,
+        /** <summary>MessageElement contains ELEMENT_NUMBER section</summary> */
+        ElementNumber = 0x04,
+        /** <summary>MessageElement contains ELEMENT_TYPE_NAME_STR section</summary> */
+        ElementTypeNameStr = 0x08,
+        /** <summary>MessageElement contains ELEMENT_TYPE_NAME_CODE section</summary> */
+        ElementTypeNameCode = 0x10,
+        /** <summary>MessageElement contains META_INFO section</summary> */
+        MetaInfo = 0x20,
+        /** <summary>MessageElement contains EXTENDED section</summary> */
+        Extended = 0x80,
+
+        /** <summary>MessageElement flags for compatibility with Message Format Version 2</summary> */
+        Version2Compat =
+            ElementNameStr | ElementTypeNameStr | MetaInfo
+    }
+
+
+    /// <summary>
+    /// Transport capability codes
+    /// </summary>
+    [Flags, PublicApi]
+    public enum TransportCapabilityCode : uint
+    {
+        /** <summary>Page mask for transport capability code</summary> */
+        PageMask = 0xFFF00000,
+        /** <summary>Message Version 2 transport capability page code</summar> */
+        Message2BasicPage = 0x02000000,
+        /** <summary>Enable Message Version 2 transport capability flag</summary> */
+        Message2BasicEnable = 0x00000001,
+        /** <summary>Enable Message Version 2 connect combined transport capability flag</summary> */
+        Message2BasicConnectCombined = 0x00000002,
+        /** <summary>Message Version 4 transport capability page code</summary> */
+        Message4BasicPage = 0x04000000,
+        /** <summary>Enable Message Version 4 transport capability flag</summary> */
+        Message4BasicEnable = 0x00000001,
+        /** <summary>Enable Message Version 4 connect combine transport capability flag</summary> */
+        Message4BasicConnectCombined = 0x00000002,
+        /** <summary>Message Version 4 String Table capability page code</summary> */
+        Message4StringTablePage = 0x04100000,
+        /** <summary>Enable Message Version 4 String Table transport capability code</summary> */
+        Message4StringTableEnable = 0x00000001,
+        /** <summary>Enable Message Version 4 local String Table capability code</summary> */
+        Message4StringTableMessageLocal = 0x00000002,
+        /** <summary>Enable Message Version 4 standard String Table capability code</summary> */
+        Message4StringTableStandardTable = 0x00000004
+    }
     /// <summary>
     /// Represents a complex number using double precision.
     /// </summary>
@@ -1201,7 +1313,8 @@ namespace RobotRaconteurWeb
             uint s = header.ComputeSize();
             foreach (MessageEntry e in entries)
             {
-                s += e.ComputeSize();
+                e.UpdateData();
+                s += e.EntrySize;
             }
             return s;
         }
@@ -1266,11 +1379,67 @@ namespace RobotRaconteurWeb
             r.PopLimit();
 
         }
+
+        public uint ComputeSize4()
+        {
+            header.EntryCount = (ushort)entries.Count;
+            ulong s = 0;
+
+            foreach (MessageEntry e in entries)
+            {
+                e.UpdateData4();
+                s += e.EntrySize;
+            }
+
+            if (s > UInt32.MaxValue) throw new ProtocolException("Message exceeds maximum length");
+
+            header.UpdateHeader4((uint)s, (ushort)entries.Count);
+
+            uint s1 = header.MessageSize;
+
+            if (s1 > UInt32.MaxValue) throw new ProtocolException("Message exceeds maximum length");
+
+            return (uint)s1;
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            uint s = ComputeSize4();
+            w.PushRelativeLimit(s);
+            header.Write4(w);
+            foreach (MessageEntry e in entries)
+            {
+                e.Write4(w);
+            }
+            //if (w.DistanceFromLimit != 0) throw new DataSerializationException("Message write error");
+            w.PopLimit();
+
+        }
+
+        public void Read4(ArrayBinaryReader r)
+        {
+            header = new MessageHeader();
+            header.Read4(r);
+
+            r.PushRelativeLimit(header.MessageSize - header.HeaderLength);
+
+            ushort s = header.EntryCount;
+            entries = new List<MessageEntry>(s);
+            for (int i = 0; i < s; i++)
+            {
+                MessageEntry e = new MessageEntry();
+                e.Read4(r);
+                entries.Add(e);
+            }
+
+            r.PopLimit();
+        }
     }
 
     public class MessageHeader
     {
-        public ushort HeaderLength;
+        public uint HeaderLength;
+        public byte MessageFlags_ = (byte)MessageFlags.Version2Compat;
         public uint SenderEndpoint;
         public uint ReceiverEndpoint;
         public string SenderNodeName = "";
@@ -1284,14 +1453,33 @@ namespace RobotRaconteurWeb
         public ushort MessageResID;
 
         public uint MessageSize;
+        public ushort Priority;
+        public byte[] Extended;
 
         public ushort ComputeSize()
         {
-            return (ushort)(64 + ArrayBinaryWriter.GetStringByteCount8(SenderNodeName) + ArrayBinaryWriter.GetStringByteCount8(ReceiverNodeName) + ArrayBinaryWriter.GetStringByteCount8(MetaData));
+            uint s1 = (uint)ArrayBinaryWriter.GetStringByteCount8(SenderNodeName);
+            uint s2 = (uint)ArrayBinaryWriter.GetStringByteCount8(ReceiverNodeName);
+            uint s3 = (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+
+            if (s1 > UInt16.MaxValue) throw new DataTypeException("SenderNodeName exceeds maximum length");
+            if (s2 > UInt16.MaxValue) throw new DataTypeException("ReceiverNodeName exceeds maximum length");
+            if (s3 > UInt16.MaxValue) throw new DataTypeException("MessageHeader MetaData exceeds maximum length");
+
+            uint s = 64 + s1 + s2 + s3;
+
+            if (s > UInt16.MaxValue) throw new DataTypeException("MessageHeader exceeds maximum length");
+
+            return (ushort)s;
         }
 
         public void UpdateHeader(uint message_size, ushort entry_count)
         {
+            if (MessageFlags_ != (byte)MessageFlags.Version2Compat)
+            {
+                throw new DataTypeException("Invalid message flags for Version 2 message");
+            }
+
             HeaderLength = ComputeSize();
             MessageSize = message_size;
             EntryCount = entry_count;
@@ -1304,7 +1492,9 @@ namespace RobotRaconteurWeb
             w.Write(MessageSize);
             w.Write((ushort)2);
 
-            w.Write(HeaderLength);
+            if (HeaderLength > UInt16.MaxValue) throw new DataTypeException("MessageHeader exceeds maximum length");
+
+            w.Write((ushort)HeaderLength);
 
             byte[] bSenderNodeID = SenderNodeID.ToByteArray();
             byte[] bReceiverNodeID = ReceiverNodeID.ToByteArray();
@@ -1324,7 +1514,6 @@ namespace RobotRaconteurWeb
 
             if (w.DistanceFromLimit != 0) throw new IOException("Message write error");
             w.PopLimit();
-
         }
 
         public void Read(ArrayBinaryReader r)
@@ -1363,24 +1552,263 @@ namespace RobotRaconteurWeb
             r.PopLimit();
 
         }
+
+        public uint ComputeSize4()
+        {
+            uint s = 11;
+
+            if ((MessageFlags_ & (byte)MessageFlags.RoutingInfo) != 0)
+            {
+                s += 32;
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(SenderNodeName);
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ReceiverNodeName);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.EndpointInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount(SenderEndpoint);
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount(ReceiverEndpoint);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Priority) != 0)
+            {
+                s += 2;
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MetaInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MetaData);
+                s += 4;
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
+            {
+                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount(EntryCount);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetUintXByteCount((uint)Extended.Length);
+                s += (uint)Extended.Length;
+            }
+
+            s = (uint)ArrayBinaryWriter.GetSizePlusUintX(s);
+
+            return s;
+        }
+
+        public void UpdateHeader4(uint message_size, ushort entry_count)
+        {
+            if (entry_count == 1)
+            {
+                MessageFlags_ &= (byte)~MessageFlags.MultipleEntries;
+            }
+            else
+            {
+                MessageFlags_ |= (byte)MessageFlags.MultipleEntries;
+            }
+
+            if (!(MetaData?.Length > 0) && MessageID == 0 && MessageResID == 0)
+            {
+                MessageFlags_ &= (byte)~MessageFlags.MetaInfo;
+            }
+            else
+            {
+                MessageFlags_ |= (byte)MessageFlags.MetaInfo;
+            }
+
+            if (!(Extended?.Length > 0))
+            {
+                MessageFlags_ &= (byte)~MessageFlags.Extended;
+            }
+            else
+            {
+                MessageFlags_ |= (byte)MessageFlags.Extended;
+            }
+
+            EntryCount = entry_count;
+            HeaderLength = ComputeSize4();
+            MessageSize = message_size + HeaderLength;
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            w.PushRelativeLimit(HeaderLength);
+            w.WriteString8("RRAC");
+            w.Write(MessageSize);
+            w.Write((ushort)4);
+
+            w.WriteUintX(HeaderLength);
+            w.Write(MessageFlags_);
+
+            if ((MessageFlags_ & (byte)MessageFlags.RoutingInfo) != 0)
+            {
+                byte[] bSenderNodeID = SenderNodeID.ToByteArray();
+                byte[] bReceiverNodeID = ReceiverNodeID.ToByteArray();
+                for (int i = 0; i < 16; i++) { w.Write(bSenderNodeID[i]); };
+                for (int i = 0; i < 16; i++) { w.Write(bReceiverNodeID[i]); };
+                w.WriteString8WithXLen(SenderNodeName);
+                w.WriteString8WithXLen(ReceiverNodeName);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.EndpointInfo) != 0)
+            {
+                w.WriteUintX(SenderEndpoint);
+                w.WriteUintX(ReceiverEndpoint);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Priority) != 0)
+            {
+                w.Write(Priority);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MetaInfo) != 0)
+            {
+                w.WriteString8WithXLen(MetaData);
+                w.Write(MessageID);
+                w.Write(MessageResID);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
+            {
+                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
+            {
+                w.WriteUintX(EntryCount);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
+            {
+                w.WriteUintX((uint)Extended.Length);
+                if (Extended.Length > 0)
+                {
+                    w.WriteArray(Extended);
+                }
+            }
+
+            if (w.DistanceFromLimit != 0) throw new DataSerializationException("Message write error");
+            w.PopLimit();
+        }
+
+        public void Read4(ArrayBinaryReader r)
+        {
+            string magic = r.ReadString8(4);
+            if (magic != "RRAC")
+                throw new ProtocolException("Incorrect message magic");
+            MessageSize = r.ReadUInt32();
+            ushort version = r.ReadUInt16();
+            if (version != 4)
+                throw new ProtocolException("Unknown protocol version");
+
+            HeaderLength = r.ReadUintX();
+
+            r.PushRelativeLimit(HeaderLength - 10 - ArrayBinaryWriter.GetUintXByteCount(HeaderLength));
+
+            MessageFlags_ = r.ReadByte();
+
+            if ((MessageFlags_ & (byte)MessageFlags.RoutingInfo) != 0)
+            {
+
+                byte[] bSenderNodeID = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    bSenderNodeID[i] = r.ReadByte();
+                };
+                SenderNodeID = new NodeID(bSenderNodeID);
+
+                byte[] bReceiverNodeID = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    bReceiverNodeID[i] = r.ReadByte();
+                };
+                ReceiverNodeID = new NodeID(bReceiverNodeID);
+
+                uint pname_s = r.ReadUintX();
+                SenderNodeName = r.ReadString8(pname_s);
+                uint pname_r = r.ReadUintX();
+                ReceiverNodeName = r.ReadString8(pname_r);
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.EndpointInfo) != 0)
+            {
+                SenderEndpoint = r.ReadUintX();
+                ReceiverEndpoint = r.ReadUintX();
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Priority) != 0)
+            {
+                Priority = r.ReadUInt16();
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MetaInfo) != 0)
+            {
+                uint meta_s = r.ReadUintX();
+                MetaData = r.ReadString8(meta_s);
+                MessageID = r.ReadUInt16();
+                MessageResID = r.ReadUInt16();
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
+            {
+                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
+            {
+                uint c = r.ReadUintX();
+                if (c > UInt16.MaxValue)
+                    throw new ProtocolException("Too many entries in message");
+                EntryCount = (ushort)c;
+            }
+            else
+            {
+                EntryCount = 1;
+            }
+
+            if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
+            {
+                uint l = r.ReadUintX();
+                if (l != 0)
+                {
+                    Extended = new byte[l];
+                    for (int i = 0; i < Extended.Length; i++)
+                        Extended[i] = r.ReadByte();
+                }
+            }
+
+            if (r.DistanceFromLimit != 0)
+                throw new DataSerializationException("Error in message format");
+            r.PopLimit();
+        }
     }
 
 
     public class MessageEntry
     {
         public uint EntrySize;
+        public byte EntryFlags = (byte)MessageEntryFlags.Version2Compat;
 
         public MessageEntryType EntryType;
 
         public string ServicePath = "";
+        public uint ServicePathCode;
 
         public string MemberName = "";
+        public uint MemberNameCode;
 
         public uint RequestID;
 
         public MessageErrorType Error;
 
         public string MetaData = "";
+        public byte[] Extended;
 
         public List<MessageElement> elements;
 
@@ -1401,14 +1829,31 @@ namespace RobotRaconteurWeb
             uint s = 22;
             foreach (MessageElement e in elements)
             {
-                s += e.ComputeSize();
+                e.UpdateData();
+                s += e.ElementSize;
             }
 
-            s += (uint)ArrayBinaryWriter.GetStringByteCount8(ServicePath);
-            s += (uint)ArrayBinaryWriter.GetStringByteCount8(MemberName);
-            s += (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+            uint s1 = (uint)ArrayBinaryWriter.GetStringByteCount8(ServicePath);
+            uint s2 = (uint)ArrayBinaryWriter.GetStringByteCount8(MemberName);
+            uint s3 = (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+
+            if (s1 > UInt16.MaxValue) throw new DataTypeException("ServicePath exceeds maximum length");
+            if (s2 > UInt16.MaxValue) throw new DataTypeException("MemberName exceeds maximum length");
+            if (s3 > UInt16.MaxValue) throw new DataTypeException("MessageEntry MetaData exceeds maximum length");
+
+            s += s1 + s2 + s3;
 
             return s;
+        }
+
+        public void UpdateData()
+        {
+            if (EntryFlags != (byte)MessageEntryFlags.Version2Compat)
+            {
+                throw new DataTypeException("Invalid message entry flags for Version 2 message");
+            }
+
+            EntrySize = ComputeSize();
         }
 
         public MessageElement FindElement(string name)
@@ -1435,7 +1880,7 @@ namespace RobotRaconteurWeb
                     if (m1.ElementName == name)
                     {
                         m = m1;
-                        return false;
+                        return true;
                     }
                 }
             }
@@ -1527,20 +1972,256 @@ namespace RobotRaconteurWeb
 
         }
 
+        public uint ComputeSize4()
+        {
+            uint s = 3;
+            foreach (MessageElement e in elements)
+            {
+                e.UpdateData4();
+                s += e.ElementSize;
+            }
 
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ServicePath);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(ServicePathCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MemberName);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(MemberNameCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.RequestID) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(RequestID);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Error) != 0)
+            {
+                s += 2;
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MetaData);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Extended) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount((uint)Extended.Length);
+                s += (uint)Extended.Length;
+            }
+
+            s += ArrayBinaryWriter.GetUintXByteCount((uint)elements.Count);
+
+            s = ArrayBinaryWriter.GetSizePlusUintX(s);
+
+            return s;
+        }
+
+        public void UpdateData4()
+        {
+            if (RequestID != 0)
+            {
+                EntryFlags |= (byte)MessageEntryFlags.RequestID;
+            }
+            else
+            {
+                EntryFlags &= (byte)~MessageEntryFlags.RequestID;
+            }
+
+            if (Error != 0)
+            {
+                EntryFlags |= (byte)MessageEntryFlags.Error;
+            }
+            else
+            {
+                EntryFlags &= (byte)~MessageEntryFlags.Error;
+            }
+
+            if (MetaData?.Length > 0)
+            {
+                EntryFlags |= (byte)MessageEntryFlags.MetaInfo;
+            }
+            else
+            {
+                EntryFlags &= (byte)~MessageEntryFlags.MetaInfo;
+            }
+
+            if (!(Extended?.Length > 0))
+            {
+                EntryFlags &= (byte)~MessageFlags.Extended;
+            }
+            else
+            {
+                EntryFlags |= (byte)MessageFlags.Extended;
+            }
+
+            EntrySize = ComputeSize4();
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            UpdateData4();
+
+            w.PushRelativeLimit(EntrySize);
+
+            w.WriteUintX(EntrySize);
+            w.Write(EntryFlags);
+            w.Write((ushort)EntryType);
+
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathStr) != 0)
+            {
+                w.WriteString8WithXLen(ServicePath);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathCode) != 0)
+            {
+                w.WriteUintX(ServicePathCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameStr) != 0)
+            {
+                w.WriteString8WithXLen(MemberName);
+            }
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameCode) != 0)
+            {
+                w.WriteUintX(MemberNameCode);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.RequestID) != 0)
+            {
+                w.WriteUintX(RequestID);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Error) != 0)
+            {
+                w.Write((ushort)Error);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
+            {
+                w.WriteString8WithXLen(MetaData);
+            }
+
+            if ((EntryFlags & (byte)MessageFlags.Extended) != 0)
+            {
+                w.WriteUintX((uint)Extended.Length);
+                if (Extended.Length > 0)
+                {
+                    w.WriteArray(Extended);
+                }
+            }
+
+            w.WriteUintX((uint)elements.Count);
+
+            foreach (MessageElement e in elements)
+            {
+                e.Write4(w);
+            }
+
+            if (w.DistanceFromLimit != 0)
+                throw new DataSerializationException("Error in message format");
+
+            w.PopLimit();
+        }
+
+        public void Read4(ArrayBinaryReader r)
+        {
+            EntrySize = r.ReadUintX();
+
+            r.PushRelativeLimit(EntrySize - ArrayBinaryWriter.GetUintXByteCount(EntrySize));
+
+            EntryFlags = r.ReadByte();
+            EntryType = (MessageEntryType)r.ReadUInt16();
+
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathStr) != 0)
+            {
+                uint sname_s = r.ReadUintX();
+                ServicePath = r.ReadString8(sname_s);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.ServicePathCode) != 0)
+            {
+                ServicePathCode = r.ReadUintX();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameStr) != 0)
+            {
+                uint mname_s = r.ReadUintX();
+                MemberName = r.ReadString8(mname_s);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MemberNameCode) != 0)
+            {
+                MemberNameCode = r.ReadUintX();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.RequestID) != 0)
+            {
+                RequestID = r.ReadUintX();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Error) != 0)
+            {
+                Error = (MessageErrorType)r.ReadUInt16();
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.MetaInfo) != 0)
+            {
+                uint metadata_s = r.ReadUintX();
+                MetaData = r.ReadString8(metadata_s);
+            }
+
+            if ((EntryFlags & (byte)MessageEntryFlags.Extended) != 0)
+            {
+                uint l = r.ReadUintX();
+                if (l != 0)
+                {
+                    Extended = new byte[l];
+                    for (int i = 0; i < Extended.Length; i++)
+                        Extended[i] = r.ReadByte();
+                }
+            }
+
+            uint ecount = r.ReadUintX();
+
+            elements = new List<MessageElement>((int)ecount);
+            for (int i = 0; i < ecount; i++)
+            {
+                MessageElement e = new MessageElement();
+                e.Read4(r);
+                elements.Add(e);
+            }
+
+            if (r.DistanceFromLimit != 0) throw new DataSerializationException("Error reading message");
+            r.PopLimit();
+        }
     }
 
     public class MessageElement
     {
         public uint ElementSize;
+        public byte ElementFlags = (byte)MessageElementFlags.Version2Compat;
 
         public string ElementName = "";
+        public uint ElementNameCode;
+        public int ElementNumber;
 
         public DataTypes ElementType;
 
         public string ElementTypeName = "";
+        public uint ElementTypeNameCode;
 
         public string MetaData = "";
+        public byte[] Extended;
 
         public uint DataCount;
 
@@ -1550,10 +2231,19 @@ namespace RobotRaconteurWeb
         {
         }
 
-        public MessageElement(String name, Object datin)
+        public MessageElement(String name, object datin)
         {
             ElementName = name;
             Data = datin;
+            //UpdateData();
+        }
+
+        public MessageElement(int number, object datin)
+        {
+            ElementNumber = number;
+            Data = datin;
+            ElementFlags &= (byte)~MessageElementFlags.ElementNameStr;
+            ElementFlags |= (byte)MessageElementFlags.ElementNumber;
             //UpdateData();
         }
 
@@ -1567,7 +2257,7 @@ namespace RobotRaconteurWeb
             {
                 dat = value;
 
-                UpdateData();
+                //UpdateData();
             }
 
         }
@@ -1575,7 +2265,16 @@ namespace RobotRaconteurWeb
 
         public uint ComputeSize()
         {
-            uint s = 16 + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName) + (uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName) + (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+            uint s = 16;
+            uint s1 = (uint)ArrayBinaryWriter.GetStringByteCount8(ElementName);
+            uint s2 = (uint)ArrayBinaryWriter.GetStringByteCount8(ElementTypeName);
+            uint s3 = (uint)ArrayBinaryWriter.GetStringByteCount8(MetaData);
+
+            if (s1 > UInt16.MaxValue) throw new DataTypeException("ElementName exceeds maximum length");
+            if (s2 > UInt16.MaxValue) throw new DataTypeException("ElementTypeName exceeds maximum length");
+            if (s3 > UInt16.MaxValue) throw new DataTypeException("MessageElement MetaData exceeds maximum length");
+
+            s += s1 + s2 + s3;
 
             switch (ElementType)
             {
@@ -1597,7 +2296,8 @@ namespace RobotRaconteurWeb
 
                         foreach (MessageElement e in d.Elements)
                         {
-                            s += e.ComputeSize();
+                            e.UpdateData();
+                            s += e.ElementSize;
                         }
                     }
                     break;
@@ -1614,15 +2314,28 @@ namespace RobotRaconteurWeb
 
         public void UpdateData()
         {
-            string datatype;
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0 && (ElementFlags & (byte)MessageElementFlags.ElementNameStr) == 0)
+            {
+                ElementName = ElementNumber.ToString();
+                ElementFlags &= (byte)~MessageElementFlags.ElementNumber;
+                ElementFlags |= (byte)MessageElementFlags.ElementNameStr;
+            }
+
+            if (ElementFlags != (byte)MessageElementFlags.Version2Compat)
+            {
+                throw new ProtocolException("Invalid message flags for Version 2 message");
+            }
 
             if (dat == null)
             {
-                datatype = "null";
+                ElementType = DataTypes.void_t;
+                DataCount = 0;
             }
             else if (dat is Array)
             {
-                datatype = dat.GetType().GetElementType().ToString();
+                string datatype = dat.GetType().GetElementType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
                 DataCount = (uint)((Array)dat).Length;
             }
             else if (dat is MessageElementNestedElementList)
@@ -1630,54 +2343,20 @@ namespace RobotRaconteurWeb
                 var dat2 = (MessageElementNestedElementList)dat;
                 DataCount = (uint)dat2.Elements.Count;
                 ElementTypeName = dat2.TypeName ?? "";
-                switch (dat2.Type)
-                {
-                    case DataTypes.vector_t:
-                        datatype = "RobotRaconteurWeb.MessageElementMap<int>";
-                        break;
-                    case DataTypes.dictionary_t:
-                        datatype = "RobotRaconteurWeb.MessageElementMap<string>";
-                        break;
-                    case DataTypes.list_t:
-                        datatype = "RobotRaconteurWeb.MessageElementList";
-                        break;
-                    case DataTypes.multidimarray_t:
-                        datatype = "RobotRaconteurWeb.MessageElementMultiDimArray";
-                        break;
-                    case DataTypes.pod_t:
-                        datatype = "RobotRaconteurWeb.MessageElementPod";
-                        break;
-                    case DataTypes.pod_array_t:
-                        datatype = "RobotRaconteurWeb.MessageElementPodArray";
-                        break;
-                    case DataTypes.pod_multidimarray_t:
-                        datatype = "RobotRaconteurWeb.MessageElementPodMultiDimArray";
-                        break;
-                    case DataTypes.namedarray_array_t:
-                        datatype = "RobotRaconteurWeb.MessageElementNamedArray";
-                        break;
-                    case DataTypes.namedarray_multidimarray_t:
-                        datatype = "RobotRaconteurWeb.MessageElementNamedMultiDimArray";
-                        break;
-                    default:
-                        datatype = "RobotRaconteurWeb.MessageElementStructure";
-                        break;
-                }
+                ElementType = dat2.Type;
             }
             else if (dat is string)
             {
-                datatype = "System.String";
+                ElementType = DataTypes.string_t;
                 DataCount = (uint)UTF8Encoding.UTF8.GetByteCount((string)dat);
 
             }
             else
             {
-
                 DataCount = 1;
-                datatype = dat.GetType().ToString();
+                string datatype = dat.GetType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
             }
-
-            ElementType = DataTypeUtil.TypeIDFromString(datatype);
 
             if (ElementType != DataTypes.void_t && ElementType < DataTypes.string_t && !(dat is Array))
             {
@@ -1804,6 +2483,345 @@ namespace RobotRaconteurWeb
 
         }
 
+        public uint ComputeSize4()
+        {
+            uint s = 3;
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ElementName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(ElementNameCode);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                s += ArrayBinaryWriter.GetIntXByteCount(ElementNumber);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameStr) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(ElementTypeName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount(ElementTypeNameCode);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.MetaInfo) != 0)
+            {
+                s += (uint)ArrayBinaryWriter.GetStringByteCount8WithXLen(MetaData);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
+            {
+                s += ArrayBinaryWriter.GetUintXByteCount((uint)Extended.Length);
+                s += (uint)Extended.Length;
+            }
+
+            switch (ElementType)
+            {
+                case DataTypes.void_t:
+                    break;
+                case DataTypes.structure_t:
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                case DataTypes.multidimarray_t:
+                case DataTypes.list_t:
+                case DataTypes.pod_t:
+                case DataTypes.pod_array_t:
+                case DataTypes.pod_multidimarray_t:
+                case DataTypes.namedarray_array_t:
+                case DataTypes.namedarray_multidimarray_t:
+                    {
+                        MessageElementNestedElementList d = (MessageElementNestedElementList)Data;
+
+
+                        foreach (MessageElement e in d.Elements)
+                        {
+                            e.UpdateData4();
+                            s += e.ElementSize;
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        s += DataCount * DataTypeUtil.size(ElementType);
+                        break;
+                    }
+            }
+
+            s += ArrayBinaryWriter.GetUintXByteCount(DataCount);
+            s = ArrayBinaryWriter.GetSizePlusUintX(s);
+
+            return s;
+        }
+
+
+        public void UpdateData4()
+        {
+            if (dat == null)
+            {
+                ElementType = DataTypes.void_t;
+                DataCount = 0;
+            }
+            else if (dat is Array)
+            {
+                string datatype = dat.GetType().GetElementType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
+                DataCount = (uint)((Array)dat).Length;
+            }
+            else if (dat is MessageElementNestedElementList)
+            {
+                var dat2 = (MessageElementNestedElementList)dat;
+                DataCount = (uint)dat2.Elements.Count;
+                if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) == 0)
+                {
+                    ElementTypeName = dat2.TypeName ?? "";
+                }
+                ElementType = dat2.Type;
+            }
+            else if (dat is string)
+            {
+                ElementType = DataTypes.string_t;
+                DataCount = (uint)UTF8Encoding.UTF8.GetByteCount((string)dat);
+
+            }
+            else
+            {
+                DataCount = 1;
+                string datatype = dat.GetType().ToString();
+                ElementType = DataTypeUtil.TypeIDFromString(datatype);
+            }
+
+            if (ElementType != DataTypes.void_t && ElementType < DataTypes.string_t && !(dat is Array))
+            {
+                dat = DataTypeUtil.ArrayFromScalar(dat);
+            }
+
+            if ((ElementFlags & (byte)(MessageElementFlags.ElementNameStr | MessageElementFlags.ElementNameCode)) != 0 &&
+                (ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                throw new ProtocolException("Cannot set both element name and number");
+            }
+
+            if (ElementTypeName?.Length > 0)
+            {
+                ElementFlags |= (byte)MessageElementFlags.ElementTypeNameStr;
+            }
+            else
+            {
+                ElementFlags &= (byte)~MessageElementFlags.ElementTypeNameStr;
+            }
+
+            if (MetaData?.Length > 0)
+            {
+                ElementFlags |= (byte)MessageElementFlags.MetaInfo;
+            }
+            else
+            {
+                ElementFlags &= (byte)~MessageElementFlags.MetaInfo;
+            }
+
+            if (!(Extended?.Length > 0))
+            {
+                ElementFlags &= (byte)~MessageElementFlags.Extended;
+            }
+            else
+            {
+                ElementFlags |= (byte)MessageElementFlags.Extended;
+            }
+
+            ElementSize = ComputeSize4();
+        }
+
+        public void Write4(ArrayBinaryWriter w)
+        {
+            UpdateData4();
+            w.PushRelativeLimit(ElementSize);
+            w.WriteUintX(ElementSize);
+            w.Write(ElementFlags);
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameStr) != 0)
+            {
+                w.WriteString8WithXLen(ElementName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
+            {
+                w.WriteUintX(ElementNameCode);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                w.WriteIntX(ElementNumber);
+            }
+            w.Write((ushort)ElementType);
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameStr) != 0)
+            {
+                w.WriteString8WithXLen(ElementTypeName);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) != 0)
+            {
+                w.WriteUintX(ElementTypeNameCode);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.MetaInfo) != 0)
+            {
+                w.WriteString8WithXLen(MetaData);
+            }
+            if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
+            {
+                w.WriteUintX((uint)Extended.Length);
+                if (Extended.Length != 0)
+                {
+                    w.WriteArray(Extended);
+                }
+            }
+            w.WriteUintX(DataCount);
+
+            if (dat == null)
+            {
+
+            }
+            else if (dat.GetType().IsArray)
+            {
+                w.WriteArray((Array)dat);
+            }
+            else if (dat is MessageElementNestedElementList)
+            {
+                List<MessageElement> l = ((MessageElementNestedElementList)dat).Elements;
+                foreach (MessageElement e in l) e.Write4(w);
+            }
+            else if (dat is string)
+            {
+                w.WriteString8((string)dat);
+            }
+            else
+            {
+                w.WriteNumber(dat, ElementType);
+            }
+
+            if (w.DistanceFromLimit != 0) throw new IOException("Message write error");
+            w.PopLimit();
+
+        }
+        public void Read4(ArrayBinaryReader r)
+        {
+            ElementSize = r.ReadUintX();
+            r.PushRelativeLimit(ElementSize - ArrayBinaryWriter.GetUintXByteCount(ElementSize));
+
+            ElementFlags = r.ReadByte();
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameStr) != 0)
+            {
+                uint name_s = r.ReadUintX();
+                ElementName = r.ReadString8(name_s);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNameCode) != 0)
+            {
+                ElementNameCode = r.ReadUintX();
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                ElementNumber = r.ReadIntX();
+            }
+
+            ElementType = (DataTypes)r.ReadUInt16();
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameStr) != 0)
+            {
+                uint nametype_s = r.ReadUintX();
+                ElementTypeName = r.ReadString8(nametype_s);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.ElementTypeNameCode) != 0)
+            {
+                ElementTypeNameCode = r.ReadUintX();
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.MetaInfo) != 0)
+            {
+                uint metadata_s = r.ReadUintX();
+                MetaData = r.ReadString8(metadata_s);
+            }
+
+            if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
+            {
+                uint l = r.ReadUintX();
+                Extended = new byte[l];
+                if (l != 0)
+                {
+                    Extended = new byte[l];
+                    for (int i = 0; i < Extended.Length; i++)
+                        Extended[i] = r.ReadByte();
+                }
+            }
+
+            DataCount = r.ReadUintX();
+
+            switch (ElementType)
+            {
+                case DataTypes.void_t:
+                    break;
+                case DataTypes.structure_t:
+                case DataTypes.vector_t:
+                case DataTypes.dictionary_t:
+                case DataTypes.multidimarray_t:
+                case DataTypes.list_t:
+                case DataTypes.pod_t:
+                case DataTypes.pod_array_t:
+                case DataTypes.pod_multidimarray_t:
+                case DataTypes.namedarray_array_t:
+                case DataTypes.namedarray_multidimarray_t:
+                    {
+                        List<MessageElement> l = new List<MessageElement>((int)DataCount);
+                        for (int i = 0; i < DataCount; i++)
+                        {
+                            MessageElement m = new MessageElement();
+                            m.Read4(r);
+                            l.Add(m);
+                        }
+
+                        dat = new MessageElementNestedElementList(ElementType, ElementTypeName, l);
+                        break;
+                    }
+
+                case DataTypes.double_t:
+                case DataTypes.single_t:
+                case DataTypes.int8_t:
+                case DataTypes.uint8_t:
+                case DataTypes.int16_t:
+                case DataTypes.uint16_t:
+                case DataTypes.int32_t:
+                case DataTypes.uint32_t:
+                case DataTypes.int64_t:
+                case DataTypes.uint64_t:
+                case DataTypes.cdouble_t:
+                case DataTypes.csingle_t:
+                case DataTypes.bool_t:
+                    {
+                        if (DataCount * DataTypeUtil.size(ElementType) > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        Array d = DataTypeUtil.ArrayFromDataType(ElementType, DataCount);
+                        r.ReadArray(d);
+                        dat = (Object)d;
+                    }
+                    break;
+                case DataTypes.string_t:
+                    {
+                        if (DataCount > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        dat = r.ReadString8(DataCount);
+                        break;
+                    }
+                default:
+                    throw new DataTypeException("Unknown data type");
+            }
+
+
+            if (r.DistanceFromLimit != 0) throw new IOException("Error reading message");
+            r.PopLimit();
+        }
+
         public static MessageElement FindElement(List<MessageElement> m, string name)
         {
             foreach (MessageElement e in m)
@@ -1877,9 +2895,7 @@ namespace RobotRaconteurWeb
     {
         public static MessageElement NewMessageElement(string name, object data)
         {
-            var m = new MessageElement();
-            m.ElementName = name;
-            m.Data = data;
+            var m = new MessageElement(name, data);
             return m;
         }
 
@@ -1897,9 +2913,7 @@ namespace RobotRaconteurWeb
 
         public static MessageElement NewMessageElement(int i, object data)
         {
-            var m = new MessageElement();
-            m.ElementName = i.ToString();
-            m.Data = data;
+            var m = new MessageElement(i, data);
             return m;
         }
 
@@ -1965,6 +2979,12 @@ namespace RobotRaconteurWeb
         public static int GetMessageElementNumber(MessageElement e)
         {
             int res;
+
+            if ((e.ElementFlags & (byte)MessageElementFlags.ElementNumber) != 0)
+            {
+                return e.ElementNumber;
+            }
+
             if (!Int32.TryParse(e.ElementName, out res))
             {
                 throw new ProtocolException("Could not determine Element Number");

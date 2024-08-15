@@ -87,7 +87,11 @@ namespace RobotRaconteurWeb
         [PublicApi]
         TcpTransportStartServer = 0x80,
         // TcpTransportStartServerPortSharer = 0x100,
-        // DisableMessage4 = 0x200,
+        /**
+         * <summary>Disable Message Version 4</summary>
+         */
+        [PublicApi]
+        DisableMessage4 = 0x200,
         // DisableStringTable = 0x400,
         // DisableTimeouts = 0x800,
         /**
@@ -177,7 +181,7 @@ namespace RobotRaconteurWeb
         | TcpTransportIpv6Discovery
         | TcpTransportIpv4Discovery
         | LocalTransportStartClient
-        // | DisableMessage4
+        | DisableMessage4
         // | DisableStringTable
         // | DisableTimeouts
         | LoadTlsCert
@@ -213,7 +217,7 @@ namespace RobotRaconteurWeb
         | IntraTransportStartServer
         | EnableNodeAnnounce
         | EnableNodeDiscoveryListening
-        // | DisableMessage4
+        | DisableMessage4
         // | DisableStringTable
         // | DisableTimeouts
         | LoadTlsCert
@@ -256,7 +260,7 @@ namespace RobotRaconteurWeb
         | EnableNodeDiscoveryListening
         | TcpTransportIpv6Discovery
         | TcpTransportIpv4Discovery
-        //| DisableMessage4
+        | DisableMessage4
         //| DisableStringTable
         //| DisableTimeouts
         | NodeNameOverride
@@ -572,7 +576,7 @@ namespace RobotRaconteurWeb
                 //{"tcp-ipv6-discovery", RobotRaconteurNodeSetupFlags.TcpTransportIPv6Discovery},
                 {"intra-start-server", RobotRaconteurNodeSetupFlags.IntraTransportStartServer},
                 //{"disable-timeouts", RobotRaconteurNodeSetupFlags.DisableTimeouts},
-                //{"disable-message4", RobotRaconteurNodeSetupFlags.DisableMessage4},
+                {"disable-message4", RobotRaconteurNodeSetupFlags.DisableMessage4},
                 //{"disable-stringtable", RobotRaconteurNodeSetupFlags.DisableStringtable},
                 {"load-tls", RobotRaconteurNodeSetupFlags.LoadTlsCert},
                 {"require-tls", RobotRaconteurNodeSetupFlags.RequireTls},
@@ -693,9 +697,9 @@ namespace RobotRaconteurWeb
                 RobotRaconteurNodeSetupFlags.TcpTransportIpv6Discovery);
             h.Add<bool>("intra-start-server", "start Intra server listening",
                 RobotRaconteurNodeSetupFlags.IntraTransportStartServer);
-            /*h.Add<bool>("disable-timeouts", "disable timeouts for debugging", RobotRaconteurNodeSetupFlags.DisableTimeouts);
+            /*h.Add<bool>("disable-timeouts", "disable timeouts for debugging", RobotRaconteurNodeSetupFlags.DisableTimeouts);*/
             h.Add<bool>("disable-message4", "disable message v4", RobotRaconteurNodeSetupFlags.DisableMessage4);
-            h.Add<bool>("disable-stringtable", "disable message v4 string table",
+            /*h.Add<bool>("disable-stringtable", "disable message v4 string table",
                 RobotRaconteurNodeSetupFlags.DisableStringtable);*/
             h.Add<bool>("load-tls", "load TLS certificate", RobotRaconteurNodeSetupFlags.LoadTlsCert);
             h.Add<bool>("require-tls", "require TLS for network communication", RobotRaconteurNodeSetupFlags.RequireTls);
@@ -942,20 +946,20 @@ namespace RobotRaconteurWeb
                 //  Always announces due to file watching by clients
                 //}
 
-                /*if (config.GetOptionOrDefaultAsBool("disable-message4"))
+                if (config.GetOptionOrDefaultAsBool("disable-message4"))
                 {
-                    local_transport.SetDisableMessage4(true);
+                    local_transport.DisableMessage4 = true;
                 }
 
-                if (config.GetOptionOrDefaultAsBool("disable-stringtable"))
+                /*if (config.GetOptionOrDefaultAsBool("disable-stringtable"))
                 {
                     local_transport.SetDisableStringTable(true);
                 }*/
 
-                /*if (config.GetOptionOrDefaultAsBool("jumbo-message"))
+                if (config.GetOptionOrDefaultAsBool("jumbo-message"))
                 {
                     local_transport.MaxMessageSize = (100 * 1024 * 1024);
-                }*/
+                }
 
                 node.RegisterTransport(local_transport);
             }
@@ -1004,20 +1008,20 @@ namespace RobotRaconteurWeb
                             tcp_transport.StartServer(tcpPort);
                         }
 
-                /*if (config.GetOptionOrDefaultAsBool("disable-message4"))
+                if (config.GetOptionOrDefaultAsBool("disable-message4"))
                 {
-                    tcp_transport.SetDisableMessage4(true);
+                    tcp_transport.DisableMessage4 = true;
                 }
 
-                if (config.GetOptionOrDefaultAsBool("disable-stringtable"))
+                /*if (config.GetOptionOrDefaultAsBool("disable-stringtable"))
                 {
                     tcp_transport.SetDisableStringTable(true);
                 }*/
 
-                /*if (config.GetOptionOrDefaultAsBool("jumbo-message"))
+                if (config.GetOptionOrDefaultAsBool("jumbo-message"))
                 {
-                    tcp_transport.SetMaxMessageSize(100 * 1024 * 1024);
-                }*/
+                    tcp_transport.MaxMessageSize = (100 * 1024 * 1024);
+                }
 
                 if (config.GetOptionOrDefaultAsBool("discovery-listening-enable"))
                 {

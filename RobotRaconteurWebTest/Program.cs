@@ -86,6 +86,8 @@ namespace RobotRaconteurTest
                     }
                 case "citests":
                     {
+                        MessageSerializationTest.RunMessageTests();
+
                         await ServiceTests.RunIntraLoopback();
                         await ServiceTests.RunTcpLoopback();
                         await ServiceTests.RunLocalLoopback();
@@ -106,6 +108,11 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByType();
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByUrl();
                         Console.WriteLine("Done!");
+                        break;
+                    }
+                case "message":
+                    {
+                        MessageSerializationTest.RunMessageTests();
                         break;
                     }
                 default:

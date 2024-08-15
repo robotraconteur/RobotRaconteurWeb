@@ -92,16 +92,16 @@ namespace RobotRaconteurWebTest
         static public async Task RunClientTests(string endpoint_url)
         {
             string join_char = endpoint_url.Contains("?") ? "&" : "?";
-            var urls = new string[] { endpoint_url + join_char + "RobotRaconteurTestService" };
-            var auth_urls = new string[] { endpoint_url + join_char + "RobotRaconteurTestService_auth" };
-            var urls2 = new string[] { endpoint_url + join_char + "RobotRaconteurTestService2" };
+            var urls = new string[] { endpoint_url + join_char + "service=RobotRaconteurTestService" };
+            var auth_urls = new string[] { endpoint_url + join_char + "service=RobotRaconteurTestService_auth" };
+            var urls2 = new string[] { endpoint_url + join_char + "service=RobotRaconteurTestService2" };
 
 #if ROBOTRACONTEUR_H5
             auth_urls = null;
 #endif
             using (var nodes = new TestNodeConfig("testprog", true, true, true, false))
             {
-                var test = new ServiceTests(null, urls, auth_urls, urls2);
+                var test = new ServiceTests(nodes.client_node, urls, auth_urls, urls2);
                 await test.LoopbackTest();
                 await test.LoopbackTest2();
             }
