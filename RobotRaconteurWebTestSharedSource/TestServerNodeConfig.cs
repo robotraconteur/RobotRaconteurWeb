@@ -23,7 +23,8 @@ namespace RobotRaconteurTest
         public Transport client_local_transport;
         public Transport client_intra_transport;
 
-        public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server = true, int tcp_port = 0)
+
+        public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server = true, object tcp_port = null)
         {
             if (start_server)
             {
@@ -58,8 +59,25 @@ namespace RobotRaconteurTest
                 if (enable_tcp_transport)
                 {
                     var t2 = new TcpTransport(node);
+                        string tcp_port_s = tcp_port as string;
+                        if (tcp_port_s != null)
+                        {
+                            if (tcp_port_s == "sharer")
+                            {
+                                t2.StartServerUsingPortSharer();
+                            }
+                            else
+                            {
+                                t2.StartServer(int.Parse(tcp_port_s));
+                            }
+                        }
+                        else
+                        {
+                            int tcp_port_i = (int)tcp_port;
+                            t2.StartServer(tcp_port_i);
+                        }
 
-                    t2.StartServer(tcp_port);
+
                     t2.EnableNodeAnnounce();
                     t2.EnableNodeDiscoveryListening();
                     node.RegisterTransport(t2);
