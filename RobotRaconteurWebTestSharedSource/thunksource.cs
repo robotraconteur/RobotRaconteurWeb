@@ -247,7 +247,7 @@ namespace com.robotraconteur.testing.TestService1
     {
         public override string DefString()
         {
-            const string s = "#This is the standard test service for RobotRaconteur\n#It is not meant to be exhaustive, rather it tests the\n#most common operations.\n\n#Each of the members defined has a specified behavior.\n#Refer to the reference implementation for details\n#on these behaviors.  New implementations of\n#Robot Raconteur should test against the reference\n#client and server to determine compatibilty.\n\nservice com.robotraconteur.testing.TestService1\n\noption version 0.8\n\nimport com.robotraconteur.testing.TestService2\n\nexception testexception1\nexception testexception2\n\nstruct teststruct1\nfield double[] dat1\nfield string str2\nfield string{int32} vec3\nfield string{string} dict4\nfield string{list} list5\nfield teststruct2 struct1\nfield teststruct2{string} dstruct2\nfield teststruct2{list} lstruct3\nfield double[*] multidimarray\n\nfield varvalue var3\n\nend struct\n\nstruct teststruct2\nfield double[] mydat\n\nend struct\n\nobject testroot\nimplements com.robotraconteur.testing.TestService2.baseobj\n\noption constant double[] doubleconst {3.4, 4.8, 14372.8}\noption constant string strconst \"This is a constant\"\n\n#Properties to test the serialization of different data types\n\n#numbers\n\nproperty double d1\nproperty double[] d2\nproperty double[16] d3\nproperty double[16-] d4\nproperty double[*] d5\nproperty double[3,3] d6\n\nproperty single s1\nproperty single[] s2\n\nproperty int8 i8_1\nproperty int8[] i8_2\n\nproperty uint8 u8_1\nproperty uint8[] u8_2\nproperty uint8[*] u8_3\n\nproperty int16 i16_1\nproperty int16[] i16_2\n\nproperty uint16 u16_1\nproperty uint16[] u16_2\n\nproperty int32 i32_1\nproperty int32[] i32_2\nproperty int32[] i32_huge\n\nproperty uint32 u32_1\nproperty uint32[] u32_2\n\nproperty int64 i64_1\nproperty int64[] i64_2\n\nproperty uint64 u64_1\nproperty uint64[] u64_2\n\n#strings\nproperty string str1\n\n#structs\nproperty teststruct1 struct1\nproperty teststruct2 struct2\n\n#indexed sets\nproperty double{int32} is_d1\nproperty double{string} is_d2\nproperty double[]{int32} is_d3\nproperty double[]{string} is_d4\nproperty double[*]{int32} is_d5\nproperty double[*]{string} is_d6\n\nproperty string{int32} is_str1\nproperty string{string} is_str2\n\nproperty teststruct2{int32} is_struct1\nproperty teststruct2{string} is_struct2\nproperty com.robotraconteur.testing.TestService2.ostruct2 struct3\n\n#lists\nproperty double{list} list_d1\nproperty double[]{list} list_d3\nproperty double[*]{list} list_d5\n\nproperty string{list} list_str1\nproperty teststruct2{list} list_struct1\n\n#varvalue\nproperty varvalue var1\nproperty varvalue{int32} var2\nproperty varvalue var_num\nproperty varvalue var_str\nproperty varvalue var_struct\nproperty varvalue var_vector\nproperty varvalue var_dictionary\nproperty varvalue var_list\nproperty varvalue var_multidimarray\n\n#Throw an error to test error transmission\nproperty double errtest\nproperty teststruct1 nulltest\n\n#functions\nfunction void func1()\nfunction void func2(double d1, double d2)\nfunction double func3(double d1, double d2)\nfunction int32 meaning_of_life()\nfunction void func_errtest()\nfunction void func_errtest1()\nfunction void func_errtest2()\nfunction void func_errtest3()\n\n#events\n\nevent ev1()\nevent ev2(double d1, teststruct2 s2 )\n\n#objrefs\n\nobjref sub1 o1\nobjref sub1[] o2\nobjref sub1{int32} o3\nobjref sub1{string} o4\nobjref com.robotraconteur.testing.TestService2.subobj o5\n\nobjref varobject o6\n\nfunction void o6_op(int32 op)\n\n#pipes\n\npipe double[] p1\n\n#option pipe p2 unreliable\npipe teststruct2 p2\nfunction void pipe_check_error()\n\npipe double broadcastpipe\n\n#callbacks\ncallback void cb1()\ncallback void cb2(double d1, double d2)\ncallback double cb3(double d1, double d2)\ncallback int32 cb_meaning_of_life()\ncallback void cb_errtest()\n\nfunction void test_callbacks()\n\n#wires\n\nwire double[] w1\nwire teststruct2 w2\nwire int32[*] w3\n\nwire double broadcastwire\n\n#memory\n\nmemory double[] m1\nmemory double[*] m2\nmemory uint8[*] m3\n\nend object\n\nobject sub1\nproperty double[] d1\nproperty double[*] d2\n\nobjref sub2 o2_1\nobjref sub2{int32} o2_2\nobjref sub2{string} o2_3\n\nproperty string s_ind\nproperty int32 i_ind\n\nend object\n\nobject sub2\n\nproperty string s_ind\nproperty int32 i_ind\n\nproperty string data\nobjref sub3{string} o3_1\nend object\n\nobject sub3\nproperty string ind\nproperty string data2\nproperty double data3\nfunction double add(double d)\nend object\n\n\n";
+            const string s = "#This is the standard test service for RobotRaconteur\n#It is not meant to be exhaustive, rather it tests the\n#most common operations.\n\n#Each of the members defined has a specified behavior.\n#Refer to the reference implementation for details\n#on these behaviors.  New implementations of\n#Robot Raconteur should test against the reference\n#client and server to determine compatibilty.\n\nservice com.robotraconteur.testing.TestService1\n\noption version 0.8\n\nimport com.robotraconteur.testing.TestService2\n\nexception testexception1\nexception testexception2\n\nstruct teststruct1\nfield double[] dat1\nfield string str2\nfield string{int32} vec3\nfield string{string} dict4\nfield string{list} list5\nfield teststruct2 struct1\nfield teststruct2{string} dstruct2\nfield teststruct2{list} lstruct3\nfield double[*] multidimarray\n\nfield varvalue var3\n\nend struct\n\nstruct teststruct2\nfield double[] mydat\n\nend struct\n\nobject testroot\nimplements com.robotraconteur.testing.TestService2.baseobj\n\noption constant double[] doubleconst {3.4, 4.8, 14372.8}\noption constant string strconst \"This is a constant\"\n\n#Properties to test the serialization of different data types\n\n#numbers\n\nproperty double d1\nproperty double[] d2\nproperty double[16] d3\nproperty double[16-] d4\nproperty double[*] d5\nproperty double[3,3] d6\n\nproperty single s1\nproperty single[] s2\n\nproperty int8 i8_1\nproperty int8[] i8_2\n\nproperty uint8 u8_1\nproperty uint8[] u8_2\nproperty uint8[*] u8_3\n\nproperty int16 i16_1\nproperty int16[] i16_2\n\nproperty uint16 u16_1\nproperty uint16[] u16_2\n\nproperty int32 i32_1\nproperty int32[] i32_2\nproperty int32[] i32_huge\n\nproperty uint32 u32_1\nproperty uint32[] u32_2\n\nproperty int64 i64_1\nproperty int64[] i64_2\n\nproperty uint64 u64_1\nproperty uint64[] u64_2\n\n#strings\nproperty string str1\n\n#structs\nproperty teststruct1 struct1\nproperty teststruct2 struct2\n\n#indexed sets\nproperty double{int32} is_d1\nproperty double{string} is_d2\nproperty double[]{int32} is_d3\nproperty double[]{string} is_d4\nproperty double[*]{int32} is_d5\nproperty double[*]{string} is_d6\n\nproperty string{int32} is_str1\nproperty string{string} is_str2\n\nproperty teststruct2{int32} is_struct1\nproperty teststruct2{string} is_struct2\nproperty com.robotraconteur.testing.TestService2.ostruct2 struct3\n\n#lists\nproperty double{list} list_d1\nproperty double[]{list} list_d3\nproperty double[*]{list} list_d5\n\nproperty string{list} list_str1\nproperty teststruct2{list} list_struct1\n\n#varvalue\nproperty varvalue var1\nproperty varvalue{int32} var2\nproperty varvalue var_num\nproperty varvalue var_str\nproperty varvalue var_struct\nproperty varvalue var_vector\nproperty varvalue var_dictionary\nproperty varvalue var_list\nproperty varvalue var_multidimarray\n\n#Throw an error to test error transmission\nproperty double errtest\nproperty teststruct1 nulltest\n\n#functions\nfunction void func1()\nfunction void func2(double d1, double d2)\nfunction double func3(double d1, double d2)\nfunction int32 meaning_of_life()\nfunction void func_errtest()\nfunction void func_errtest1()\nfunction void func_errtest2()\nfunction void func_errtest3()\n\n#events\n\nevent ev1()\nevent ev2(double d1, teststruct2 s2 )\n\n#objrefs\n\nobjref sub1 o1\nobjref sub1[] o2\nobjref sub1{int32} o3\nobjref sub1{string} o4\nobjref com.robotraconteur.testing.TestService2.subobj o5\n\nobjref varobject o6\n\nfunction void o6_op(int32 op)\n\n#pipes\n\npipe double[] p1\n\n#option pipe p2 unreliable\npipe teststruct2 p2\nfunction void pipe_check_error()\n\npipe double broadcastpipe\n\n#callbacks\ncallback void cb1()\ncallback void cb2(double d1, double d2)\ncallback double cb3(double d1, double d2)\ncallback int32 cb_meaning_of_life()\ncallback void cb_errtest()\n\nfunction void test_callbacks()\n\n#wires\n\nwire double[] w1\nwire teststruct2 w2\nwire int32[*] w3\n\nwire double broadcastwire\n\n#memory\n\nmemory double[] m1\nmemory double[*] m2\nmemory uint8[*] m3\n\nend object\n\nobject sub1\nproperty double[] d1\nproperty double[*] d2\n\nobjref sub2 o2_1\nobjref sub2{int32} o2_2\nobjref sub2{string} o2_3\n\nproperty string s_ind\nproperty int32 i_ind\n\nend object\n\nobject sub2\n\nproperty string s_ind\nproperty int32 i_ind\n\nproperty string data\nobjref sub3{string} o3_1\nend object\n\nobject sub3\nproperty string ind\nproperty string data2\nproperty double data3\nfunction double add(double d)\nend object\n\n";
             return s;
         }
         public override string GetServiceName() { return "com.robotraconteur.testing.TestService1"; }
@@ -3217,733 +3217,563 @@ namespace com.robotraconteur.testing.TestService1
             return false;
         }
     }
-    public class testroot_default_impl : testroot
-    {
-        protected Callback<Func<CancellationToken, Task>> rrvar_cb1;
-        protected Callback<Func<double, double, CancellationToken, Task>> rrvar_cb2;
-        protected Callback<Func<double, double, CancellationToken, Task<double>>> rrvar_cb3;
-        protected Callback<Func<CancellationToken, Task<int>>> rrvar_cb_meaning_of_life;
-        protected Callback<Func<CancellationToken, Task>> rrvar_cb_errtest;
-        public virtual Task<double> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double[]> get_d2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d2(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double[]> get_d3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d3(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double[]> get_d4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d4(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_d5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d5(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_d6(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d6(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<float> get_s1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_s1(float value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<float[]> get_s2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_s2(float[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sbyte> get_i8_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i8_1(sbyte value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sbyte[]> get_i8_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i8_2(sbyte[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<byte> get_u8_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u8_1(byte value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<byte[]> get_u8_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u8_2(byte[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_u8_3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u8_3(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<short> get_i16_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i16_1(short value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<short[]> get_i16_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i16_2(short[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<ushort> get_u16_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u16_1(ushort value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<ushort[]> get_u16_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u16_2(ushort[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> get_i32_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i32_1(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int[]> get_i32_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i32_2(int[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int[]> get_i32_huge(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i32_huge(int[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<uint> get_u32_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u32_1(uint value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<uint[]> get_u32_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u32_2(uint[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<long> get_i64_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i64_1(long value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<long[]> get_i64_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i64_2(long[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<ulong> get_u64_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u64_1(ulong value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<ulong[]> get_u64_2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_u64_2(ulong[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<string> get_str1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_str1(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<teststruct1> get_struct1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_struct1(teststruct1 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<teststruct2> get_struct2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_struct2(teststruct2 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, double>> get_is_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_d1(Dictionary<int, double> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<string, double>> get_is_d2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_d2(Dictionary<string, double> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, double[]>> get_is_d3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_d3(Dictionary<int, double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<string, double[]>> get_is_d4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_d4(Dictionary<string, double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, MultiDimArray>> get_is_d5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_d5(Dictionary<int, MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<string, MultiDimArray>> get_is_d6(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_d6(Dictionary<string, MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, string>> get_is_str1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_str1(Dictionary<int, string> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<string, string>> get_is_str2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_str2(Dictionary<string, string> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, teststruct2>> get_is_struct1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_struct1(Dictionary<int, teststruct2> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<string, teststruct2>> get_is_struct2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_is_struct2(Dictionary<string, teststruct2> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<com.robotraconteur.testing.TestService2.ostruct2> get_struct3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_struct3(com.robotraconteur.testing.TestService2.ostruct2 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<double>> get_list_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_list_d1(List<double> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<double[]>> get_list_d3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_list_d3(List<double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<MultiDimArray>> get_list_d5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_list_d5(List<MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<string>> get_list_str1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_list_str1(List<string> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<teststruct2>> get_list_struct1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_list_struct1(List<teststruct2> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var1(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, object>> get_var2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var2(Dictionary<int, object> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_num(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_num(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_str(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_str(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_struct(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_struct(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_vector(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_vector(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_dictionary(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_dictionary(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_list(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_list(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_var_multidimarray(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_var_multidimarray(object value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> get_errtest(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_errtest(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<teststruct1> get_nulltest(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_nulltest(teststruct1 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task func1(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task func2(double d1, double d2, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> func3(double d1, double d2, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> meaning_of_life(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task func_errtest(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task func_errtest1(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task func_errtest2(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task func_errtest3(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task o6_op(int op, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task pipe_check_error(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task test_callbacks(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual event Action ev1;
-        public virtual event Action<double, teststruct2> ev2;
-        public virtual Task<sub1> get_o1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub1> get_o2(int ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub1> get_o3(int ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub1> get_o4(string ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<com.robotraconteur.testing.TestService2.subobj> get_o5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<object> get_o6(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Pipe<double[]> p1
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Pipe<teststruct2> p2
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Pipe<double> broadcastpipe
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Callback<Func<CancellationToken, Task>> cb1
-        {
-            get { return rrvar_cb1; }
-            set
-            {
-                if (rrvar_cb1 != null) throw new InvalidOperationException("Callback already set");
-                rrvar_cb1 = value;
-            }
-        }
-        public virtual Callback<Func<double, double, CancellationToken, Task>> cb2
-        {
-            get { return rrvar_cb2; }
-            set
-            {
-                if (rrvar_cb2 != null) throw new InvalidOperationException("Callback already set");
-                rrvar_cb2 = value;
-            }
-        }
-        public virtual Callback<Func<double, double, CancellationToken, Task<double>>> cb3
-        {
-            get { return rrvar_cb3; }
-            set
-            {
-                if (rrvar_cb3 != null) throw new InvalidOperationException("Callback already set");
-                rrvar_cb3 = value;
-            }
-        }
-        public virtual Callback<Func<CancellationToken, Task<int>>> cb_meaning_of_life
-        {
-            get { return rrvar_cb_meaning_of_life; }
-            set
-            {
-                if (rrvar_cb_meaning_of_life != null) throw new InvalidOperationException("Callback already set");
-                rrvar_cb_meaning_of_life = value;
-            }
-        }
-        public virtual Callback<Func<CancellationToken, Task>> cb_errtest
-        {
-            get { return rrvar_cb_errtest; }
-            set
-            {
-                if (rrvar_cb_errtest != null) throw new InvalidOperationException("Callback already set");
-                rrvar_cb_errtest = value;
-            }
-        }
-        public virtual Wire<double[]> w1
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual Wire<teststruct2> w2
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual Wire<MultiDimArray> w3
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual Wire<double> broadcastwire
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<double> m1
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual MultiDimArrayMemory<double> m2
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual MultiDimArrayMemory<byte> m3
-        {
-            get { throw new NotImplementedException(); }
-        }
+#if !ROBOTRACONTEUR_H5
+public class testroot_default_impl : testroot{
+    protected Callback<Func<CancellationToken, Task>> rrvar_cb1;
+    protected Callback<Func<double, double, CancellationToken, Task>> rrvar_cb2;
+    protected Callback<Func<double, double, CancellationToken, Task<double>>> rrvar_cb3;
+    protected Callback<Func<CancellationToken, Task<int>>> rrvar_cb_meaning_of_life;
+    protected Callback<Func<CancellationToken, Task>> rrvar_cb_errtest;
+    public virtual Task<double> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class sub1_default_impl : sub1
-    {
-        public virtual Task<double[]> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_d2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d2(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<string> get_s_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_s_ind(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> get_i_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i_ind(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub2> get_o2_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub2> get_o2_2(int ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub2> get_o2_3(string ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task set_d1(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class sub2_default_impl : sub2
-    {
-        public virtual Task<string> get_s_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_s_ind(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> get_i_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i_ind(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<string> get_data(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_data(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<sub3> get_o3_1(string ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task<double[]> get_d2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class sub3_default_impl : sub3
-    {
-        public virtual Task<string> get_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_ind(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<string> get_data2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_data2(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> get_data3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_data3(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> add(double d, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task set_d2(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
+    public virtual Task<double[]> get_d3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d3(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double[]> get_d4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d4(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_d5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d5(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_d6(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d6(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<float> get_s1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_s1(float value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<float[]> get_s2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_s2(float[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sbyte> get_i8_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i8_1(sbyte value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sbyte[]> get_i8_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i8_2(sbyte[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<byte> get_u8_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u8_1(byte value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<byte[]> get_u8_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u8_2(byte[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_u8_3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u8_3(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<short> get_i16_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i16_1(short value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<short[]> get_i16_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i16_2(short[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<ushort> get_u16_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u16_1(ushort value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<ushort[]> get_u16_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u16_2(ushort[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> get_i32_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i32_1(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int[]> get_i32_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i32_2(int[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int[]> get_i32_huge(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i32_huge(int[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<uint> get_u32_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u32_1(uint value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<uint[]> get_u32_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u32_2(uint[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<long> get_i64_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i64_1(long value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<long[]> get_i64_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i64_2(long[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<ulong> get_u64_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u64_1(ulong value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<ulong[]> get_u64_2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_u64_2(ulong[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> get_str1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_str1(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<teststruct1> get_struct1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_struct1(teststruct1 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<teststruct2> get_struct2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_struct2(teststruct2 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,double>> get_is_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_d1(Dictionary<int,double> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<string,double>> get_is_d2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_d2(Dictionary<string,double> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,double[]>> get_is_d3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_d3(Dictionary<int,double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<string,double[]>> get_is_d4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_d4(Dictionary<string,double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,MultiDimArray>> get_is_d5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_d5(Dictionary<int,MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<string,MultiDimArray>> get_is_d6(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_d6(Dictionary<string,MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,string>> get_is_str1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_str1(Dictionary<int,string> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<string,string>> get_is_str2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_str2(Dictionary<string,string> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,teststruct2>> get_is_struct1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_struct1(Dictionary<int,teststruct2> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<string,teststruct2>> get_is_struct2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_is_struct2(Dictionary<string,teststruct2> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<com.robotraconteur.testing.TestService2.ostruct2> get_struct3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_struct3(com.robotraconteur.testing.TestService2.ostruct2 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<double>> get_list_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_list_d1(List<double> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<double[]>> get_list_d3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_list_d3(List<double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<MultiDimArray>> get_list_d5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_list_d5(List<MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<string>> get_list_str1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_list_str1(List<string> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<teststruct2>> get_list_struct1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_list_struct1(List<teststruct2> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var1(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,object>> get_var2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var2(Dictionary<int,object> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_num(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_num(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_str(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_str(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_struct(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_struct(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_vector(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_vector(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_dictionary(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_dictionary(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_list(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_list(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_var_multidimarray(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_var_multidimarray(object value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> get_errtest(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_errtest(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<teststruct1> get_nulltest(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_nulltest(teststruct1 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task func1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task func2(double d1, double d2,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> func3(double d1, double d2,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> meaning_of_life(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task func_errtest(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task func_errtest1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task func_errtest2(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task func_errtest3(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task o6_op(int op,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task pipe_check_error(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task test_callbacks(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual event Action ev1;
+    public virtual event Action<double, teststruct2> ev2;
+    public virtual Task<sub1> get_o1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub1> get_o2(int ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub1> get_o3(int ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub1> get_o4(string ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<com.robotraconteur.testing.TestService2.subobj> get_o5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<object> get_o6(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Pipe<double[]> p1 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Pipe<teststruct2> p2 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Pipe<double> broadcastpipe {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Callback<Func<CancellationToken, Task>> cb1 {
+    get { return rrvar_cb1;  }
+    set {
+    if (rrvar_cb1!=null) throw new InvalidOperationException("Callback already set");
+    rrvar_cb1= value;
+    }
+    }
+    public virtual Callback<Func<double, double, CancellationToken, Task>> cb2 {
+    get { return rrvar_cb2;  }
+    set {
+    if (rrvar_cb2!=null) throw new InvalidOperationException("Callback already set");
+    rrvar_cb2= value;
+    }
+    }
+    public virtual Callback<Func<double, double, CancellationToken, Task<double>>> cb3 {
+    get { return rrvar_cb3;  }
+    set {
+    if (rrvar_cb3!=null) throw new InvalidOperationException("Callback already set");
+    rrvar_cb3= value;
+    }
+    }
+    public virtual Callback<Func<CancellationToken, Task<int>>> cb_meaning_of_life {
+    get { return rrvar_cb_meaning_of_life;  }
+    set {
+    if (rrvar_cb_meaning_of_life!=null) throw new InvalidOperationException("Callback already set");
+    rrvar_cb_meaning_of_life= value;
+    }
+    }
+    public virtual Callback<Func<CancellationToken, Task>> cb_errtest {
+    get { return rrvar_cb_errtest;  }
+    set {
+    if (rrvar_cb_errtest!=null) throw new InvalidOperationException("Callback already set");
+    rrvar_cb_errtest= value;
+    }
+    }
+    public virtual Wire<double[]> w1 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual Wire<teststruct2> w2 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual Wire<MultiDimArray> w3 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual Wire<double> broadcastwire {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual ArrayMemory<double> m1 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual MultiDimArrayMemory<double> m2 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual MultiDimArrayMemory<byte> m3 {
+    get { throw new NotImplementedException(); }
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class sub1_default_impl : sub1{
+    public virtual Task<double[]> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d1(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_d2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d2(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> get_s_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_s_ind(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> get_i_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i_ind(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub2> get_o2_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub2> get_o2_2(int ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub2> get_o2_3(string ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class sub2_default_impl : sub2{
+    public virtual Task<string> get_s_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_s_ind(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> get_i_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i_ind(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> get_data(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_data(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<sub3> get_o3_1(string ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class sub3_default_impl : sub3{
+    public virtual Task<string> get_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_ind(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> get_data2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_data2(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> get_data3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_data3(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> add(double d,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
     public static class RRExtensions
     {
     }
@@ -3991,7 +3821,7 @@ namespace com.robotraconteur.testing.TestService2
     {
         public override string DefString()
         {
-            const string s = "service com.robotraconteur.testing.TestService2\n\noption version 0.8\n\nexception testexception3\n\nstruct ostruct2\nfield double[] a1\nend struct\n\n\nobject baseobj\nproperty double d1\nproperty double[] d2\n\nfunction double func3(double d1, double d2)\n\nevent ev1()\n\nobjref subobj o5\n\npipe double[] p1\n\ncallback void cb2(double d1, double d2)\n\nwire double[] w1\n\nmemory double[] m1\n\n\nend object\n\nobject subobj\n\nfunction double add_val(double v)\n\nend object\n";
+            const string s = "service com.robotraconteur.testing.TestService2\n\noption version 0.8\n\nexception testexception3\n\nstruct ostruct2\nfield double[] a1\nend struct\n\n\nobject baseobj\nproperty double d1\nproperty double[] d2\n\nfunction double func3(double d1, double d2)\n\nevent ev1()\n\nobjref subobj o5\n\npipe double[] p1\n\ncallback void cb2(double d1, double d2)\n\nwire double[] w1\n\nmemory double[] m1\n\n\nend object\n\nobject subobj\n\nfunction double add_val(double v)\n\nend object\n\n";
             return s;
         }
         public override string GetServiceName() { return "com.robotraconteur.testing.TestService2"; }
@@ -4613,65 +4443,55 @@ namespace com.robotraconteur.testing.TestService2
             return false;
         }
     }
-    public class baseobj_default_impl : baseobj
-    {
-        protected Callback<Func<double, double, CancellationToken, Task>> rrvar_cb2;
-        public virtual Task<double> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double[]> get_d2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d2(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> func3(double d1, double d2, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual event Action ev1;
-        public virtual Task<subobj> get_o5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Pipe<double[]> p1
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Callback<Func<double, double, CancellationToken, Task>> cb2
-        {
-            get { return rrvar_cb2; }
-            set
-            {
-                if (rrvar_cb2 != null) throw new InvalidOperationException("Callback already set");
-                rrvar_cb2 = value;
-            }
-        }
-        public virtual Wire<double[]> w1
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<double> m1
-        {
-            get { throw new NotImplementedException(); }
-        }
+#if !ROBOTRACONTEUR_H5
+public class baseobj_default_impl : baseobj{
+    protected Callback<Func<double, double, CancellationToken, Task>> rrvar_cb2;
+    public virtual Task<double> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class subobj_default_impl : subobj
-    {
-        public virtual Task<double> add_val(double v, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task set_d1(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
+    public virtual Task<double[]> get_d2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d2(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> func3(double d1, double d2,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual event Action ev1;
+    public virtual Task<subobj> get_o5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Pipe<double[]> p1 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Callback<Func<double, double, CancellationToken, Task>> cb2 {
+    get { return rrvar_cb2;  }
+    set {
+    if (rrvar_cb2!=null) throw new InvalidOperationException("Callback already set");
+    rrvar_cb2= value;
+    }
+    }
+    public virtual Wire<double[]> w1 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual ArrayMemory<double> m1 {
+    get { throw new NotImplementedException(); }
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class subobj_default_impl : subobj{
+    public virtual Task<double> add_val(double v,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
     public static class RRExtensions
     {
     }
@@ -5094,7 +4914,7 @@ namespace com.robotraconteur.testing.TestService3
     {
         public override string DefString()
         {
-            const string s = "service com.robotraconteur.testing.TestService3\n\nstdver 0.9.2\n#option version 0.9.0\n\nimport com.robotraconteur.testing.TestService1\nusing  com.robotraconteur.testing.TestService1.testroot\nusing  com.robotraconteur.testing.TestService1.teststruct1\nusing  com.robotraconteur.testing.TestService1.teststruct2\nusing  com.robotraconteur.testing.TestService1.testexception1\nusing  com.robotraconteur.testing.TestService1.sub2\nusing  com.robotraconteur.testing.TestService1.sub3\n\nenum testenum1\nvalue1 = 0,	value2,	value3,	anothervalue = -1,\nanothervalue2 = -2,\nanothervalue3 = -3,\nhexval1 = 0x10,\nhexval2,\nneghexval1 = -0x7ffffffb,\nneghexval2,\nmore_values\nend\n\nconstant string strconst \"This is a\\n \\\"string constant\\\" \\\\\\/\\b\\f \\r\\u00FF tabme\\ttabme\\n smile! \\ud83d\\udE01\"\nconstant int32 int32const 3856384\nconstant int32[] int32const_array {182476, 56483, -2947}\nconstant int32 int32hexconst 0x082bc7\nconstant int32 int32hexconst2 -0x7264c17\nconstant int32[] int32hexconst_array { 0x8274ec, -0x0001, +0xABCDEF, 0xabcdef, 0x012345, 0x6789 }\nconstant double[] doubleconst_array {1.5847, 3.14, -548e3, 3452.67e2, 485e-21}\nconstant struct structconst {field1: strconst, field2: int32const_array}\nconstant struct structconst2 {field3: structconst, field4: int32const}\n\nexception test_exception4\n\nnamedarray vector3\nfield double x\nfield double y\nfield double z\nend\n\nnamedarray quaternion\nfield double q0\nfield double q1\nfield double q2\nfield double q3\nend\n\nnamedarray transform\nfield quaternion rotation\nfield vector3 translation\nend\n\nnamedarray pixel\nfield uint8 r\nfield uint8 b\nfield uint8 g\nend\n\nnamedarray pixel2\nfield uint8 c\nfield pixel d\nfield pixel e\nfield pixel[7] f\nfield pixel g\nend\n\npod testpod1\nfield double d1\nfield double[6] d2\nfield double[6-] d3\nfield double[3,3] d4\nfield testpod2 s1\nfield testpod2[8] s2\nfield testpod2[9-] s3\nfield testpod2[2,4] s4\nfield transform t1\nfield transform[4] t2\nfield transform[15-] t3\nfield transform[2,4] t4\nend\n\npod testpod2\nfield int8 i1\nfield int8[15] i2\nfield int8[17-] i3\nend\n\nstruct teststruct3\nfield testpod1 s1\nfield testpod1[] s2\nfield testpod1[11] s3\nfield testpod1[16-] s4\nfield testpod1[3,3] s5\nfield testpod1[*] s6\nfield testpod1{list} s7\nfield testpod1[]{list} s8\nfield testpod1[*]{list} s9\nfield varvalue s10\nfield varvalue s11\nfield varvalue s12\nfield varvalue s13\nfield varvalue s14\nfield varvalue s15\nfield transform t1\nfield transform[4] t2\nfield transform[2,4] t3\nfield varvalue t4\nfield varvalue t5\nfield transform{list} t6\nfield transform[4]{list} t7\nfield transform[2,4]{list} t8\nfield varvalue t9\nfield varvalue t10\nfield varvalue t11\n\nend\n\nobject testroot3\n\nconstant string unknown_modifier_hello \"hello world!\"\n\nproperty int32 readme [readonly]\nproperty int32 writeme [writeonly]\n\npipe int32 unreliable1 [unreliable,readonly]\n\nwire int32 peekwire [readonly]\nwire int32 \\\npokewire [writeonly]\nproperty int32 unknown_modifier [unknown, unknown_3(23, 45.8e-5, unknown_modifier_hello)]\n\nmemory double[] readmem [readonly]\n\nobjref obj4 o4\n\nproperty testenum1 testenum1_prop\n\nproperty testpod1 testpod1_prop\nfunction void testpod1_func1(testpod1 s)\nfunction testpod1 testpod1_func2()\n\nproperty teststruct3 teststruct3_prop\n\nmemory testpod2[] pod_m1\nmemory testpod2[*] pod_m2\n\nfunction double{generator} gen_func1()\nfunction uint8[]{generator} gen_func2(string name)\nfunction void gen_func3(string name, uint8[]{generator} in)\nfunction uint8[]{generator} gen_func4(uint8[]{generator} in)\nfunction teststruct2{generator} gen_func5(teststruct2{generator} in)\n\n#extra tests for fixed length arrays\nproperty double[6]{list} d1\nproperty double[6-]{list} d2\nproperty double[6]{int32} d3\nproperty double[6-]{int32} d4\nproperty double[3,3]{list} d5\nproperty double[3,3]{int32} d6\n\n#Test pipe and wire verification\npipe int32[3] p1\npipe int32[3-] p2\npipe int32[2,2] p3\nwire int32[6] w1\nwire int32[6-] w2\nwire int32[3,2] w3\n\n#namedarray test\nproperty vector3 testnamedarray1\nproperty transform testnamedarray2\nproperty transform[10-] testnamedarray3\nproperty transform[*] testnamedarray4\nproperty transform[3,2] testnamedarray5\n\nmemory transform[] namedarray_m1\nmemory transform[*] namedarray_m2\n\n#new primitive types test\nproperty cdouble c1\nproperty cdouble[] c2\nproperty cdouble[*] c3\nproperty cdouble{list} c4\nproperty cdouble[]{list} c5\nproperty cdouble[*]{list} c6\nproperty csingle c7\nproperty csingle[] c8\nproperty csingle[*] c9\nproperty csingle{list} c10\nproperty csingle[]{list} c11\nproperty csingle[*]{list} c12\n\nproperty bool b1\nproperty bool[] b2\nproperty bool[*] b3\nproperty bool{list} b4\nproperty bool[]{list} b5\nproperty bool[*]{list} b6\n\nmemory cdouble[] c_m1\nmemory cdouble[*] c_m2\nmemory cdouble[] c_m3\nmemory cdouble[*] c_m4\nmemory bool[] c_m5\nmemory bool[*] c_m6\n\nobjref obj5 nolock_test\n\nfunction void test_exception_params1()\nfunction void test_exception_params2()\n\nend\n\nobject obj1\nproperty double[] d1\nend\n\nobject obj2\nimplements obj1\nproperty double[] d1\nend\n\nobject obj3\nimplements obj1\nimplements obj2\nproperty double[] d1\nend\n\nobject obj4\nimplements sub2\nproperty string s_ind\nproperty int32 i_ind\n\nproperty string data\nobjref sub3{string} o3_1\nend\n\nobject obj5\n\nproperty double p1\nproperty double p2 [nolock]\nproperty double p3 [nolockread]\n\nfunction int32 f1()\nfunction int32 f2() [nolock]\n\npipe int32 q1 [readonly]\npipe int32 q2 [readonly,nolock]\n\nwire int32 w1 [readonly]\nwire int32 w2 [readonly,nolock]\n\nmemory int32[] m1\nmemory int32[] m2 [nolock]\nmemory int32[] m3 [nolockread]\n\nend\n\n\n";
+            const string s = "service com.robotraconteur.testing.TestService3\n\nstdver 0.9.2\n#option version 0.9.0\n\nimport com.robotraconteur.testing.TestService1\nusing  com.robotraconteur.testing.TestService1.testroot\nusing  com.robotraconteur.testing.TestService1.teststruct1\nusing  com.robotraconteur.testing.TestService1.teststruct2\nusing  com.robotraconteur.testing.TestService1.testexception1\nusing  com.robotraconteur.testing.TestService1.sub2\nusing  com.robotraconteur.testing.TestService1.sub3\n\nenum testenum1\nvalue1 = 0,	value2,	value3,	anothervalue = -1,\nanothervalue2 = -2,\nanothervalue3 = -3,\nhexval1 = 0x10,\nhexval2,\nneghexval1 = -0x7ffffffb,\nneghexval2,\nmore_values\nend\n\nconstant string strconst \"This is a\\n \\\"string constant\\\" \\\\\\/\\b\\f \\r\\u00FF tabme\\ttabme\\n smile! \\ud83d\\udE01\"\nconstant int32 int32const 3856384\nconstant int32[] int32const_array {182476, 56483, -2947}\nconstant int32 int32hexconst 0x082bc7\nconstant int32 int32hexconst2 -0x7264c17\nconstant int32[] int32hexconst_array { 0x8274ec, -0x0001, +0xABCDEF, 0xabcdef, 0x012345, 0x6789 }\nconstant double[] doubleconst_array {1.5847, 3.14, -548e3, 3452.67e2, 485e-21}\nconstant struct structconst {field1: strconst, field2: int32const_array}\nconstant struct structconst2 {field3: structconst, field4: int32const}\n\nexception test_exception4\n\nnamedarray vector3\nfield double x\nfield double y\nfield double z\nend\n\nnamedarray quaternion\nfield double q0\nfield double q1\nfield double q2\nfield double q3\nend\n\nnamedarray transform\nfield quaternion rotation\nfield vector3 translation\nend\n\nnamedarray pixel\nfield uint8 r\nfield uint8 b\nfield uint8 g\nend\n\nnamedarray pixel2\nfield uint8 c\nfield pixel d\nfield pixel e\nfield pixel[7] f\nfield pixel g\nend\n\npod testpod1\nfield double d1\nfield double[6] d2\nfield double[6-] d3\nfield double[3,3] d4\nfield testpod2 s1\nfield testpod2[8] s2\nfield testpod2[9-] s3\nfield testpod2[2,4] s4\nfield transform t1\nfield transform[4] t2\nfield transform[15-] t3\nfield transform[2,4] t4\nend\n\npod testpod2\nfield int8 i1\nfield int8[15] i2\nfield int8[17-] i3\nend\n\nstruct teststruct3\nfield testpod1 s1\nfield testpod1[] s2\nfield testpod1[11] s3\nfield testpod1[16-] s4\nfield testpod1[3,3] s5\nfield testpod1[*] s6\nfield testpod1{list} s7\nfield testpod1[]{list} s8\nfield testpod1[*]{list} s9\nfield varvalue s10\nfield varvalue s11\nfield varvalue s12\nfield varvalue s13\nfield varvalue s14\nfield varvalue s15\nfield transform t1\nfield transform[4] t2\nfield transform[2,4] t3\nfield varvalue t4\nfield varvalue t5\nfield transform{list} t6\nfield transform[4]{list} t7\nfield transform[2,4]{list} t8\nfield varvalue t9\nfield varvalue t10\nfield varvalue t11\n\nend\n\nobject testroot3\n\nconstant string unknown_modifier_hello \"hello world!\"\n\nproperty int32 readme [readonly]\nproperty int32 writeme [writeonly]\n\npipe int32 unreliable1 [unreliable,readonly]\n\nwire int32 peekwire [readonly]\nwire int32 \\\npokewire [writeonly]\nproperty int32 unknown_modifier [unknown, unknown_3(23, 45.8e-5, unknown_modifier_hello)]\n\nmemory double[] readmem [readonly]\n\nobjref obj4 o4\n\nproperty testenum1 testenum1_prop\n\nproperty testpod1 testpod1_prop\nfunction void testpod1_func1(testpod1 s)\nfunction testpod1 testpod1_func2()\n\nproperty teststruct3 teststruct3_prop\n\nmemory testpod2[] pod_m1\nmemory testpod2[*] pod_m2\n\nfunction double{generator} gen_func1()\nfunction uint8[]{generator} gen_func2(string name)\nfunction void gen_func3(string name, uint8[]{generator} in)\nfunction uint8[]{generator} gen_func4(uint8[]{generator} in)\nfunction teststruct2{generator} gen_func5(teststruct2{generator} in)\n\n#extra tests for fixed length arrays\nproperty double[6]{list} d1\nproperty double[6-]{list} d2\nproperty double[6]{int32} d3\nproperty double[6-]{int32} d4\nproperty double[3,3]{list} d5\nproperty double[3,3]{int32} d6\n\n#Test pipe and wire verification\npipe int32[3] p1\npipe int32[3-] p2\npipe int32[2,2] p3\nwire int32[6] w1\nwire int32[6-] w2\nwire int32[3,2] w3\n\n#namedarray test\nproperty vector3 testnamedarray1\nproperty transform testnamedarray2\nproperty transform[10-] testnamedarray3\nproperty transform[*] testnamedarray4\nproperty transform[3,2] testnamedarray5\n\nmemory transform[] namedarray_m1\nmemory transform[*] namedarray_m2\n\n#new primitive types test\nproperty cdouble c1\nproperty cdouble[] c2\nproperty cdouble[*] c3\nproperty cdouble{list} c4\nproperty cdouble[]{list} c5\nproperty cdouble[*]{list} c6\nproperty csingle c7\nproperty csingle[] c8\nproperty csingle[*] c9\nproperty csingle{list} c10\nproperty csingle[]{list} c11\nproperty csingle[*]{list} c12\n\nproperty bool b1\nproperty bool[] b2\nproperty bool[*] b3\nproperty bool{list} b4\nproperty bool[]{list} b5\nproperty bool[*]{list} b6\n\nmemory cdouble[] c_m1\nmemory cdouble[*] c_m2\nmemory cdouble[] c_m3\nmemory cdouble[*] c_m4\nmemory bool[] c_m5\nmemory bool[*] c_m6\n\nobjref obj5 nolock_test\n\nfunction void test_exception_params1()\nfunction void test_exception_params2()\n\nend\n\nobject obj1\nproperty double[] d1\nend\n\nobject obj2\nimplements obj1\nproperty double[] d1\nend\n\nobject obj3\nimplements obj1\nimplements obj2\nproperty double[] d1\nend\n\nobject obj4\nimplements sub2\nproperty string s_ind\nproperty int32 i_ind\n\nproperty string data\nobjref sub3{string} o3_1\nend\n\nobject obj5\n\nproperty double p1\nproperty double p2 [nolock]\nproperty double p3 [nolockread]\n\nfunction int32 f1()\nfunction int32 f2() [nolock]\n\npipe int32 q1 [readonly]\npipe int32 q2 [readonly,nolock]\n\nwire int32 w1 [readonly]\nwire int32 w2 [readonly,nolock]\n\nmemory int32[] m1\nmemory int32[] m2 [nolock]\nmemory int32[] m3 [nolockread]\n\nend\n\n";
             return s;
         }
         public override string GetServiceName() { return "com.robotraconteur.testing.TestService3"; }
@@ -8140,588 +7960,458 @@ namespace com.robotraconteur.testing.TestService3
             return false;
         }
     }
-    public class testroot3_default_impl : testroot3
-    {
-        protected PipeBroadcaster<int> rrvar_unreliable1;
-        protected WireBroadcaster<int> rrvar_peekwire;
-        protected WireUnicastReceiver<int> rrvar_pokewire;
-        public virtual Task<int> get_readme(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_readme(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> get_writeme(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_writeme(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> get_unknown_modifier(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_unknown_modifier(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testenum1> get_testenum1_prop(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testenum1_prop(testenum1 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testpod1> get_testpod1_prop(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testpod1_prop(testpod1 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<teststruct3> get_teststruct3_prop(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_teststruct3_prop(teststruct3 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<double[]>> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(List<double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<double[]>> get_d2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d2(List<double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, double[]>> get_d3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d3(Dictionary<int, double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, double[]>> get_d4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d4(Dictionary<int, double[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<MultiDimArray>> get_d5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d5(List<MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Dictionary<int, MultiDimArray>> get_d6(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d6(Dictionary<int, MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<vector3> get_testnamedarray1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testnamedarray1(vector3 value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<transform> get_testnamedarray2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testnamedarray2(transform value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<transform[]> get_testnamedarray3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testnamedarray3(transform[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<NamedMultiDimArray> get_testnamedarray4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testnamedarray4(NamedMultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<NamedMultiDimArray> get_testnamedarray5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_testnamedarray5(NamedMultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<CDouble> get_c1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c1(CDouble value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<CDouble[]> get_c2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c2(CDouble[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_c3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c3(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<CDouble>> get_c4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c4(List<CDouble> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<CDouble[]>> get_c5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c5(List<CDouble[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<MultiDimArray>> get_c6(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c6(List<MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<CSingle> get_c7(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c7(CSingle value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<CSingle[]> get_c8(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c8(CSingle[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_c9(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c9(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<CSingle>> get_c10(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c10(List<CSingle> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<CSingle[]>> get_c11(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c11(List<CSingle[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<MultiDimArray>> get_c12(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_c12(List<MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<bool> get_b1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_b1(bool value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<bool[]> get_b2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_b2(bool[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<MultiDimArray> get_b3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_b3(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<bool>> get_b4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_b4(List<bool> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<bool[]>> get_b5(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_b5(List<bool[]> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<List<MultiDimArray>> get_b6(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_b6(List<MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task testpod1_func1(testpod1 s, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testpod1> testpod1_func2(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Generator2<double>> gen_func1(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Generator2<byte[]>> gen_func2(string name, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Generator3<byte[]>> gen_func3(string name, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Generator1<byte[], byte[]>> gen_func4(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<Generator1<com.robotraconteur.testing.TestService1.teststruct2, com.robotraconteur.testing.TestService1.teststruct2>> gen_func5(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task test_exception_params1(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task test_exception_params2(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<obj4> get_o4(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<obj5> get_nolock_test(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Pipe<int> unreliable1
-        {
-            get { return rrvar_unreliable1.Pipe; }
-            set
-            {
-                if (rrvar_unreliable1 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_unreliable1 = new PipeBroadcaster<int>(value);
-            }
-        }
-        public virtual Pipe<int[]> p1
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Pipe<int[]> p2
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Pipe<MultiDimArray> p3
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
-        public virtual Wire<int> peekwire
-        {
-            get { return rrvar_peekwire.Wire; }
-            set
-            {
-                if (rrvar_peekwire != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_peekwire = new WireBroadcaster<int>(value);
-            }
-        }
-        public virtual Wire<int> pokewire
-        {
-            get { return rrvar_pokewire.Wire; }
-            set
-            {
-                if (rrvar_pokewire != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_pokewire = new WireUnicastReceiver<int>(value);
-            }
-        }
-        public virtual Wire<int[]> w1
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual Wire<int[]> w2
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual Wire<MultiDimArray> w3
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<double> readmem
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual PodArrayMemory<testpod2> pod_m1
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual PodMultiDimArrayMemory<testpod2> pod_m2
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual NamedArrayMemory<transform> namedarray_m1
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual NamedMultiDimArrayMemory<transform> namedarray_m2
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<CDouble> c_m1
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual MultiDimArrayMemory<CDouble> c_m2
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<CDouble> c_m3
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual MultiDimArrayMemory<CDouble> c_m4
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<bool> c_m5
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual MultiDimArrayMemory<bool> c_m6
-        {
-            get { throw new NotImplementedException(); }
-        }
+#if !ROBOTRACONTEUR_H5
+public class testroot3_default_impl : testroot3{
+    protected PipeBroadcaster<int> rrvar_unreliable1;
+    protected WireBroadcaster<int> rrvar_peekwire;
+    protected WireUnicastReceiver<int> rrvar_pokewire;
+    public virtual Task<int> get_readme(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class obj1_default_impl : obj1
-    {
-        public virtual Task<double[]> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task set_readme(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class obj2_default_impl : obj2
-    {
-        public virtual Task<double[]> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task<int> get_writeme(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class obj3_default_impl : obj3
-    {
-        public virtual Task<double[]> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double[] value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task set_writeme(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class obj4_default_impl : obj4
-    {
-        public virtual Task<string> get_s_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_s_ind(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> get_i_ind(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_i_ind(int value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<string> get_data(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_data(string value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<com.robotraconteur.testing.TestService1.sub3> get_o3_1(string ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task<int> get_unknown_modifier(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class obj5_default_impl : obj5
-    {
-        protected PipeBroadcaster<int> rrvar_q1;
-        protected PipeBroadcaster<int> rrvar_q2;
-        protected WireBroadcaster<int> rrvar_w1;
-        protected WireBroadcaster<int> rrvar_w2;
-        public virtual Task<double> get_p1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_p1(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> get_p2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_p2(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<double> get_p3(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_p3(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> f1(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<int> f2(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Pipe<int> q1
-        {
-            get { return rrvar_q1.Pipe; }
-            set
-            {
-                if (rrvar_q1 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_q1 = new PipeBroadcaster<int>(value);
-            }
-        }
-        public virtual Pipe<int> q2
-        {
-            get { return rrvar_q2.Pipe; }
-            set
-            {
-                if (rrvar_q2 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_q2 = new PipeBroadcaster<int>(value);
-            }
-        }
-        public virtual Wire<int> w1
-        {
-            get { return rrvar_w1.Wire; }
-            set
-            {
-                if (rrvar_w1 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_w1 = new WireBroadcaster<int>(value);
-            }
-        }
-        public virtual Wire<int> w2
-        {
-            get { return rrvar_w2.Wire; }
-            set
-            {
-                if (rrvar_w2 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_w2 = new WireBroadcaster<int>(value);
-            }
-        }
-        public virtual ArrayMemory<int> m1
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<int> m2
-        {
-            get { throw new NotImplementedException(); }
-        }
-        public virtual ArrayMemory<int> m3
-        {
-            get { throw new NotImplementedException(); }
-        }
+    public virtual Task set_unknown_modifier(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
+    public virtual Task<testenum1> get_testenum1_prop(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testenum1_prop(testenum1 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testpod1> get_testpod1_prop(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testpod1_prop(testpod1 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<teststruct3> get_teststruct3_prop(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_teststruct3_prop(teststruct3 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<double[]>> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d1(List<double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<double[]>> get_d2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d2(List<double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,double[]>> get_d3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d3(Dictionary<int,double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,double[]>> get_d4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d4(Dictionary<int,double[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<MultiDimArray>> get_d5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d5(List<MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Dictionary<int,MultiDimArray>> get_d6(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d6(Dictionary<int,MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<vector3> get_testnamedarray1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testnamedarray1(vector3 value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<transform> get_testnamedarray2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testnamedarray2(transform value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<transform[]> get_testnamedarray3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testnamedarray3(transform[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<NamedMultiDimArray> get_testnamedarray4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testnamedarray4(NamedMultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<NamedMultiDimArray> get_testnamedarray5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_testnamedarray5(NamedMultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<CDouble> get_c1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c1(CDouble value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<CDouble[]> get_c2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c2(CDouble[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_c3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c3(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<CDouble>> get_c4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c4(List<CDouble> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<CDouble[]>> get_c5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c5(List<CDouble[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<MultiDimArray>> get_c6(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c6(List<MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<CSingle> get_c7(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c7(CSingle value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<CSingle[]> get_c8(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c8(CSingle[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_c9(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c9(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<CSingle>> get_c10(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c10(List<CSingle> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<CSingle[]>> get_c11(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c11(List<CSingle[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<MultiDimArray>> get_c12(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_c12(List<MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<bool> get_b1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_b1(bool value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<bool[]> get_b2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_b2(bool[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<MultiDimArray> get_b3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_b3(MultiDimArray value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<bool>> get_b4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_b4(List<bool> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<bool[]>> get_b5(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_b5(List<bool[]> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<List<MultiDimArray>> get_b6(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_b6(List<MultiDimArray> value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task testpod1_func1(testpod1 s,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testpod1> testpod1_func2(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Generator2<double>> gen_func1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Generator2<byte[]>> gen_func2(string name,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Generator3<byte[]>> gen_func3(string name,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Generator1<byte[],byte[]>> gen_func4(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<Generator1<com.robotraconteur.testing.TestService1.teststruct2,com.robotraconteur.testing.TestService1.teststruct2>> gen_func5(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task test_exception_params1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task test_exception_params2(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<obj4> get_o4(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<obj5> get_nolock_test(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Pipe<int> unreliable1 {
+    get { return rrvar_unreliable1.Pipe;  }
+    set {
+    if (rrvar_unreliable1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_unreliable1= new PipeBroadcaster<int>(value);
+    }
+    }
+    public virtual Pipe<int[]> p1 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Pipe<int[]> p2 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Pipe<MultiDimArray> p3 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+    public virtual Wire<int> peekwire {
+    get { return rrvar_peekwire.Wire;  }
+    set {
+    if (rrvar_peekwire!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_peekwire= new WireBroadcaster<int>(value);
+    }
+    }
+    public virtual Wire<int> pokewire {
+    get { return rrvar_pokewire.Wire;  }
+    set {
+    if (rrvar_pokewire!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_pokewire= new WireUnicastReceiver<int>(value);
+    }
+    }
+    public virtual Wire<int[]> w1 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual Wire<int[]> w2 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual Wire<MultiDimArray> w3 {
+    get { throw new NotImplementedException(); }
+    set { throw new NotImplementedException();}
+    }
+    public virtual ArrayMemory<double> readmem {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual PodArrayMemory<testpod2> pod_m1 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual PodMultiDimArrayMemory<testpod2> pod_m2 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual NamedArrayMemory<transform> namedarray_m1 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual NamedMultiDimArrayMemory<transform> namedarray_m2 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<CDouble> c_m1 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual MultiDimArrayMemory<CDouble> c_m2 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<CDouble> c_m3 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual MultiDimArrayMemory<CDouble> c_m4 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<bool> c_m5 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual MultiDimArrayMemory<bool> c_m6 {
+    get { throw new NotImplementedException(); }
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class obj1_default_impl : obj1{
+    public virtual Task<double[]> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d1(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class obj2_default_impl : obj2{
+    public virtual Task<double[]> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d1(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class obj3_default_impl : obj3{
+    public virtual Task<double[]> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d1(double[] value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class obj4_default_impl : obj4{
+    public virtual Task<string> get_s_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_s_ind(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> get_i_ind(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_i_ind(int value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> get_data(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_data(string value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<com.robotraconteur.testing.TestService1.sub3> get_o3_1(string ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class obj5_default_impl : obj5{
+    protected PipeBroadcaster<int> rrvar_q1;
+    protected PipeBroadcaster<int> rrvar_q2;
+    protected WireBroadcaster<int> rrvar_w1;
+    protected WireBroadcaster<int> rrvar_w2;
+    public virtual Task<double> get_p1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_p1(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> get_p2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_p2(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<double> get_p3(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_p3(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> f1(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<int> f2(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Pipe<int> q1 {
+    get { return rrvar_q1.Pipe;  }
+    set {
+    if (rrvar_q1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_q1= new PipeBroadcaster<int>(value);
+    }
+    }
+    public virtual Pipe<int> q2 {
+    get { return rrvar_q2.Pipe;  }
+    set {
+    if (rrvar_q2!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_q2= new PipeBroadcaster<int>(value);
+    }
+    }
+    public virtual Wire<int> w1 {
+    get { return rrvar_w1.Wire;  }
+    set {
+    if (rrvar_w1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_w1= new WireBroadcaster<int>(value);
+    }
+    }
+    public virtual Wire<int> w2 {
+    get { return rrvar_w2.Wire;  }
+    set {
+    if (rrvar_w2!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_w2= new WireBroadcaster<int>(value);
+    }
+    }
+    public virtual ArrayMemory<int> m1 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<int> m2 {
+    get { throw new NotImplementedException(); }
+    }
+    public virtual ArrayMemory<int> m3 {
+    get { throw new NotImplementedException(); }
+    }
+}
+#endif
     public static class RRExtensions
     {
         public static double[] GetNumericArray(this vector3[] s)
@@ -8863,7 +8553,7 @@ namespace experimental.sub_test
     {
         public override string DefString()
         {
-            const string s = "service experimental.sub_test\n\nobject testobj\nfunction double add_two_numbers(double a, double b)\nend\n";
+            const string s = "service experimental.sub_test\n\nobject testobj\nfunction double add_two_numbers(double a, double b)\nend\n\n";
             return s;
         }
         public override string GetServiceName() { return "experimental.sub_test"; }
@@ -9124,13 +8814,13 @@ namespace experimental.sub_test
             return false;
         }
     }
-    public class testobj_default_impl : testobj
-    {
-        public virtual Task<double> add_two_numbers(double a, double b, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+#if !ROBOTRACONTEUR_H5
+public class testobj_default_impl : testobj{
+    public virtual Task<double> add_two_numbers(double a, double b,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
+}
+#endif
     public static class RRExtensions
     {
     }
@@ -9160,7 +8850,7 @@ namespace experimental.testing.subtestfilter
     {
         public override string DefString()
         {
-            const string s = "service experimental.testing.subtestfilter\n\nobject sub_testroot\nproperty double d1\nend\n\nobject sub_testroot2\nproperty double d1\nend\n";
+            const string s = "service experimental.testing.subtestfilter\n\nobject sub_testroot\nproperty double d1\nend\n\nobject sub_testroot2\nproperty double d1\nend\n\n";
             return s;
         }
         public override string GetServiceName() { return "experimental.testing.subtestfilter"; }
@@ -9626,28 +9316,26 @@ namespace experimental.testing.subtestfilter
             return false;
         }
     }
-    public class sub_testroot_default_impl : sub_testroot
-    {
-        public virtual Task<double> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+#if !ROBOTRACONTEUR_H5
+public class sub_testroot_default_impl : sub_testroot{
+    public virtual Task<double> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class sub_testroot2_default_impl : sub_testroot2
-    {
-        public virtual Task<double> get_d1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task set_d1(double value, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task set_d1(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class sub_testroot2_default_impl : sub_testroot2{
+    public virtual Task<double> get_d1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task set_d1(double value, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
     public static class RRExtensions
     {
     }
@@ -9677,7 +9365,7 @@ namespace experimental.pipe_sub_test
     {
         public override string DefString()
         {
-            const string s = "service experimental.pipe_sub_test\n\nstdver 0.10\n\nobject testobj\npipe double testpipe1 [readonly]\npipe double testpipe2\nobjref testobj2 subobj\nend\n\nobject testobj2\npipe double testpipe3 [readonly]\nend\n";
+            const string s = "service experimental.pipe_sub_test\n\nstdver 0.10\n\nobject testobj\npipe double testpipe1 [readonly]\npipe double testpipe2\nobjref testobj2 subobj\nend\n\nobject testobj2\npipe double testpipe3 [readonly]\nend\n\n";
             return s;
         }
         public override string GetServiceName() { return "experimental.pipe_sub_test"; }
@@ -10157,41 +9845,37 @@ namespace experimental.pipe_sub_test
             return false;
         }
     }
-    public class testobj_default_impl : testobj
-    {
-        protected PipeBroadcaster<double> rrvar_testpipe1;
-        public virtual Task<testobj2> get_subobj(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Pipe<double> testpipe1
-        {
-            get { return rrvar_testpipe1.Pipe; }
-            set
-            {
-                if (rrvar_testpipe1 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_testpipe1 = new PipeBroadcaster<double>(value);
-            }
-        }
-        public virtual Pipe<double> testpipe2
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new InvalidOperationException(); }
-        }
+#if !ROBOTRACONTEUR_H5
+public class testobj_default_impl : testobj{
+    protected PipeBroadcaster<double> rrvar_testpipe1;
+    public virtual Task<testobj2> get_subobj(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class testobj2_default_impl : testobj2
-    {
-        protected PipeBroadcaster<double> rrvar_testpipe3;
-        public virtual Pipe<double> testpipe3
-        {
-            get { return rrvar_testpipe3.Pipe; }
-            set
-            {
-                if (rrvar_testpipe3 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_testpipe3 = new PipeBroadcaster<double>(value);
-            }
-        }
+    public virtual Pipe<double> testpipe1 {
+    get { return rrvar_testpipe1.Pipe;  }
+    set {
+    if (rrvar_testpipe1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_testpipe1= new PipeBroadcaster<double>(value);
     }
+    }
+    public virtual Pipe<double> testpipe2 {
+    get { throw new NotImplementedException(); }
+    set { throw new InvalidOperationException();}
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class testobj2_default_impl : testobj2{
+    protected PipeBroadcaster<double> rrvar_testpipe3;
+    public virtual Pipe<double> testpipe3 {
+    get { return rrvar_testpipe3.Pipe;  }
+    set {
+    if (rrvar_testpipe3!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_testpipe3= new PipeBroadcaster<double>(value);
+    }
+    }
+}
+#endif
     public static class RRExtensions
     {
     }
@@ -10221,7 +9905,7 @@ namespace experimental.wire_sub_test
     {
         public override string DefString()
         {
-            const string s = "service experimental.wire_sub_test\n\nstdver 0.10\n\nobject testobj\nwire double testwire1 [readonly]\nwire double testwire2 [writeonly]\nobjref testobj2 subobj\nend\n\nobject testobj2\nwire double testwire3 [readonly]\nend\n";
+            const string s = "service experimental.wire_sub_test\n\nstdver 0.10\n\nobject testobj\nwire double testwire1 [readonly]\nwire double testwire2 [writeonly]\nobjref testobj2 subobj\nend\n\nobject testobj2\nwire double testwire3 [readonly]\nend\n\n";
             return s;
         }
         public override string GetServiceName() { return "experimental.wire_sub_test"; }
@@ -10701,46 +10385,41 @@ namespace experimental.wire_sub_test
             return false;
         }
     }
-    public class testobj_default_impl : testobj
-    {
-        protected WireBroadcaster<double> rrvar_testwire1;
-        protected WireUnicastReceiver<double> rrvar_testwire2;
-        public virtual Task<testobj2> get_subobj(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Wire<double> testwire1
-        {
-            get { return rrvar_testwire1.Wire; }
-            set
-            {
-                if (rrvar_testwire1 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_testwire1 = new WireBroadcaster<double>(value);
-            }
-        }
-        public virtual Wire<double> testwire2
-        {
-            get { return rrvar_testwire2.Wire; }
-            set
-            {
-                if (rrvar_testwire2 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_testwire2 = new WireUnicastReceiver<double>(value);
-            }
-        }
+#if !ROBOTRACONTEUR_H5
+public class testobj_default_impl : testobj{
+    protected WireBroadcaster<double> rrvar_testwire1;
+    protected WireUnicastReceiver<double> rrvar_testwire2;
+    public virtual Task<testobj2> get_subobj(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class testobj2_default_impl : testobj2
-    {
-        protected WireBroadcaster<double> rrvar_testwire3;
-        public virtual Wire<double> testwire3
-        {
-            get { return rrvar_testwire3.Wire; }
-            set
-            {
-                if (rrvar_testwire3 != null) throw new InvalidOperationException("Pipe already set");
-                rrvar_testwire3 = new WireBroadcaster<double>(value);
-            }
-        }
+    public virtual Wire<double> testwire1 {
+    get { return rrvar_testwire1.Wire;  }
+    set {
+    if (rrvar_testwire1!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_testwire1= new WireBroadcaster<double>(value);
     }
+    }
+    public virtual Wire<double> testwire2 {
+    get { return rrvar_testwire2.Wire;  }
+    set {
+    if (rrvar_testwire2!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_testwire2= new WireUnicastReceiver<double>(value);
+    }
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class testobj2_default_impl : testobj2{
+    protected WireBroadcaster<double> rrvar_testwire3;
+    public virtual Wire<double> testwire3 {
+    get { return rrvar_testwire3.Wire;  }
+    set {
+    if (rrvar_testwire3!=null) throw new InvalidOperationException("Pipe already set");
+    rrvar_testwire3= new WireBroadcaster<double>(value);
+    }
+    }
+}
+#endif
     public static class RRExtensions
     {
     }
@@ -11454,47 +11133,42 @@ namespace experimental.subobject_sub_test
             return false;
         }
     }
-    public class testobj_default_impl : testobj
-    {
-        public virtual Task<string> getf_service_path(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testobj2> get_subobj2(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+#if !ROBOTRACONTEUR_H5
+public class testobj_default_impl : testobj{
+    public virtual Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class testobj2_default_impl : testobj2
-    {
-        public virtual Task<string> getf_service_path(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testobj3> get_subobj3_1(CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testobj3> get_subobj3_2(int ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<testobj3> get_subobj3_3(string ind, CancellationToken cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+    public virtual Task<testobj2> get_subobj2(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
-    public class testobj3_default_impl : testobj3
-    {
-        public virtual Task<double> add_two_numbers(double a, double b, CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<string> getf_service_path(CancellationToken rr_cancel = default(CancellationToken))
-        {
-            throw new NotImplementedException();
-        }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class testobj2_default_impl : testobj2{
+    public virtual Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
     }
+    public virtual Task<testobj3> get_subobj3_1(CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testobj3> get_subobj3_2(int ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<testobj3> get_subobj3_3(string ind, CancellationToken cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
+#if !ROBOTRACONTEUR_H5
+public class testobj3_default_impl : testobj3{
+    public virtual Task<double> add_two_numbers(double a, double b,CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+    public virtual Task<string> getf_service_path(CancellationToken rr_cancel=default(CancellationToken)) {
+    throw new NotImplementedException();
+    }
+}
+#endif
     public static class RRExtensions
     {
     }
