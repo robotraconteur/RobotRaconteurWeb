@@ -1510,8 +1510,14 @@ namespace RobotRaconteurWeb
                                 }
                                 else
                                 {
-                                    servicedef = GetService(name).ServiceDef.DefString();
+                                    var service = GetService(name);
+                                    servicedef = service.ServiceDef.DefString();
                                     eret.AddElement("attributes", PackMapType<string, object>(GetService(name).Attributes, null));
+                                    var extra_imports = service.ExtraImports.ToList();
+                                    if (extra_imports.Count > 0)
+                                    {
+                                        eret.AddElement("extra_imports", PackListType<string>(extra_imports, null));
+                                    }
                                 }
                                 eret.AddElement("servicedef", servicedef);
                             }
@@ -1716,14 +1722,14 @@ namespace RobotRaconteurWeb
                                     var defs = new Dictionary<string, ServiceFactory>();
                                     defs.Add(servicedef1.GetServiceName(), servicedef1);
 
-                                    //var extra_imports = c.ExtraImports;
-                                    /*foreach(var e in extra_imports)
+                                    var extra_imports = c.ExtraImports;
+                                    foreach (var e3 in extra_imports)
                                     {
-                                        if (defs.find(e) == defs.end())
+                                        if (!defs.ContainsKey(e3))
                                         {
-                                            defs.insert(std::make_pair(e, GetServiceType(e)));
+                                            defs.Add(e3, GetServiceType(e3));
                                         }
-                                    }*/
+                                    }
 
                                     while (true)
                                     {
