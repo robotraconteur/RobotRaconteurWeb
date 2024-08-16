@@ -1723,15 +1723,23 @@ namespace RobotRaconteurWeb
                 chain0.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
             }
 
-            X509Certificate2 rootcert;
-            using (var root_cert_stream1 = typeof(AsyncStreamTransport).Assembly.GetManifestResourceStream("RobotRaconteurNETStandard.Data.Robot_Raconteur_Node_Root_CA"))
-            using (var root_cert_stream = new MemoryStream())
+            List<X509Certificate2> rootcerts = new List<X509Certificate2>();
+            string[] root_cert_names = new string[] { "Robot_Raconteur_Node_Root_CA.cer", "Robot_Raconteur_Node_Root_CA2.cer" };
+
+            foreach (var root_cert_name in root_cert_names)
             {
-                root_cert_stream1.CopyTo(root_cert_stream);
-                rootcert = new X509Certificate2(root_cert_stream.ToArray());
+                using (var root_cert_stream1 = typeof(AsyncStreamTransport).Assembly.GetManifestResourceStream("RobotRaconteurWeb.Data." + root_cert_name))
+                using (var root_cert_stream = new MemoryStream())
+                {
+                    root_cert_stream1.CopyTo(root_cert_stream);
+                    rootcerts.Add(new X509Certificate2(root_cert_stream.ToArray()));
+                }
             }
 
-            chain0.ChainPolicy.ExtraStore.Add(rootcert);
+            foreach (var rootcert in rootcerts)
+            {
+                chain0.ChainPolicy.ExtraStore.Add(rootcert);
+            }
             for (int i = 1; i < chain.ChainElements.Count; i++)
             {
                 chain0.ChainPolicy.ExtraStore.Add(chain.ChainElements[i].Certificate);
@@ -1740,7 +1748,7 @@ namespace RobotRaconteurWeb
 
             if (chain0.ChainStatus.Any(x => x.Status == X509ChainStatusFlags.UntrustedRoot))
             {
-                if (chain0.ChainElements[chain0.ChainElements.Count - 1].Certificate.Thumbprint != rootcert.Thumbprint)
+                if (!rootcerts.Any(x=> x.Thumbprint == chain0.ChainElements[chain0.ChainElements.Count - 1].Certificate.Thumbprint))
                 {
                     return false;
                 }
