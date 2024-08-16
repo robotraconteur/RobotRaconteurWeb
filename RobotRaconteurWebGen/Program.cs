@@ -47,6 +47,7 @@ namespace RobotRaconteurWebGen
                 string outfile = null;
                 var include_dirs = new List<string>();
                 string output_dir = ".";
+                bool auto_import = false;
 
                 var p = new OptionSet()
             {
@@ -55,6 +56,7 @@ namespace RobotRaconteurWebGen
                 {"output-dir=", "directory for output", v => output_dir = v },
                 {"lang=", "language to generate sources for for (only csharp currently supported)", v=> lang=v},
                 {"import=", "input file for use in imports", v=> sources.Add(new Source {filename = v, is_import = true }) },
+                {"auto-import", "automatically load imported robdef", v => auto_import = v != null },
                 {"I|include-path=", "include path", v=> include_dirs.Add(v) },
                 {"outfile=", "unified output file (csharp only)", v=> outfile = v },
                 {"h|help", "show this message and exit", v=> show_help = v!=null},
@@ -146,6 +148,8 @@ namespace RobotRaconteurWebGen
                     return 1003;
                 }
 
+                var required_imports = new HashSet<string>();
+
                 foreach (var s in sources)
                 {
                     ServiceDefinition d = null;
@@ -171,11 +175,49 @@ namespace RobotRaconteurWebGen
                         string a = d.ToString();
                         s.full_text = def;
                         s.service_def = d;
+                        required_imports.UnionWith(d.Imports);
+
                     }
                     catch (ServiceDefinitionParseException ee)
                     {
                         Console.WriteLine("{0}({1}): error: {2}", s.filename, ee.ParseInfo.LineNumber, ee.ShortMessage);
                         return 1005;
+                    }
+                }
+
+                if (auto_import)
+                {
+                    Console.WriteLine($"RobotRaconteurGen: Auto-importing: {string.Join(", ", required_imports)}");
+                    var missing_imports = new HashSet<string>(required_imports);
+                    missing_imports.ExceptWith(sources.Select(x => x.service_def.Name));
+                    while (missing_imports.Any())
+                    {
+                        if (required_imports.Any())
+                        {
+                            var imp = missing_imports.First();
+                            string imp_file = imp + ".robdef";
+                            foreach (var inc in include_dirs)
+                            {
+                                string s3 = Path.Join(inc, imp_file);
+                                if (File.Exists(s3))
+                                {
+                                    StreamReader sr = new StreamReader(s3);
+                                    var def = sr.ReadToEnd();
+                                    sr.Close();
+                                    var d = new ServiceDefinition();
+                                    ServiceDefinitionParseInfo parse_info = default(ServiceDefinitionParseInfo);
+                                    parse_info.RobDefFilePath = s3;
+                                    d.FromString(def, parse_info);
+                                    string a = d.ToString();
+                                    sources.Add(new Source { filename = s3, is_import = true, full_text = def, service_def = d });
+                                    required_imports.UnionWith(d.Imports);
+                                    break;
+                                }
+                            }
+
+                        }
+                        missing_imports.UnionWith(required_imports);
+                        missing_imports.ExceptWith(sources.Select(x => x.service_def.Name));
                     }
                 }
 
