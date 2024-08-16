@@ -1,0 +1,31 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+<ItemGroup>
+  <AvailableItemName Include="RobotRaconteurGenCSharp" />
+  <AvailableItemName Include="RobotRaconteurGenInclude" />
+  <AvailableItemName Include="RobotRaconteurGenIncludePath" />
+</ItemGroup>
+
+<Target Name="BeforeBuild">
+	<Message Text="RobotRaconteurGenCSharp: @(RobotRaconteurGenCSharp->'&quot;%(fullpath)&quot;', ' ')"/>
+	<Message Text="RobotRaconteurGenInclude: @(RobotRaconteurGenInclude->'--include &quot;%(fullpath)&quot;', ' ')"/>
+</Target>
+
+<Target Name="UpdateRobotRaconteurGenFiles" DependsOnTargets="_UpdateRobotRaconteurGenFiles" Condition="'@(RobotRaconteurGenCSharp)' != ''">
+  <ItemGroup>
+    <Compile Include="$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" />
+  </ItemGroup>
+</Target>
+
+<Target Name="_UpdateRobotRaconteurGenFiles" Inputs="$(MSBuildProjectFile);@(RobotRaconteurGenCSharp)"
+  Outputs="$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" BeforeTargets="BeforeCompile"
+  DependsOnTargets="PrepareForBuild;GetReferenceAssemblyPaths">
+
+  <Exec Command="RobotRaconteurWebGen --thunksource --lang=csharp --outfile=$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs @(RobotRaconteurGenInclude->'--include &quot;%(fullpath)&quot;', ' ') @(RobotRaconteurGenIncludePath->'--include-path &quot;%(FullPath)&quot;', ' ') --auto-import @(RobotRaconteurGenCSharp->'&quot;%(fullpath)&quot;',' ')"/>
+</Target>
+
+<PropertyGroup>
+  <CoreCompileDependsOn>UpdateRobotRaconteurGenFiles;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+</PropertyGroup>
+
+</Project>
