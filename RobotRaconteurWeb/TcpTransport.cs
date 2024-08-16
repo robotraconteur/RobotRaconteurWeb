@@ -3671,6 +3671,23 @@ namespace RobotRaconteurWeb
                     }
                 }
             }
+
+            if (string.IsNullOrEmpty(fname))
+            {
+                string p1 = Path.Combine(LocalTransportUtil.GetTransportPrivateSocketPath(nodeDirs), "..", "tcp", "portsharer", "portsharer.info");
+                p1 = Path.GetFullPath(p1);
+
+                RRLogFuncs.LogTrace($"Looking for portsharer.info in {p1}");
+
+                if (NodeDirectoriesUtil.ReadInfoFile(p1, out var info))
+                {
+                    if (info.TryGetValue("socket", out string socket))
+                    {
+                        fname = socket;
+                    }
+                }
+            }
+
             return fname.Trim();
         }
     }
