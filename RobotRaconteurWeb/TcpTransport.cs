@@ -3513,14 +3513,14 @@ namespace RobotRaconteurWeb
                                 else
                                 {
                                     nread = await Task.Run(() => socket.Receive(inData), cancel);
-                                    if (nread > 2)
-                                        nread -= 1;
                                 }
 
                                 if (nread == 0)
                                     throw new InvalidOperationException("Connection closed");
 
-                                string inDataStr = Encoding.UTF8.GetString(inData, 0, nread).Trim();
+                                string inDataStr = Encoding.ASCII.GetString(inData, 0, nread);
+                                Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+                                inDataStr = rgx.Replace(inDataStr, " ").Trim();
 
                                 if (!inDataStr.StartsWith("OK"))
                                     throw new InvalidOperationException("Return error");
