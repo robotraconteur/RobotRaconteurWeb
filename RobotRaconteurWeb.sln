@@ -3,6 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobotRaconteurH5Test", "RobotRaconteurH5Test\RobotRaconteurH5Test.csproj", "{58D9802B-F3A9-4ABB-A35C-0BD5B3CAB9E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{09A49E6D-A7FC-45C9-A5C1-7BA6FF596C15} = {09A49E6D-A7FC-45C9-A5C1-7BA6FF596C15}
+	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "RobotRaconteurWebSharedSource", "RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.shproj", "{9648C599-747E-4BEA-8AF3-D24A07DF8E22}"
 EndProject

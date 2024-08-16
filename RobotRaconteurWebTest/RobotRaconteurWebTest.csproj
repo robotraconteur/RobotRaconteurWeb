@@ -12,8 +12,26 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RobotRaconteurWeb\RobotRaconteurWeb.csproj" />
+    <ProjectReference Include="..\RobotRaconteurWebGen\RobotRaconteurWebGen.csproj" >
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+    </ProjectReference>
   </ItemGroup>
 
   <Import Project="..\RobotRaconteurWebTestSharedSource\RobotRaconteurWebTestSharedSource.projitems" Label="Shared" />
+
+  <Target Name="UpdateRobotRaconteurGenFiles" DependsOnTargets="_UpdateRobotRaconteurGenFiles">
+    <ItemGroup>
+      <Compile Include="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_UpdateRobotRaconteurGenFiles" Outputs="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs">
+    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)../RobotRaconteurWebGen/RobotRaconteurWebGen.csproj -- --include-path=$(MSBuildThisFileDirectory)../RobotRaconteurWebTestSharedSource --thunksource --lang=csharp --outfile=$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs com.robotraconteur.testing.TestService1.robdef com.robotraconteur.testing.TestService2.robdef com.robotraconteur.testing.TestService3.robdef experimental.testing.sub_test.robdef experimental.testing.subtestfilter.robdef experimental.pipe_sub_test.robdef experimental.wire_sub_test.robdef experimental.subobject_sub_test.robdef" />
+  </Target>
+
+  <PropertyGroup>
+    <CoreCompileDependsOn>UpdateRobotRaconteurGenFiles;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
 
 </Project>
