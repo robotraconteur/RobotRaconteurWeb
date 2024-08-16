@@ -11,7 +11,7 @@
     <FileVersion>0.20.0.0</FileVersion>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Title>RobotRaconteurWeb</Title>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>John Wason</Authors>
     <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteurWeb.git</RepositoryUrl>
     <IncludeContentInPack>true</IncludeContentInPack>

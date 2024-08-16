@@ -5,7 +5,18 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>RobotRaconteurWebGen.Program</StartupObject>
     <AssemblyName>RobotRaconteurWebGen</AssemblyName>
+    <PackAsTool>True</PackAsTool>
     <ApplicationIcon />
+    <Company>Wason Technology, LLC</Company>
+    <Copyright>Wason Technology, LLC 2023</Copyright>
+    <PackageProjectUrl>http://robotraconteur.com</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>0.20.0.0</AssemblyVersion>
+    <FileVersion>0.20.0.0</FileVersion>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Authors>John Wason</Authors>
+    <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteurWeb.git</RepositoryUrl>
+    <Version>0.20.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
