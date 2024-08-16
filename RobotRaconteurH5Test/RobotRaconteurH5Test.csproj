@@ -30,7 +30,7 @@
 
 
 
-  <Target Name="UpdateRobotRaconteurGenFiles" Outputs="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs">
+  <Target Name="UpdateRobotRaconteurGenFiles" Outputs="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" BeforeTargets="PreBuildEvent">
     <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)../RobotRaconteurWebGen/RobotRaconteurWebGen.csproj -- --include-path=$(MSBuildThisFileDirectory)../RobotRaconteurWebTestSharedSource --thunksource --lang=csharp --outfile=$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs com.robotraconteur.testing.TestService1.robdef com.robotraconteur.testing.TestService2.robdef com.robotraconteur.testing.TestService3.robdef experimental.testing.sub_test.robdef experimental.testing.subtestfilter.robdef experimental.pipe_sub_test.robdef experimental.wire_sub_test.robdef experimental.subobject_sub_test.robdef" />
   </Target>
 
@@ -38,9 +38,5 @@
     <PackageReference Include="h5" Version="23.11.43678" />
     <PackageReference Include="h5.Core" Version="23.11.43674" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <CoreCompileDependsOn>UpdateRobotRaconteurGenFiles;$(CoreCompileDependsOn)</CoreCompileDependsOn>
-  </PropertyGroup>
 
  </Project>
