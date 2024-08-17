@@ -21,7 +21,7 @@
   Outputs="$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" BeforeTargets="BeforeCompile"
   DependsOnTargets="PrepareForBuild;GetReferenceAssemblyPaths">
 
-  <Exec Command="RobotRaconteurWebGen --thunksource --lang=csharp --outfile=$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs @(RobotRaconteurGenInclude->'--include &quot;%(fullpath)&quot;', ' ') @(RobotRaconteurGenIncludePath->'--include-path &quot;%(FullPath)&quot;', ' ') --auto-import @(RobotRaconteurGenCSharp->'&quot;%(fullpath)&quot;',' ')"/>
+  <Exec Command="RobotRaconteurWebGen --thunksource --lang=csharp --outfile=&quot;$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs&quot; @(RobotRaconteurGenInclude->'--include &quot;%(fullpath)&quot;', ' ') @(RobotRaconteurGenIncludePath->'--include-path &quot;%(FullPath)&quot;', ' ') --auto-import @(RobotRaconteurGenCSharp->'&quot;%(fullpath)&quot;',' ')"/>
 </Target>
 
 <PropertyGroup>
