@@ -298,9 +298,12 @@ namespace RobotRaconteurWeb
                         string[] lines = packet.Split(new char[] { '\n' });
                         string[] idline = lines[1].Split(new char[] { ',' });
 
+                        string nodename = null;
                         NodeID nodeid = new NodeID(idline[0]);
-
-                        string nodename = idline[1];
+                        if (idline.Length > 1)
+                        {
+                            nodename = idline[1];
+                        }
                         string url = lines[2];
                         //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
 

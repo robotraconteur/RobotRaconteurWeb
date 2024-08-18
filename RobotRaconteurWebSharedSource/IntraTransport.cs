@@ -248,8 +248,11 @@ namespace RobotRaconteurWeb
         /// <inheretdoc/>
         public override Task CloseTransportConnection(Endpoint e, CancellationToken cancel)
         {
-            if (TransportConnections.ContainsKey(e.LocalEndpoint))
-                TransportConnections[e.LocalEndpoint].Close();
+            lock (this)
+            {
+                if (TransportConnections.ContainsKey(e.LocalEndpoint))
+                    TransportConnections[e.LocalEndpoint].Close();
+            }
             return Task.FromResult(0);
         }
         /**
@@ -335,7 +338,12 @@ namespace RobotRaconteurWeb
             m.ComputeSize();
             try
             {
-                await TransportConnections[m.header.SenderEndpoint].SendMessage(m, cancel).ConfigureAwait(false);
+                ITransportConnection tc;
+                lock (this)
+                {
+                    tc = TransportConnections[m.header.SenderEndpoint];
+                }
+                await tc.SendMessage(m, cancel).ConfigureAwait(false);
             }
             catch (System.Collections.Generic.KeyNotFoundException)
             {
@@ -377,7 +385,11 @@ namespace RobotRaconteurWeb
                 });
             }
 
-            var cc = TransportConnections.Values.ToArray();
+            ITransportConnection[] cc;
+            lock (this)
+            {
+                cc = TransportConnections.Values.ToArray();
+            }
 
             foreach (var c in cc)
             {
@@ -391,7 +403,10 @@ namespace RobotRaconteurWeb
 
             try
             {
-                TransportConnections.Clear();
+                lock (this)
+                {
+                    TransportConnections.Clear();
+                }
             }
             catch { }
 
@@ -409,7 +424,10 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                TransportConnections[endpoint].CheckConnection(endpoint);
+                lock (this)
+                {
+                    TransportConnections[endpoint].CheckConnection(endpoint);
+                }
             }
             catch (KeyNotFoundException)
             {

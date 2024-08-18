@@ -49,7 +49,7 @@ namespace RobotRaconteurTest
             }
         }
 
-        public async Task RunFullTest(string url, string authurl)
+        public async Task RunFullTest(string[] url, string[] authurl)
         {
             RRWebTest.WriteLine("Test Members");
             await ConnectService(url);
@@ -74,7 +74,7 @@ namespace RobotRaconteurTest
 
         testroot r;
 
-        public async Task ConnectService(string url)
+        public async Task ConnectService(string[] url)
         {
             r = (testroot)await node.ConnectService(url);
         }
@@ -1021,7 +1021,7 @@ namespace RobotRaconteurTest
 
         }
 
-        public async Task TestAuthentication(string url)
+        public async Task TestAuthentication(string[] url)
         {
             //Test two different logins
             Dictionary<string, object> cred1 = new Dictionary<string, object>();
@@ -1083,7 +1083,7 @@ namespace RobotRaconteurTest
 
         }
 
-        public async Task TestObjectLock(string url)
+        public async Task TestObjectLock(string[] url)
         {
             //Run a test, check 6 things:
             //1. Exclusive username lock works as expected (user with lock can acces, other user can't)
@@ -1222,7 +1222,7 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(err);
         }
 
-        public async Task TestMonitorLock(string url)
+        public async Task TestMonitorLock(string[] url)
         {
 
             //The monitor lock aquires an exclusive sock to a single thread on the client.
