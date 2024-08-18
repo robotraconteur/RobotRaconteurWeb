@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobotRaconteurWeb", "RobotR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobotRaconteurWebTest", "RobotRaconteurWebTest\RobotRaconteurWebTest.csproj", "{2B321CEC-7AA3-437D-9340-19E8BD717BC0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobotRaconteurWebASPTest", "RobotRaconteurWebASPTest\RobotRaconteurWebASPTest.csproj", "{FA3F5EB5-E868-4991-A62A-0E6F5FFAFCF2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobotRaconteurWebGen", "RobotRaconteurWebGen\RobotRaconteurWebGen.csproj", "{09A49E6D-A7FC-45C9-A5C1-7BA6FF596C15}"
 EndProject
 Global
