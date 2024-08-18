@@ -92,6 +92,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunTcpLoopback();
                         await ServiceTests.RunLocalLoopback();
 
+                        await AttributesTest.RunAttributesTest();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
