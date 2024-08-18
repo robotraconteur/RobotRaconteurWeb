@@ -34,7 +34,7 @@ namespace RobotRaconteurWebTest
         public async Task LoopbackTest()
         {
             ServiceTestClient serviceTestClient = new ServiceTestClient(node);
-            await serviceTestClient.RunFullTest(urls[0], auth_urls?[0]);
+            await serviceTestClient.RunFullTest(urls.ToArray(), auth_urls.ToArray());
         }
 
         public async Task LoopbackTest2()

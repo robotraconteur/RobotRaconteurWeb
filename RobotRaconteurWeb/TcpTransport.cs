@@ -334,8 +334,11 @@ namespace RobotRaconteurWeb
 
         public override Task CloseTransportConnection(Endpoint e, CancellationToken cancel)
         {
-            if (TransportConnections.ContainsKey(e.LocalEndpoint))
-                TransportConnections[e.LocalEndpoint].Close();
+            lock (this)
+            {
+                if (TransportConnections.ContainsKey(e.LocalEndpoint))
+                    TransportConnections[e.LocalEndpoint].Close();
+            }
             return Task.FromResult(0);
         }
 
@@ -841,7 +844,12 @@ namespace RobotRaconteurWeb
             }
             try
             {
-                await TransportConnections[m.header.SenderEndpoint].SendMessage(m, cancel).ConfigureAwait(false);
+                ITransportConnection tc;
+                lock (this)
+                {
+                    tc = TransportConnections[m.header.SenderEndpoint];
+                }
+                await tc.SendMessage(m, cancel).ConfigureAwait(false);
             }
             catch (KeyNotFoundException)
             {
@@ -869,7 +877,11 @@ namespace RobotRaconteurWeb
             transportopen = false;
             transportcancel.Cancel();
 
-            AsyncStreamTransport[] cc = TransportConnections.Values.ToArray();
+            AsyncStreamTransport[] cc;
+            lock (this)
+            {
+                cc = TransportConnections.Values.ToArray();
+            }
 
             foreach (AsyncStreamTransport c in cc)
             {
@@ -883,8 +895,10 @@ namespace RobotRaconteurWeb
 
             try
             {
-
-                TransportConnections.Clear();
+                lock (this)
+                {
+                    TransportConnections.Clear();
+                }
             }
             catch { }
 
@@ -931,7 +945,10 @@ namespace RobotRaconteurWeb
         {
             try
             {
-                TransportConnections[endpoint].CheckConnection(endpoint);
+                lock (this)
+                {
+                    TransportConnections[endpoint].CheckConnection(endpoint);
+                }
             }
             catch (KeyNotFoundException)
             {
@@ -1008,7 +1025,10 @@ namespace RobotRaconteurWeb
 
         internal void RemoveTransportConnection(uint e)
         {
-            TransportConnections.Remove(e);
+            lock (this)
+            {
+                TransportConnections.Remove(e);
+            }
 
             FireTransportEventListener(TransportListenerEventType.TransportConnectionClosed, e);
         }
@@ -1141,7 +1161,7 @@ namespace RobotRaconteurWeb
             try
             {
                 AsyncStreamTransport t = null;
-                lock (TransportConnections)
+                lock (this)
                 {
                     if (!TransportConnections.ContainsKey(endpoint)) throw new ConnectionException("Transport connection not found");
                     t = TransportConnections[endpoint];
@@ -1203,7 +1223,7 @@ namespace RobotRaconteurWeb
             try
             {
                 AsyncStreamTransport t = null;
-                lock (TransportConnections)
+                lock (this)
                 {
                     if (!TransportConnections.ContainsKey(endpoint)) throw new ConnectionException("Transport connection not found");
                     t = TransportConnections[endpoint];
@@ -1263,7 +1283,7 @@ namespace RobotRaconteurWeb
         public string GetSecurePeerIdentity(uint endpoint)
         {
             AsyncStreamTransport t = null;
-            lock (TransportConnections)
+            lock (this)
             {
                 if (!TransportConnections.ContainsKey(endpoint)) throw new ConnectionException("Transport connection not found");
                 t = TransportConnections[endpoint];
@@ -1804,8 +1824,10 @@ namespace RobotRaconteurWeb
 
             await ConnectStream(socket.GetStream(), false, target_nodeid, target_nodename, tls, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
 
-
-            parenttransport.TransportConnections.Add(LocalEndpoint, this);
+            lock (this)
+            {
+                parenttransport.TransportConnections.Add(LocalEndpoint, this);
+            }
 
 
         }
@@ -1986,8 +2008,10 @@ namespace RobotRaconteurWeb
 
             var webstream = new WebSocketStreamWrapper(websocket);
             await ConnectStream(webstream, false, target_nodeid, target_nodename, tls, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
-
-            parenttransport.TransportConnections.Add(LocalEndpoint, this);
+            lock (this)
+            {
+                parenttransport.TransportConnections.Add(LocalEndpoint, this);
+            }
 
 
         }
@@ -2773,7 +2797,7 @@ namespace RobotRaconteurWeb
                         int delay = random.Next(250, 1000);
                         var d = discovery_request_timer;
                         discovery_request_timer = new Timer(HandleRequestTimer, c, delay, Timeout.Infinite);
-                        d.Dispose();
+                        d?.Dispose();
                     }
                     else
                     {
