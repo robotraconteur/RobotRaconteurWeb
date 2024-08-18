@@ -30,10 +30,12 @@
 
   <ItemGroup>
     <None Remove="Data\Robot_Raconteur_Node_Root_CA.cer" />
+    <None Remove="Data\Robot_Raconteur_Node_Root_CA2.cer" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Data\Robot_Raconteur_Node_Root_CA.cer" />
+    <EmbeddedResource Include="Data\Robot_Raconteur_Node_Root_CA2.cer" />
   </ItemGroup>
 
   <ItemGroup>
