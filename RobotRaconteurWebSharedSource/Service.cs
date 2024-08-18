@@ -2311,4 +2311,110 @@ up to the specified timeout.
         [PublicApi]
         void RRServiceObjectInit(ServerContext context, string servicePath);
     }
+
+    /// <summary>
+    /// Service path segment containing a name and an optional index
+    /// </summary>
+    public class ServicePathSegment
+    {
+        /// <summary>
+        /// The name of the service path segment
+        /// </summary>
+        public string name;
+        /// <summary>
+        /// The index of the service path segment or null if the segment has no index
+        /// </summary>
+        public string index;
+    }
+
+    /// <summary>
+    /// Service path utility functions
+    /// </summary>
+    public static class ServicePathUtil
+    {
+        /// <summary>
+        /// Encode a service path index for use in a Robot Raconteur service path
+        /// </summary>
+        /// <param name="index">The index to encode</param>
+        /// <returns>The encoded index</returns>
+        public static string EncodeServicePathIndex(string index)
+        {
+            return RRUriExtensions.EscapeDataString(index).Replace(".", "%2e");
+        }
+
+        /// <summary>
+        /// Decode a service path index from a Robot Raconteur service path
+        /// </summary>
+        /// <param name="index">The index to decode</param>
+        /// <returns>The decoded index</returns>
+        public static string DecodeServicePathIndex(string index)
+        {
+            return RRUriExtensions.UnescapeDataString(index);
+        }
+
+        /// <summary>
+        /// Parse a Robot Raconteur service path into segments
+        /// </summary>
+        /// <param name="path">The service path to parse</param>
+        /// <returns>The parsed service path segments</returns>
+        public static ServicePathSegment[] ParseServicePathIndex(string path)
+        {
+            string segment_regex = "^([a-zA-Z0-9_]+)(?:\\[([a-zA-Z0-9_%]+)\\])?$";
+            List<ServicePathSegment> segments = new List<ServicePathSegment>();
+            string[] segments1 = path.Split('.');
+            foreach (string segment in segments1)
+            {
+                Match match = Regex.Match(segment, segment_regex);
+                if (match.Success)
+                {
+                    if (match.Groups[2].Success)
+                    {
+                        segments.Add(new ServicePathSegment() { name = match.Groups[1].Value, index = DecodeServicePathIndex(match.Groups[2].Value) });
+                    }
+                    else
+                    {
+                        segments.Add(new ServicePathSegment() { name = match.Groups[1].Value, index = null });
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid service path segment");
+                }
+            }
+            return segments.ToArray();
+        }
+
+        /// <summary>
+        /// Build a Robot Raconteur service path from segments
+        /// </summary>
+        /// <param name="segments">The segments to build the service path from</param>
+        /// <returns>The built service path</returns>
+        public static string BuildServicePath(ServicePathSegment[] segments)
+        {
+            string segment_name_regex = "^[a-zA-Z](?:\\w*[a-zA-Z0-9])?$";
+            List<string> segments1 = new List<string>();
+            bool first = true;
+            foreach (ServicePathSegment segment in segments)
+            {
+                if (!Regex.IsMatch(segment.name, segment_name_regex))
+                {
+                    if (!(first && segment.name == "*"))
+                    {
+                        throw new ArgumentException("Invalid service path segment name");
+                    }
+                }
+
+                first = false;
+                if (segment.index != null)
+                {
+                    segments1.Add(segment.name + "[" + EncodeServicePathIndex(segment.index) + "]");
+                }
+                else
+                {
+                    segments1.Add(segment.name);
+                }
+            }
+            return string.Join(".", segments1);
+        }
+    }
 }
