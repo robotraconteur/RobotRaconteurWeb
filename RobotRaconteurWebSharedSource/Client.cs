@@ -767,6 +767,13 @@ namespace RobotRaconteurWeb
                         throw new ServiceException("Could not find correct service factory for remote service");
                     }
 
+                    if (ret.TryFindElement("attributes", out var attributes_m))
+                    {
+                        lock (this)
+                        {
+                            Attributes = (Dictionary<string, object>)node.UnpackMapType<string, object>(attributes_m.CastDataToNestedList(DataTypes.dictionary_t), null);
+                        }
+                    }
                 }
                 else
                 {

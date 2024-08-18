@@ -1809,6 +1809,18 @@ namespace RobotRaconteurWeb
 
                             try
                             {
+                                eret.AddElement("attributes", PackMapType<string, object>(GetService(name).Attributes, null));
+                            }
+                            catch (Exception exp)
+                            {
+                                RRLogFuncs.LogWarning(string.Format("Could not add attributes to client connect return message: {0}", exp.Message),
+                                            this, RobotRaconteur_LogComponent.Node,
+                                            endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
+                                                                        member: e.MemberName);
+                            }
+
+                            try
+                            {
                                 if (c == null)
                                 {
                                     throw new ServiceException("Service not found");

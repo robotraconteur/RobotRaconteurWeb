@@ -45,7 +45,12 @@ namespace RobotRaconteurTest
             testservice = new RobotRaconteurTest_testroot(t);
             testservice_auth = new RobotRaconteurTest_testroot(t);
 
-            node.RegisterService("RobotRaconteurTestService", "com.robotraconteur.testing.TestService1", testservice);
+            var ctx1 = node.RegisterService("RobotRaconteurTestService", "com.robotraconteur.testing.TestService1", testservice);
+            ctx1.Attributes = new Dictionary<string, object>() {
+                {"test", "This is a test attribute"},
+                { "test2", 42 }
+
+            };
 #if !ROBOTRACONTEUR_H5
             string authdata = "testuser1 0b91dec4fe98266a03b136b59219d0d6 objectlock\ntestuser2 841c4221c2e7e0cefbc0392a35222512 objectlock\ntestsuperuser 503ed776c50169f681ad7bbc14198b68 objectlock,objectlockoverride";
             PasswordFileUserAuthenticator p = new PasswordFileUserAuthenticator(authdata);
