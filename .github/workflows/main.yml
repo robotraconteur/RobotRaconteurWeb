@@ -37,7 +37,7 @@ jobs:
       with:
         name: nuget-packages
         path: |
-          ./**/bin/Release/*.nupkg
+          ./**/*.nupkg
   ubuntu:
     runs-on: ubuntu-22.04
     steps:
