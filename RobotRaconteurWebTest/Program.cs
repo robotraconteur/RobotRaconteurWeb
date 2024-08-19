@@ -117,6 +117,11 @@ namespace RobotRaconteurTest
                         MessageSerializationTest.RunMessageTests();
                         break;
                     }
+                case "httpserver":
+                    {
+                        await HttpServerTest.RunHttpServer();
+                        break;
+                    }
                 default:
                     throw new ArgumentException("Invalid test command " + command);
             }
