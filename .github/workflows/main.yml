@@ -14,21 +14,20 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup dotnet 3.1.x
+    - name: Setup dotnet 6.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 6.x
     - name: Install dependencies
       run: dotnet restore
     - name: Install H5
       run: dotnet tool update --global h5-compiler
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release -p:Platform="AnyCPU"
     - name: tree
       run: tree  /a /f
     - name: Run
-      working-directory: ./RobotRaconteurWebTest/bin/Release/netcoreapp3.1
-      run: RobotRaconteurWebTest citests
+      run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj -p:Platform="AnyCPU" --configuration Release
       shell: cmd
     - name: Upload nuget packages
       uses: actions/upload-artifact@v2
