@@ -23,7 +23,7 @@ jobs:
     - name: Install H5
       run: dotnet tool update --global h5-compiler
     - name: Build
-      run: dotnet build --configuration Release -p:Platform="AnyCPU"
+      run: dotnet build --configuration Release -p:Platform="Any CPU"
     - name: tree
       run: tree  /a /f
     - name: Run
