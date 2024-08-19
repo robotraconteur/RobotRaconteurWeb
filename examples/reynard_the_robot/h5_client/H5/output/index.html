@@ -1,0 +1,28 @@
+<!-- index.html - Reynard the Robot client using RobotRaconteurH5 -->
+<!doctype html>
+<html>
+  <head>
+      <script src="app.js"></script>
+  </head>
+  <body>
+    <h1>Reynard the Robot H5 Client</h1>
+    <h3>Status</h3>
+    <div id="status">Loading...</div>
+
+    <h3>Reynard Position</h3>
+    <div id="reynard_position"></div>
+
+    <h3>Teleport Reynard</h3>
+    x: <input id="teleport_x" placeholder="0.0"/> y: <input id="teleport_y" placeholder="0.0"/> <button id="teleport">Teleport</button>
+
+    <h3>Send a message to Reynard</h3>
+    <input id="message" cols="50"/>
+    <button id="send_message">Send</button>
+
+    <h3>New Messages from Reynard</h3>
+    <div id="received_messages"></div>
+
+    <h3>Error Log</h3>
+    <div id="error_log"></div>
+  </body>
+</html>

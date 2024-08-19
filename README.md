@@ -1,4 +1,4 @@
-<p align="center"><img src="https://robotraconteurpublicfiles.s3.amazonaws.com/RRheader2.jpg"></p>
+<p align="center"><img src="docs/figures/logo-header.svg"></p>
 
 # RobotRaconteurWeb
 
@@ -20,6 +20,8 @@ to the infrastructure!
 RobotRaconteurWeb is very similar to RobotRaconteurNET. The main difference is that RobotRaconteurWeb
 uses the asynchronous Task framework instead of blocking. All function that could potentially block
 are instead asynchronous, and should be used with async/await.
+
+See the `examples/` directory for examples of how to use RobotRaconteurWeb.
 
 See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library:
 https://github.com/robotraconteur/robotraconteur/wiki/Documentation

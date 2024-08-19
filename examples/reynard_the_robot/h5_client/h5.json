@@ -1,0 +1,11 @@
+{
+  "generateDocumentation": "None",
+  "output": "H5/output",
+  "combineScripts": true,
+  "fileName": "app.js",
+  "html":
+  {
+    "disabled": true
+  }
+
+}
