@@ -5,7 +5,7 @@
       "commandLineArgs": "citests",
       "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\RobotRaconteurWebTestSharedSource",
       "environmentVariables": {
-        "ROBOTRACONTEUR_LOG_LEVEL": "DEBUG"
+        "ROBOTRACONTEUR_LOG_LEVEL": "WARNING"
       }
     }
   }
