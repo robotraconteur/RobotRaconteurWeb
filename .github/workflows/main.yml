@@ -22,8 +22,6 @@ jobs:
       run: dotnet restore
     - name: Install H5
       run: dotnet tool update --global h5-compiler
-    - name: tree
-      run: tree  /a /f
     - name: Run
       run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
       shell: cmd
