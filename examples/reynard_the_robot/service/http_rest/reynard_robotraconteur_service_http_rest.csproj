@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net7.0</TargetFrameworks>
+        <LangVersion>9.0</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <RobotRaconteurGenCSharp Include="../../robdef/experimental.reynard_the_robot.robdef" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DrekarLaunchProcessNET" Version="*" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="restsharp" Version="110.2.0" />
+      <PackageReference Include="RobotRaconteurWeb" Version="*" />
+    </ItemGroup>
+</Project>
