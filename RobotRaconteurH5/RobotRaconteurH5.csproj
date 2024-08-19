@@ -1,4 +1,4 @@
-<Project Sdk="h5.Target/23.2.35852">
+<Project Sdk="h5.Target/23.11.43676">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -15,21 +15,20 @@
     <Authors>John Wason</Authors>
     <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteurWeb.git</RepositoryUrl>
     <IncludeContentInPack>true</IncludeContentInPack>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Version>0.20.0</Version>
+    <DebugType>None</DebugType>
   </PropertyGroup>
 
   <PropertyGroup>
 
     <DefineConstants>$(DefineConstants);ROBOTRACONTEUR_H5</DefineConstants>
-
-    <Version>0.20.0</Version>
   </PropertyGroup>
 
   <Import Project="..\RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems" Label="Shared" />
 
   <ItemGroup>
     <PackageReference Include="h5" Version="23.11.43678" />
-    <PackageReference Include="h5.Core" Version="23.11.43674" />
+    <PackageReference Include="h5.core" Version="23.11.43674" />
   </ItemGroup>
 
 </Project>
