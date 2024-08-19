@@ -27,7 +27,7 @@ jobs:
     - name: tree
       run: tree  /a /f
     - name: Run
-      run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj -p:Platform="AnyCPU" --configuration Release
+      run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
       shell: cmd
     - name: Upload nuget packages
       uses: actions/upload-artifact@v2
