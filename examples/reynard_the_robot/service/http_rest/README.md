@@ -14,6 +14,13 @@ Install the "dotnet" SDK from https://dotnet.microsoft.com/download. In this exa
 The `reynard-the-robot` Python package must be installed. See
 [Reynard the Robot](https://github.com/robotraconteur/reynard-the-robot) for instructions.
 
+The example requires the `RobotRaconteurWebGen` dotnet tool to be installed to generate
+the Robot Raconteur thunk code.
+
+```
+dotnet tool install -g RobotRaconteurWebGen
+```
+
 ## Run Example
 
 Start the Reynard the Robot server:
