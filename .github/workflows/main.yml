@@ -57,4 +57,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y dos2unix
+    - name: Setup dotnet 6.x
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.x
     - uses: pre-commit/action@v3.0.1
