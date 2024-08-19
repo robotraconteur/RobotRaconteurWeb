@@ -22,19 +22,22 @@ jobs:
       run: dotnet restore
     - name: Install H5
       run: dotnet tool update --global h5-compiler
-    - name: Build
-      run: dotnet build --configuration Release -p:Platform="Any CPU"
     - name: tree
       run: tree  /a /f
     - name: Run
       run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
       shell: cmd
+    - name: Build nuget packages
+      run: |
+        dotnet pack  "RobotRaconteurWeb/RobotRaconteurWeb.csproj" -p:Platform="AnyCPU" --configuration Release
+        dotnet pack  "RobotRaconteurWebGen/RobotRaconteurWebGen.csproj" -p:Platform="AnyCPU" --configuration Release
+        dotnet pack  "RobotRaconteurH5/RobotRaconteurH5.csproj" -p:Platform="AnyCPU" --configuration Release
     - name: Upload nuget packages
       uses: actions/upload-artifact@v2
       with:
         name: nuget-packages
         path: |
-          ./**/*.nupkg
+          ./**/bin/Release/*.nupkg
   ubuntu:
     runs-on: ubuntu-22.04
     steps:
