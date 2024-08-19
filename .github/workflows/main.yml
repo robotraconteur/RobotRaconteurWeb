@@ -35,6 +35,16 @@ jobs:
         name: nuget-packages
         path: |
           ./**/*.nupkg
+  ubuntu:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup dotnet 6.x
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.x
+    - name: Build and Run
+      run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
   pre-commit:
     runs-on: ubuntu-22.04
     env:
