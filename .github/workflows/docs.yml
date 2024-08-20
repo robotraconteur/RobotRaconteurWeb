@@ -28,6 +28,7 @@ jobs:
       run: |
         mkdir doc\doc\latest
         move docs\netcore\_site doc\doc\latest\netcore
+        copy docs\github_pages\index.html doc\index.html
 
     - name: tree
       run: tree  /a /f
