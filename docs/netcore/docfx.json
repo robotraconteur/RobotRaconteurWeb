@@ -4,7 +4,7 @@
       "filter": "docfx.filter",
       "src": [
         {
-          "cwd": "../../RobotRaconteurWeb",
+          "src": "../../RobotRaconteurWeb",
           "files": [
             "**/*.csproj"
           ]
