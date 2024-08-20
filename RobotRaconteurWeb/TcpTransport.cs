@@ -1824,7 +1824,7 @@ namespace RobotRaconteurWeb
 
             await ConnectStream(socket.GetStream(), false, target_nodeid, target_nodename, tls, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
 
-            lock (this)
+            lock (parenttransport)
             {
                 parenttransport.TransportConnections.Add(LocalEndpoint, this);
             }
@@ -2008,7 +2008,7 @@ namespace RobotRaconteurWeb
 
             var webstream = new WebSocketStreamWrapper(websocket);
             await ConnectStream(webstream, false, target_nodeid, target_nodename, tls, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
-            lock (this)
+            lock (parenttransport)
             {
                 parenttransport.TransportConnections.Add(LocalEndpoint, this);
             }
