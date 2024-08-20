@@ -32,17 +32,17 @@ The tutorials are targeted at Python and C++, however the concepts are identical
 language interface used. It is recommended the user familiarizes themselves with the framework using Python
 before using C\#.
 
-Homepage: http://robotraconteur.com
-GitHub Page: https://github.com/robotraconteur/robotraconteur
-Documentation Listing: https://github.com/robotraconteur/robotraconteur/wiki/Documentation
-RobotRaconteurCore: https://github.com/robotraconteur/robotraconteur
+* Homepage: http://robotraconteur.com
+* GitHub Page: https://github.com/robotraconteur/robotraconteur
+* Documentation: https://github.com/robotraconteur/robotraconteur/wiki/Documentation
+* RobotRaconteurCore: https://github.com/robotraconteur/robotraconteur
 
-## Installation
-### .NET Installation
+## Package Readme
 
-`RobotRaconteurWeb` and `RobotRaconteurh5` can be easily installed using the NuGet package:
+See the individual package Readme files for more information:
 
-NuGet RobotRaconteurWeb homepage: https://www.nuget.org/packages/RobotRaconteurWeb/
-NuGet RobotRaconteurH5 homepage: https://www.nuget.org/packages/RobotRaconteurH5/
+* [RobotRaconteurWeb](articles/robotraconteurweb_readme.md)
+* [RobotRaconteurWebGen](articles/robotraconteurwebgen_readme.md)
+* [RobotRaconteurH5](articles/robotraconteurh5_readme.md)
 
 Copyright (C) 2024 Wason Technology, LLC

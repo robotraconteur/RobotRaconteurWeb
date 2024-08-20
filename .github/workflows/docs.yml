@@ -9,12 +9,17 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup dotnet 3.1.x
+    - name: Setup dotnet 6.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 6.x
     - name: Install docfx
       run: dotnet tool update -g docfx
+    - name: Copy readme files to docs
+      run: |
+        cp RobotRaconteurWeb/README.md docs/netcore/articles/robotraconteurweb_readme.md
+        cp RobotRaconteurWebGen/README.md docs/netcore/articles/robotraconteurwebgen_readme.md
+        cp RobotRaconteurH5/README.md docs/netcore/articles/robotraconteurh5_readme.md
     - name: Build docs
       working-directory: ./docs/netcore
       run: docfx
@@ -22,6 +27,7 @@ jobs:
       run: |
         mkdir doc\doc\latest
         move docs\netcore\_site doc\doc\latest\netcore
+        copy docs\github_pages\index.html doc\index.html
 
     - name: tree
       run: tree  /a /f

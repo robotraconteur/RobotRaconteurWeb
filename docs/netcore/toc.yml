@@ -1,5 +1,13 @@
 # - name: Articles
 #   href: articles/
+- name: Home
+  href: index.md
 - name: Api Documentation
   href: api/
   homepage: api/index.md
+- name: RobotRaconteurWeb Readme
+  href: articles/robotraconteurweb_readme.md
+- name: RobotRaconteurWebGen Readme
+  href: articles/robotraconteurwebgen_readme.md
+- name: RobotRaconteurH5 Readme
+  href: articles/robotraconteurh5_readme.md

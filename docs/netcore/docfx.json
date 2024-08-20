@@ -4,7 +4,7 @@
       "filter": "docfx.filter",
       "src": [
         {
-          "cwd": "../../RobotRaconteurWeb",
+          "src": "../../RobotRaconteurWeb",
           "files": [
             "**/*.csproj"
           ]
@@ -64,6 +64,9 @@
     "noLangKeyword": false,
     "keepFileLink": false,
     "cleanupCacheHistory": false,
-    "disableGitFeatures": false
+    "disableGitFeatures": false,
+    "globalMetadata": {
+      "_appLogoPath": "images/logo-icon.svg"
+    }
   }
 }
