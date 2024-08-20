@@ -17,7 +17,6 @@ jobs:
       run: dotnet tool update -g docfx
     - name: Copy readme files to docs
       run: |
-        mkdir docs
         cp RobotRaconteurWeb/README.md docs/netcore/articles/robotraconteurweb_readme.md
         cp RobotRaconteurWebGen/README.md docs/netcore/articles/robotraconteurwebgen_readme.md
         cp RobotRaconteurH5/README.md docs/netcore/articles/robotraconteurh5_readme.md
