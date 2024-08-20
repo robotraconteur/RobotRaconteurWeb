@@ -126,7 +126,7 @@ Apache 2.0
 
 Please report bugs and issues on the [GitHub issue tracker](https://github.com/robotraconteur/RobotRaconteurWeb/issues).
 
-Ask questions on the [Github discussions](https://github.com/robotraconteur/RobotRaconteurWeb/discussions).
+Ask questions on the [Github discussions](https://github.com/robotraconteur/robotraconteur/discussions).
 
 ## Acknowledgment
 
