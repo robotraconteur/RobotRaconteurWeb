@@ -3,7 +3,7 @@
 # RobotRaconteurWeb
 
 **RobotRaconteurWeb is a pure C\# implementation of the Robot Raconteur framework for use with .NET Core and
-JavaScript!
+JavaScript!**
 
 Robot Raconteur is a communication framework for robotics, automation, and the Internet of Things. RobotRaconteurWeb
 is an implementation of Robot Raconteur developed in pure C#. This is in contrast to RobotRaconteurNET, which
@@ -43,12 +43,12 @@ before using C\#.
 ## Installation
 ### .NET Installation
 
-`RobotRaconteurWeb` and `RobotRaconteurh5` can be easily installed using the NuGet package:
+`RobotRaconteurWeb` and `RobotRaconteurH5` can be easily installed using the NuGet package:
 
 * NuGet RobotRaconteurWeb homepage: https://www.nuget.org/packages/RobotRaconteurWeb/
 * NuGet RobotRaconteurH5 homepage: https://www.nuget.org/packages/RobotRaconteurH5/
 
-Copyright (C) 2023 Wason Technology, LLC
+Copyright (C) 2024 Wason Technology, LLC
 
 ## Acknowledgment
 

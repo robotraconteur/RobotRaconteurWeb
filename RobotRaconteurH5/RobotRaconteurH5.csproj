@@ -16,6 +16,7 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <Version>0.20.0</Version>
     <DebugType>None</DebugType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -28,6 +29,10 @@
   <ItemGroup>
     <PackageReference Include="h5" Version="23.11.43678" />
     <PackageReference Include="h5.core" Version="23.11.43674" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

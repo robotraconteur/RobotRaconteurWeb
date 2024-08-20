@@ -17,6 +17,7 @@
     <Authors>John Wason</Authors>
     <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteurWeb.git</RepositoryUrl>
     <Version>0.20.0</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +26,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RobotRaconteurWeb\RobotRaconteurWeb.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
