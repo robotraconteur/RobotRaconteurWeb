@@ -45,4 +45,4 @@ RobotRaconteurCore: https://github.com/robotraconteur/robotraconteur
 NuGet RobotRaconteurWeb homepage: https://www.nuget.org/packages/RobotRaconteurWeb/
 NuGet RobotRaconteurH5 homepage: https://www.nuget.org/packages/RobotRaconteurH5/
 
-Copyright (C) 2023 Wason Technology, LLC
+Copyright (C) 2024 Wason Technology, LLC
