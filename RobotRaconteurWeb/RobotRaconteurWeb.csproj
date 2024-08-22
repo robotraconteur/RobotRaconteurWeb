@@ -48,5 +48,6 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\"/>
+    <None Include="targets\RobotRaconteurWeb.targets" Pack="true" PackagePath="build\"/>
   </ItemGroup>
 </Project>
