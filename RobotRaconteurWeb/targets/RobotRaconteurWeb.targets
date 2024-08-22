@@ -19,7 +19,8 @@
 
 <Target Name="_UpdateRobotRaconteurGenFiles" Inputs="$(MSBuildProjectFile);@(RobotRaconteurGenCSharp)"
   Outputs="$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" BeforeTargets="BeforeCompile"
-  DependsOnTargets="PrepareForBuild;GetReferenceAssemblyPaths">
+  DependsOnTargets="PrepareForBuild;GetReferenceAssemblyPaths"
+  Condition="'@(RobotRaconteurGenCSharp)' != ''">
 
   <Exec Command="RobotRaconteurWebGen --thunksource --lang=csharp --outfile=&quot;$(IntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs&quot; @(RobotRaconteurGenInclude->'--include &quot;%(fullpath)&quot;', ' ') @(RobotRaconteurGenIncludePath->'--include-path &quot;%(FullPath)&quot;', ' ') --auto-import @(RobotRaconteurGenCSharp->'&quot;%(fullpath)&quot;',' ')"/>
 </Target>
