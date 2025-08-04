@@ -513,7 +513,7 @@ namespace RobotRaconteurWeb
                     {
                         close_callback(this);
                     }
-                    catch { };
+                    catch { }
                 try
                 {
                     Close().IgnoreResult();
@@ -794,7 +794,7 @@ namespace RobotRaconteurWeb
                     }
                     ep.RemoteClose();
                 }
-                catch { };
+                catch { }
             }
             else if (m.EntryType == MessageEntryType.PipePacket)
             {

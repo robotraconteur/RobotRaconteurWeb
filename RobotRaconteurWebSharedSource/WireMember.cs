@@ -438,7 +438,7 @@ namespace RobotRaconteurWeb
                     {
                         close_callback(this);
                     }
-                    catch { };
+                    catch { }
                 }
 
                 Close();

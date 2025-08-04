@@ -1498,8 +1498,8 @@ namespace RobotRaconteurWeb
 
             byte[] bSenderNodeID = SenderNodeID.ToByteArray();
             byte[] bReceiverNodeID = ReceiverNodeID.ToByteArray();
-            for (int i = 0; i < 16; i++) { w.Write(bSenderNodeID[i]); };
-            for (int i = 0; i < 16; i++) { w.Write(bReceiverNodeID[i]); };
+            for (int i = 0; i < 16; i++) { w.Write(bSenderNodeID[i]); }
+            for (int i = 0; i < 16; i++) { w.Write(bReceiverNodeID[i]); }
             w.Write(SenderEndpoint);
             w.Write(ReceiverEndpoint);
             w.Write((ushort)ArrayBinaryWriter.GetStringByteCount8(SenderNodeName));
@@ -1531,10 +1531,10 @@ namespace RobotRaconteurWeb
             r.PushRelativeLimit((uint)(HeaderLength - 12));
 
             byte[] bSenderNodeID = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            for (int i = 0; i < 16; i++) { bSenderNodeID[i] = r.ReadByte(); };
+            for (int i = 0; i < 16; i++) { bSenderNodeID[i] = r.ReadByte(); }
             SenderNodeID = new NodeID(bSenderNodeID);
             byte[] bReceiverNodeID = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            for (int i = 0; i < 16; i++) { bReceiverNodeID[i] = r.ReadByte(); };
+            for (int i = 0; i < 16; i++) { bReceiverNodeID[i] = r.ReadByte(); }
             ReceiverNodeID = new NodeID(bReceiverNodeID);
             SenderEndpoint = r.ReadUInt32();
             ReceiverEndpoint = r.ReadUInt32();
@@ -1650,8 +1650,8 @@ namespace RobotRaconteurWeb
             {
                 byte[] bSenderNodeID = SenderNodeID.ToByteArray();
                 byte[] bReceiverNodeID = ReceiverNodeID.ToByteArray();
-                for (int i = 0; i < 16; i++) { w.Write(bSenderNodeID[i]); };
-                for (int i = 0; i < 16; i++) { w.Write(bReceiverNodeID[i]); };
+                for (int i = 0; i < 16; i++) { w.Write(bSenderNodeID[i]); }
+                for (int i = 0; i < 16; i++) { w.Write(bReceiverNodeID[i]); }
                 w.WriteString8WithXLen(SenderNodeName);
                 w.WriteString8WithXLen(ReceiverNodeName);
             }
@@ -1720,14 +1720,14 @@ namespace RobotRaconteurWeb
                 for (int i = 0; i < 16; i++)
                 {
                     bSenderNodeID[i] = r.ReadByte();
-                };
+                }
                 SenderNodeID = new NodeID(bSenderNodeID);
 
                 byte[] bReceiverNodeID = new byte[16];
                 for (int i = 0; i < 16; i++)
                 {
                     bReceiverNodeID[i] = r.ReadByte();
-                };
+                }
                 ReceiverNodeID = new NodeID(bReceiverNodeID);
 
                 uint pname_s = r.ReadUintX();
