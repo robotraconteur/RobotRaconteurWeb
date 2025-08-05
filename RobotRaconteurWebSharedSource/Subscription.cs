@@ -202,7 +202,7 @@ namespace RobotRaconteurWeb
         }
 
         /**
-         * <sumarry>Construct a new Service Subscription Filter Attribute object</sumarry>
+         * <summary>Construct a new Service Subscription Filter Attribute object</summary>
          *
          * <remarks>
          * This is a nameless attribute for use with attribute lists. The value is compared using a regex
@@ -1941,7 +1941,7 @@ namespace RobotRaconteurWeb
         }
         /**
         <summary>
-        Release a client previously clamed with ClaimClient()
+        Release a client previously claimed with ClaimClient()
         </summary>
         <remarks>
         Lifecycle management is returned to the subscription
@@ -3611,7 +3611,7 @@ an exception.
             return await GetObjFromRoot<T>(client, cancel);
         }
         /**
-         * <summary>Try getting the "default client" sub object aind wait if not available</summary>
+         * <summary>Try getting the "default client" sub object and wait if not available</summary>
          * <remarks>
          * Same as TryGetDefaultClient() but waits for a client to be available
          * </remarks>

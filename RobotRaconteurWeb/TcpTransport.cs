@@ -232,7 +232,7 @@ namespace RobotRaconteurWeb
         public bool DisableMessage4 { get; set; }
 
         /// <summary>
-        /// The maxmimum message size in bytes
+        /// The maximum message size in bytes
         /// </summary>
         [PublicApi]
         public uint MaxMessageSize { get; set; }
@@ -461,6 +461,7 @@ namespace RobotRaconteurWeb
             try
             {
                 if (!transportopen) return;
+                // cSpell: ignore tcpc
                 TcpClient tcpc = listen.EndAcceptTcpClient(a);
 
                 ClientConnected2(tcpc).IgnoreResult();
@@ -1344,7 +1345,7 @@ namespace RobotRaconteurWeb
             }
         }
         /**
-         * <summayr>brief Add a WebSocket allowed origin</summayr>
+         * <summary>brief Add a WebSocket allowed origin</summary>
          *
          * <remarks>
          * WebSockets are vulnerable to an attack method called "cross-site scripting" (XSS). In
@@ -2348,6 +2349,7 @@ namespace RobotRaconteurWeb
                             IPv6MulticastOption ipv6m = new IPv6MulticastOption(ip);
                             recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, ipv6m);
 
+                            // cSpell: ignore sidi
                             foreach (long sidi in scopeids)
                             {
                                 IPv6MulticastOption ipv6m2 = new IPv6MulticastOption(ip, sidi);
@@ -2374,6 +2376,7 @@ namespace RobotRaconteurWeb
 
             try
             {
+                // cSpell: ignore recvep
                 recvep = (EndPoint)iep;
                 recvsock?.BeginReceiveFrom(recvbuf, 0, 4096, SocketFlags.None, ref recvep, new AsyncCallback(recvsock_receivecallback), recvsock);
             }
@@ -3750,6 +3753,7 @@ namespace RobotRaconteurWeb
     }
     static class TcpTransportUtil
     {
+        // cSpell: ignore iovdat
 
         [DllImport("libc", SetLastError = true)]
         public static extern int recvmsg(int s, IntPtr msg, int flags);

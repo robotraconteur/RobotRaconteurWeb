@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+// cSpell: ignore ecount
+
 namespace RobotRaconteurWeb
 {
 

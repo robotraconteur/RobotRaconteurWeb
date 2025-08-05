@@ -23,6 +23,8 @@ using com.robotraconteur.testing.TestService1;
 using RobotRaconteurWeb;
 using RobotRaconteurWebTest;
 
+// cSpell: ignore subscriptioncitests, citests
+
 namespace RobotRaconteurTest
 {
     class Program

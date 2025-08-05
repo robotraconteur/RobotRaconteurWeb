@@ -1,0 +1,30 @@
+version: "0.2"
+allowCompoundWords: true
+ignorePaths:
+- build
+- "*.svg"
+- ".gitignore"
+- ".cmake-format.yml"
+- ".clang-tidy"
+- ".clang-format"
+- RobotRaconteurWebTest/Properties/launchSettings.json
+- ".editorconfig"
+dictionaryDefinitions:
+- name: custom-dictionary
+  path: ./.cspell/custom-dictionary.txt
+  addWords: true
+dictionaries:
+- custom-dictionary
+- companies
+- softwareTerms
+- programmingTerms
+- misc
+- markdown
+- public-licenses
+- git
+- en_us
+- csharp
+- cpp
+words: []
+ignoreWords: []
+import: []

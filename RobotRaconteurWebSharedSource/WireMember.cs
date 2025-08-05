@@ -1359,7 +1359,7 @@ namespace RobotRaconteurWeb
 #pragma warning restore 1591
         /**
         <summary>
-        Get the assosciated wire
+        Get the associated wire
         </summary>
         <remarks>None</remarks>
         */
@@ -1436,6 +1436,7 @@ namespace RobotRaconteurWeb
             {
                 lock (connected_wires_lock)
                 {
+                    // cSpell: ignore ceps
                     current_out_value = value;
                     out_value_valid = true;
                     List<connected_connection> ceps = new List<connected_connection>();

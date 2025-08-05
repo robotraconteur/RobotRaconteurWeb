@@ -58,4 +58,26 @@ repos:
         language: system 
         entry: dotnet format --include 
         types_or: ["c#", "vb"]
+- repo: https://github.com/streetsidesoftware/cspell-cli
+  rev: v9.2.0
+  hooks:
+  - id: cspell   # Spell check changed files
+    args:
+    - --no-progress
+    - --no-summary
+    - --gitignore
+    - --unique
+    - --files
+  - id: cspell   # Spell check the commit message
+    name: check commit message spelling
+    args:
+    - --no-must-find-files
+    - --no-progress
+    - --no-summary
+    - --files
+    - --allow-compound-words
+    - --ignore-case
+    - .git/COMMIT_EDITMSG
+    stages: [commit-msg]
+    always_run: true
 
