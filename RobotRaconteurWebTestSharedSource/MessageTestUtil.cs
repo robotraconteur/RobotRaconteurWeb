@@ -780,6 +780,7 @@ namespace RobotRaconteurTest
 
         public static void MessageSerializationTest_CompareSubElements(MessageElement m1, MessageElement m2)
         {
+            // cSpell: ignore sdat
             MessageElementNestedElementList sdat1 = m1.CastDataToNestedList();
             MessageElementNestedElementList sdat2 = m2.CastDataToNestedList();
 

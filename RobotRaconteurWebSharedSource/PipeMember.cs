@@ -22,6 +22,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
 
+// cSpell: ignore opacket
+
 namespace RobotRaconteurWeb
 {
     //TODO: Add threading locks
@@ -430,7 +432,7 @@ namespace RobotRaconteurWeb
             in milliseconds for a finite duration timeout, or RR_TIMEOUT_INFINITE for no timeout</param>
             <param name="peek">If true, the packet is not removed from the receive queue</param>
             <param name="cancel">The cancellation token for the operation</param>
-            <returns>Succes and returned value as a tuple</returns>
+            <returns>Success and returned value as a tuple</returns>
             */
 
             [PublicApi]
@@ -551,7 +553,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Delegate type for pipe endpoint disconnect callback functions
         /// </summary>
-        /// <param name="closedpipe">The PipeEpndoint that was disconnected</param>
+        /// <param name="closedpipe">The PipeEndpoint that was disconnected</param>
         [PublicApi]
         public delegate void PipeDisconnectCallbackFunction(PipeEndpoint closedpipe);
 
@@ -565,7 +567,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Delegate type for pipe packet ack received callback functions
         /// </summary>
-        /// <param name="e">The PipeEndpoint that reecived the packet ack</param>
+        /// <param name="e">The PipeEndpoint that received the packet ack</param>
         /// <param name="packetnum">The packet number ack that was received</param>
         [PublicApi]
         public delegate void PipePacketAckReceivedCallbackFunction(PipeEndpoint e, uint packetnum);
@@ -886,6 +888,7 @@ namespace RobotRaconteurWeb
 
         public override void Shutdown()
         {
+            // cSpell: ignore endps
             Pipe<T>.PipeEndpoint[] endps = pipeendpoints.Values.ToArray();
             foreach (Pipe<T>.PipeEndpoint e in endps)
             {

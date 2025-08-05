@@ -1133,7 +1133,7 @@ namespace RobotRaconteurWeb
         private async Task ClientLockOp(MessageEntry m, MessageEntry ret)
         {
 
-
+            // cSpell: ignore sskels
             // if (m.ServicePath != ServiceName) throw new Exception("Only locking of root object currently supported");
 
             string[] priv = null;

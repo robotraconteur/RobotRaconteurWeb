@@ -44,7 +44,7 @@ namespace RobotRaconteurWeb
     PipeBroadcaster and WireBroadcaster must be added to the downsampler
     using AddPipeBroadcaster() and AddWireBroadcaster(), respectively.
     It is recommended that these functions be called within
-    the RRServiceObjectInit(context,servicepath) function thit is called
+    the RRServiceObjectInit(context,servicepath) function that is called
     by the node when a service object is initialized.
     </para>
     <para>

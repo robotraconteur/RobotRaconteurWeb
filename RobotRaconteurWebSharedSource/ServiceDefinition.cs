@@ -3922,6 +3922,7 @@ namespace RobotRaconteurWeb
             throw new ServiceDefinitionVerifyException("Invalid member \"" + m.Name + "\"", m2.ParseInfo);
         }
 
+        //cSpell: ignore rrimplements
         internal class rrimplements
         {
             public string name;
@@ -4312,7 +4313,7 @@ namespace RobotRaconteurWeb
                         NamedTypeDefinition tt = VerifyResolveNamedType(t, defs);
                         if (tt.RRDataType != DataTypes.pod_t && tt.RRDataType != DataTypes.namedarray_t)
                         {
-                            throw new ServiceDefinitionVerifyException("Pods must only contain numeric, custruct, pod types", e.ParseInfo);
+                            throw new ServiceDefinitionVerifyException("Pods must only contain numeric, namedarray, pod types", e.ParseInfo);
                         }
                     }
 
@@ -4401,6 +4402,7 @@ namespace RobotRaconteurWeb
             VerifyStructure_common(strut, def, defs, ref warnings, DataTypes.namedarray_t);
         }
 
+        // cSpell: ignore rrimports
         internal class rrimports
         {
             public ServiceDefinition def;
@@ -4856,7 +4858,7 @@ namespace RobotRaconteurWeb
             }
 
             if (parentinterfaces.Count != 1)
-                throw new DataTypeException("Robot Raconteur types can only directly inheret one Robot Raconteur interface type");
+                throw new DataTypeException("Robot Raconteur types can only directly inherit one Robot Raconteur interface type");
 
             return parentinterfaces[0];
 

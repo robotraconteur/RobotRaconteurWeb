@@ -63,9 +63,9 @@ namespace RobotRaconteurWeb
         private bool transportopen = false;
         private bool serverstarted = false;
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override bool IsServer { get { return serverstarted; } }
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override bool IsClient { get { return true; } }
 
         internal Dictionary<uint, IntraTransportConnection> TransportConnections = new Dictionary<uint, IntraTransportConnection>();
@@ -138,7 +138,7 @@ namespace RobotRaconteurWeb
             DefaultConnectTimeout = 2500;
         }
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
 
         public override async Task<ITransportConnection> CreateTransportConnection(string url, Endpoint e, CancellationToken cancel)
         {
@@ -245,7 +245,7 @@ namespace RobotRaconteurWeb
 
         }
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override Task CloseTransportConnection(Endpoint e, CancellationToken cancel)
         {
             lock (this)
@@ -328,7 +328,7 @@ namespace RobotRaconteurWeb
             return true;
         }
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override async Task SendMessage(Message m, CancellationToken cancel)
         {
             if (m.header.SenderNodeID != node.NodeID)
@@ -352,7 +352,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         protected internal override void MessageReceived(Message m)
         {
             node.MessageReceived(m);
@@ -419,7 +419,7 @@ namespace RobotRaconteurWeb
             return Task.FromResult(0);
         }
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override void CheckConnection(uint endpoint)
         {
             try
@@ -459,7 +459,7 @@ namespace RobotRaconteurWeb
         }
 
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override uint TransportCapability(string name)
         {
             return base.TransportCapability(name);

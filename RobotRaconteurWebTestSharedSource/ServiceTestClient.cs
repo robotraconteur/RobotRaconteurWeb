@@ -615,6 +615,7 @@ namespace RobotRaconteurTest
 
         public async Task TestObjRefs()
         {
+            // cSpell: ignore myind
             sub1 o1 = await r.get_o1();
             sub1 o2_10 = await r.get_o2(10);
             sub1 o2_34 = await r.get_o2(34);
@@ -941,6 +942,7 @@ namespace RobotRaconteurTest
 #if !ROBOTRACONTEUR_H5
         private async Task test_m2()
         {
+            // cSpell: ignore testmdarray
             RRAssert.AreEqual(await r.m2.GetDimCount(), 5);
             ulong[] m2_dims = await r.m2.GetDimensions();
             ca<ulong>(m2_dims, new ulong[] { 10, 10, 10, 10, 10 });
@@ -1086,7 +1088,7 @@ namespace RobotRaconteurTest
         public async Task TestObjectLock(string[] url)
         {
             //Run a test, check 6 things:
-            //1. Exclusive username lock works as expected (user with lock can acces, other user can't)
+            //1. Exclusive username lock works as expected (user with lock can access, other user can't)
             //2. Check that session-level lock works as expected (only one session can access the locked object)
             //3. Check that "sub-tree" objects lock as expected
             //5. Object lock release works
@@ -1225,7 +1227,7 @@ namespace RobotRaconteurTest
         public async Task TestMonitorLock(string[] url)
         {
 
-            //The monitor lock aquires an exclusive sock to a single thread on the client.
+            //The monitor lock acquires an exclusive sock to a single thread on the client.
             //This lock is for a single thread, and works for all clients and the service if
             //it is checking for monitor locks.
 

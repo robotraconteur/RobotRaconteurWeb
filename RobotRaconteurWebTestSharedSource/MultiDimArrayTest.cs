@@ -34,6 +34,7 @@ namespace RobotRaconteurTest
 
         public static void TestDouble()
         {
+            // cSpell: ignore testmdarray
             MultiDimArray m1 = LoadDoubleArrayFromFile(Path.Combine("testdata", "testmdarray1.bin"));
             MultiDimArray m2 = LoadDoubleArrayFromFile(Path.Combine("testdata", "testmdarray2.bin"));
             MultiDimArray m3 = LoadDoubleArrayFromFile(Path.Combine("testdata", "testmdarray3.bin"));

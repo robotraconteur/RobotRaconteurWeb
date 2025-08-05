@@ -1800,7 +1800,7 @@ namespace RobotRaconteurWeb
                                                                         member: e.MemberName);
                                 eret.elements.Clear();
                                 eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
-                                eret.AddElement("errorstring", "Service factory configuraiton error");
+                                eret.AddElement("errorstring", "Service factory configuration error");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                                 break;
                             }
@@ -2363,7 +2363,7 @@ namespace RobotRaconteurWeb
         /// <summary>
         /// Returns the currently detected nodes from discovery
         /// </summary>
-        /// <remarks>This is raw information from listening to multicast packtes.
+        /// <remarks>This is raw information from listening to multicast packets.
         /// These nodes are not validated and may not be reachable</remarks>
         /// <value></value>
         [PublicApi]
@@ -2394,7 +2394,7 @@ namespace RobotRaconteurWeb
         <remarks>
             <para>
             Service discovery will often return a list of candidate URLs to
-            use to connect to a node. This function uses hueristics to select
+            use to connect to a node. This function uses heuristics to select
             the "best" URL to use. The selection criteria ranks URLs in roughly
             the following order, lower number being better:
             </para>
@@ -2455,6 +2455,7 @@ namespace RobotRaconteurWeb
 
         /*public async Task<object> ConnectService(string[] urls, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
         {
+            // cSpell: ignore urlsl
             List<string> urlsl = urls.ToList();
 
             while (urlsl.Count > 0 && !cancel.IsCancellationRequested)
@@ -2722,7 +2723,7 @@ namespace RobotRaconteurWeb
         </summary>
         <remarks>
         <para>
-        Robot Raconteur service object types are polymorphic using inheritence,
+        Robot Raconteur service object types are polymorphic using inheritance,
         meaning that an object may be represented using multiple object types.
         `objref` will attempt to return the relevant type, but it is sometimes
         necessary to request a specific type for an objref.

@@ -1768,6 +1768,7 @@ namespace RobotRaconteurWeb
                 }
                 else
                 {
+                    // cSpell: ignore tvoid
                     TypeDefinition tvoid = new TypeDefinition();
                     tvoid.Type = DataTypes.int32_t;
                     w2.WriteLine(String.Format("    await this.{0}.Function({1}).ConfigureAwait(false);", FixName(m.Name), params_));
@@ -2550,7 +2551,7 @@ namespace RobotRaconteurWeb
                 {
                     ConstantDefinition c3;
                     if (!c2.TryGetValue(f2.ConstantRefName, out c3))
-                        throw new ServiceException("Invalid structure cosntant " + c.Name);
+                        throw new ServiceException("Invalid structure constant " + c.Name);
                     o += convert_constant(c3, c2, def) + " ";
                 }
 

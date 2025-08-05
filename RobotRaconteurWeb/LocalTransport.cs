@@ -113,9 +113,9 @@ namespace RobotRaconteurWeb
         private bool transportopen = false;
         private bool serverstarted = false;
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override bool IsServer { get { return true; } }
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override bool IsClient { get { return true; } }
 
         internal Dictionary<uint, AsyncStreamTransport> TransportConnections = new Dictionary<uint, AsyncStreamTransport>();
@@ -147,7 +147,7 @@ namespace RobotRaconteurWeb
         public bool DisableMessage4 { get; set; }
 
         /// <summary>
-        /// The maxmimum message size in bytes
+        /// The maximum message size in bytes
         /// </summary>
         [PublicApi]
         public uint MaxMessageSize { get; set; }
@@ -171,7 +171,7 @@ namespace RobotRaconteurWeb
             parent_adapter = new AsyncStreamTransportParentImpl(this);
         }
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
 
         public override async Task<ITransportConnection> CreateTransportConnection(string url, Endpoint e, CancellationToken cancel)
         {
@@ -279,7 +279,7 @@ namespace RobotRaconteurWeb
             return connection;
         }
 
-        /// <inheretdoc/>
+        /// <inheritdoc/>
         public override Task CloseTransportConnection(Endpoint e, CancellationToken cancel)
         {
             lock (this)

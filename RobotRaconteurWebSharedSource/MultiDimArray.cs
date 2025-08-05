@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-
+//cSpell: ignore mema, strideb,
 
 namespace RobotRaconteurWeb
 {
