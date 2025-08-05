@@ -1496,7 +1496,7 @@ namespace RobotRaconteurWeb
                     r.TrySetResult(m);
                 }
             }
-            catch { };
+            catch { }
         }
 
         public virtual uint StreamCapabilities(string name)

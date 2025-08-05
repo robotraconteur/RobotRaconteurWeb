@@ -462,7 +462,7 @@ namespace RobotRaconteurWeb
                                 RemoveClient(c);
                             }
                             catch (Exception)
-                            { };
+                            { }
                         }
                     });
                 }
@@ -473,7 +473,7 @@ namespace RobotRaconteurWeb
                         RemoveClient(c);
                     }
                     catch (Exception)
-                    { };
+                    { }
                 }
             }
 
@@ -871,7 +871,7 @@ namespace RobotRaconteurWeb
                 MessageEntry e = new MessageEntry(MessageEntryType.ServiceClosed, "");
                 SendEvent(e).IgnoreResult();
             }
-            catch { };
+            catch { }
 
             ServerEndpoint[] eea = client_endpoints.Values.ToArray();
 
@@ -881,7 +881,7 @@ namespace RobotRaconteurWeb
                 {
                     node.DeleteEndpoint(ee);
                 }
-                catch { };
+                catch { }
             }
 
             client_endpoints.Clear();
@@ -892,7 +892,7 @@ namespace RobotRaconteurWeb
                 {
                     s.ReleaseObject();
                 }
-                catch { };
+                catch { }
             }
 
             try
@@ -1632,7 +1632,7 @@ namespace RobotRaconteurWeb
                                 RemoveClient(c);
                             }
                             catch (Exception)
-                            { };
+                            { }
                         }
                     });
                 }
@@ -1643,7 +1643,7 @@ namespace RobotRaconteurWeb
                         RemoveClient(c);
                     }
                     catch (Exception)
-                    { };
+                    { }
                 }
             }
 

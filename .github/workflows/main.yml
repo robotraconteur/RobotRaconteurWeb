@@ -14,10 +14,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup dotnet 6.x
+    - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
     - name: Install dependencies
       run: dotnet restore
     - name: Install H5
@@ -31,23 +31,23 @@ jobs:
         dotnet pack  "RobotRaconteurWebGen/RobotRaconteurWebGen.csproj" -p:Platform="AnyCPU" --configuration Release
         dotnet pack  "RobotRaconteurH5/RobotRaconteurH5.csproj" -p:Platform="AnyCPU" --configuration Release
     - name: Upload nuget packages
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: nuget-packages
         path: |
           ./**/*.nupkg
   ubuntu:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup dotnet 6.x
+    - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
     - name: Build and Run
       run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
   pre-commit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       SKIP: no-commit-to-branch
     steps:
@@ -57,8 +57,10 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y dos2unix
-    - name: Setup dotnet 6.x
-      uses: actions/setup-dotnet@v3
+    - name: Setup dotnet 8.x
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
+    - name: Update dotnet format
+      run: dotnet tool update -g dotnet-format
     - uses: pre-commit/action@v3.0.1

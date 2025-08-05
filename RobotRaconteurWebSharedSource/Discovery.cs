@@ -322,7 +322,7 @@ namespace RobotRaconteurWeb
 
                 }
             }
-            catch { };
+            catch { }
 
             //Console.WriteLine(packet);
         }
@@ -553,7 +553,7 @@ namespace RobotRaconteurWeb
             {
                 await UpdateDetectedNodes(cancel).ConfigureAwait(false);
             }
-            catch { };
+            catch { }
 
             List<ServiceInfo2> services = new List<ServiceInfo2>();
             List<string> nodeids;
@@ -686,7 +686,7 @@ namespace RobotRaconteurWeb
             {
                 await UpdateDetectedNodes(cancel).ConfigureAwait(false);
             }
-            catch { };
+            catch { }
 
             var o = new List<NodeInfo2>();
 
@@ -746,7 +746,7 @@ namespace RobotRaconteurWeb
             {
                 await UpdateDetectedNodes(cancel).ConfigureAwait(false);
             }
-            catch { };
+            catch { }
 
             var o = new List<NodeInfo2>();
 

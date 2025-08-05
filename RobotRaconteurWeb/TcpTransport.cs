@@ -908,7 +908,7 @@ namespace RobotRaconteurWeb
                 {
                     listen.Stop();
                 }
-                catch { };
+                catch { }
             }
 
 
@@ -917,13 +917,13 @@ namespace RobotRaconteurWeb
 
                 DisableNodeDiscoveryListening();
             }
-            catch { };
+            catch { }
 
             try
             {
                 DisableNodeAnnounce();
             }
-            catch { };
+            catch { }
 
             try
             {
@@ -1740,7 +1740,7 @@ namespace RobotRaconteurWeb
                             wait_tasks.Add(Tuple.Create(task1, socket1));
 
                         }
-                        catch (Exception) { };
+                        catch (Exception) { }
 
                     }
 
@@ -1947,7 +1947,7 @@ namespace RobotRaconteurWeb
                             wait_tasks.Add(Tuple.Create(task1, socket1));
 
                         }
-                        catch (Exception) { };
+                        catch (Exception) { }
 
                     }
 
@@ -2357,7 +2357,7 @@ namespace RobotRaconteurWeb
                                 }
                                 catch (Exception)
                                 {
-                                };
+                                }
 
                             }
                         }
@@ -2482,13 +2482,13 @@ namespace RobotRaconteurWeb
             {
                 recvsock?.Close();
             }
-            catch (Exception) { };
+            catch (Exception) { }
 
             try
             {
                 recvsockV6.Close();
             }
-            catch (Exception) { };
+            catch (Exception) { }
 
             listening = false;
             var t = discovery_request_timer;
@@ -2701,7 +2701,7 @@ namespace RobotRaconteurWeb
 
                                     await t.ConfigureAwait(false);
                                 }
-                                catch { };
+                                catch { }
                             }
 
 

@@ -2012,7 +2012,7 @@ namespace RobotRaconteurWeb
                 {
                     DeleteEndpoint(c);
                 }
-                catch { };
+                catch { }
 
                 throw new ConnectionException("Could not connect to service");
             }
@@ -2327,7 +2327,7 @@ namespace RobotRaconteurWeb
                 {
                     c.Close();
                 }
-                catch { };
+                catch { }
             }
 
             ServerContext[] sc;
@@ -2342,7 +2342,7 @@ namespace RobotRaconteurWeb
                 {
                     c.Close();
                 }
-                catch { };
+                catch { }
             }
 
             lock (endpoints)
