@@ -14,10 +14,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup dotnet 6.x
+    - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
     - name: Install dependencies
       run: dotnet restore
     - name: Install H5
@@ -37,17 +37,17 @@ jobs:
         path: |
           ./**/*.nupkg
   ubuntu:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup dotnet 6.x
+    - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
     - name: Build and Run
       run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
   pre-commit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       SKIP: no-commit-to-branch
     steps:
@@ -57,8 +57,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y dos2unix
-    - name: Setup dotnet 6.x
+    - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
     - uses: pre-commit/action@v3.0.1
