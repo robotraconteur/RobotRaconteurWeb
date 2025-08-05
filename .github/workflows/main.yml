@@ -61,4 +61,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.x
+    - name: Update dotnet format
+      run: dotnet tool update -g dotnet-format
     - uses: pre-commit/action@v3.0.1
