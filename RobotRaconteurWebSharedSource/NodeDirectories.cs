@@ -390,7 +390,7 @@ namespace RobotRaconteurWeb
                                    "user_data_dir", node);
                 TryCatchDirResolve(() => ret.user_config_dir = user_unix_home_dir(".config/RobotRaconteur", "XDG_CONFIG_HOME", "ROBOTRACONTEUR_USER_CONFIG_DIR"),
                                    "user_config_dir", node);
-                TryCatchDirResolve(() => ret.user_state_dir = user_unix_home_dir(".local/state/RobotRaconteur", "XDG_STATE_HOME", "ROBOTRACONTEUR_USER_CONFIG_DIR"),
+                TryCatchDirResolve(() => ret.user_state_dir = user_unix_home_dir(".local/state/RobotRaconteur", "XDG_STATE_HOME", "ROBOTRACONTEUR_USER_STATE_DIR"),
                                    "user_state_dir", node);
                 TryCatchDirResolve(() => ret.user_cache_dir = user_unix_home_dir(".cache/RobotRaconteur", "XDG_CACHE_HOME", "ROBOTRACONTEUR_USER_CACHE_DIR"),
                                    "user_cache_dir", node);
