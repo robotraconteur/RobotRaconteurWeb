@@ -2115,7 +2115,7 @@ namespace RobotRaconteurWeb
 
             w2.WriteLine("    }");
 
-            w2.WriteLine("    public override async Task<MessageEntry> CallPipeFunction(MessageEntry m,Endpoint e) {");
+            w2.WriteLine("    public override async Task<MessageEntry> CallPipeFunction(MessageEntry m, global::RobotRaconteurWeb.Endpoint e) {");
             w2.WriteLine("    string ename=m.MemberName;");
             w2.WriteLine("    switch (ename) {");
             foreach (var m in MemberIter<PipeDefinition>(e))
@@ -2129,7 +2129,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    }");
             w2.WriteLine("    }");
 
-            w2.WriteLine("    public override async Task<MessageEntry> CallWireFunction(MessageEntry m,Endpoint e) {");
+            w2.WriteLine("    public override async Task<MessageEntry> CallWireFunction(MessageEntry m, global::RobotRaconteurWeb.Endpoint e) {");
             w2.WriteLine("    string ename=m.MemberName;");
             w2.WriteLine("    switch (ename) {");
             foreach (var m in MemberIter<WireDefinition>(e))
@@ -2142,7 +2142,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    }");
             w2.WriteLine("    }");
 
-            w2.WriteLine("    public override void DispatchPipeMessage(MessageEntry m, Endpoint e)");
+            w2.WriteLine("    public override void DispatchPipeMessage(MessageEntry m, global::RobotRaconteurWeb.Endpoint e)");
             w2.WriteLine("    {");
             w2.WriteLine("    switch (m.MemberName) {");
             foreach (var m in MemberIter<PipeDefinition>(e))
@@ -2156,7 +2156,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    }");
             w2.WriteLine("    }");
 
-            w2.WriteLine("    public override void DispatchWireMessage(MessageEntry m, Endpoint e)");
+            w2.WriteLine("    public override void DispatchWireMessage(MessageEntry m, global::RobotRaconteurWeb.Endpoint e)");
             w2.WriteLine("    {");
             w2.WriteLine("    switch (m.MemberName) {");
             foreach (var m in MemberIter<WireDefinition>(e))
@@ -2172,7 +2172,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    }");
 
 
-            w2.WriteLine("    public override async Task<MessageEntry> CallMemoryFunction(MessageEntry m,Endpoint e) {");
+            w2.WriteLine("    public override async Task<MessageEntry> CallMemoryFunction(MessageEntry m, global::RobotRaconteurWeb.Endpoint e) {");
             w2.WriteLine("    string ename=m.MemberName;");
             w2.WriteLine("    switch (ename) {");
             foreach (var m in MemberIter<MemoryDefinition>(e))
