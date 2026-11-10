@@ -1526,7 +1526,7 @@ namespace RobotRaconteurWeb
             MessageSize = r.ReadUInt32();
             ushort version = r.ReadUInt16();
             if (version != 2)
-                throw new ProtocolException("Uknown protocol version");
+                throw new ProtocolException("Unknown protocol version");
 
             HeaderLength = r.ReadUInt16();
 
