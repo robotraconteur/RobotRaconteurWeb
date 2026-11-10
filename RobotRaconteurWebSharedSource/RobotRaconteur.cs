@@ -80,7 +80,7 @@ namespace RobotRaconteurWeb
         }
 
         /**
-         * <summary>The current version of RobotRaconteurWeb ins tring format</summary>
+         * <summary>The current version of RobotRaconteurWeb in string format</summary>
          * <remarks>None</remarks>
          */
         [PublicApi]
@@ -2917,7 +2917,7 @@ namespace RobotRaconteurWeb
         A ServiceSubscription will track the availability of service types and
         create connections when available.
         </remarks>
-        <param name="service_types">An arrayof service types to listen for, ie
+        <param name="service_types">An array of service types to listen for, ie
         `com.robotraconteur.robotics.robot.Robot`</param>
         <param name="filter">A filter to select individual services based on specified criteria</param>
         <returns>The active subscription</returns>

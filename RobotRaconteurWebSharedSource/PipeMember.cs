@@ -830,8 +830,7 @@ namespace RobotRaconteurWeb
                                 {
                                     p = early_endpoints[index];
                                 }
-                                else
-                                if (connecting.Count > 0)
+                                else if (connecting.Count > 0)
                                 {
                                     if (connecting.Any(x => x.Item1 == -1 || x.Item1 == index))
                                     {

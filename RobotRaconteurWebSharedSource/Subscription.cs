@@ -2243,7 +2243,7 @@ of pipes and wires can be managed automatically.
         /// Update the service type and filter for the subscription
         /// </summary>
         /// <remarks>None</remarks>
-        /// <param name="service_types">n arrayof service types to listen for, ie
+        /// <param name="service_types">An array of service types to listen for, ie
         /// `com.robotraconteur.robotics.robot.Robot`</param>
         /// <param name="filter">A filter to select individual services based on specified criteria</param>
         [PublicApi]
