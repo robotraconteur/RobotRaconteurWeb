@@ -40,6 +40,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Checkout Robot Raconteur Core test vectors
+      uses: actions/checkout@v4
+      with:
+        repository: robotraconteur/robotraconteur
+        ref: master
+        path: rr-core
+        sparse-checkout: test/data
+    - name: Check test vectors against Core
+      run: python3 .github/scripts/check_test_vectors.py RobotRaconteurWebTestSharedSource/test_vectors.bin rr-core/test/data
     - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
