@@ -31,6 +31,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)MessageTestUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LFSRSeqGen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageSerializationTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestVectors.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)test_vectors.bin" LogicalName="test_vectors.bin" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.robdef" />
