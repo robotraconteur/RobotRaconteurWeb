@@ -196,6 +196,7 @@ namespace RobotRaconteurWebGen
                         {
                             var imp = missing_imports.First();
                             string imp_file = imp + ".robdef";
+                            bool imp_found = false;
                             foreach (var inc in include_dirs)
                             {
                                 string s3 = Path.Join(inc, imp_file);
@@ -211,8 +212,15 @@ namespace RobotRaconteurWebGen
                                     string a = d.ToString();
                                     sources.Add(new Source { filename = s3, is_import = true, full_text = def, service_def = d });
                                     required_imports.UnionWith(d.Imports);
+                                    imp_found = true;
                                     break;
                                 }
+                            }
+
+                            if (!imp_found)
+                            {
+                                Console.WriteLine("RobotRaconteurWebGen: fatal error: could not find import {0}", imp_file);
+                                return 1002;
                             }
 
                         }
