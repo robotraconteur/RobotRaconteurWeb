@@ -2210,6 +2210,15 @@ namespace RobotRaconteurWeb
 
     public class MessageElement
     {
+        // Maximum nesting depth of message element lists accepted when reading. Read and Read4 recurse per
+        // nesting level, so unbounded nesting allows a small message to overflow the stack.
+        internal const int MaxNestingDepth = 512;
+
+#if !ROBOTRACONTEUR_H5
+        [ThreadStatic]
+#endif
+        private static int read_nesting_depth;
+
         public uint ElementSize;
         public byte ElementFlags = (byte)MessageElementFlags.Version2Compat;
 
@@ -2437,12 +2446,22 @@ namespace RobotRaconteurWeb
                 case DataTypes.namedarray_array_t:
                 case DataTypes.namedarray_multidimarray_t:
                     {
+                        if (read_nesting_depth >= MaxNestingDepth)
+                            throw new ProtocolException("Message element nesting depth exceeds maximum");
                         List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                        for (int i = 0; i < DataCount; i++)
+                        read_nesting_depth++;
+                        try
                         {
-                            MessageElement m = new MessageElement();
-                            m.Read(r);
-                            l.Add(m);
+                            for (int i = 0; i < DataCount; i++)
+                            {
+                                MessageElement m = new MessageElement();
+                                m.Read(r);
+                                l.Add(m);
+                            }
+                        }
+                        finally
+                        {
+                            read_nesting_depth--;
                         }
 
                         dat = new MessageElementNestedElementList(ElementType, ElementTypeName, l);
@@ -2777,12 +2796,22 @@ namespace RobotRaconteurWeb
                 case DataTypes.namedarray_array_t:
                 case DataTypes.namedarray_multidimarray_t:
                     {
+                        if (read_nesting_depth >= MaxNestingDepth)
+                            throw new ProtocolException("Message element nesting depth exceeds maximum");
                         List<MessageElement> l = new List<MessageElement>((int)DataCount);
-                        for (int i = 0; i < DataCount; i++)
+                        read_nesting_depth++;
+                        try
                         {
-                            MessageElement m = new MessageElement();
-                            m.Read4(r);
-                            l.Add(m);
+                            for (int i = 0; i < DataCount; i++)
+                            {
+                                MessageElement m = new MessageElement();
+                                m.Read4(r);
+                                l.Add(m);
+                            }
+                        }
+                        finally
+                        {
+                            read_nesting_depth--;
                         }
 
                         dat = new MessageElementNestedElementList(ElementType, ElementTypeName, l);

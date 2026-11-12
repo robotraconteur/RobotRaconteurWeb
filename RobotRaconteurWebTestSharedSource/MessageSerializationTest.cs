@@ -138,12 +138,56 @@ namespace RobotRaconteurTest
         }
 
 
+        static Message BuildNestedMessage(int levels)
+        {
+            var el = new MessageElement("e", new MessageElementNestedElementList(DataTypes.structure_t, "", new List<MessageElement>()));
+            for (int i = 1; i < levels; i++)
+            {
+                var v = new List<MessageElement>();
+                v.Add(el);
+                el = new MessageElement("e", new MessageElementNestedElementList(DataTypes.structure_t, "", v));
+            }
+            var m = CreateMessage();
+            m.header = CreateMessageHeader();
+            var e = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            e.elements.Add(el);
+            m.entries.Add(e);
+            return m;
+        }
+
+        static void ReadNested4(int levels)
+        {
+            var m = BuildNestedMessage(levels);
+            uint messageSize = m.ComputeSize4();
+            var buf = new byte[messageSize];
+            using (var w = new ArrayBinaryWriter(new MemoryStream(buf), (int)messageSize))
+            {
+                m.Write4(w);
+            }
+            using (var r = new ArrayBinaryReader(new MemoryStream(buf), (int)messageSize))
+            {
+                var m2 = CreateMessage();
+                m2.Read4(r);
+            }
+        }
+
+        static public void TestNestingDepth()
+        {
+            // Messages nested deeper than 512 levels must be rejected instead of recursing without limit
+            ReadNested4(512);
+            RRAssert.ThrowsException<ProtocolException>(() => ReadNested4(513));
+            // The per-thread depth counter must be restored after a rejected message
+            ReadNested4(512);
+            Console.WriteLine("MessageSerializationTest.TestNestingDepth passed");
+        }
+
         static public void RunMessageTests()
         {
             /*Test();
             RandomTest();*/
             Test4();
             RandomTest4();
+            TestNestingDepth();
         }
     }
 }
