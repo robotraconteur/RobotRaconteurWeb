@@ -32,6 +32,21 @@ namespace RobotRaconteurTest
             TestByte();
         }
 
+        public static void TestInvalidPosLength()
+        {
+            var a = new MultiDimArray(new uint[] { 4, 4 }, new double[16]);
+            var b = new MultiDimArray(new uint[] { 4, 4 }, new double[16]);
+            uint[] short_pos = new uint[0];
+            uint[] pos = new uint[] { 0, 0 };
+            uint[] count = new uint[] { 2, 2 };
+
+            RRAssert.ThrowsException<ArgumentException>(() => a.RetrieveSubArray(short_pos, b, pos, count));
+            RRAssert.ThrowsException<ArgumentException>(() => a.RetrieveSubArray(pos, b, short_pos, count));
+            RRAssert.ThrowsException<ArgumentException>(() => a.AssignSubArray(short_pos, b, pos, count));
+            RRAssert.ThrowsException<ArgumentException>(() => a.AssignSubArray(pos, b, short_pos, count));
+            Console.WriteLine("MultiDimArrayTest.TestInvalidPosLength passed");
+        }
+
         public static void TestDouble()
         {
             // cSpell: ignore testmdarray

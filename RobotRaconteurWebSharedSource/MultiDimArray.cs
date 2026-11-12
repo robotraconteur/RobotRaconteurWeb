@@ -39,8 +39,8 @@ namespace RobotRaconteurWeb
         {
             if (count.Length == 0) throw new ArgumentException("MultiDimArray count invalid");
 
-            if (count.Length > mema_dims.Length || count.Length > memb_dims.Length) throw new ArgumentException("MultiDimArray copy count invalid");
-            if (count.Length > memb_dims.Length || count.Length > memb_dims.Length) throw new ArgumentException("MultiDimArray copy count invalid");
+            if (count.Length > mema_dims.Length || count.Length > mema_pos.Length) throw new ArgumentException("MultiDimArray copy count invalid");
+            if (count.Length > memb_dims.Length || count.Length > memb_pos.Length) throw new ArgumentException("MultiDimArray copy count invalid");
 
             for (int i = 0; i < mema_dims.Length; i++)
             {

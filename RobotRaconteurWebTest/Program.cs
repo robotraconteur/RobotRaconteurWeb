@@ -95,6 +95,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        MultiDimArrayTest.TestInvalidPosLength();
+
 
                         ServicePathTest.RunServicePathTest();
 
@@ -114,6 +116,11 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByType();
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByUrl();
                         Console.WriteLine("Done!");
+                        break;
+                    }
+                case "multidimarray":
+                    {
+                        MultiDimArrayTest.TestInvalidPosLength();
                         break;
                     }
                 case "message":
