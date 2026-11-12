@@ -1296,7 +1296,7 @@ namespace RobotRaconteurWeb
 
                         clients.Remove(k);
 
-                        Task.Run(() => ServiceDetected?.Invoke(this, id1, info1));
+                        Task.Run(() => ServiceLost?.Invoke(this, id1, info1));
                     }
                 }
 

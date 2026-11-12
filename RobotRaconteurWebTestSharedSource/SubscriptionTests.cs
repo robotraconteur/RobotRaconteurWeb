@@ -317,5 +317,54 @@ namespace RobotRaconteurSubTest
         }
 
 
+
+        // Regression test: when a node stops advertising a service, ServiceInfo2Subscription must
+        // fire ServiceLost (not ServiceDetected)
+        public static async Task RunTestServiceInfo2ServiceRemoved()
+        {
+            var server_id = new NodeID("0d694574-1ad8-4b9e-9aea-e881524fb451");
+
+            var server_node = new RobotRaconteurNode();
+            server_node.NodeID = server_id;
+            var server_node_setup = new RobotRaconteurNodeSetup(server_node, new ServiceFactory[] { new experimental__sub_testFactory() },
+                false, "server1", 0, testservice_impl.intra_server_flags);
+
+            var client_node = new RobotRaconteurNode();
+            var client_node_setup = new RobotRaconteurNodeSetup(client_node, new ServiceFactory[] { new experimental__sub_testFactory() },
+                false, null, 0, testservice_impl.intra_client_flags);
+
+            using (server_node_setup)
+            using (client_node_setup)
+            {
+                server_node.RegisterService("test_service", "experimental.sub_test", new testobj_impl());
+                server_node.RegisterService("test_service2", "experimental.sub_test", new testobj_impl());
+
+                var filter = new ServiceSubscriptionFilter();
+                filter.ServiceNames = new string[] { "test_service2" };
+                var sub = client_node.SubscribeServiceInfo2(new string[] { "experimental.sub_test.testobj" }, filter);
+
+                var id2 = new ServiceSubscriptionClientID(server_id, "test_service2");
+
+                for (int i = 0; i < 50 && !sub.GetDetectedServiceInfo2().ContainsKey(id2); i++)
+                {
+                    await Task.Delay(100);
+                }
+                RRAssert.IsTrue(sub.GetDetectedServiceInfo2().ContainsKey(id2));
+
+                var lostTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                bool detected_after_remove = false;
+                sub.ServiceLost += (s, id, info) => { if (id == id2) lostTcs.TrySetResult(true); };
+                sub.ServiceDetected += (s, id, info) => { if (id == id2) detected_after_remove = true; };
+
+                server_node.CloseService("test_service2");
+                server_node.UpdateServiceStateNonce();
+                // Rediscover nodes so the client sees the new service state nonce
+                client_node_setup.IntraTransport.StartClient();
+
+                RRAssert.IsTrue(await Task.WhenAny(lostTcs.Task, Task.Delay(5000)) == lostTcs.Task);
+                RRAssert.IsFalse(detected_after_remove);
+                RRAssert.IsFalse(sub.GetDetectedServiceInfo2().ContainsKey(id2));
+            }
+        }
     }
 }
