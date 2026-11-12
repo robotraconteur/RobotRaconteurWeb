@@ -114,6 +114,8 @@ namespace RobotRaconteurTest
 
                         await TcpTransportTests.TestWebSocketHandshakeHeaderLineLimit();
 
+                        await WebSocketTests.TestWebSocketOversizedControlFrame();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

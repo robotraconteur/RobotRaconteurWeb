@@ -3171,6 +3171,12 @@ namespace RobotRaconteurWeb
                         case (byte)WebSocketOpcode.ping:
                         case (byte)WebSocketOpcode.pong:
                             {
+                                // RFC 6455: control frame payloads are limited to 125 bytes
+                                if (data_len1 > 125)
+                                {
+                                    stream.Close();
+                                    throw new IOException("Invalid control frame");
+                                }
                                 var h4 = new byte[data_len1];
                                 int h4_r = 0;
                                 do
