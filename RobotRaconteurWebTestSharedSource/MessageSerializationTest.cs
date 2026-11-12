@@ -299,9 +299,30 @@ namespace RobotRaconteurTest
             RandomTest();*/
             Test4();
             RandomTest4();
+            TestReadString8LengthCheck();
             TestNestingDepth();
             TestElementCount();
             TestLengthAllocation();
+        }
+
+        // Regression test: a string length larger than the remaining message must be rejected
+        // with IOException before the string buffer is allocated
+        static public void TestReadString8LengthCheck()
+        {
+            var buf = new byte[16];
+            using (var r = new ArrayBinaryReader(new MemoryStream(buf), buf.Length))
+            {
+                bool io_error = false;
+                try
+                {
+                    r.ReadString8(0xFFFFFFF0);
+                }
+                catch (IOException)
+                {
+                    io_error = true;
+                }
+                RRAssert.IsTrue(io_error);
+            }
         }
     }
 }
