@@ -770,7 +770,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                List<string> value_v = new List<string>(value.Split(','));
+                List<string> value_v = new List<string>(value.Split(SplitStringDelimiter));
                 return IsMatch(value_v);
             }
         }

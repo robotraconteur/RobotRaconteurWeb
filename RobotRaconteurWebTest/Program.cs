@@ -76,6 +76,7 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
                         RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriptionAttributeIdentifier();
+                        RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
@@ -111,6 +112,7 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
                         RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriptionAttributeIdentifier();
+                        RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
@@ -128,6 +130,12 @@ namespace RobotRaconteurTest
                 case "multidimarray":
                     {
                         MultiDimArrayTest.TestCopyRangeOverflow();
+                        break;
+                    }
+
+                case "filterdelimiter":
+                    {
+                        RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
                         break;
                     }
                 case "message":

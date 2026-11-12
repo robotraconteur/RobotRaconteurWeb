@@ -323,6 +323,17 @@ namespace RobotRaconteurSubTest
             node4.Shutdown();
         }
 
+        public static void TestAttributeGroupSplitStringDelimiter()
+        {
+            // String attributes must be split on SplitStringDelimiter, not always on ','
+            var group = new ServiceSubscriptionFilterAttributeGroup(ServiceSubscriptionFilterAttributeGroupOperation.Or);
+            group.Attributes.Add(new ServiceSubscriptionFilterAttribute("beta"));
+            group.SplitStringDelimiter = ';';
+            RRAssert.IsTrue(group.IsMatch("alpha;beta"));
+            RRAssert.IsFalse(group.IsMatch("alpha,beta"));
+            Console.WriteLine("SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter passed");
+        }
+
         public static void TestSubscriptionAttributeIdentifier()
         {
             ServiceSubscriptionFilterAttribute attr1 = ServiceSubscriptionFilterAttributeFactory.CreateServiceSubscriptionFilterAttributeIdentifier("identifier_1", "");
