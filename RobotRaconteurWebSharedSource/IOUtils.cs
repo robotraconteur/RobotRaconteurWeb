@@ -365,7 +365,7 @@ namespace RobotRaconteurWeb
         {
             if (Position + limit > CurrentLimit)
             {
-                throw new IOException("Error reading message");
+                throw new IOException("Error writing message");
             }
 
             limits.Push(Position + limit);
@@ -375,7 +375,7 @@ namespace RobotRaconteurWeb
         {
             if (limit > CurrentLimit)
             {
-                throw new IOException("Error reading message");
+                throw new IOException("Error writing message");
             }
 
             limits.Push(limit);
