@@ -1272,34 +1272,34 @@ namespace RobotRaconteurWeb
                         Task.Run(() => ServiceDetected?.Invoke(this, noden, c2.service_info2));
                     }
                 }
-            }
 
-            foreach (var k in clients.Keys.ToList())
-            {
-                var v = clients[k];
-
-                if (k.NodeID == storage.info.NodeID)
+                foreach (var k in clients.Keys.ToList())
                 {
-                    bool found = false;
-                    foreach (var info in storage.services)
+                    var v = clients[k];
+
+                    if (k.NodeID == storage.info.NodeID)
                     {
-                        if (info.Name == k.ServiceName)
+                        bool found = false;
+                        foreach (var info in storage.services)
                         {
-                            found = true;
-                            break;
+                            if (info.Name == k.ServiceName)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            var info1 = v.service_info2;
+                            var id1 = k;
+
+                            clients.Remove(k);
+
+                            Task.Run(() => ServiceLost?.Invoke(this, id1, info1));
                         }
                     }
-                    if (!found)
-                    {
-                        var info1 = v.service_info2;
-                        var id1 = k;
 
-                        clients.Remove(k);
-
-                        Task.Run(() => ServiceLost?.Invoke(this, id1, info1));
-                    }
                 }
-
             }
 
 
