@@ -583,7 +583,7 @@ namespace RobotRaconteurWeb
                                 }
                                 else
                                 {
-                                    throw new ServiceDefinitionParseException("option keyword is not support in stdver 0.9.2 or greater", working_info);
+                                    throw new ServiceDefinitionParseException("option keyword is not supported in stdver 0.9.2 or greater", working_info);
                                 }
                                 continue;
                             }
@@ -645,7 +645,7 @@ namespace RobotRaconteurWeb
                                 var struct_def = new ServiceEntryDefinition(this);
                                 struct_def.FromString(block.ToString(), ref warnings, init_info);
                                 if (stdver_version >= new RobotRaconteurVersion(0, 9, 2) && struct_def.Options.Count != 0)
-                                    throw new ServiceDefinitionParseException("option keyword is not support in stdver 0.9.2 or greater", working_info);
+                                    throw new ServiceDefinitionParseException("option keyword is not supported in stdver 0.9.2 or greater", working_info);
                                 Structures.Add(struct_def.Name, struct_def);
                                 entry_key_max = 9;
                                 continue;
@@ -659,7 +659,7 @@ namespace RobotRaconteurWeb
                                 var object_def = new ServiceEntryDefinition(this);
                                 object_def.FromString(block.ToString(), ref warnings, init_info);
                                 if (stdver_version >= new RobotRaconteurVersion(0, 9, 2) && object_def.Options.Count != 0)
-                                    throw new ServiceDefinitionParseException("option keyword is not support in stdver 0.9.2 or greater", working_info);
+                                    throw new ServiceDefinitionParseException("option keyword is not supported in stdver 0.9.2 or greater", working_info);
                                 Objects.Add(object_def.Name, object_def);
                                 entry_key_max = 10;
                                 continue;
@@ -673,7 +673,7 @@ namespace RobotRaconteurWeb
                                 var struct_def = new ServiceEntryDefinition(this);
                                 struct_def.FromString(block.ToString(), ref warnings, init_info);
                                 if (stdver_version >= new RobotRaconteurVersion(0, 9, 2) && struct_def.Options.Count != 0)
-                                    throw new ServiceDefinitionParseException("option keyword is not support in stdver 0.9.2 or greater", working_info);
+                                    throw new ServiceDefinitionParseException("option keyword is not supported in stdver 0.9.2 or greater", working_info);
                                 Pods.Add(struct_def.Name, struct_def);
                                 entry_key_max = 9;
                                 continue;
@@ -687,7 +687,7 @@ namespace RobotRaconteurWeb
                                 var struct_def = new ServiceEntryDefinition(this);
                                 struct_def.FromString(block.ToString(), ref warnings, init_info);
                                 if (stdver_version >= new RobotRaconteurVersion(0, 9, 2) && struct_def.Options.Count != 0)
-                                    throw new ServiceDefinitionParseException("option keyword is not support in stdver 0.9.2 or greater", working_info);
+                                    throw new ServiceDefinitionParseException("option keyword is not supported in stdver 0.9.2 or greater", working_info);
                                 NamedArrays.Add(struct_def.Name, struct_def);
                                 entry_key_max = 9;
                                 continue;
@@ -2586,7 +2586,7 @@ namespace RobotRaconteurWeb
             var r_match = r.Match(s);
             if (!r_match.Success)
             {
-                throw new ServiceDefinitionParseException("Format error for using  definition", ParseInfo);
+                throw new ServiceDefinitionParseException("Format error for using definition", ParseInfo);
             }
 
             if (!r_match.Groups[2].Success)

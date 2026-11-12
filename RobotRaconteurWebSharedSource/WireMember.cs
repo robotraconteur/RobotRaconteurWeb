@@ -68,8 +68,8 @@ namespace RobotRaconteurWeb
     </para>
     <para>
     Wires can be declared*readonly* or*writeonly*. If neither is specified, the wire is assumed
-    to be full duplex.*readonly* pipes may only send values from service to client, ie OutValue
-    on service side and InValue on client side.*writeonly* pipes may only send values from
+    to be full duplex.*readonly* wires may only send values from service to client, ie OutValue
+    on service side and InValue on client side.*writeonly* wires may only send values from
     client to service, ie OutValue on client side and InValue on service side. Use Direction()
     to determine the direction of the wire.
     </para>

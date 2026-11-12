@@ -1346,7 +1346,7 @@ namespace RobotRaconteurWeb
                     return m;
             }
 
-            throw new MessageEntryNotFoundException("Element " + name + " not found.");
+            throw new MessageEntryNotFoundException("Entry " + name + " not found.");
 
         }
 
