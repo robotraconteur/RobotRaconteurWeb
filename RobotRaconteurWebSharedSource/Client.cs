@@ -326,7 +326,7 @@ namespace RobotRaconteurWeb
             {
                 lock (rec_wait)
                 {
-                    if (rec_wait.Count < 0)
+                    if (rec_wait.Count == 0)
                     {
                         ProcessRequest_checkconnection_current = null;
                         return;
