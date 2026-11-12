@@ -59,13 +59,13 @@ namespace RobotRaconteurWeb
 
             for (int i = 0; i < mema_dims.Length && i < count.Length; i++)
             {
-                if (mema_pos[i] > mema_dims[i] || (mema_pos[i] + count[i]) > mema_dims[i])
+                if (mema_pos[i] > mema_dims[i] || ((ulong)mema_pos[i] + count[i]) > mema_dims[i])
                     throw new ArgumentException("MultiDimArray A count invalid");
             }
 
             for (int i = 0; i < memb_dims.Length && i < count.Length; i++)
             {
-                if (memb_pos[i] > memb_dims[i] || (memb_pos[i] + count[i]) > memb_dims[i])
+                if (memb_pos[i] > memb_dims[i] || ((ulong)memb_pos[i] + count[i]) > memb_dims[i])
                     throw new ArgumentException("MultiDimArray B count invalid");
             }
 

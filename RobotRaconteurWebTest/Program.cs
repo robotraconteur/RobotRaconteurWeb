@@ -95,6 +95,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        MultiDimArrayTest.TestCopyRangeOverflow();
+
                         MultiDimArrayTest.TestInvalidPosLength();
 
 
@@ -121,6 +123,11 @@ namespace RobotRaconteurTest
                 case "multidimarray":
                     {
                         MultiDimArrayTest.TestInvalidPosLength();
+                        break;
+                    }
+                case "multidimarray":
+                    {
+                        MultiDimArrayTest.TestCopyRangeOverflow();
                         break;
                     }
                 case "message":

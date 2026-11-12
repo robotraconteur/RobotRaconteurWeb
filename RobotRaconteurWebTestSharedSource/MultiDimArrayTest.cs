@@ -170,6 +170,34 @@ namespace RobotRaconteurTest
 
             return new MultiDimArray(dims, real);
         }
+
+        static void ExpectRangeRejected(Action f)
+        {
+            string msg = null;
+            try
+            {
+                f();
+            }
+            catch (ArgumentException e)
+            {
+                msg = e.Message;
+            }
+            // Must be rejected by the copy range validation, not by a later failure in Array.Copy
+            RRAssert.IsTrue(msg != null && msg.StartsWith("MultiDimArray"));
+        }
+
+        public static void TestCopyRangeOverflow()
+        {
+            // pos + count must not wrap around in 32 bits and pass the range check
+            var a = new MultiDimArray(new uint[] { 10 }, new double[10]);
+            var b = new MultiDimArray(new uint[] { 10 }, new double[10]);
+            uint[] pos = new uint[] { 1 };
+            uint[] count = new uint[] { 0xFFFFFFFF };
+
+            ExpectRangeRejected(() => a.RetrieveSubArray(pos, b, pos, count));
+            ExpectRangeRejected(() => a.AssignSubArray(pos, b, pos, count));
+            Console.WriteLine("MultiDimArrayTest.TestCopyRangeOverflow passed");
+        }
     }
 #endif
 }
