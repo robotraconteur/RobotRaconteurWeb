@@ -96,6 +96,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await TimerTest.TestWallRateDefaultNode();
+
                         MultiDimArrayTest.TestCopyRangeOverflow();
 
                         MultiDimArrayTest.TestInvalidPosLength();
@@ -136,6 +138,11 @@ namespace RobotRaconteurTest
                 case "filterdelimiter":
                     {
                         RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
+                        break;
+                    }
+                case "timer":
+                    {
+                        await TimerTest.TestWallRateDefaultNode();
                         break;
                     }
                 case "message":

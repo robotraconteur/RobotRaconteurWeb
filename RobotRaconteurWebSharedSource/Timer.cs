@@ -309,8 +309,8 @@ namespace RobotRaconteurWeb
             }
 
             this.period = (double)(1000.0 / frequency);
-            last_time = node.UtcNow;
-            start_time = node.UtcNow;
+            last_time = this.node.UtcNow;
+            start_time = this.node.UtcNow;
         }
 
         public async Task Sleep()
