@@ -96,6 +96,8 @@ namespace RobotRaconteurTest
 
                         await AttributesTest.RunAttributesTest();
 
+                        ServicePathTest.RunServicePathTest();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
@@ -117,6 +119,11 @@ namespace RobotRaconteurTest
                 case "message":
                     {
                         MessageSerializationTest.RunMessageTests();
+                        break;
+                    }
+                case "servicepath":
+                    {
+                        ServicePathTest.RunServicePathTest();
                         break;
                     }
                 case "httpserver":

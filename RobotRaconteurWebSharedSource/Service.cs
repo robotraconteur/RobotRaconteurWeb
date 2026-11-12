@@ -2339,7 +2339,7 @@ up to the specified timeout.
         /// <returns>The encoded index</returns>
         public static string EncodeServicePathIndex(string index)
         {
-            return RRUriExtensions.EscapeDataString(index).Replace(".", "%2e");
+            return RRUriExtensions.EscapeDataString(index).Replace(".", "%2e").Replace("-", "%2d").Replace("~", "%7e");
         }
 
         /// <summary>
