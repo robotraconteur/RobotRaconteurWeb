@@ -1777,6 +1777,7 @@ namespace RobotRaconteurWeb
             if ((MessageFlags_ & (byte)MessageFlags.Extended) != 0)
             {
                 uint l = r.ReadUintX();
+                if (l > r.DistanceFromLimit) throw new IOException("Error reading message");
                 if (l != 0)
                 {
                     Extended = new byte[l];
@@ -2185,6 +2186,7 @@ namespace RobotRaconteurWeb
             if ((EntryFlags & (byte)MessageEntryFlags.Extended) != 0)
             {
                 uint l = r.ReadUintX();
+                if (l > r.DistanceFromLimit) throw new IOException("Error reading message");
                 if (l != 0)
                 {
                     Extended = new byte[l];
@@ -2194,6 +2196,8 @@ namespace RobotRaconteurWeb
             }
 
             uint ecount = r.ReadUintX();
+            // Every element takes at least one byte, so a larger count is malformed
+            if (ecount > r.DistanceFromLimit) throw new IOException("Error reading message");
 
             elements = new List<MessageElement>((int)ecount);
             for (int i = 0; i < ecount; i++)
@@ -2448,6 +2452,8 @@ namespace RobotRaconteurWeb
                     {
                         if (read_nesting_depth >= MaxNestingDepth)
                             throw new ProtocolException("Message element nesting depth exceeds maximum");
+                        // Every child element takes at least one byte, so a larger count is malformed
+                        if (DataCount > r.DistanceFromLimit) throw new IOException("Error reading message");
                         List<MessageElement> l = new List<MessageElement>((int)DataCount);
                         read_nesting_depth++;
                         try
@@ -2482,7 +2488,7 @@ namespace RobotRaconteurWeb
                 case DataTypes.csingle_t:
                 case DataTypes.bool_t:
                     {
-                        if (DataCount * DataTypeUtil.size(ElementType) > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        if ((ulong)DataCount * DataTypeUtil.size(ElementType) > (ulong)r.DistanceFromLimit) throw new IOException("Error reading message");
                         Array d = DataTypeUtil.ArrayFromDataType(ElementType, DataCount);
                         r.ReadArray(d);
                         dat = (Object)d;
@@ -2798,6 +2804,8 @@ namespace RobotRaconteurWeb
                     {
                         if (read_nesting_depth >= MaxNestingDepth)
                             throw new ProtocolException("Message element nesting depth exceeds maximum");
+                        // Every child element takes at least one byte, so a larger count is malformed
+                        if (DataCount > r.DistanceFromLimit) throw new IOException("Error reading message");
                         List<MessageElement> l = new List<MessageElement>((int)DataCount);
                         read_nesting_depth++;
                         try
@@ -2832,7 +2840,7 @@ namespace RobotRaconteurWeb
                 case DataTypes.csingle_t:
                 case DataTypes.bool_t:
                     {
-                        if (DataCount * DataTypeUtil.size(ElementType) > r.DistanceFromLimit) throw new IOException("Error reading message");
+                        if ((ulong)DataCount * DataTypeUtil.size(ElementType) > (ulong)r.DistanceFromLimit) throw new IOException("Error reading message");
                         Array d = DataTypeUtil.ArrayFromDataType(ElementType, DataCount);
                         r.ReadArray(d);
                         dat = (Object)d;

@@ -575,8 +575,9 @@ namespace RobotRaconteurWeb
 
         public String ReadString8(uint l)
         {
+            // Check the length (from the wire) before allocating
+            if ((long)Position + l > CurrentLimit) throw new IOException("Message read error");
             byte[] b = new byte[l];
-            if (Position + b.Length > CurrentLimit) throw new IOException("Message read error");
             int n = Read(b, 0, b.Length);
 
             string s = UTF8Encoding.UTF8.GetString(b);

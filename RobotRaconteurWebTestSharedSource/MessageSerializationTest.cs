@@ -181,6 +181,118 @@ namespace RobotRaconteurTest
             Console.WriteLine("MessageSerializationTest.TestNestingDepth passed");
         }
 
+        static public void TestElementCount()
+        {
+            // A nested list claiming more children than the message holds must be rejected before allocating
+            var v = new List<MessageElement>();
+            for (int i = 0; i < 70000; i++)
+                v.Add(new MessageElement("a", null));
+            var m = CreateMessage();
+            m.header = CreateMessageHeader();
+            var e = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            e.elements.Add(new MessageElement("l", new MessageElementNestedElementList(DataTypes.list_t, "", v)));
+            m.entries.Add(e);
+
+            uint messageSize = m.ComputeSize4();
+            var buf = new byte[messageSize];
+            using (var w = new ArrayBinaryWriter(new MemoryStream(buf), (int)messageSize))
+            {
+                m.Write4(w);
+            }
+
+            // The child count 70000 is encoded as uint_x 0xFE + uint32; replace it with 0xFFFFFFFF
+            byte[] pattern = new byte[] { 0xFE, 0x70, 0x11, 0x01, 0x00 };
+            int pos = -1;
+            for (int i = 0; i + pattern.Length <= buf.Length && pos < 0; i++)
+            {
+                if (buf.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
+                    pos = i;
+            }
+            RRAssert.IsTrue(pos >= 0);
+            for (int i = 1; i < 5; i++)
+                buf[pos + i] = 0xFF;
+
+            RRAssert.ThrowsException<IOException>(() =>
+            {
+                using (var r = new ArrayBinaryReader(new MemoryStream(buf), (int)messageSize))
+                {
+                    var m2 = CreateMessage();
+                    m2.Read4(r);
+                }
+            });
+            Console.WriteLine("MessageSerializationTest.TestElementCount passed");
+        }
+
+        static byte[] SerializeAndPatch70000(Message m, uint new_count)
+        {
+            uint messageSize = m.ComputeSize4();
+            var buf = new byte[messageSize];
+            using (var w = new ArrayBinaryWriter(new MemoryStream(buf), (int)messageSize))
+            {
+                m.Write4(w);
+            }
+            // 70000 is encoded as uint_x 0xFE + little-endian uint32
+            byte[] pattern = new byte[] { 0xFE, 0x70, 0x11, 0x01, 0x00 };
+            int pos = -1;
+            for (int i = 0; i + pattern.Length <= buf.Length && pos < 0; i++)
+            {
+                if (buf[i] == 0xFE && buf.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
+                    pos = i;
+            }
+            RRAssert.IsTrue(pos >= 0);
+            byte[] c = BitConverter.GetBytes(new_count);
+            Array.Copy(c, 0, buf, pos + 1, 4);
+            return buf;
+        }
+
+        static void CheckRejectedWithoutLargeAllocation(Message m)
+        {
+            // Length patched to 0x10000000 (256 MiB) while ~70 KB is present
+            byte[] buf = SerializeAndPatch70000(m, 0x10000000);
+            long before = GC.GetTotalAllocatedBytes(true);
+            RRAssert.ThrowsException<IOException>(() =>
+            {
+                using (var r = new ArrayBinaryReader(new MemoryStream(buf), buf.Length))
+                {
+                    var m2 = CreateMessage();
+                    m2.Read4(r);
+                }
+            });
+            long allocated = GC.GetTotalAllocatedBytes(true) - before;
+            RRAssert.IsTrue(allocated < 64L * 1024 * 1024);
+        }
+
+        static public void TestLengthAllocation()
+        {
+            // String length
+            var m1 = CreateMessage();
+            m1.header = CreateMessageHeader();
+            var e1 = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            e1.elements.Add(new MessageElement(new string('a', 70000), null));
+            m1.entries.Add(e1);
+            CheckRejectedWithoutLargeAllocation(m1);
+
+            // Entry Extended field
+            var m2 = CreateMessage();
+            m2.header = CreateMessageHeader();
+            var e2 = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            e2.EntryFlags |= (byte)MessageEntryFlags.Extended;
+            e2.Extended = new byte[70000];
+            m2.entries.Add(e2);
+            CheckRejectedWithoutLargeAllocation(m2);
+
+            // Entry element count
+            var m3 = CreateMessage();
+            m3.header = CreateMessageHeader();
+            var e3 = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            for (int i = 0; i < 70000; i++)
+                e3.elements.Add(new MessageElement("a", null));
+            m3.entries.Add(e3);
+            CheckRejectedWithoutLargeAllocation(m3);
+
+            Console.WriteLine("MessageSerializationTest.TestLengthAllocation passed");
+        }
+
         static public void RunMessageTests()
         {
             /*Test();
@@ -188,6 +300,8 @@ namespace RobotRaconteurTest
             Test4();
             RandomTest4();
             TestNestingDepth();
+            TestElementCount();
+            TestLengthAllocation();
         }
     }
 }
