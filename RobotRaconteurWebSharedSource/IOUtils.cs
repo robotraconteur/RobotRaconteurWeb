@@ -581,10 +581,6 @@ namespace RobotRaconteurWeb
             int n = Read(b, 0, b.Length);
 
             string s = UTF8Encoding.UTF8.GetString(b);
-            if (s.Contains("\0"))
-            {
-                Console.WriteLine("null");
-            }
 
             m_Position += (uint)b.Length;
             return s;
