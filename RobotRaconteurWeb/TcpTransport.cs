@@ -620,6 +620,7 @@ namespace RobotRaconteurWeb
 
 
 
+                        trycount2++;
                         if (trycount2 > 100)
                         {
                             tcpc.Close();
