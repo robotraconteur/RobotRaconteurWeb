@@ -591,8 +591,6 @@ namespace RobotRaconteurWeb
         bool connected = false;
         List<Message> recv_queue = new List<Message>();
         bool recv_queue_post_requested = false;
-        //private Stream socket;
-        //public NetworkStream netstream;
         bool server = false;
         RobotRaconteurNode node;
         bool closed = false;
@@ -696,7 +694,6 @@ namespace RobotRaconteurWeb
                             }
                         }
 
-                        //if (mes.entries[0].EntryType != MessageEntryType.ConnectionTest && mes.entries[0].EntryType != MessageEntryType.ConnectionTestRet)
                         {
                             tlastrec = DateTime.UtcNow;
                         }

@@ -181,7 +181,6 @@ namespace RobotRaconteurWeb
         public ServiceInfo2[] services;
         public string last_update_nonce;
         public DateTime last_update_time;
-        //public Discovery_updateserviceinfo updater;
         public Queue<string> recent_service_nonce = new Queue<string>();
         public DateTime retry_window_start;
         public uint retry_count;
@@ -305,7 +304,6 @@ namespace RobotRaconteurWeb
                             nodename = idline[1];
                         }
                         string url = lines[2];
-                        //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(RobotRaconteurNode.s.NodeID))
 
                         NodeDiscoveryInfo i = new NodeDiscoveryInfo();
                         i.NodeID = nodeid;
@@ -317,14 +315,12 @@ namespace RobotRaconteurWeb
 
                         NodeDetected(i);
 
-                        //RobotRaconteurNode.s.NodeAnnouncePacketReceived(packet);
                     }
 
                 }
             }
             catch { }
 
-            //Console.WriteLine(packet);
         }
 
         internal void NodeDetected(NodeDiscoveryInfo n)
@@ -372,7 +368,6 @@ namespace RobotRaconteurWeb
                                 u.URL = url.URL;
                                 u.LastAnnounceTime = DateTime.UtcNow;
                                 i.URLs.Add(u);
-                                //Console.WriteLine(url);
                             }
                             else
                             {
