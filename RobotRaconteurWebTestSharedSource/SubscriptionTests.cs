@@ -366,5 +366,40 @@ namespace RobotRaconteurSubTest
                 RRAssert.IsFalse(sub.GetDetectedServiceInfo2().ContainsKey(id2));
             }
         }
+
+        // Regression test: a service registered after the IntraTransport server has started must be
+        // announced to other intra nodes (IntraTransport.LocalNodeServicesChanged)
+        public static async Task RunTestIntraServiceRegisteredLater()
+        {
+            var server_id = new NodeID("0d694574-1ad8-4b9e-9aea-e881524fb451");
+
+            var server_node = new RobotRaconteurNode();
+            server_node.NodeID = server_id;
+            var server_node_setup = new RobotRaconteurNodeSetup(server_node, new ServiceFactory[] { new experimental__sub_testFactory() },
+                false, "server1", 0, testservice_impl.intra_server_flags);
+            // Give the server a service state nonce so discovery doesn't apply the empty-nonce backoff
+            server_node.UpdateServiceStateNonce();
+
+            var client_node = new RobotRaconteurNode();
+            var client_node_setup = new RobotRaconteurNodeSetup(client_node, new ServiceFactory[] { new experimental__sub_testFactory() },
+                false, null, 0, testservice_impl.intra_client_flags);
+
+            using (server_node_setup)
+            using (client_node_setup)
+            {
+                var sub = client_node.SubscribeServiceInfo2(new string[] { "experimental.sub_test.testobj" });
+                await Task.Delay(1000);
+                RRAssert.AreEqual(sub.GetDetectedServiceInfo2().Count, 0);
+
+                server_node.RegisterService("test_service", "experimental.sub_test", new testobj_impl());
+
+                var id = new ServiceSubscriptionClientID(server_id, "test_service");
+                for (int i = 0; i < 50 && !sub.GetDetectedServiceInfo2().ContainsKey(id); i++)
+                {
+                    await Task.Delay(100);
+                }
+                RRAssert.IsTrue(sub.GetDetectedServiceInfo2().ContainsKey(id));
+            }
+        }
     }
 }

@@ -474,6 +474,11 @@ namespace RobotRaconteurWeb
             return Task.FromResult(o);
         }
 
+        public override void LocalNodeServicesChanged()
+        {
+            SendNodeDiscovery();
+        }
+
         protected void SendNodeDiscovery()
         {
             if (!serverstarted)
