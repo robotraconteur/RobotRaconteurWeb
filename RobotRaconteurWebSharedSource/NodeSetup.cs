@@ -891,11 +891,7 @@ namespace RobotRaconteurWeb
                 }
                 catch (Exception e)
                 {
-#if !ROBOTRACONTEUR_H5
-                    Console.Error.WriteLine("warning: assembly scanning failed: " + e.Message);
-#else
-                    Console.WriteLine("warning: assembly scanning failed: " + e.Message);
-#endif
+                    LogWarning("assembly scanning failed: " + e.Message, node, RobotRaconteur_LogComponent.NodeSetup);
                 }
             }
 

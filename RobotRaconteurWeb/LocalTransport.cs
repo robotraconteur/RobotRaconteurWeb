@@ -402,7 +402,7 @@ namespace RobotRaconteurWeb
 
             if (!IsLocalTransportSupported)
             {
-                Console.Error.WriteLine("warning: local transport not supported on this operating system");
+                RRLogFuncs.LogWarning("local transport not supported on this operating system", node, RobotRaconteur_LogComponent.Transport);
                 StartClientAsNodeName(name);
                 return;
             }
