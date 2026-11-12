@@ -2733,7 +2733,7 @@ namespace RobotRaconteurWeb
                 {
                     var fromnow = next_broadcast - DateTime.UtcNow;
                     int backoff = random.Next(500, 1000);
-                    if (fromnow.Milliseconds > backoff || fromnow.Milliseconds < 0)
+                    if (fromnow.TotalMilliseconds > backoff || fromnow.TotalMilliseconds < 0)
                     {
                         var t = broadcast_timer;
 
