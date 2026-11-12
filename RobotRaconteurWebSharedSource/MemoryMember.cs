@@ -1035,7 +1035,7 @@ namespace RobotRaconteurWeb
 
                 e.AddElement("data", PackWriteRequest(buffer, bufferpos, count, elemcount));
 
-                var ret = stub.ProcessRequest(e, cancel);
+                var ret = await stub.ProcessRequest(e, cancel).ConfigureAwait(false);
 
             }
             else

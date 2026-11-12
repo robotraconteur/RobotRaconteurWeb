@@ -237,6 +237,18 @@ namespace RobotRaconteurTest
             {
                 ServiceTest2_pod.verify_testpod2(ref ((testpod2[])s2.pod_array)[i], 75721 + i);
             }
+
+            // An out of range write must report the remote error (write request must be awaited)
+            bool write_error_caught = false;
+            try
+            {
+                await r.pod_m2.Write(new ulong[] { 10, 10 }, s, new ulong[] { 0, 0 }, new ulong[] { 3, 3 });
+            }
+            catch (Exception)
+            {
+                write_error_caught = true;
+            }
+            RRAssert.IsTrue(write_error_caught);
         }
 
         public async Task TestNamedArrays()
