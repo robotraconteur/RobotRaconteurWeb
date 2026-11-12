@@ -96,6 +96,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await MemoryReplyTest.TestMemoryWriteReplyType();
+
                         await TimerTest.TestWallRateDefaultNode();
 
                         MultiDimArrayTest.TestCopyRangeOverflow();
@@ -143,6 +145,11 @@ namespace RobotRaconteurTest
                 case "timer":
                     {
                         await TimerTest.TestWallRateDefaultNode();
+                        break;
+                    }
+                case "memoryreply":
+                    {
+                        await MemoryReplyTest.TestMemoryWriteReplyType();
                         break;
                     }
                 case "message":

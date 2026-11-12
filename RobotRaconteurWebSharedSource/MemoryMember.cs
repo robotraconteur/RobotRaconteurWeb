@@ -414,7 +414,7 @@ namespace RobotRaconteurWeb
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
                         var data = m.FindElement("data").Data;
                         await DoWrite(memorypos, data, 0, count, mem).ConfigureAwait(false);
-                        var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
+                        var ret = new MessageEntry(MessageEntryType.MemoryWriteRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
                         return ret;
@@ -530,7 +530,7 @@ namespace RobotRaconteurWeb
                         ulong elem_count = count.Aggregate((ulong)1, (x, y) => x * y);
                         var data = m.FindElement("data").Data;
                         await DoWrite(memorypos, data, new ulong[count.Length], count, elem_count, mem).ConfigureAwait(false);
-                        var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
+                        var ret = new MessageEntry(MessageEntryType.MemoryWriteRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
                         ret.AddElement("count", count);
                         return ret;

@@ -13,6 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServicePathTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)TimerTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)MemoryReplyTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
