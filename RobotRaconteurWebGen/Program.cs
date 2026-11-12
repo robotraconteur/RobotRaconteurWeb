@@ -54,7 +54,7 @@ namespace RobotRaconteurWebGen
                 {"thunksource", "generate thunk source code", v=> thunksource = v!=null},
                 {"version", "print program version", v => show_version = v != null},
                 {"output-dir=", "directory for output", v => output_dir = v },
-                {"lang=", "language to generate sources for for (only csharp currently supported)", v=> lang=v},
+                {"lang=", "language to generate sources for (only csharp currently supported)", v=> lang=v},
                 {"import=", "input file for use in imports", v=> sources.Add(new Source {filename = v, is_import = true }) },
                 {"auto-import", "automatically load imported robdef", v => auto_import = v != null },
                 {"I|include-path=", "include path", v=> include_dirs.Add(v) },
@@ -144,7 +144,7 @@ namespace RobotRaconteurWebGen
 
                 if (!Directory.Exists(output_dir))
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: output director not found {0}", output_dir);
+                    Console.WriteLine("RobotRaconteurWebGen: fatal error: output directory not found {0}", output_dir);
                     return 1003;
                 }
 
@@ -322,7 +322,7 @@ namespace RobotRaconteurWebGen
         static void ShowHelp(OptionSet p)
         {
             Console.WriteLine("Usage: RobotRaconteurWebGen [Options+] sources");
-            Console.WriteLine("Generates sources and provides utitilies for the RobotRaconteurWeb library.");
+            Console.WriteLine("Generates sources and provides utilities for the RobotRaconteurWeb library.");
             Console.WriteLine();
             Console.WriteLine("Options:");
             p.WriteOptionDescriptions(Console.Out);
