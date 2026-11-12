@@ -71,6 +71,7 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeServiceInfo2();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeMultiServiceSameNode();
 
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
@@ -111,6 +112,7 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeServiceInfo2();
+                        await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeMultiServiceSameNode();
 
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();

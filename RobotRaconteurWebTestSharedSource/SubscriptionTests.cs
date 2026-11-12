@@ -49,6 +49,11 @@ namespace RobotRaconteurSubTest
             node.RegisterService("test_service", "experimental.sub_test", _obj);
         }
 
+        public void RegisterAdditionalService(string name)
+        {
+            node.RegisterService(name, "experimental.sub_test", new testobj_impl());
+        }
+
         public void Dispose()
         {
             node_setup?.Dispose();
@@ -265,6 +270,49 @@ namespace RobotRaconteurSubTest
                 }
 
                 sub.ServiceDetected -= connectHandler;
+            }
+        }
+
+        // Regression test: a service added to a node after the subscription already has another
+        // service on that node must still be detected (NodeUpdated must not stop at the first
+        // already-known service)
+        public static async Task RunTestSubscribeMultiServiceSameNode()
+        {
+            var server1_id = new NodeID("0d694574-1ad8-4b9e-9aea-e881524fb451");
+
+            var client_node = new RobotRaconteurNode();
+            var service_types = new ServiceFactory[] { new experimental__sub_testFactory() };
+
+            var client_node_setup = new RobotRaconteurNodeSetup(client_node, service_types, false, null, 0, testservice_impl.intra_client_flags);
+
+            using (client_node_setup)
+            using (var server1 = new testservice_impl("server1", server1_id))
+            {
+                var sub = client_node.SubscribeServiceByType(new string[] { "experimental.sub_test.testobj" });
+                var sub_info = client_node.SubscribeServiceInfo2(new string[] { "experimental.sub_test.testobj" });
+
+                var id1 = new ServiceSubscriptionClientID(server1_id, "test_service");
+                var id2 = new ServiceSubscriptionClientID(server1_id, "test_service2");
+
+                async Task<bool> WaitFor(ServiceSubscriptionClientID id)
+                {
+                    for (int i = 0; i < 50; i++)
+                    {
+                        if (sub.GetConnectedClients().ContainsKey(id) && sub_info.GetDetectedServiceInfo2().ContainsKey(id))
+                            return true;
+                        await Task.Delay(100);
+                    }
+                    return false;
+                }
+
+                RRAssert.IsTrue(await WaitFor(id1));
+
+                server1.RegisterAdditionalService("test_service2");
+                // Rediscover nodes so the client sees the new service state nonce
+                client_node_setup.IntraTransport.StartClient();
+
+                RRAssert.IsTrue(await WaitFor(id2));
+                RRAssert.IsTrue(sub.GetConnectedClients().ContainsKey(id1));
             }
         }
 

@@ -1245,7 +1245,7 @@ namespace RobotRaconteurWeb
                             Task.Run(() => ServiceDetected?.Invoke(this, k, info));
                         }
                         e.last_node_update = DateTime.UtcNow;
-                        return;
+                        continue;
                     }
 
                     List<string> urls;
@@ -1793,7 +1793,7 @@ namespace RobotRaconteurWeb
                     {
                         if (e.client != null)
                             // Already have connection, ignore
-                            return;
+                            continue;
                     }
 
                     if (!SubscriptionFilterUtil.FilterService(service_types, filter, storage, info, out var urls, out var client_service_type, out var filter_node))
