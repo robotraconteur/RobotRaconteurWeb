@@ -1993,7 +1993,7 @@ namespace RobotRaconteurWeb
         </para>
         <para>
         Clients using GetDefaultClient() should not store a reference to the client. It should instead
-        call GetDefaultClient() right before using the client to make sure the most recenty connection
+        call GetDefaultClient() right before using the client to make sure the most recent connection
         is being used. If possible, SubscribePipe() or SubscribeWire() should be used so the lifecycle
         of pipes and wires can be managed automatically.
         </para>

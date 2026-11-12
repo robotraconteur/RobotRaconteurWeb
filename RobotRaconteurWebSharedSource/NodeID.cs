@@ -248,7 +248,7 @@ namespace RobotRaconteurWeb
         Is the NodeID UUID all zeros
         </summary>
         <remarks>
-        The all zero UUID respresents "any" node, or an unset NodeID
+        The all zero UUID represents "any" node, or an unset NodeID
         </remarks>
         <returns>true The NodeID UUID is all zeros, representing any node, false The NodeID UUID is
         not all zeros</returns>

@@ -1214,7 +1214,7 @@ namespace RobotRaconteurWeb
             if (!TryGetServiceType(servicetype, out f))
             {
 #if RR_LOG_DEBUG
-                LogDebug(string.Format("Cannot unregister nonexistant service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
+                LogDebug(string.Format("Cannot unregister nonexistent service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
 #endif
                 throw new ServiceException("Service factory not found for " + servicetype);
             }
@@ -2647,7 +2647,7 @@ namespace RobotRaconteurWeb
 
         /**
         <summary>
-        Release an excluse access lock previously locked with RequestObjectLock()
+        Release an exclusive access lock previously locked with RequestObjectLock()
         </summary>
         <remarks>
         <para>
@@ -3195,7 +3195,7 @@ namespace RobotRaconteurWeb
             User level lock
         </summary>
         <remarks>
-            The object will be accesible for all client connections
+            The object will be accessible for all client connections
             authenticated by the current user
         </remarks>
         */

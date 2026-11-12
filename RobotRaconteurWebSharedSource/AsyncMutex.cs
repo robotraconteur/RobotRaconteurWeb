@@ -75,7 +75,7 @@ namespace RobotRaconteurWeb
                 catch { }
             });
 
-            throw new TimeoutException("Timeout wating for mutex lock");
+            throw new TimeoutException("Timeout waiting for mutex lock");
 
         }
 

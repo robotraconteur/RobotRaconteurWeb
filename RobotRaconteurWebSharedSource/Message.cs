@@ -667,7 +667,7 @@ namespace RobotRaconteurWeb
     {
         /** <summary>Page mask for transport capability code</summary> */
         PageMask = 0xFFF00000,
-        /** <summary>Message Version 2 transport capability page code</summar> */
+        /** <summary>Message Version 2 transport capability page code</summary> */
         Message2BasicPage = 0x02000000,
         /** <summary>Enable Message Version 2 transport capability flag</summary> */
         Message2BasicEnable = 0x00000001,
