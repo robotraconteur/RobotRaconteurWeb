@@ -2165,7 +2165,7 @@ namespace RobotRaconteurWeb
 
         public override void MessageReceived(Message m)
         {
-            if (m.entries.Count >= 0)
+            if (m.entries.Count >= 1)
             {
                 if (m.entries[0].EntryType == MessageEntryType.EndpointCheckCapability)
                 {
