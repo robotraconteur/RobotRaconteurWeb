@@ -1250,7 +1250,7 @@ namespace RobotRaconteurWeb
                     NodeID nodeid = new NodeID(info["nodeid"]);
                     string nodename1 = info["nodename"];
 
-                    if (nodename1 != Path.ChangeExtension(Path.GetFileName(f), ""))
+                    if (nodename1 != Path.GetFileNameWithoutExtension(f))
                     {
                         continue;
                     }

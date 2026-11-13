@@ -124,6 +124,8 @@ namespace RobotRaconteurTest
 
                         LocalTransportTests.TestDiscoveryListeningReenable();
 
+                        await LocalTransportDiscoveryTests.TestGetDetectedNodesNodeName();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
