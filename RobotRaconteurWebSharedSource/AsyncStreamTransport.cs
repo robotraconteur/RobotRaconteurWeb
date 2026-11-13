@@ -1231,7 +1231,7 @@ namespace RobotRaconteurWeb
                                     mmret.AddElement("capabilities", ret_caps.ToArray());
                                 }
 
-                                if (header.ReceiverNodeID.IsAnyNode && header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName)
+                                if (header.ReceiverNodeID.IsAnyNode && (header.ReceiverNodeName == "" || header.ReceiverNodeName == node.NodeName))
                                 {
                                     m_RemoteNodeID = header.SenderNodeID;
                                     return Task.FromResult(mmret);
@@ -1548,7 +1548,7 @@ namespace RobotRaconteurWeb
         bool good = false;
         lock (this)
         {
-            if (m.header.ReceiverNodeID.IsAnyNode && m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == node.NodeName)
+            if (m.header.ReceiverNodeID.IsAnyNode && (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == node.NodeName))
             {
                 m_RemoteNodeID = m.header.SenderNodeID;
                 good = true;
