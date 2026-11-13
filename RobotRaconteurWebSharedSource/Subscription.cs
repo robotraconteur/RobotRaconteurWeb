@@ -2752,9 +2752,9 @@ of pipes and wires can be managed automatically.
             }
             try
             {
-                var wait_task = new TaskCompletionSource<bool>();
-                while (!c.cancel.IsCancellationRequested && !wait_task.Task.IsCompleted)
+                while (!c.cancel.IsCancellationRequested)
                 {
+                    var wait_task = new TaskCompletionSource<bool>();
                     try
                     {
                         object obj = client;
@@ -2814,7 +2814,7 @@ of pipes and wires can be managed automatically.
                         };
                         Wire<T>.WireDisconnectCallbackFunction wire_closed_ev = delegate (Wire<T>.WireConnection ev_c)
                         {
-                            wait_task.SetResult(true);
+                            wait_task.TrySetResult(true);
                         };
 
                         cc.WireCloseCallback = wire_closed_ev;
@@ -3389,9 +3389,9 @@ an exception.
             }
             try
             {
-                var wait_task = new TaskCompletionSource<bool>();
-                while (!c.cancel.IsCancellationRequested && !wait_task.Task.IsCompleted)
+                while (!c.cancel.IsCancellationRequested)
                 {
+                    var wait_task = new TaskCompletionSource<bool>();
                     try
                     {
                         object obj = client;
@@ -3454,7 +3454,7 @@ an exception.
 
                         Pipe<T>.PipeDisconnectCallbackFunction pipe_closed_ev = delegate (Pipe<T>.PipeEndpoint ev_ep)
                         {
-                            wait_task.SetResult(true);
+                            wait_task.TrySetResult(true);
                         };
 
                         Pipe<T>.PipePacketAckReceivedCallbackFunction pipe_ack_ev = delegate (Pipe<T>.PipeEndpoint ev_ep, uint packetnum)
