@@ -131,6 +131,8 @@ namespace RobotRaconteurTest
 
                         await LocalTransportDiscoveryTests.TestGetDetectedNodesNodeName();
 
+                        await StreamHeaderTests.TestOversizedMessageLengthRejected();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

@@ -244,15 +244,6 @@ namespace RobotRaconteurWeb
                     int meslength = (int)BitConverter.ToUInt32(recbuf, 4);
                     ushort message_version = BitConverter.ToUInt16(recbuf, 8);
 
-                    if (recbuf.Length < meslength)
-                    {
-                        byte[] newbuf = new byte[(int)(meslength * 1.2)];
-                        Buffer.BlockCopy(recbuf, 0, newbuf, 0, mempos);
-                        recbuf = newbuf;
-                        mread = new MemoryStream(recbuf, 0, recbuf.Length, true);
-                        sreader = new ArrayBinaryReader(mread, recbuf, recbuf.Length);
-                    }
-
                     if (meslength < 8)
                     {
                         RRLogFuncs.LogDebug("Received too small a message", node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
@@ -265,6 +256,15 @@ namespace RobotRaconteurWeb
                             node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
 
                         throw new ProtocolException("Received too large a message");
+                    }
+
+                    if (recbuf.Length < meslength)
+                    {
+                        byte[] newbuf = new byte[(int)(meslength * 1.2)];
+                        Buffer.BlockCopy(recbuf, 0, newbuf, 0, mempos);
+                        recbuf = newbuf;
+                        mread = new MemoryStream(recbuf, 0, recbuf.Length, true);
+                        sreader = new ArrayBinaryReader(mread, recbuf, recbuf.Length);
                     }
 
                     while (mempos < meslength)
