@@ -925,7 +925,7 @@ namespace RobotRaconteurWeb
                 {
                     var deftype = d.Name;
                     var objtype = "";
-                    if (e.Contains('.'))
+                    if (!e.Contains('.'))
                     {
                         objtype = e;
                     }
