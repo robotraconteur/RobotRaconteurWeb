@@ -853,6 +853,7 @@ namespace RobotRaconteurWeb
             lock (this)
             {
                 discovery?.Dispose();
+                discovery = null;
             }
         }
 

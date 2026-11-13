@@ -122,6 +122,8 @@ namespace RobotRaconteurTest
 
                         await AsyncStreamTransportTests.TestWirePacketBurstDoesNotStall();
 
+                        LocalTransportTests.TestDiscoveryListeningReenable();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MessageTestUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ErrorMappingTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LFSRSeqGen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalTransportTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageSerializationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestVectors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebSocketTests.cs" />
