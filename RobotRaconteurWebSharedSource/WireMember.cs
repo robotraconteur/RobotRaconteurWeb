@@ -782,7 +782,7 @@ namespace RobotRaconteurWeb
         <remarks>
         <para>
         Peeks the current InValue using a "request" instead of a streaming value. Use
-        if only the instantanouse value is required.
+        if only the instantaneous value is required.
         </para>
         <para>
         Peek and poke are similar to `property` members. Unlike streaming,
@@ -807,7 +807,7 @@ namespace RobotRaconteurWeb
         <remarks>
         <para>
         Peeks the current OutValue using a "request" instead of a streaming value. Use
-        if only the instantanouse value is required.
+        if only the instantaneous value is required.
         </para>
         <para>
         Peek and poke are similar to `property` members. Unlike streaming,

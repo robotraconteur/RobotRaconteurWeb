@@ -179,7 +179,7 @@ namespace RobotRaconteurWeb
             Sends a packet to the peer endpoint
             </summary>
             <remarks>
-            Sends a packet to the peer endpoint. If the pipe is reliable, the packetsare  guaranteed to arrive
+            Sends a packet to the peer endpoint. If the pipe is reliable, the packets are guaranteed to arrive
             in order. If the pipe is set to unreliable, "best effort" is made to deliver packets, and they are not
             guaranteed to arrive in order. This function will block until the packet has been transmitted by the
             transport. It will return before the peer endpoint has received the packet.
@@ -544,7 +544,7 @@ namespace RobotRaconteurWeb
         public abstract string MemberName { get; }
 
         /// <summary>
-        /// Delegate type for pipe endpoint connection callaback functions
+        /// Delegate type for pipe endpoint connection callback functions
         /// </summary>
         /// <param name="newpipe">The new connected PipeEndpoint</param>
         [PublicApi]
@@ -958,7 +958,7 @@ namespace RobotRaconteurWeb
             MessageEntry m;
             lock (pipeendpointlock)
             {
-                if (!pipeendpoints.ContainsKey(e.LocalEndpoint)) throw new Exception("Pipe has been disconnect");
+                if (!pipeendpoints.ContainsKey(e.LocalEndpoint)) throw new Exception("Pipe has been disconnected");
                 if (!pipeendpoints[e.LocalEndpoint].ContainsKey(index)) throw new Exception("Pipe has been disconnected");
 
                 me = PackPacket(data, index, packetnumber, requestack);
