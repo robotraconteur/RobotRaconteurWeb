@@ -2140,7 +2140,7 @@ namespace RobotRaconteurWeb
                     }
 
                     if (listener != null)
-                        ((ClientContext)r).ClientServiceListener += listener;
+                        ((ServiceStub)r).RRContext.ClientServiceListener += listener;
                     return r;
                 }
             }

@@ -77,6 +77,8 @@ namespace RobotRaconteurTest
 
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestIntraServiceRegisteredLater();
 
+                        await RobotRaconteurSubTest.ConnectServiceTests.TestConnectServiceUrlsWithListener();
+
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
@@ -128,6 +130,8 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestServiceInfo2ServiceRemoved();
 
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestIntraServiceRegisteredLater();
+
+                        await RobotRaconteurSubTest.ConnectServiceTests.TestConnectServiceUrlsWithListener();
 
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
