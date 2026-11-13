@@ -98,6 +98,7 @@ namespace RobotRaconteurTest
                 case "citests":
                     {
                         MessageSerializationTest.RunMessageTests();
+                        ErrorMappingTests.TestArgumentOutOfRangeMapping();
 
                         await ServiceTests.RunIntraLoopback();
                         await ServiceTests.RunTcpLoopback();

@@ -721,6 +721,14 @@ namespace RobotRaconteurWeb
                 return;
             }
 
+            if (exception is ArgumentOutOfRangeException)
+            {
+                entry.Error = MessageErrorType.OutOfRange;
+                entry.AddElement("errorname", "RobotRaconteur.OutOfRange");
+                entry.AddElement("errorstring", exception.Message);
+                return;
+            }
+
             if (exception is ArgumentException)
             {
                 entry.Error = MessageErrorType.InvalidArgument;
@@ -741,14 +749,6 @@ namespace RobotRaconteurWeb
             {
                 entry.Error = MessageErrorType.NotImplementedError;
                 entry.AddElement("errorname", "RobotRaconteur.NotImplementedError");
-                entry.AddElement("errorstring", exception.Message);
-                return;
-            }
-
-            if (exception is ArgumentOutOfRangeException)
-            {
-                entry.Error = MessageErrorType.OutOfRange;
-                entry.AddElement("errorname", "RobotRaconteur.OutOfRange");
                 entry.AddElement("errorstring", exception.Message);
                 return;
             }
