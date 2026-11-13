@@ -2778,6 +2778,7 @@ of pipes and wires can be managed automatically.
                         if (w == null)
                         {
                             await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false); ;
+                            continue;
                         }
 
                         Wire<T>.WireConnection cc = await w.Connect().ConfigureAwait(false);
@@ -3413,6 +3414,7 @@ an exception.
                         if (w == null)
                         {
                             await Task.Delay(2500, c.cancel.Token).ConfigureAwait(false); ;
+                            continue;
                         }
 
                         Pipe<T>.PipeEndpoint cc = await w.Connect(-1).ConfigureAwait(false);
