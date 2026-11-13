@@ -1498,7 +1498,7 @@ namespace RobotRaconteurWeb
                         {
                             if (s.objectlock.RootServicePath == path1)
                             {
-                                active_object_locks.Remove(s.objectlock.Username);
+                                active_object_locks.Remove(path1);
                                 s.objectlock.ReleaseLock();
 
                             }
@@ -1567,7 +1567,7 @@ namespace RobotRaconteurWeb
                         {
                             if (s.objectlock.RootServicePath == path1)
                             {
-                                active_object_locks.Remove(s.objectlock.Username);
+                                active_object_locks.Remove(path1);
                                 s.objectlock.ReleaseLock();
 
                             }
