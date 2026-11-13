@@ -1268,7 +1268,6 @@ namespace RobotRaconteurWeb
                 cons = connections.Values.ToArray();
                 connections.Clear();
             }
-            cons = connections.Values.ToArray();
             foreach (Wire<T>.WireConnection con in cons)
             {
                 try
