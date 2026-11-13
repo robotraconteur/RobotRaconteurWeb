@@ -1037,8 +1037,9 @@ namespace RobotRaconteurWeb
             {
                 try
                 {
-                    connection.Close();
+                    var c = connection;
                     connection = null;
+                    c?.RemoteClose();
                 }
                 catch { }
             }
