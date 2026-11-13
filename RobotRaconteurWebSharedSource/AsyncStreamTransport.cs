@@ -722,6 +722,7 @@ namespace RobotRaconteurWeb
                             else
                             {
                                 send_queue[i] = Tuple.Create(waiter, m);
+                                replaced = true;
                                 i++;
                             }
                             //Tell this send message to return immediately

@@ -116,6 +116,8 @@ namespace RobotRaconteurTest
 
                         await WebSocketTests.TestWebSocketOversizedControlFrame();
 
+                        await AsyncStreamTransportTests.TestWirePacketBurstDoesNotStall();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
