@@ -77,7 +77,7 @@ namespace RobotRaconteurWeb
                         if (!version_b)
                             continue;
 
-                        object_type_ver.Add(Tuple.Create(d2.StdVer, s));
+                        object_type_ver.Add(Tuple.Create(d2.StdVer, s1));
 
                         if (!(bool)d2.StdVer)
                             break;
