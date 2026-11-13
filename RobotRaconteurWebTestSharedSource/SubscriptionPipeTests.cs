@@ -145,6 +145,18 @@ namespace RobotRaconteurSubTest.Pipes
                 var res2 = await pipeSub.TryReceivePacketWait(1000);
                 RRAssert.IsTrue(res2.Item1 && res2.Item2 == 4.0);
 
+                // Peek while waiting for a packet must not remove it from the queue
+                async Task DelaySend2()
+                {
+                    await Task.Delay(150);
+                    await server1.obj.TestPipe1SendPacket(9.0);
+                }
+                var t2 = DelaySend2();
+                var res6 = await pipeSub.TryReceivePacketWait(1000, true);
+                RRAssert.IsTrue(res6.Item1 && res6.Item2 == 9.0);
+                RRAssert.AreEqual((int)pipeSub.Available, (int)1);
+                RRAssert.AreEqual(pipeSub.ReceivePacket(), 9.0);
+
                 var pipeSub2 = sub.SubscribePipe<double>("testpipe2");
                 await Task.Delay(500);
                 RRAssert.AreEqual((int)pipeSub2.ActivePipeEndpointCount, (int)1);

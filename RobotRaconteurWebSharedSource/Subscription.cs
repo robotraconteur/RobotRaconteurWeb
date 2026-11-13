@@ -3113,7 +3113,7 @@ an exception.
             {
                 if (recv_packets.Count > 0)
                 {
-                    var q = recv_packets.Dequeue();
+                    var q = peek ? recv_packets.Peek() : recv_packets.Dequeue();
                     return Tuple.Create(true, q.Item1, q.Item2);
                 }
                 else
