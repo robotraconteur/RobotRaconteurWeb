@@ -1214,7 +1214,7 @@ namespace RobotRaconteurWeb
             if (!TryGetServiceType(servicetype, out f))
             {
 #if RR_LOG_DEBUG
-                LogDebug(string.Format("Cannot unregister nonexistent service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
+                LogDebug(string.Format("Cannot get nonexistent service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
 #endif
                 throw new ServiceException("Service factory not found for " + servicetype);
             }
