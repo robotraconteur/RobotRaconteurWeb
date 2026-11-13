@@ -961,8 +961,10 @@ namespace RobotRaconteurWeb
             this.connecturl = connecturl;
             m_LocalEndpoint = e.LocalEndpoint;
 
+            var u = TransportUtil.ParseConnectionUrl(connecturl);
+
             m_Connected = true;
-            await ConnectStream(socket, true, null, null, false, false, 30000, cancel).ConfigureAwait(false);
+            await ConnectStream(socket, false, u.nodeid, u.nodename, false, false, 30000, cancel).ConfigureAwait(false);
             lock (parenttransport)
             {
                 parenttransport.TransportConnections.Add(LocalEndpoint, this);
