@@ -2760,11 +2760,12 @@ of pipes and wires can be managed automatically.
                         object obj = client;
                         if (!string.IsNullOrEmpty(servicepath) && servicepath != "*")
                         {
-                            if (servicepath.StartsWith("*."))
+                            string service_path1 = servicepath;
+                            if (service_path1.StartsWith("*."))
                             {
-                                servicepath = servicepath.ReplaceFirst("*", ((ServiceStub)client).RRContext.ServiceName);
+                                service_path1 = service_path1.ReplaceFirst("*", ((ServiceStub)client).RRContext.ServiceName);
                             }
-                            obj = await ((ServiceStub)client).RRContext.FindObjRef(servicepath, null, c.cancel.Token).ConfigureAwait(false);
+                            obj = await ((ServiceStub)client).RRContext.FindObjRef(service_path1, null, c.cancel.Token).ConfigureAwait(false);
                         }
 
                         var property_info = obj.GetType().GetProperty(this.membername);
@@ -3396,11 +3397,12 @@ an exception.
                         object obj = client;
                         if (!string.IsNullOrEmpty(servicepath) && servicepath != "*")
                         {
-                            if (servicepath.StartsWith("*."))
+                            string service_path1 = servicepath;
+                            if (service_path1.StartsWith("*."))
                             {
-                                servicepath = servicepath.ReplaceFirst("*", ((ServiceStub)client).RRContext.ServiceName);
+                                service_path1 = service_path1.ReplaceFirst("*", ((ServiceStub)client).RRContext.ServiceName);
                             }
-                            obj = await ((ServiceStub)client).RRContext.FindObjRef(servicepath, null, c.cancel.Token).ConfigureAwait(false);
+                            obj = await ((ServiceStub)client).RRContext.FindObjRef(service_path1, null, c.cancel.Token).ConfigureAwait(false);
                         }
 
                         var property_info = obj.GetType().GetProperty(this.membername);
