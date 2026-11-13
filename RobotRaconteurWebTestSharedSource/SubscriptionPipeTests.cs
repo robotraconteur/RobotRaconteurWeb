@@ -168,6 +168,15 @@ namespace RobotRaconteurSubTest.Pipes
 
                 RRAssert.AreEqual((int)server1.obj.recv_packets.Count, 2);
 
+                // More packets than the default send backlog (5) must all be sent
+                for (int i = 0; i < 10; i++)
+                {
+                    pipeSub2.AsyncSendPacketAll(10.0 + i);
+                    await Task.Delay(20);
+                }
+                await Task.Delay(200);
+                RRAssert.AreEqual((int)server1.obj.recv_packets.Count, 12);
+
                 var pipeSub3 = sub.SubscribePipe<double>("testpipe3", "*.subobj");
                 await Task.Delay(100);
                 RRAssert.AreEqual<int>((int)pipeSub3.ActivePipeEndpointCount, 1);

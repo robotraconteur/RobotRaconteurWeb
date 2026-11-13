@@ -3342,20 +3342,20 @@ an exception.
             {
                 foreach (var c in connections.Values)
                 {
-                    if (c.active_send_count < this.max_send_backlog)
+                    if (this.max_send_backlog < 0 || c.active_sends.Count < this.max_send_backlog)
                     {
                         var ep = c.endpoint as Pipe<T>.PipeEndpoint;
                         if (ep != null)
                         {
+                            // Track in-flight sends by key, removed when the send completes (as in Core)
+                            c.active_send_count = c.active_send_count < int.MaxValue ? c.active_send_count + 1 : 0;
+                            uint send_key = c.active_send_count;
+                            c.active_sends.Add(send_key);
                             ep.SendPacket(packet, cancel.Token).ContinueWith((t) =>
                             {
-                                if (t.Status == TaskStatus.RanToCompletion)
+                                lock (this)
                                 {
-                                    lock (this)
-                                    {
-                                        c.active_sends.Add(t.Result);
-                                        c.active_send_count = (uint)c.active_sends.Count;
-                                    }
+                                    c.active_sends.Remove(send_key);
                                 }
                             });
                         }
