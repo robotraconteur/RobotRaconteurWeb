@@ -936,13 +936,15 @@ namespace RobotRaconteurWeb
             var cancel = new CancellationTokenSource();
             cancel.CancelAfter(backoff + 10000);
 
-            var ret = await DoUpdateServiceInfo(storage, storage.info.ServiceStateNonce, backoff, cancel.Token).ConfigureAwait(false);
+            // The nonce this update queries for; storage.info.ServiceStateNonce may change while it runs
+            var nonce = storage.info.ServiceStateNonce;
+            var ret = await DoUpdateServiceInfo(storage, nonce, backoff, cancel.Token).ConfigureAwait(false);
             if (!ret.Item1)
             {
                 return;
             }
 
-            EndUpdateServiceInfo(storage, storage.info.ServiceStateNonce, ret.Item2);
+            EndUpdateServiceInfo(storage, nonce, ret.Item2);
 
 
         }

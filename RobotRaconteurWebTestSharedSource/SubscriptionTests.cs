@@ -394,7 +394,9 @@ namespace RobotRaconteurSubTest
                 server_node.RegisterService("test_service", "experimental.sub_test", new testobj_impl());
 
                 var id = new ServiceSubscriptionClientID(server_id, "test_service");
-                for (int i = 0; i < 50 && !sub.GetDetectedServiceInfo2().ContainsKey(id); i++)
+                // Up to ~15 s: if a service info update is already running when the nonce changes, the
+                // missed-update refresh runs after a 5 s anti-flood delay (Discovery.EndUpdateServiceInfo)
+                for (int i = 0; i < 150 && !sub.GetDetectedServiceInfo2().ContainsKey(id); i++)
                 {
                     await Task.Delay(100);
                 }
