@@ -773,7 +773,14 @@ namespace RobotRaconteurWeb
         {
             MessageEntry m = new MessageEntry(MessageEntryType.PipeDisconnectReq, MemberName);
             m.AddElement("index", e.Index);
-            MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
+            try
+            {
+                MessageEntry ret = await stub.ProcessRequest(m, cancel).ConfigureAwait(false);
+            }
+            finally
+            {
+                DeleteEndpoint(e);
+            }
         }
 
         public override PipeConnectCallbackFunction PipeConnectCallback

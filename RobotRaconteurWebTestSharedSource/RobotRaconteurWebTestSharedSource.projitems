@@ -19,6 +19,7 @@
 
     <Compile Include="$(MSBuildThisFileDirectory)ConnectServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />

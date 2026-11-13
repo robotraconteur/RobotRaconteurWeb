@@ -86,6 +86,7 @@ namespace RobotRaconteurTest
                         RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
+                        await RobotRaconteurSubTest.Pipes.PipeClientTests.TestPipeReconnectAfterClose();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
                         await RobotRaconteurSubTest.Wires.WireMemberTests.TestWaitOutValueValid();
 
@@ -149,6 +150,7 @@ namespace RobotRaconteurTest
                         RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
 
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
+                        await RobotRaconteurSubTest.Pipes.PipeClientTests.TestPipeReconnectAfterClose();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();
                         await RobotRaconteurSubTest.Wires.WireMemberTests.TestWaitOutValueValid();
 
