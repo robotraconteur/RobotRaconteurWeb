@@ -79,6 +79,8 @@ namespace RobotRaconteurTest
 
                         await RobotRaconteurSubTest.ConnectServiceTests.TestConnectServiceUrlsWithListener();
 
+                        await RobotRaconteurSubTest.ConnectFailureTests.TestFailedConnectDoesNotLeakEndpoint();
+
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
@@ -144,6 +146,8 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestIntraServiceRegisteredLater();
 
                         await RobotRaconteurSubTest.ConnectServiceTests.TestConnectServiceUrlsWithListener();
+
+                        await RobotRaconteurSubTest.ConnectFailureTests.TestFailedConnectDoesNotLeakEndpoint();
 
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();

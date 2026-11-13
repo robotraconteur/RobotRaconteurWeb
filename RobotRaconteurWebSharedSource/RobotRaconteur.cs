@@ -1998,7 +1998,20 @@ namespace RobotRaconteurWeb
                         if (end.CanConnectService(url))
                         {
 
-                            object r = await c.ConnectService(end, url, username, credentials, objecttype, cancel).ConfigureAwait(false);
+                            object r;
+                            try
+                            {
+                                r = await c.ConnectService(end, url, username, credentials, objecttype, cancel).ConfigureAwait(false);
+                            }
+                            catch
+                            {
+                                try
+                                {
+                                    DeleteEndpoint(c);
+                                }
+                                catch { }
+                                throw;
+                            }
 
                             if (listener != null)
                                 c.ClientServiceListener += listener;
