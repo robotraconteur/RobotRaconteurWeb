@@ -297,7 +297,7 @@ namespace RobotRaconteurWeb
                     outval_valid = true;
                     lasttime_send = TimeSpec.Now;
                     lasttime_send_local = DateTime.UtcNow;
-                    inval_waiter.NotifyAll(true);
+                    outval_waiter.NotifyAll(true);
                     return t;
                 }
             }

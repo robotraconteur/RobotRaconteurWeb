@@ -40,6 +40,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)MessageSerializationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestVectors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebSocketTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)WireMemberTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)test_vectors.bin" LogicalName="test_vectors.bin" />
