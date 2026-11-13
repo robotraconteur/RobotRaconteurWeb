@@ -1723,49 +1723,43 @@ namespace RobotRaconteurWeb
         Task ProcessCallbackRequest_checkconnection_current = null;
         private async Task ProcessCallbackRequest_checkconnection()
         {
-            lock (rec_wait)
+            while (true)
             {
-                if (rec_wait.Count < 0)
+                Tuple<TaskCompletionSource<MessageEntry>, ServerEndpoint>[] waits;
+                lock (rec_wait)
                 {
-                    ProcessCallbackRequest_checkconnection_current = null;
-                    return;
-                }
-            }
-
-            foreach (var c in rec_wait.Values.Distinct())
-            {
-                try
-                {
-                    node.CheckConnection(c.Item2.LocalEndpoint);
-                }
-                catch (Exception)
-                {
-                    var rec_wait2 = new List<TaskCompletionSource<MessageEntry>>();
-                    lock (rec_wait)
+                    if (rec_wait.Count == 0)
                     {
-                        foreach (var r in rec_wait.Values)
+                        ProcessCallbackRequest_checkconnection_current = null;
+                        return;
+                    }
+                    waits = rec_wait.Values.ToArray();
+                }
+
+                foreach (var ep in waits.Select(x => x.Item2).Distinct())
+                {
+                    try
+                    {
+                        node.CheckConnection(ep.LocalEndpoint);
+                    }
+                    catch (Exception)
+                    {
+                        foreach (var r in waits)
                         {
-                            if (r.Item2.LocalEndpoint == c.Item2.LocalEndpoint)
+                            if (r.Item2.LocalEndpoint == ep.LocalEndpoint)
                             {
-                                rec_wait2.Add(r.Item1);
+                                r.Item1.TrySetException(new ConnectionException("Connection closed"));
                             }
                         }
                     }
-
-                    foreach (var t in rec_wait2)
-                    {
-                        t.TrySetException(new ConnectionException("Connection closed"));
-                    }
-                    return;
                 }
-            }
-            try
-            {
-                await Task.Delay(500).ConfigureAwait(false);
-            }
-            catch { }
 
-
+                try
+                {
+                    await Task.Delay(500).ConfigureAwait(false);
+                }
+                catch { }
+            }
         }
 
         public class MonitorObjectSkel
