@@ -50,6 +50,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)WireMemberTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)WireSubscriptionServicePathTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)WireServerCloseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)test_vectors.bin" LogicalName="test_vectors.bin" />

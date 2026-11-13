@@ -90,6 +90,8 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.Wires.WireMemberTests.TestWaitOutValueValid();
 
                         await RobotRaconteurSubTest.Wires.WireSubscriptionServicePathTests.TestWildcardServicePathMultipleServiceNames();
+
+                        await RobotRaconteurSubTest.Wires.WireServerCloseTests.TestServiceSideWireClose();
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByType();
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByUrl();
 
@@ -151,6 +153,8 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.Wires.WireMemberTests.TestWaitOutValueValid();
 
                         await RobotRaconteurSubTest.Wires.WireSubscriptionServicePathTests.TestWildcardServicePathMultipleServiceNames();
+
+                        await RobotRaconteurSubTest.Wires.WireServerCloseTests.TestServiceSideWireClose();
                         await RobotRaconteurSubTest.SubObject.SubObjectSubscriptionTests.RunTestSubscribeSubObject();
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByType();
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerTests.RunTestSubManagerSubscribeByUrl();

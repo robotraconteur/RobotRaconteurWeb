@@ -356,7 +356,7 @@ namespace RobotRaconteurWeb
                     send_closed = true;
                 }
 
-                return parent.Close(this);
+                return parent.Close(this, endpoint);
             }
             /**
             <summary>

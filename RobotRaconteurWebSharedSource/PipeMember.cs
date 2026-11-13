@@ -220,7 +220,7 @@ namespace RobotRaconteurWeb
             [PublicApi]
             public async Task Close()
             {
-                await parent.Close(this).ConfigureAwait(false);
+                await parent.Close(this, endpoint).ConfigureAwait(false);
             }
 
             private uint increment_packet_number(uint packetnum)
