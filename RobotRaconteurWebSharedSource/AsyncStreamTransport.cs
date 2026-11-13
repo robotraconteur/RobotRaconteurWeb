@@ -1435,6 +1435,7 @@ namespace RobotRaconteurWeb
             try
             {
                 Message m = new Message();
+                m.header = new MessageHeader();
 
                 m.header.SenderNodeID = node.NodeID;
 
