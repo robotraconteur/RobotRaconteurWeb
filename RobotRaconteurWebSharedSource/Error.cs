@@ -885,7 +885,7 @@ namespace RobotRaconteurWeb
                     return new ServiceDefinitionException(errorstring);
 
                 case MessageErrorType.OutOfRange:
-                    return new ArgumentOutOfRangeException(errorstring);
+                    return new ArgumentOutOfRangeException(null, errorstring);
 
                 case MessageErrorType.KeyNotFound:
                     return new KeyNotFoundException(errorstring);
