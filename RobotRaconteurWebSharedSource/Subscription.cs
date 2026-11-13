@@ -1681,7 +1681,7 @@ namespace RobotRaconteurWeb
                             }
                             catch (Exception ex2)
                             {
-                                LogDebug(string.Format("Error in ServiceSubscription.ConnectClientFailed callback {0}", ex2), node, RobotRaconteur_LogComponent.Subscription);
+                                LogDebug(string.Format("Error in ServiceSubscription.ClientDisconnected callback {0}", ex2), node, RobotRaconteur_LogComponent.Subscription);
                             }
                             client.claimed = false;
                             wait_task.TrySetResult(true);
@@ -2666,11 +2666,11 @@ of pipes and wires can be managed automatically.
 
         public int InValueLifespan { get; set; } = -1;
 
-        internal WireSubscriptionBase(ServiceSubscription parent, string membernname, string servicepath)
+        internal WireSubscriptionBase(ServiceSubscription parent, string membername, string servicepath)
         {
             this.parent = parent;
             this.node = parent.node;
-            this.membername = membernname;
+            this.membername = membername;
             this.servicepath = servicepath;
         }
 
