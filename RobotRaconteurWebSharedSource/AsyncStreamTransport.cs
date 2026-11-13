@@ -1902,11 +1902,11 @@ namespace RobotRaconteurWeb
                 if (cert == null) throw new AuthenticationException("Peer identity is not verified");
                 return cert.Subject.ReplaceFirst("CN=Robot Raconteur Node ", "");
             }
-            throw new AuthenticationException("Connection is not seccure");
+            throw new AuthenticationException("Connection is not secure");
         }
         catch
         {
-            throw new AuthenticationException("Connection is not seccure");
+            throw new AuthenticationException("Connection is not secure");
         }
     }
 
