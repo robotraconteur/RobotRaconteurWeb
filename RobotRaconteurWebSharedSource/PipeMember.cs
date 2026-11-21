@@ -279,6 +279,13 @@ namespace RobotRaconteurWeb
                     }
                     else
                     {
+                        // Ignore packet numbers that were already delivered or are already queued
+                        // (a repeated number threw from Dictionary.Add)
+                        uint ahead = packetnum - recv_packet_number;
+                        if (ahead == 0 || ahead >= 0x80000000u || out_of_order_packets.ContainsKey(packetnum))
+                        {
+                            return;
+                        }
                         out_of_order_packets.Add(packetnum, packet);
                     }
                 }
