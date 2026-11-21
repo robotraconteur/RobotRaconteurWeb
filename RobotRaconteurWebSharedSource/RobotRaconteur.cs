@@ -1487,14 +1487,15 @@ namespace RobotRaconteurWeb
                             string[] s1 = path.Split(new char[] { '.' }, 2);
 
                             RobotRaconteurVersion v = default;
-                            if (e.TryFindElement("clientversion", out var m_ver))
-                            {
-                                v = new RobotRaconteurVersion();
-                                v.FromString(m_ver.CastDataToString());
-                            }
 
                             try
                             {
+                                if (e.TryFindElement("clientversion", out var m_ver))
+                                {
+                                    v = new RobotRaconteurVersion();
+                                    v.FromString(m_ver.CastDataToString());
+                                }
+
                                 ServerContext s;
 
                                 s = GetService(s1[0]);
@@ -1691,13 +1692,13 @@ namespace RobotRaconteurWeb
 
                             var v = new RobotRaconteurVersion();
 
-                            if (e.TryFindElement("clientversion", out var m_ver))
-                            {
-                                v.FromString(m_ver.CastDataToString());
-                            }
-
                             try
                             {
+                                if (e.TryFindElement("clientversion", out var m_ver))
+                                {
+                                    v.FromString(m_ver.CastDataToString());
+                                }
+
                                 c = GetService(name);
                                 var objtype = await c.GetRootObjectType(v);
                                 eret.AddElement("objecttype", objtype);
