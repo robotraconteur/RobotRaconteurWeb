@@ -898,16 +898,23 @@ namespace RobotRaconteurWeb
 
         public bool VerifyObjectImplements(string objecttype, string implementstype)
         {
-            if (!VerifyObjectImplements2(objecttype, implementstype))
+            if (!VerifyObjectImplements2(objecttype, implementstype, new HashSet<string>()))
                 throw new ServiceException("Invalid object type");
             return true;
         }
 
         protected bool VerifyObjectImplements2(string objecttype, string implementstype)
         {
+            return VerifyObjectImplements2(objecttype, implementstype, new HashSet<string>());
+        }
+
+        private bool VerifyObjectImplements2(string objecttype, string implementstype, HashSet<string> visited)
+        {
             lock (this)
             {
                 if (objecttype == implementstype) return true;
+                // Pulled definitions are not verified: stop on implements cycles
+                if (!visited.Add(objecttype)) return false;
                 var s1 = ServiceDefinitionUtil.SplitQualifiedName(objecttype);
                 if (!pulled_service_defs.ContainsKey(s1.Item1))
                 {
@@ -937,7 +944,7 @@ namespace RobotRaconteurWeb
                     }
 
                     if ((deftype + "." + objtype) == implementstype) return true;
-                    if (VerifyObjectImplements2(deftype + "." + objtype, implementstype)) return true;
+                    if (VerifyObjectImplements2(deftype + "." + objtype, implementstype, visited)) return true;
                 }
 
                 return false;
