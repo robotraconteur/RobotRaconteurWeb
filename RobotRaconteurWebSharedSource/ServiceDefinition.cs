@@ -2582,7 +2582,7 @@ namespace RobotRaconteurWeb
                 ParseInfo = parse_info.Value;
             }
 
-            var r = new Regex("^[ \\t]*using[ \\t]+(" + detail.ServiceDefinitionUtil.RR_QUALIFIED_TYPE_REGEX + ")(?:[ \\t]+as[ \\t](" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + "))?[ \\t]*$");
+            var r = new Regex("^[ \\t]*using[ \\t]+(" + detail.ServiceDefinitionUtil.RR_QUALIFIED_TYPE_REGEX + ")(?:[ \\t]+as[ \\t]+(" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + "))?[ \\t]*$");
 
             var r_match = r.Match(s);
             if (!r_match.Success)

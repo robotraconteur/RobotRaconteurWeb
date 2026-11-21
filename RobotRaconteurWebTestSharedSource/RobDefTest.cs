@@ -256,5 +256,18 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(def.ParseInfo.Line.Trim(), "service test.firstline");
             RRWebTest.WriteLine("RobDefTest.TestServiceDefinitionFirstLine passed");
         }
+
+        public static void TestUsingAsWhitespace()
+        {
+            // Any amount of blanks may follow "as", as everywhere else in the parser
+            var u = new UsingDefinition(null);
+            u.FromString("using a.b.c as  d");
+            RRAssert.AreEqual(u.QualifiedName, "a.b.c");
+            RRAssert.AreEqual(u.UnqualifiedName, "d");
+            u = new UsingDefinition(null);
+            u.FromString("using a.b.c as\td");
+            RRAssert.AreEqual(u.UnqualifiedName, "d");
+            RRWebTest.WriteLine("RobDefTest.TestUsingAsWhitespace passed");
+        }
     }
 }

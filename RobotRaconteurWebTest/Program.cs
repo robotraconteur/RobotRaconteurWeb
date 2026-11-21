@@ -157,6 +157,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestServiceDefinitionFirstLine();
 
+                        RobDefTest.TestUsingAsWhitespace();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
