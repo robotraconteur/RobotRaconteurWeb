@@ -1213,7 +1213,7 @@ namespace RobotRaconteurWeb
                         if (username != skel.objectlock.Username && !priv.Contains("objectlockoverride")) throw new ObjectLockedException("Service locked by user " + skel.objectlock.Username);
                         if (skel.objectlock.Endpoint != 0)
                         {
-                            if (e.LocalEndpoint != skel.objectlock.Endpoint && !priv.Contains("objectlockoverride")) if (username != skel.objectlock.Username && !priv.Contains("objectlockoverride")) throw new Exception("Service locked by other session");
+                            if (e.LocalEndpoint != skel.objectlock.Endpoint && !priv.Contains("objectlockoverride")) throw new ObjectLockedException("Service locked by other session");
                         }
 
                         active_object_locks.Remove(skel.ServicePath);
