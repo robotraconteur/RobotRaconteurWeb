@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceLockAsyncTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRAssert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRWebTest.cs" />

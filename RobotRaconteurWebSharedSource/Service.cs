@@ -715,7 +715,7 @@ namespace RobotRaconteurWeb
 
                 if (RequireValidUser)
                 {
-                    if (ServerEndpoint.CurrentAuthenticatedUser == null)
+                    if (c.EndpointAuthenticatedUser == null)
                         throw new AuthenticationException("User must authenticate before accessing this service");
                 }
 
@@ -745,35 +745,35 @@ namespace RobotRaconteurWeb
                 if (m.EntryType == MessageEntryType.PropertyGetReq)
                 {
                     ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallGetProperty(m).ConfigureAwait(false);
                 }
 
                 if (m.EntryType == MessageEntryType.PropertySetReq)
                 {
                     ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallSetProperty(m).ConfigureAwait(false);
                 }
 
                 if (m.EntryType == MessageEntryType.FunctionCallReq)
                 {
                     ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallFunction(m).ConfigureAwait(false);
                 }
 
                 if (m.EntryType == MessageEntryType.PipeConnectReq || m.EntryType == MessageEntryType.PipeDisconnectReq)
                 {
                     ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallPipeFunction(m, c).ConfigureAwait(false);
                 }
 
                 if (m.EntryType == MessageEntryType.WireConnectReq || m.EntryType == MessageEntryType.WireDisconnectReq || m.EntryType == MessageEntryType.WirePeekInValueReq || m.EntryType == MessageEntryType.WirePeekOutValueReq || m.EntryType == MessageEntryType.WirePokeOutValueReq)
                 {
                     ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallWireFunction(m, c).ConfigureAwait(false);
                 }
 
@@ -782,7 +782,7 @@ namespace RobotRaconteurWeb
                 if (m.EntryType == MessageEntryType.MemoryWrite || m.EntryType == MessageEntryType.MemoryRead || m.EntryType == MessageEntryType.MemoryGetParam)
                 {
                     ServiceSkel skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallMemoryFunction(m, c).ConfigureAwait(false);
                 }
 
@@ -806,7 +806,7 @@ namespace RobotRaconteurWeb
                 else if (m.EntryType == MessageEntryType.GeneratorNextReq)
                 {
                     var skel = await GetObjectSkel(m.ServicePath).ConfigureAwait(false);
-                    check_lock(skel, m);
+                    check_lock(skel, m, c);
                     ret = await skel.CallGeneratorNext(m, c).ConfigureAwait(false);
                     noreturn = true;
                 }
@@ -1106,7 +1106,7 @@ namespace RobotRaconteurWeb
                 case "MonitorExit":
                     {
 
-                        await ClientLockOp(m, ret).ConfigureAwait(false);
+                        await ClientLockOp(m, ret, e).ConfigureAwait(false);
                         ret.AddElement("return", "OK");
                         return ret;
                     }
@@ -1130,8 +1130,10 @@ namespace RobotRaconteurWeb
 
         private object ClientLockOp_lockobj = new object();
 
-        private async Task ClientLockOp(MessageEntry m, MessageEntry ret)
+        private async Task ClientLockOp(MessageEntry m, MessageEntry ret, ServerEndpoint e)
         {
+            // Thread-static current user/endpoint are not valid after an await
+            AuthenticatedUser current_user = e.EndpointAuthenticatedUser;
 
             // cSpell: ignore sskels
             // if (m.ServicePath != ServiceName) throw new Exception("Only locking of root object currently supported");
@@ -1140,16 +1142,16 @@ namespace RobotRaconteurWeb
             string username = null;
             if (!m.MemberName.StartsWith("Monitor"))
             {
-                if (ServerEndpoint.CurrentAuthenticatedUser == null) throw new AuthenticationException("User must be authenticated to lock object");
-                priv = ServerEndpoint.CurrentAuthenticatedUser.Privileges;
+                if (current_user == null) throw new AuthenticationException("User must be authenticated to lock object");
+                priv = current_user.Privileges;
                 if (!(priv.Contains("objectlock") || priv.Contains("objectlockoverride"))) throw new ObjectLockedException("User does not have object locking privileges");
-                username = ServerEndpoint.CurrentAuthenticatedUser.Username;
+                username = current_user.Username;
             }
             else
             {
                 if (this.RequireValidUser)
                 {
-                    if (ServerEndpoint.CurrentAuthenticatedUser == null)
+                    if (current_user == null)
                     {
                         throw new AuthenticationException("User is not authenticated");
                     }
@@ -1172,7 +1174,7 @@ namespace RobotRaconteurWeb
                             KeyValuePair<string, ServiceSkel>[] sskels = (skels.Where(x => x.Key.StartsWith(servicepath)).ToArray());
                             if (sskels.Any(x => x.Value.IsLocked)) throw new ObjectLockedException("Object already locked");
 
-                            ObjectLock o = new ObjectLock(ServerEndpoint.CurrentAuthenticatedUser.Username, skel);
+                            ObjectLock o = new ObjectLock(current_user.Username, skel);
                             foreach (KeyValuePair<string, ServiceSkel> s in sskels)
                             {
                                 o.AddSkel(s.Value);
@@ -1191,7 +1193,7 @@ namespace RobotRaconteurWeb
                             KeyValuePair<string, ServiceSkel>[] sskels = (skels.Where(x => x.Key.StartsWith(servicepath)).ToArray());
                             if (sskels.Any(x => x.Value.IsLocked)) throw new ObjectLockedException("Object already locked");
 
-                            ObjectLock o = new ObjectLock(ServerEndpoint.CurrentAuthenticatedUser.Username, skel, ServerEndpoint.CurrentEndpoint.LocalEndpoint);
+                            ObjectLock o = new ObjectLock(current_user.Username, skel, e.LocalEndpoint);
                             foreach (KeyValuePair<string, ServiceSkel> s in sskels)
                             {
                                 s.Value.objectlock = o;
@@ -1211,7 +1213,7 @@ namespace RobotRaconteurWeb
                         if (username != skel.objectlock.Username && !priv.Contains("objectlockoverride")) throw new ObjectLockedException("Service locked by user " + skel.objectlock.Username);
                         if (skel.objectlock.Endpoint != 0)
                         {
-                            if (ServerEndpoint.CurrentEndpoint.LocalEndpoint != skel.objectlock.Endpoint && !priv.Contains("objectlockoverride")) if (username != skel.objectlock.Username && !priv.Contains("objectlockoverride")) throw new Exception("Service locked by other session");
+                            if (e.LocalEndpoint != skel.objectlock.Endpoint && !priv.Contains("objectlockoverride")) if (username != skel.objectlock.Username && !priv.Contains("objectlockoverride")) throw new Exception("Service locked by other session");
                         }
 
                         active_object_locks.Remove(skel.ServicePath);
@@ -1226,11 +1228,11 @@ namespace RobotRaconteurWeb
                         MonitorObjectSkel s;
                         lock (ClientLockOp_lockobj)
                         {
-                            if (skel.monitorlocks.ContainsKey(ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Already acquiring or acquired monitor lock");
+                            if (skel.monitorlocks.ContainsKey(e.LocalEndpoint)) throw new InvalidOperationException("Already acquiring or acquired monitor lock");
                             s = new MonitorObjectSkel(skel);
                             timeout = m.FindElement("timeout").CastData<int[]>()[0];
                         }
-                        string retcode = await s.MonitorEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint, timeout).ConfigureAwait(false);
+                        string retcode = await s.MonitorEnter(e.LocalEndpoint, timeout).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
 
                         break;
@@ -1240,10 +1242,10 @@ namespace RobotRaconteurWeb
                         MonitorObjectSkel s;
                         lock (ClientLockOp_lockobj)
                         {
-                            if (!skel.monitorlocks.ContainsKey(ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Not acquiring monitor lock");
-                            s = skel.monitorlocks[ServerEndpoint.CurrentEndpoint.LocalEndpoint];
+                            if (!skel.monitorlocks.ContainsKey(e.LocalEndpoint)) throw new InvalidOperationException("Not acquiring monitor lock");
+                            s = skel.monitorlocks[e.LocalEndpoint];
                         }
-                        string retcode = await s.MonitorContinueEnter(ServerEndpoint.CurrentEndpoint.LocalEndpoint).ConfigureAwait(false);
+                        string retcode = await s.MonitorContinueEnter(e.LocalEndpoint).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
                         break;
                     }
@@ -1252,9 +1254,9 @@ namespace RobotRaconteurWeb
                     {
                         lock (ClientLockOp_lockobj)
                         {
-                            if (skel.monitorlock.LocalEndpoint != (ServerEndpoint.CurrentEndpoint.LocalEndpoint)) throw new InvalidOperationException("Not monitor locked");
+                            if (skel.monitorlock.LocalEndpoint != (e.LocalEndpoint)) throw new InvalidOperationException("Not monitor locked");
                         }
-                        string retcode = await skel.monitorlock.MonitorExit(ServerEndpoint.CurrentEndpoint.LocalEndpoint).ConfigureAwait(false);
+                        string retcode = await skel.monitorlock.MonitorExit(e.LocalEndpoint).ConfigureAwait(false);
                         ret.AddElement("return", retcode);
                         break;
 
@@ -1270,16 +1272,21 @@ namespace RobotRaconteurWeb
 
         protected void check_lock(ServiceSkel skel, MessageEntry m)
         {
-            check_monitor_lock(skel);
+            check_lock(skel, m, ServerEndpoint.CurrentEndpoint);
+        }
+
+        private void check_lock(ServiceSkel skel, MessageEntry m, ServerEndpoint e)
+        {
+            check_monitor_lock(skel, e);
             if (skel.IsLocked)
             {
                 if (skel.IsRequestNoLock(m))
                 {
                     return;
                 }
-                if (skel.objectlock.Username == ServerEndpoint.CurrentAuthenticatedUser.Username && skel.objectlock.Endpoint == 0)
+                if (skel.objectlock.Username == e.EndpointAuthenticatedUser?.Username && skel.objectlock.Endpoint == 0)
                     return;
-                if (skel.objectlock.Username == ServerEndpoint.CurrentAuthenticatedUser.Username && skel.objectlock.Endpoint == ServerEndpoint.CurrentEndpoint.LocalEndpoint)
+                if (skel.objectlock.Username == e.EndpointAuthenticatedUser?.Username && skel.objectlock.Endpoint == e.LocalEndpoint)
                     return;
                 throw new ObjectLockedException("Object locked by " + skel.objectlock.Username);
 
@@ -1288,11 +1295,16 @@ namespace RobotRaconteurWeb
 
         protected void check_monitor_lock(ServiceSkel skel)
         {
+            check_monitor_lock(skel, ServerEndpoint.CurrentEndpoint);
+        }
+
+        private void check_monitor_lock(ServiceSkel skel, ServerEndpoint e)
+        {
             if (skel.IsMonitorLocked)
             {
-                if (skel.monitorlock.LocalEndpoint == ServerEndpoint.CurrentEndpoint.LocalEndpoint)
+                if (skel.monitorlock.LocalEndpoint == e.LocalEndpoint)
                 {
-                    skel.monitorlock.MonitorRefresh(ServerEndpoint.CurrentEndpoint.LocalEndpoint);
+                    skel.monitorlock.MonitorRefresh(e.LocalEndpoint);
                 }
                 else
                 {
@@ -2145,6 +2157,11 @@ namespace RobotRaconteurWeb
             this.service = service;
         }
 
+
+        internal AuthenticatedUser EndpointAuthenticatedUser
+        {
+            get { return endpoint_authenticated_user; }
+        }
 
         public string AuthenticatedUsername
         {
