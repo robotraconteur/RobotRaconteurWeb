@@ -155,5 +155,16 @@ namespace RobotRaconteurTest
 
             return;
         }
+
+        public static void TestConstantInt64()
+        {
+            // int64 constants must be accepted
+            var c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant int64 c1 -9223372036854775808");
+            RRAssert.AreEqual(c.Value, "-9223372036854775808");
+            c.FromString("constant int64 c2 1234");
+            RRAssert.AreEqual(c.Value, "1234");
+            RRWebTest.WriteLine("RobDefTest.TestConstantInt64 passed");
+        }
     }
 }

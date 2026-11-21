@@ -135,6 +135,8 @@ namespace RobotRaconteurTest
 
                         await StreamHeaderTests.TestOversizedMessageLengthRejected();
 
+                        RobDefTest.TestConstantInt64();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

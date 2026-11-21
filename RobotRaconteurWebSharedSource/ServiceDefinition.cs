@@ -2716,7 +2716,7 @@ namespace RobotRaconteurWeb
                         min_value = int.MinValue;
                         max_value = int.MaxValue;
                         break;
-                    case DataTypes.uint64_t:
+                    case DataTypes.int64_t:
                         min_value = long.MinValue;
                         max_value = long.MaxValue;
                         break;
