@@ -1529,6 +1529,16 @@ namespace RobotRaconteurWeb
         MessageEntry mmret = new MessageEntry(MessageEntryType.StreamOpRet, "STARTTLS");
         mret.entries.Add(mmret);
 
+        if (basestream is SslStream)
+        {
+            // A second STARTTLS would wrap a new SslStream around the existing one
+            mmret.AddElement("errorname", "RobotRaconteur.ProtocolError");
+            mmret.AddElement("errorstring", "TLS already active");
+            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
+            Close();
+            return;
+        }
+
         var cert = GetTlsCertificate();
 
         if (cert == null)
