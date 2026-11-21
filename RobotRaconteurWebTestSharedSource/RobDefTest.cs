@@ -227,5 +227,24 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(b.ArrayLength[0], 3);
             RRWebTest.WriteLine("RobDefTest.TestTypeDefinitionMultiDimSingleToString passed");
         }
+
+        public static void TestObjRefArrayContainer()
+        {
+            // An objref may have an array or a container, not both
+            var entry = new ServiceEntryDefinition(new ServiceDefinition());
+            var o = new ObjRefDefinition(entry);
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => o.FromString("objref varobject[]{string} x"));
+            o = new ObjRefDefinition(entry);
+            o.FromString("objref varobject[] x");
+            RRAssert.AreEqual(o.ArrayType, DataTypes_ArrayTypes.array);
+            RRAssert.AreEqual(o.ContainerType, DataTypes_ContainerTypes.none);
+            o.ToString();
+            o = new ObjRefDefinition(entry);
+            o.FromString("objref varobject{string} x");
+            RRAssert.AreEqual(o.ArrayType, DataTypes_ArrayTypes.none);
+            RRAssert.AreEqual(o.ContainerType, DataTypes_ContainerTypes.map_string);
+            o.ToString();
+            RRWebTest.WriteLine("RobDefTest.TestObjRefArrayContainer passed");
+        }
     }
 }

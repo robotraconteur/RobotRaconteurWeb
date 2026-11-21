@@ -1760,7 +1760,7 @@ namespace RobotRaconteurWeb
                     }
                 case DataTypes_ArrayTypes.array:
                     {
-                        if (ContainerType != DataTypes_ContainerTypes.none)
+                        if (t.ContainerType != DataTypes_ContainerTypes.none)
                         {
                             throw new ServiceDefinitionParseException("Invalid objref definition \"" + s + "\"", ParseInfo);
                         }
