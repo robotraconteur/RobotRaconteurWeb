@@ -1029,6 +1029,7 @@ namespace RobotRaconteurWeb
             try
             {
                 string user_run_path = node_dirs.user_run_dir;
+                NodeDirectoriesUtil.SecureTmpUserRunDir(user_run_path);
                 string path = Path.Combine(user_run_path, "transport", "local");
                 string bynodeid_path = Path.Combine(path, "by-nodeid");
                 string bynodename_path = Path.Combine(path, "by-nodename");

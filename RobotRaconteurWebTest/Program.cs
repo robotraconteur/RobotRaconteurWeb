@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        TmpUserRunDirTests.RunTestTmpUserRunDirSecure();
                         await TcpSilentConnectionTests.RunTestSilentConnectionClosed();
                         DiscoveryAnnounceValidationTests.RunTestAnnounceValidation();
                         DiscoveryAnnounceValidationTests.RunTestAnnounceLoopbackSender();

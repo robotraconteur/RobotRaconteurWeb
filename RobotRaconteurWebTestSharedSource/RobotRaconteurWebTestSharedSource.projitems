@@ -33,6 +33,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryAnnounceValidationTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)TcpSilentConnectionTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)TmpUserRunDirTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRAssert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRWebTest.cs" />

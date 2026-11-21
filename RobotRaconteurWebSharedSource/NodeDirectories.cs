@@ -232,6 +232,61 @@ namespace RobotRaconteurWeb
             return run_path;
         }
 
+        // Creates the /tmp/robotraconteur-run-<uid> fallback user run directory with mode 0700 and verifies that it is a
+        // directory (not a symlink) owned by the current user, so another local user cannot pre-create it. No-op for
+        // any other user run directory. Same as Core NodeDirectories_secure_tmp_user_run_dir.
+        internal static void SecureTmpUserRunDir(string user_run_dir)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return;
+            }
+
+            uint u = Mono.Unix.Native.Syscall.getuid();
+            string run_path = $"/tmp/robotraconteur-run-{u}";
+            if (user_run_dir == null || user_run_dir.TrimEnd('/') != run_path)
+            {
+                return;
+            }
+
+            if (Mono.Unix.Native.Syscall.mkdir(run_path, Mono.Unix.Native.FilePermissions.S_IRWXU) < 0
+                && Mono.Unix.Native.Stdlib.GetLastError() != Mono.Unix.Native.Errno.EEXIST)
+            {
+                throw new SystemResourceException("Could not create user run directory");
+            }
+
+            int dir_fd = Mono.Unix.Native.Syscall.open(run_path, Mono.Unix.Native.OpenFlags.O_RDONLY
+                | Mono.Unix.Native.OpenFlags.O_DIRECTORY | Mono.Unix.Native.OpenFlags.O_NOFOLLOW);
+            if (dir_fd < 0)
+            {
+                throw new SystemResourceException("User run directory " + run_path + " is not a directory");
+            }
+
+            bool ok;
+            try
+            {
+                Mono.Unix.Native.Stat st;
+                ok = Mono.Unix.Native.Syscall.fstat(dir_fd, out st) == 0
+                    && (st.st_mode & Mono.Unix.Native.FilePermissions.S_IFMT) == Mono.Unix.Native.FilePermissions.S_IFDIR
+                    && (st.st_uid == u || st.st_uid == Mono.Unix.Native.Syscall.geteuid());
+                var group_other = Mono.Unix.Native.FilePermissions.S_IRWXG | Mono.Unix.Native.FilePermissions.S_IRWXO;
+                if (ok && (st.st_mode & group_other) != 0)
+                {
+                    ok = Mono.Unix.Native.Syscall.fchmod(dir_fd, Mono.Unix.Native.FilePermissions.S_IRWXU) == 0;
+                }
+            }
+            finally
+            {
+                Mono.Unix.Native.Syscall.close(dir_fd);
+            }
+
+            if (!ok)
+            {
+                throw new SystemResourceException("User run directory " + run_path
+                    + " is not a private directory owned by the current user");
+            }
+        }
+
         public static string user_apple_run_dir(string rr_env_var)
         {
             string rr_env_var_val = Environment.GetEnvironmentVariable(rr_env_var);
@@ -546,6 +601,7 @@ namespace RobotRaconteurWeb
                 }
                 else
                 {
+                    SecureTmpUserRunDir(node_dirs.user_run_dir);
                     string p_lock = node_dirs.user_run_dir;
                     foreach(var s in scope)
                     {
