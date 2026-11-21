@@ -230,6 +230,7 @@ namespace RobotRaconteurWeb
             }
 
             private Dictionary<uint, T> out_of_order_packets = new Dictionary<uint, T>();
+            private const uint max_out_of_order_packets = 1024;
             private object recv_lock = new object();
             /**
             <summary>
@@ -283,6 +284,11 @@ namespace RobotRaconteurWeb
                         // (a repeated number threw from Dictionary.Add)
                         uint ahead = packetnum - recv_packet_number;
                         if (ahead == 0 || ahead >= 0x80000000u || out_of_order_packets.ContainsKey(packetnum))
+                        {
+                            return;
+                        }
+                        // Bound the packets held while waiting for a missing number
+                        if (ahead > max_out_of_order_packets || out_of_order_packets.Count >= max_out_of_order_packets)
                         {
                             return;
                         }
