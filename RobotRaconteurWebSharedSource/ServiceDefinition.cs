@@ -2031,7 +2031,7 @@ namespace RobotRaconteurWeb
                         {
                             if (ArrayLength.Count == 1)
                             {
-                                o.Write("[{0}]", ArrayLength[0]);
+                                o.Write("[{0},]", ArrayLength[0]);
                             }
                             else
                             {

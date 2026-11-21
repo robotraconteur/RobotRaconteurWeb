@@ -211,5 +211,21 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(a != d);
             RRWebTest.WriteLine("RobDefTest.TestTypeDefinitionEquality passed");
         }
+
+        public static void TestTypeDefinitionMultiDimSingleToString()
+        {
+            // A single-dimension fixed multidim array must be written as [N,] so it re-parses as a multidim array
+            var a = new TypeDefinition();
+            a.FromString("double[3,] x");
+            RRAssert.AreEqual(a.ArrayType, DataTypes_ArrayTypes.multidimarray);
+            RRAssert.AreEqual(a.ToString(), "double[3,] x");
+            var b = new TypeDefinition();
+            b.FromString(a.ToString());
+            RRAssert.AreEqual(b.ArrayType, DataTypes_ArrayTypes.multidimarray);
+            RRAssert.IsFalse(b.ArrayVarLength);
+            RRAssert.AreEqual(b.ArrayLength.Count, 1);
+            RRAssert.AreEqual(b.ArrayLength[0], 3);
+            RRWebTest.WriteLine("RobDefTest.TestTypeDefinitionMultiDimSingleToString passed");
+        }
     }
 }

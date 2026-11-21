@@ -145,6 +145,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestTypeDefinitionEquality();
 
+                        RobDefTest.TestTypeDefinitionMultiDimSingleToString();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
