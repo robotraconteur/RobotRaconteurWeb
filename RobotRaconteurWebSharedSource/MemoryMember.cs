@@ -694,7 +694,7 @@ namespace RobotRaconteurWeb
                     ulong bufferpos_i = bufferpos + max_elems * i;
                     ulong memorypos_i = memorypos + max_elems * i;
 
-                    await ReadImpl(memorypos_i, buffer, bufferpos_i, max_elems).ConfigureAwait(false);
+                    await ReadImpl(memorypos_i, buffer, bufferpos_i, max_elems, cancel).ConfigureAwait(false);
 
                 }
 
@@ -703,7 +703,7 @@ namespace RobotRaconteurWeb
                     ulong bufferpos_i = bufferpos + max_elems * blocks;
                     ulong memorypos_i = memorypos + max_elems * blocks;
 
-                    await ReadImpl(memorypos_i, buffer, bufferpos_i, blockrem).ConfigureAwait(false);
+                    await ReadImpl(memorypos_i, buffer, bufferpos_i, blockrem, cancel).ConfigureAwait(false);
                 }
             }
         }
@@ -739,14 +739,14 @@ namespace RobotRaconteurWeb
                 {
                     ulong bufferpos_i = bufferpos + max_elems * i;
                     ulong memorypos_i = memorypos + max_elems * i;
-                    await WriteImpl(memorypos_i, buffer, bufferpos_i, max_elems).ConfigureAwait(false);
+                    await WriteImpl(memorypos_i, buffer, bufferpos_i, max_elems, cancel).ConfigureAwait(false);
                 }
 
                 if (blockrem > 0)
                 {
                     ulong bufferpos_i = bufferpos + max_elems * blocks;
                     ulong memorypos_i = memorypos + max_elems * blocks;
-                    await WriteImpl(memorypos_i, buffer, bufferpos_i, blockrem).ConfigureAwait(false);
+                    await WriteImpl(memorypos_i, buffer, bufferpos_i, blockrem, cancel).ConfigureAwait(false);
                 }
             }
         }
@@ -819,7 +819,7 @@ namespace RobotRaconteurWeb
 
         private Task<uint> GetMaxTransferSize(CancellationToken cancel)
         {
-            return impl.GetMaxTransferSize();
+            return impl.GetMaxTransferSize(cancel);
         }
 
         public override Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
@@ -962,7 +962,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count).ConfigureAwait(false);
+                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count, cancel).ConfigureAwait(false);
                     }
 
                     if (split_remainder != 0)
@@ -977,7 +977,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge).ConfigureAwait(false);
+                        await ReadImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge, cancel).ConfigureAwait(false);
                     }
 
                     if (split_dim == count.Length - 1)
@@ -1019,7 +1019,7 @@ namespace RobotRaconteurWeb
                 throw new ReadOnlyMemberException("Read only member");
             }
 
-            uint max_transfer_size = await GetMaxTransferSize().ConfigureAwait(false);
+            uint max_transfer_size = await GetMaxTransferSize(cancel).ConfigureAwait(false);
 
             ulong elemcount = count.Aggregate((ulong)1, (x, y) => x * y);
 
@@ -1068,7 +1068,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count).ConfigureAwait(false);
+                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count, cancel).ConfigureAwait(false);
                     }
 
                     if (split_remainder != 0)
@@ -1083,7 +1083,7 @@ namespace RobotRaconteurWeb
                             current_mem_pos[j] = current_pos[j] + memorypos[j];
                         }
 
-                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge).ConfigureAwait(false);
+                        await WriteImpl(current_mem_pos, buffer, current_buf_pos, block_count_edge, cancel).ConfigureAwait(false);
                     }
 
                     if (split_dim == (count.Length - 1))
@@ -1359,7 +1359,7 @@ namespace RobotRaconteurWeb
 
         private Task<uint> GetMaxTransferSize(CancellationToken cancel)
         {
-            return impl.GetMaxTransferSize();
+            return impl.GetMaxTransferSize(cancel);
         }
 
         public override Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
@@ -1791,7 +1791,7 @@ namespace RobotRaconteurWeb
 
         private Task<uint> GetMaxTransferSize(CancellationToken cancel)
         {
-            return impl.GetMaxTransferSize();
+            return impl.GetMaxTransferSize(cancel);
         }
 
         public override Task Read(ulong memorypos, T[] buffer, ulong bufferpos, ulong count, CancellationToken cancel = default(CancellationToken))
