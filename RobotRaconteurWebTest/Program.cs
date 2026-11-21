@@ -282,6 +282,8 @@ namespace RobotRaconteurTest
 
                         await AsyncStreamStalledWriteTest.TestStalledWriteReceiveTimeout();
 
+                        await ServiceTests.TestPipeDisconnectReplyType();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

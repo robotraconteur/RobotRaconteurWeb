@@ -1125,7 +1125,7 @@ namespace RobotRaconteurWeb
 
                             ep.Remove(index);
 
-                            return Task.FromResult(new MessageEntry(MessageEntryType.PipeDisconnectReq, MemberName));
+                            return Task.FromResult(new MessageEntry(MessageEntryType.PipeDisconnectRet, MemberName));
                         }
                     default:
                         throw new Exception("Invalid Command");

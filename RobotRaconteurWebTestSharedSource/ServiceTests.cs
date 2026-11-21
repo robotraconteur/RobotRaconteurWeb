@@ -129,6 +129,23 @@ namespace RobotRaconteurWebTest
                     throw new ArgumentException("Invalid test command");
             }
         }
+
+        static public async Task TestPipeDisconnectReplyType()
+        {
+            // PipeDisconnectReq must be answered with PipeDisconnectRet
+            using (var nodes = new TestNodeConfig("testprog", true, false, false))
+            {
+                var urls = nodes.GetServiceUrl("RobotRaconteurTestService");
+                var c = (com.robotraconteur.testing.TestService1.testroot)await nodes.client_node.ConnectService(urls[0]);
+                var e1 = await c.p1.Connect(-1);
+
+                var m = new MessageEntry(MessageEntryType.PipeDisconnectReq, "p1");
+                m.AddElement("index", e1.Index);
+                var ret = await ((ServiceStub)c).ProcessRequest(m, System.Threading.CancellationToken.None);
+                RRAssert.AreEqual(ret.EntryType, MessageEntryType.PipeDisconnectRet);
+            }
+            Console.WriteLine("ServiceTests.TestPipeDisconnectReplyType passed");
+        }
     }
 
     public class TestServer : IDisposable
