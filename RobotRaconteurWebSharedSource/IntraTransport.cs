@@ -618,6 +618,7 @@ namespace RobotRaconteurWeb
                 recv_queue.Add(m);
                 if (!recv_queue_post_requested)
                 {
+                    recv_queue_post_requested = true;
                     _ = Task.Run(() => { ProcessNextMessage(); });
                 }
             }
@@ -636,17 +637,20 @@ namespace RobotRaconteurWeb
                 }
                 m = recv_queue.First();
                 recv_queue.RemoveAt(0);
-                if (recv_queue.Count == 0)
-                {
-                    recv_queue_post_requested = false;
-                }
-                else
-                {
-                    _ = Task.Run(() => { ProcessNextMessage(); });
-                }
             }
 
             _ = ProcessMessage(m);
+
+            lock (recv_queue)
+            {
+                if (recv_queue.Count == 0)
+                {
+                    recv_queue_post_requested = false;
+                    return;
+                }
+            }
+
+            _ = Task.Run(() => { ProcessNextMessage(); });
         }
 
         internal async Task ProcessMessage(Message mes)
