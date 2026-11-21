@@ -340,7 +340,12 @@ namespace RobotRaconteurWeb
             string passwordhash = MD5Hash(password);
 
             if (validusers[username].passwordhash != passwordhash)
-                throw new AuthenticationException("Invalid username or password");
+            {
+                // Legacy: password files written for older versions of Web hashed the ASCII bytes of the
+                // password, with every non-ASCII character replaced by '?'
+                if (validusers[username].passwordhash != MD5Hash(ASCIIEncoding.ASCII.GetBytes(password)))
+                    throw new AuthenticationException("Invalid username or password");
+            }
 
             return new AuthenticatedUser(username, validusers[username].privileges);
 
@@ -349,10 +354,16 @@ namespace RobotRaconteurWeb
 
         public static string MD5Hash(string text)
         {
+            // UTF-8, as Core and the other implementations hash the password bytes
+            return MD5Hash(Encoding.UTF8.GetBytes(text));
+        }
+
+        static string MD5Hash(byte[] text)
+        {
             System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
 
             //compute hash from the bytes of text
-            md5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(text));
+            md5.ComputeHash(text);
 
             //get hash result after compute it
             byte[] result = md5.Hash;

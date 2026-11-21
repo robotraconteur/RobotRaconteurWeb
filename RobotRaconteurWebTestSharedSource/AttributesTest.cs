@@ -27,5 +27,26 @@ namespace RobotRaconteurWebTest
                 RRAssert.Equals((int[])attr["test2"], new int[] { 42 });
             }
         }
+
+#if !ROBOTRACONTEUR_H5
+        public static void TestPasswordHashUtf8()
+        {
+            // Passwords are hashed from their UTF-8 bytes, as in Core
+            RRAssert.AreEqual(PasswordFileUserAuthenticator.MD5Hash("password"), "5f4dcc3b5aa765d61d8327deb882cf99");
+            RRAssert.AreEqual(PasswordFileUserAuthenticator.MD5Hash("pässword"), "8e1843033a0f6ee52e2f618aa8ebbef4");
+
+            var auth = new PasswordFileUserAuthenticator("user1 8e1843033a0f6ee52e2f618aa8ebbef4 objectlock\n");
+            auth.AuthenticateUser("user1", new Dictionary<string, object> { { "password", "pässword" } });
+            RRAssert.ThrowsException<AuthenticationException>(() =>
+                auth.AuthenticateUser("user1", new Dictionary<string, object> { { "password", "p?ssword" } }));
+            RRAssert.ThrowsException<AuthenticationException>(() =>
+                auth.AuthenticateUser("user1", new Dictionary<string, object> { { "password", "pössword" } }));
+
+            // Legacy files hashed from ASCII bytes (non-ASCII replaced by '?') are still accepted
+            var auth2 = new PasswordFileUserAuthenticator("user1 c0060859e24d230671220d23e4b22cb7 objectlock\n");
+            auth2.AuthenticateUser("user1", new Dictionary<string, object> { { "password", "pässword" } });
+            Console.WriteLine("AttributesTest.TestPasswordHashUtf8 passed");
+        }
+#endif
     }
 }

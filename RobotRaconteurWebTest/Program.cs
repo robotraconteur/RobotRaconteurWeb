@@ -284,6 +284,8 @@ namespace RobotRaconteurTest
 
                         await ServiceTests.TestPipeDisconnectReplyType();
 
+                        AttributesTest.TestPasswordHashUtf8();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
