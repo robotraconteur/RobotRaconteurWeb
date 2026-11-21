@@ -280,5 +280,19 @@ namespace RobotRaconteurTest
             RRAssert.ThrowsException<ServiceDefinitionParseException>(() => def2.FromString("service test.stdver2\nstdver 0.10\nstdver 0.9\n\nobject obj\n    property double d1\nend\n"));
             RRWebTest.WriteLine("RobDefTest.TestServiceDefinitionDuplicateStdver passed");
         }
+
+        public static void TestNumberParseException()
+        {
+            // Numbers that do not fit their type must raise ServiceDefinitionParseException
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => new RobotRaconteurVersion("99999999999.0"));
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => new TypeDefinition().FromString("double[99999999999] x"));
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => new TypeDefinition().FromString("double[2147483648] x"));
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => new TypeDefinition().FromString("double[3,,4] x"));
+            var t = new TypeDefinition();
+            t.FromString("double[3,4] x");
+            RRAssert.AreEqual(t.ArrayLength.Count, 2);
+            RRAssert.AreEqual(t.ArrayLength[1], 4);
+            RRWebTest.WriteLine("RobDefTest.TestNumberParseException passed");
+        }
     }
 }

@@ -162,6 +162,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestServiceDefinitionDuplicateStdver();
 
+                        RobDefTest.TestNumberParseException();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

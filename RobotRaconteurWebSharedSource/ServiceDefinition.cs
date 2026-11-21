@@ -81,10 +81,20 @@ namespace RobotRaconteurWeb
                 throw new ServiceDefinitionParseException("Format error for version definition \"" + v + "\"", ParseInfo);
             }
 
-            major = UInt32.Parse(m.Groups[1].Value);
-            minor = UInt32.Parse(m.Groups[2].Value);
-            patch = m.Groups[3].Success ? UInt32.Parse(m.Groups[3].Value) : 0;
-            tweak = m.Groups[4].Success ? UInt32.Parse(m.Groups[4].Value) : 0;
+            major = ParseVersionPart(m.Groups[1].Value, v);
+            minor = ParseVersionPart(m.Groups[2].Value, v);
+            patch = m.Groups[3].Success ? ParseVersionPart(m.Groups[3].Value, v) : 0;
+            tweak = m.Groups[4].Success ? ParseVersionPart(m.Groups[4].Value, v) : 0;
+        }
+
+        uint ParseVersionPart(string s, string v)
+        {
+            uint r;
+            if (!UInt32.TryParse(s, NumberStyles.None, CultureInfo.InvariantCulture, out r))
+            {
+                throw new ServiceDefinitionParseException("Format error for version definition \"" + v + "\"", ParseInfo);
+            }
+            return r;
         }
 
         public static bool operator ==(RobotRaconteurVersion v1, RobotRaconteurVersion v2)
@@ -2077,6 +2087,16 @@ namespace RobotRaconteurWeb
             return o.ToString().Trim();
         }
 
+        int ParseArrayLength(string v, string s)
+        {
+            int r;
+            if (!Int32.TryParse(v, NumberStyles.None, CultureInfo.InvariantCulture, out r))
+            {
+                throw new ServiceDefinitionParseException("Could not parse type \"" + s.Trim() + "\": invalid array length", ParseInfo);
+            }
+            return r;
+        }
+
         public void FromString(string s, ServiceDefinitionParseInfo? parse_info = null)
         {
             Reset();
@@ -2144,7 +2164,7 @@ namespace RobotRaconteurWeb
                     //Fixed array
                     ArrayType = DataTypes_ArrayTypes.array;
                     ArrayLength.Clear();
-                    ArrayLength.Add((int)UInt32.Parse(array_var_result.Value));
+                    ArrayLength.Add(ParseArrayLength(array_var_result.Value, s));
                     ArrayVarLength = false;
                 }
                 else if (array_max_var_result.Success)
@@ -2152,7 +2172,7 @@ namespace RobotRaconteurWeb
                     //variable array max sized
                     ArrayType = DataTypes_ArrayTypes.array;
                     ArrayLength.Clear();
-                    ArrayLength.Add((int)UInt32.Parse(array_max_var_result.Value));
+                    ArrayLength.Add(ParseArrayLength(array_max_var_result.Value, s));
                     ArrayVarLength = true;
                 }
                 else if (array_multi_result.Success)
@@ -2167,7 +2187,7 @@ namespace RobotRaconteurWeb
                     ArrayType = DataTypes_ArrayTypes.multidimarray;
                     ArrayVarLength = false;
                     ArrayLength.Clear();
-                    ArrayLength.Add((int)UInt32.Parse(array_multi_single_fixed_result.Value));
+                    ArrayLength.Add(ParseArrayLength(array_multi_single_fixed_result.Value, s));
                 }
                 else if (array_multi_fixed_result.Success)
                 {
@@ -2179,7 +2199,7 @@ namespace RobotRaconteurWeb
                     foreach (var d in dims)
 
                     {
-                        ArrayLength.Add((int)UInt32.Parse(d));
+                        ArrayLength.Add(ParseArrayLength(d, s));
                     }
                 }
                 else
