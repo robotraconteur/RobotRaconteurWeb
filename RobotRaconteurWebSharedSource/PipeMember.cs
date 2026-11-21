@@ -846,7 +846,9 @@ namespace RobotRaconteurWeb
                                 }
                                 else if (connecting.Count > 0)
                                 {
-                                    if (connecting.Any(x => x.Item1 == -1 || x.Item1 == index))
+                                    // At most one early endpoint per pending connect
+                                    if (connecting.Any(x => x.Item1 == index)
+                                        || (connecting.Any(x => x.Item1 == -1) && early_endpoints.Count < connecting.Count))
                                     {
                                         p = new PipeEndpoint(this, index);
                                         early_endpoints.Add(index, p);
