@@ -2731,8 +2731,8 @@ of pipes and wires can be managed automatically.
     public class WireSubscription<T> : WireSubscriptionBase
     {
 #pragma warning disable 1591
-        public WireSubscription(ServiceSubscription parent, string membernname, string servicepath)
-            : base(parent, membernname, servicepath)
+        public WireSubscription(ServiceSubscription parent, string membername, string servicepath)
+            : base(parent, membername, servicepath)
         {
         }
 #pragma warning restore 1591
