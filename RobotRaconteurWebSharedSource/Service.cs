@@ -1029,37 +1029,7 @@ namespace RobotRaconteurWeb
             node.DeleteEndpoint(cendpoint);
 
 
-            lock (ClientLockOp_lockobj)
-            {
-                KeyValuePair<string, ObjectLock>[] oo = active_object_locks.ToArray();
-                foreach (KeyValuePair<string, ObjectLock> o in oo)
-                {
-                    try
-                    {
-                        if (o.Value.Username == cusername)
-                        {
-                            if (o.Value.Endpoint == ce)
-                            {
-                                o.Value.ReleaseLock();
-                                active_object_locks.Remove(o.Key);
-                            }
-                            else
-                            {
-                                lock (client_endpoints)
-                                {
-                                    if (!client_endpoints.Any(x => x.Value.AuthenticatedUsername == cusername))
-                                    {
-                                        o.Value.ReleaseLock();
-                                        active_object_locks.Remove(o.Key);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-
-                }
-            }
+            ReleaseEndpointLocks(cendpoint, cusername);
 
 
 
@@ -1069,6 +1039,41 @@ namespace RobotRaconteurWeb
                     ServerServiceListener(this, ServerServiceListenerEventType.ClientDisconnected, cendpoint.LocalEndpoint);
             }
             catch { }
+        }
+
+        // Release the session (client) locks held by endpoint e, and the user locks of username when no other
+        // session of that user remains. Called when the client disconnects, logs out or logs in as another user.
+        internal void ReleaseEndpointLocks(ServerEndpoint e, string username)
+        {
+            uint ce = e.LocalEndpoint;
+            lock (ClientLockOp_lockobj)
+            {
+                KeyValuePair<string, ObjectLock>[] oo = active_object_locks.ToArray();
+                foreach (KeyValuePair<string, ObjectLock> o in oo)
+                {
+                    try
+                    {
+                        if (o.Value.Endpoint != 0 && o.Value.Endpoint == ce)
+                        {
+                            o.Value.ReleaseLock();
+                            active_object_locks.Remove(o.Key);
+                        }
+                        else if (username != null && o.Value.Username == username)
+                        {
+                            lock (client_endpoints)
+                            {
+                                if (!client_endpoints.Any(x => !Object.ReferenceEquals(x.Value, e) && x.Value.AuthenticatedUsername == username))
+                                {
+                                    o.Value.ReleaseLock();
+                                    active_object_locks.Remove(o.Key);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+
+                }
+            }
         }
 
         public virtual MessageElementNestedElementList PackStructure(Object s)
@@ -2274,14 +2279,24 @@ namespace RobotRaconteurWeb
         public void AuthenticateUser(string username, Dictionary<string, object> credentials)
         {
             AuthenticatedUser u = service.AuthenticateUser(username, credentials);
+            string old_username = AuthenticatedUsername;
             endpoint_authenticated_user = u;
             m_CurrentAuthenticatedUser = u;
+            if (old_username != null && old_username != u?.Username)
+            {
+                service.ReleaseEndpointLocks(this, old_username);
+            }
         }
 
         public void LogoutUser()
         {
+            string old_username = AuthenticatedUsername;
             endpoint_authenticated_user = null;
             m_CurrentAuthenticatedUser = null;
+            if (old_username != null)
+            {
+                service.ReleaseEndpointLocks(this, old_username);
+            }
         }
 
 
