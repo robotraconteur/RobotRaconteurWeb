@@ -499,12 +499,23 @@ namespace RobotRaconteurWeb
 
                 int i = 0;
                 int trycount = 0;
+                // A connection that sends nothing must not be held open forever
+                DateTime first_data_deadline = DateTime.UtcNow.AddMilliseconds(DefaultReceiveTimeout);
                 while (true)
                 {
-                    i = await Task<int>.Factory.FromAsync(delegate (AsyncCallback cb, object state)
+                    var recv_task = Task<int>.Factory.FromAsync(delegate (AsyncCallback cb, object state)
                     {
                         return s.BeginReceive(b, 0, b.Length, SocketFlags.Peek, cb, state);
-                    }, s.EndReceive, s).ConfigureAwait(false);
+                    }, s.EndReceive, s);
+
+                    int remaining_ms = (int)Math.Max(0, (first_data_deadline - DateTime.UtcNow).TotalMilliseconds);
+                    if (await Task.WhenAny(recv_task, Task.Delay(remaining_ms)).ConfigureAwait(false) != recv_task)
+                    {
+                        recv_task.IgnoreResult();
+                        tcpc.Close();
+                        return;
+                    }
+                    i = await recv_task.ConfigureAwait(false);
 
                     if (i > 4) break;
 

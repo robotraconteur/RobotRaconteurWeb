@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await TcpSilentConnectionTests.RunTestSilentConnectionClosed();
                         DiscoveryAnnounceValidationTests.RunTestAnnounceValidation();
                         DiscoveryAnnounceValidationTests.RunTestAnnounceLoopbackSender();
                         await MemoryMaxTransferSizeTests.RunTestMaxTransferSizeTooSmall();
