@@ -1598,6 +1598,7 @@ namespace RobotRaconteurWeb
             var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
             await ssl.AuthenticateAsServerAsync(cert.Item1, mutualauth, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
             basestream = ssl;
+            m_IsTls = true;
 
             await ResumeSendPause().ConfigureAwait(false);
 
@@ -1682,6 +1683,7 @@ namespace RobotRaconteurWeb
             var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
             await ssl.AuthenticateAsClientAsync(host, certs, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
             basestream = ssl;
+            m_IsTls = true;
 
             await ResumeSendPause().ConfigureAwait(false);
         }
