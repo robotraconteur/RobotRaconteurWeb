@@ -60,5 +60,20 @@ namespace RobotRaconteurWebTest
             }
             Console.WriteLine("AttributesTest.TestCloseServiceUpdatesNonce passed");
         }
+
+        public static void TestSetAttributesUpdatesNonce()
+        {
+            // ServerContext.SetAttributes must replace the attributes and change the service state nonce
+            using (var nodes = new TestNodeConfig("testprog", true, false, false))
+            {
+                var nonce1 = nodes.node.ServiceStateNonce;
+                var ctx = nodes.node.GetService("RobotRaconteurTestService2");
+                var attr = new Dictionary<string, object> { { "test3", "value3" } };
+                ctx.SetAttributes(attr);
+                RRAssert.IsTrue(ctx.Attributes == attr);
+                RRAssert.IsTrue(nodes.node.ServiceStateNonce != nonce1);
+            }
+            Console.WriteLine("AttributesTest.TestSetAttributesUpdatesNonce passed");
+        }
     }
 }

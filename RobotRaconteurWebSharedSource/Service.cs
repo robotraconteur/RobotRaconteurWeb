@@ -410,6 +410,24 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
+        /**
+        <summary>
+        Set the service attributes and notify discovery clients
+        </summary>
+        <remarks>
+        Replaces the service attributes and updates the node's service state nonce so
+        clients refresh the service information. Assigning Attributes directly does
+        not notify clients.
+        </remarks>
+        <param name="attributes">The new service attributes</param>
+        */
+        [PublicApi]
+        public void SetAttributes(Dictionary<string, object> attributes)
+        {
+            Attributes = attributes;
+            node.UpdateServiceStateNonce();
+        }
+
         public ServiceFactory ServiceDef { get { return m_ServiceDef; } }
 
         public async Task<ServiceFactory> GetRootObjectServiceDef(RobotRaconteurVersion client_version)

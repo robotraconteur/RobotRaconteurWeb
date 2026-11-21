@@ -288,6 +288,8 @@ namespace RobotRaconteurTest
 
                         AttributesTest.TestCloseServiceUpdatesNonce();
 
+                        AttributesTest.TestSetAttributesUpdatesNonce();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
