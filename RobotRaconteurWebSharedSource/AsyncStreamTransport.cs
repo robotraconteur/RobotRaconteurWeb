@@ -435,17 +435,21 @@ namespace RobotRaconteurWeb
                         }
                     }
 
-                    if (local_ep != 0 && remote_ep != 0)
+                }
+
+                // Session isolation: once the connection has an endpoint pair, only messages for that pair are
+                // accepted, on every connection (this was only checked for TLS connections). Node-level messages
+                // (both endpoints 0, e.g. ConnectionTest) are not routed to an endpoint and are let through.
+                if (local_ep != 0 && remote_ep != 0 && (mes.header.ReceiverEndpoint != 0 || mes.header.SenderEndpoint != 0))
+                {
+                    if (local_ep != mes.header.ReceiverEndpoint || remote_ep != mes.header.SenderEndpoint)
                     {
-                        if (local_ep != mes.header.ReceiverEndpoint || remote_ep != mes.header.SenderEndpoint)
+                        var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.InvalidEndpoint, "RobotRaconteurNode.InvalidEndpoint", "Invalid sender endpoint");
+                        if (ret1.entries.Count > 0)
                         {
-                            var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.InvalidEndpoint, "RobotRaconteurNode.InvalidEndpoint", "Invalid sender endpoint");
-                            if (ret1.entries.Count > 0)
-                            {
-                                Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();
-                                return;
-                            }
+                            Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();
                         }
+                        return;
                     }
                 }
 
