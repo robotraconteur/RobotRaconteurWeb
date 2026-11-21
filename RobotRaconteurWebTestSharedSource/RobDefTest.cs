@@ -246,5 +246,15 @@ namespace RobotRaconteurTest
             o.ToString();
             RRWebTest.WriteLine("RobDefTest.TestObjRefArrayContainer passed");
         }
+
+        public static void TestServiceDefinitionFirstLine()
+        {
+            // ParseInfo.Line of a parsed service definition must hold its first line
+            var def = new ServiceDefinition();
+            def.FromString("service test.firstline\n\nobject obj\n    property double d1\nend\n");
+            RRAssert.IsTrue(def.ParseInfo.Line != null);
+            RRAssert.AreEqual(def.ParseInfo.Line.Trim(), "service test.firstline");
+            RRWebTest.WriteLine("RobDefTest.TestServiceDefinitionFirstLine passed");
+        }
     }
 }

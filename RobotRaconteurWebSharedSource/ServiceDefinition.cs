@@ -504,7 +504,7 @@ namespace RobotRaconteurWeb
             bool stdver_found = false;
             uint entry_key_max = 0;
 
-            bool first_line = false;
+            bool first_line = true;
 
             try
             {
@@ -517,7 +517,7 @@ namespace RobotRaconteurWeb
 
                     if (first_line)
                     {
-                        first_line = true;
+                        first_line = false;
                         ParseInfo.Line = l;
                     }
 
