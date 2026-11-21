@@ -686,6 +686,7 @@ namespace RobotRaconteurWeb
             }
             else
             {
+                if (max_elems == 0) throw new InvalidOperationException("Memory MaxTransferSize is smaller than the element size");
                 ulong blocks = count / max_elems;
                 ulong blockrem = count % max_elems;
 
@@ -732,6 +733,7 @@ namespace RobotRaconteurWeb
                 if (GetBufferLength(buffer) - bufferpos < count)
                     throw new ArgumentOutOfRangeException("");
 
+                if (max_elems == 0) throw new InvalidOperationException("Memory MaxTransferSize is smaller than the element size");
                 ulong blocks = count / max_elems;
                 ulong blockrem = count % max_elems;
 
@@ -942,6 +944,7 @@ namespace RobotRaconteurWeb
                 ulong[] block_count;
                 ulong[] block_count_edge;
 
+                if (max_elems == 0) throw new InvalidOperationException("Memory MaxTransferSize is smaller than the element size");
                 CalculateMatrixBlocks(element_size, count, max_elems, out split_dim, out split_dim_block, out split_elem_count, out splits_count, out split_remainder, out block_count, out block_count_edge);
 
                 bool done = false;
@@ -1048,6 +1051,7 @@ namespace RobotRaconteurWeb
                 ulong[] block_count;
                 ulong[] block_count_edge;
 
+                if (max_elems == 0) throw new InvalidOperationException("Memory MaxTransferSize is smaller than the element size");
                 CalculateMatrixBlocks(element_size, count, max_elems, out split_dim, out split_dim_block, out split_elem_count, out splits_count, out split_remainder, out block_count, out block_count_edge);
 
                 bool done = false;

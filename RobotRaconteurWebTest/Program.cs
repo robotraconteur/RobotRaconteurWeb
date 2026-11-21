@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await MemoryMaxTransferSizeTests.RunTestMaxTransferSizeTooSmall();
                         await ServiceLockSessionTests.RunTestReleaseClientLockOtherSession();
                         await ServiceLockAsyncTests.RunTestLockAfterAsyncGetter();
                         await MemoryReplyTest.TestMemoryWriteReplyType();
