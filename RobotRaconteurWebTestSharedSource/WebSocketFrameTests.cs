@@ -130,6 +130,26 @@ namespace RobotRaconteurWebTest
             });
             Console.WriteLine("WebSocketFrameTests.TestWebSocketZeroLengthFrames passed");
         }
+
+        // Regression test: a frame header that arrives in several TCP segments must be assembled correctly
+        public static async Task TestWebSocketSplitFrameHeader()
+        {
+            await WithWebSocketServer(async stream =>
+            {
+                // Send a masked ping one byte at a time so the 2-byte header and the 4-byte mask key arrive
+                // in separate reads
+                var payload = new byte[] { 0x61, 0x62, 0x63 };
+                var f = MaskedFrame(0x9, payload);
+                for (int i = 0; i < f.Length; i++)
+                {
+                    await stream.WriteAsync(f, i, 1);
+                    await stream.FlushAsync();
+                    await Task.Delay(50);
+                }
+                await ExpectPong(stream, payload);
+            });
+            Console.WriteLine("WebSocketFrameTests.TestWebSocketSplitFrameHeader passed");
+        }
     }
 }
 #endif

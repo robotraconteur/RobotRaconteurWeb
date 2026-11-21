@@ -3065,7 +3065,7 @@ namespace RobotRaconteurWeb
                     int h1_r = 0;
                     do
                     {
-                        var h1_r1 = await stream.ReadAsync(h1, 0, h1.Length, cancellationToken).ConfigureAwait(false);
+                        var h1_r1 = await stream.ReadAsync(h1, h1_r, h1.Length - h1_r, cancellationToken).ConfigureAwait(false);
                         if (h1_r1 == 0) throw new IOException("Connection closed");
                         h1_r += h1_r1;
                     }
@@ -3090,7 +3090,7 @@ namespace RobotRaconteurWeb
                         int h2_r = 0;
                         do
                         {
-                            var h2_r1 = await stream.ReadAsync(h2, 0, h2.Length, cancellationToken).ConfigureAwait(false);
+                            var h2_r1 = await stream.ReadAsync(h2, h2_r, h2.Length - h2_r, cancellationToken).ConfigureAwait(false);
                             if (h2_r1 == 0) throw new IOException("Connection closed");
                             h2_r += h2_r1;
                         }
@@ -3103,7 +3103,7 @@ namespace RobotRaconteurWeb
                         int h2_r = 0;
                         do
                         {
-                            var h2_r1 = await stream.ReadAsync(h2, 0, h2.Length, cancellationToken).ConfigureAwait(false);
+                            var h2_r1 = await stream.ReadAsync(h2, h2_r, h2.Length - h2_r, cancellationToken).ConfigureAwait(false);
                             if (h2_r1 == 0) throw new IOException("Connection closed");
                             h2_r += h2_r1;
                         }
@@ -3118,7 +3118,7 @@ namespace RobotRaconteurWeb
                         int h3_r = 0;
                         do
                         {
-                            var h3_r1 = await stream.ReadAsync(h3, 0, h3.Length, cancellationToken).ConfigureAwait(false);
+                            var h3_r1 = await stream.ReadAsync(h3, h3_r, h3.Length - h3_r, cancellationToken).ConfigureAwait(false);
                             if (h3_r1 == 0) throw new IOException("Connection closed");
                             h3_r += h3_r1;
                         }
@@ -3186,7 +3186,7 @@ namespace RobotRaconteurWeb
                                 int h4_r = 0;
                                 while (h4_r < h4.Length)
                                 {
-                                    var h4_r1 = await stream.ReadAsync(h4, 0, h4.Length, cancellationToken).ConfigureAwait(false);
+                                    var h4_r1 = await stream.ReadAsync(h4, h4_r, h4.Length - h4_r, cancellationToken).ConfigureAwait(false);
                                     if (h4_r1 == 0) throw new IOException("Connection closed");
                                     h4_r += h4_r1;
                                 }

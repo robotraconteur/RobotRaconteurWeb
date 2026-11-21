@@ -150,6 +150,8 @@ namespace RobotRaconteurTest
 
                         await WebSocketFrameTests.TestWebSocketZeroLengthFrames();
 
+                        await WebSocketFrameTests.TestWebSocketSplitFrameHeader();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
