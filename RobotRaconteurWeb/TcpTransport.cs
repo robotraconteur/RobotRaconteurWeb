@@ -2474,13 +2474,27 @@ namespace RobotRaconteurWeb
                 }
                 IPAddress addr;
                 if (!IPAddress.TryParse(u_host, out addr)) return false;
-                if (IPAddress.IsLoopback(addr)) return true;
 
                 var sender_ip = sender as IPEndPoint;
                 if (sender_ip == null) return false;
-                IPAddress sender_addr = sender_ip.Address;
+                return NodeAnnounceAddressValid(addr, sender_ip.Address);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        // A loopback URL is only accepted from a loopback sender, otherwise a LAN host could make
+        // subscribers connect to their own loopback ports
+        static bool NodeAnnounceAddressValid(IPAddress addr, IPAddress sender_addr)
+        {
+            try
+            {
                 if (sender_addr.IsIPv4MappedToIPv6) sender_addr = sender_addr.MapToIPv4();
                 if (addr.IsIPv4MappedToIPv6) addr = addr.MapToIPv4();
+
+                if (IPAddress.IsLoopback(addr)) return IPAddress.IsLoopback(sender_addr);
 
                 if (addr.AddressFamily != sender_addr.AddressFamily) return false;
 

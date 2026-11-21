@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
@@ -49,6 +51,23 @@ namespace RobotRaconteurWebTest
             {
                 node.Shutdown();
             }
+        }
+
+        public static void RunTestAnnounceLoopbackSender()
+        {
+            // A loopback URL must only be accepted from a loopback sender
+            var t = typeof(TcpTransport).Assembly.GetType("RobotRaconteurWeb.IPNodeDiscovery");
+            var m = t.GetMethod("NodeAnnounceAddressValid", BindingFlags.NonPublic | BindingFlags.Static);
+            RRAssert.IsTrue(m != null);
+            Func<string, string, bool> valid = (a, s) => (bool)m.Invoke(null, new object[] { IPAddress.Parse(a), IPAddress.Parse(s) });
+
+            RRAssert.IsFalse(valid("127.0.0.1", "192.168.1.5"));
+            RRAssert.IsFalse(valid("::1", "fe80::1"));
+            RRAssert.IsFalse(valid("::ffff:127.0.0.1", "192.168.1.5"));
+            RRAssert.IsTrue(valid("127.0.0.1", "127.0.0.1"));
+            RRAssert.IsTrue(valid("::1", "::1"));
+            RRAssert.IsTrue(valid("192.168.1.7", "192.168.1.5"));
+            RRAssert.IsFalse(valid("10.0.0.1", "192.168.1.5"));
         }
     }
 }
