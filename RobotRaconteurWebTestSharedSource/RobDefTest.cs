@@ -180,5 +180,18 @@ namespace RobotRaconteurTest
             c.FromString("constant int32 c1 -2147483648");
             RRWebTest.WriteLine("RobDefTest.TestConstantSignedRange passed");
         }
+
+        public static void TestConstantSignedZero()
+        {
+            // Signed constants written as zero must parse (TrimStart('0') produced an empty string)
+            var c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant int32 c1 0");
+            c.FromString("constant int8 c1 00");
+            c.FromString("constant int16 c1 0x0");
+            c.FromString("constant int32 c1 -0x0");
+            c.FromString("constant int32 c1 0x10");
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => c.FromString("constant int8 c1 0xZ"));
+            RRWebTest.WriteLine("RobDefTest.TestConstantSignedZero passed");
+        }
     }
 }

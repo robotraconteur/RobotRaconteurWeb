@@ -2727,7 +2727,7 @@ namespace RobotRaconteurWeb
                 long val2;
                 if (val.StartsWith("-0x"))
                 {
-                    val2 = -Convert.ToInt64(val.Substring(3).TrimStart('0'), b);
+                    val2 = -Convert.ToInt64(val.Substring(3), b);
                 }
                 else
                 {
@@ -2739,7 +2739,7 @@ namespace RobotRaconteurWeb
                     {
                         val = val.Substring(2);
                     }
-                    val2 = Convert.ToInt64(val.TrimStart('0'), b);
+                    val2 = Convert.ToInt64(val, b);
                 }
 
                 if (val2 < min_value || val2 > max_value)
