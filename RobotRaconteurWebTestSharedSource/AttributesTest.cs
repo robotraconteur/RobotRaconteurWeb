@@ -48,5 +48,17 @@ namespace RobotRaconteurWebTest
             Console.WriteLine("AttributesTest.TestPasswordHashUtf8 passed");
         }
 #endif
+
+        public static void TestCloseServiceUpdatesNonce()
+        {
+            // Closing a service must change the service state nonce so discovery clients see the removal
+            using (var nodes = new TestNodeConfig("testprog", true, false, false))
+            {
+                var nonce1 = nodes.node.ServiceStateNonce;
+                nodes.node.CloseService("RobotRaconteurTestService2");
+                RRAssert.IsTrue(nodes.node.ServiceStateNonce != nonce1);
+            }
+            Console.WriteLine("AttributesTest.TestCloseServiceUpdatesNonce passed");
+        }
     }
 }

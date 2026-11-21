@@ -1387,6 +1387,7 @@ namespace RobotRaconteurWeb
 
                 services.Remove(sname);
             }
+            UpdateServiceStateNonce();
             LogInfo(string.Format("Service {0} removed", sname), this, RobotRaconteur_LogComponent.Node);
 
 

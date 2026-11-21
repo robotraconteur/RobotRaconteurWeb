@@ -286,6 +286,8 @@ namespace RobotRaconteurTest
 
                         AttributesTest.TestPasswordHashUtf8();
 
+                        AttributesTest.TestCloseServiceUpdatesNonce();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
