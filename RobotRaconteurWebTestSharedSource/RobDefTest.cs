@@ -269,5 +269,16 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(u.UnqualifiedName, "d");
             RRWebTest.WriteLine("RobDefTest.TestUsingAsWhitespace passed");
         }
+
+        public static void TestServiceDefinitionDuplicateStdver()
+        {
+            // A second stdver line must be rejected
+            var def = new ServiceDefinition();
+            def.FromString("service test.stdver1\nstdver 0.10\n\nobject obj\n    property double d1\nend\n");
+            RRAssert.IsTrue(def.StdVer == new RobotRaconteurVersion(0, 10));
+            var def2 = new ServiceDefinition();
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => def2.FromString("service test.stdver2\nstdver 0.10\nstdver 0.9\n\nobject obj\n    property double d1\nend\n"));
+            RRWebTest.WriteLine("RobDefTest.TestServiceDefinitionDuplicateStdver passed");
+        }
     }
 }

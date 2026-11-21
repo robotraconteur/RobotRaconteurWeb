@@ -564,7 +564,9 @@ namespace RobotRaconteurWeb
                         case 2:
                             {
                                 if (entry_key_max >= 2)
-                                    throw new ServiceDefinitionParseException("service name must be first after service name");
+                                    throw new ServiceDefinitionParseException("stdver must be first after service name", working_info);
+                                if (stdver_found)
+                                    throw new ServiceDefinitionParseException("stdver already specified", working_info);
                                 stdver_version.FromString(r_entry_match_remaining.Value, working_info);
                                 stdver_found = true;
                                 if (stdver_version < new RobotRaconteurVersion(0, 9))
