@@ -387,9 +387,18 @@ namespace RobotRaconteurWeb
             {
                 if (m.entries[0].EntryType == MessageEntryType.ConnectClientRet || m.entries[0].EntryType == MessageEntryType.ConnectClientCombinedRet)
                 {
-                    m_RemoteEndpoint = m.header.SenderEndpoint;
-                    m_RemoteNodeID = m.header.SenderNodeID;
-                    m_RemoteNodeName = m.header.SenderNodeName;
+                    // Accept the remote identity only once, while connecting, and only from the node the URL names
+                    if (m_RemoteEndpoint == 0 && m.entries[0].Error == MessageErrorType.None)
+                    {
+                        bool id_ok = m_RemoteNodeID == null || m_RemoteNodeID.IsAnyNode || m_RemoteNodeID == m.header.SenderNodeID;
+                        bool name_ok = string.IsNullOrEmpty(m_RemoteNodeName) || m_RemoteNodeName == m.header.SenderNodeName;
+                        if (id_ok && name_ok)
+                        {
+                            m_RemoteEndpoint = m.header.SenderEndpoint;
+                            m_RemoteNodeID = m.header.SenderNodeID;
+                            m_RemoteNodeName = m.header.SenderNodeName;
+                        }
+                    }
                 }
 
                 if (m.entries[0].EntryType == MessageEntryType.EndpointCheckCapability)
@@ -680,6 +689,11 @@ namespace RobotRaconteurWeb
 
                     MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
 
+                    if (m_RemoteEndpoint == 0)
+                    {
+                        throw new ConnectionException("Connect reply did not come from the requested node");
+                    }
+
                     if (!ret.TryFindElement("servicedefs", out var m_servicedefs))
                     {
                         throw new ServiceException("servicedefs cannot be null on connect");
@@ -825,6 +839,11 @@ namespace RobotRaconteurWeb
                     e2.MemberName = "registerclient";
                     e2.EntryType = MessageEntryType.ConnectClient;
                     await ProcessRequest(e2, cancel).ConfigureAwait(false);
+
+                    if (m_RemoteEndpoint == 0)
+                    {
+                        throw new ConnectionException("Connect reply did not come from the requested node");
+                    }
 
                     if (username != null)
                         await AuthenticateUser(username, credentials, cancel).ConfigureAwait(false);
