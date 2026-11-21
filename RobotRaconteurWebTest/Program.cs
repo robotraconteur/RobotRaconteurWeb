@@ -290,6 +290,8 @@ namespace RobotRaconteurTest
 
                         AttributesTest.TestSetAttributesUpdatesNonce();
 
+                        await WebSocketFrameTests.TestWebSocketStrictServer();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

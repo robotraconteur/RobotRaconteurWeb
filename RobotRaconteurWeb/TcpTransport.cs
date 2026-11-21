@@ -650,6 +650,18 @@ namespace RobotRaconteurWeb
                         error = "426 Upgrade Required";
                     }
 
+                    if (error == null)
+                    {
+                        // RFC 6455 4.2.1: Upgrade must be "websocket" and Connection must include "Upgrade"
+                        bool upgrade_ok = string.Equals(request["Upgrade"].Trim(), "websocket", StringComparison.OrdinalIgnoreCase);
+                        bool connection_ok = request.ContainsKey("Connection") && request["Connection"].Split(new char[] { ',' })
+                            .Any(x => string.Equals(x.Trim(), "upgrade", StringComparison.OrdinalIgnoreCase));
+                        if (!upgrade_ok || !connection_ok)
+                        {
+                            error = "426 Upgrade Required";
+                        }
+                    }
+
                     if (error == null && request.ContainsKey("Sec-WebSocket-Protocol"))
                     {
                         var p = request["Sec-WebSocket-Protocol"].Split(new char[] { ',' }).Select(x => x.Trim());
@@ -3106,6 +3118,14 @@ namespace RobotRaconteurWeb
                     byte opcode_recv1 = (byte)((h1[0] & 0xF));
 
                     bool recv_en_mask1 = (h1[1] & 0x80) != 0;
+
+                    // This stream is only used on the server side. RFC 6455 5.1 and 5.2: client frames must be
+                    // masked, and the RSV bits must be zero since no extension is negotiated
+                    if ((h1[0] & 0x70) != 0 || !recv_en_mask1)
+                    {
+                        stream.Close();
+                        throw new IOException("Invalid WebSocket frame");
+                    }
                     byte[] recv_mask1 = new byte[4];
                     byte payload_len1 = (byte)((h1[1] & 0x7F));
 

@@ -150,6 +150,92 @@ namespace RobotRaconteurWebTest
             });
             Console.WriteLine("WebSocketFrameTests.TestWebSocketSplitFrameHeader passed");
         }
+
+        static async Task<bool> WaitForClose(NetworkStream stream, int timeout_ms)
+        {
+            var buf = new byte[256];
+            var deadline = DateTime.UtcNow + TimeSpan.FromMilliseconds(timeout_ms);
+            while (true)
+            {
+                var remaining = (int)(deadline - DateTime.UtcNow).TotalMilliseconds;
+                if (remaining <= 0)
+                    return false;
+                var read_task = stream.ReadAsync(buf, 0, buf.Length);
+                if (await Task.WhenAny(read_task, Task.Delay(remaining)) != read_task)
+                    return false;
+                try
+                {
+                    if (await read_task == 0)
+                        return true;
+                }
+                catch (Exception)
+                {
+                    return true;
+                }
+            }
+        }
+
+        // Regression test: the server must reject unmasked client frames, frames with RSV bits set, and
+        // handshakes without "Connection: Upgrade"
+        public static async Task TestWebSocketStrictServer()
+        {
+            // Unmasked binary frame
+            await WithWebSocketServer(async stream =>
+            {
+                var f = new byte[] { 0x82, 0x02, 0x52, 0x52 };
+                await stream.WriteAsync(f, 0, f.Length);
+                RRAssert.IsTrue(await WaitForClose(stream, 5000));
+            });
+
+            // Masked ping with RSV1 set
+            await WithWebSocketServer(async stream =>
+            {
+                var f = MaskedFrame(0x9, new byte[] { 0x61 });
+                f[0] |= 0x40;
+                await stream.WriteAsync(f, 0, f.Length);
+                RRAssert.IsTrue(await WaitForClose(stream, 5000));
+            });
+
+            // Valid masked ping is still answered
+            await WithWebSocketServer(async stream =>
+            {
+                var f = MaskedFrame(0x9, new byte[] { 0x61 });
+                await stream.WriteAsync(f, 0, f.Length);
+                await ExpectPong(stream, new byte[] { 0x61 });
+            });
+
+            // Handshake without a Connection header
+            var node = new RobotRaconteurNode();
+            node.SetLogLevelFromString("ERROR");
+            var t = new TcpTransport(node);
+            node.RegisterTransport(t);
+            t.StartServer(test_port, true);
+            try
+            {
+                using (var c = new TcpClient())
+                {
+                    await c.ConnectAsync("127.0.0.1", test_port);
+                    var stream = c.GetStream();
+                    var req = "GET / HTTP/1.1\r\n"
+                        + "Host: 127.0.0.1\r\n"
+                        + "Upgrade: websocket\r\n"
+                        + "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+                        + "Sec-WebSocket-Version: 13\r\n"
+                        + "Sec-WebSocket-Protocol: robotraconteur.robotraconteur.com\r\n"
+                        + "\r\n";
+                    var b = Encoding.ASCII.GetBytes(req);
+                    await stream.WriteAsync(b, 0, b.Length);
+                    var resp = new byte[12];
+                    RRAssert.AreEqual(await ReadWithTimeout(stream, resp, resp.Length, 5000), resp.Length);
+                    RRAssert.IsFalse(Encoding.ASCII.GetString(resp).StartsWith("HTTP/1.1 101"));
+                }
+            }
+            finally
+            {
+                node.Shutdown();
+            }
+            Console.WriteLine("WebSocketFrameTests.TestWebSocketStrictServer passed");
+        }
     }
 }
 #endif
