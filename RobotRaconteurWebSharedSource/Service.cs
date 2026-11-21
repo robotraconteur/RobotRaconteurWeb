@@ -1208,6 +1208,7 @@ namespace RobotRaconteurWeb
             string username = null;
             if (!m.MemberName.StartsWith("Monitor"))
             {
+                if (!AllowObjectLock) throw new ObjectLockedException("Object locking not allowed by service security policy");
                 if (current_user == null) throw new AuthenticationException("User must be authenticated to lock object");
                 priv = current_user.Privileges;
                 if (!(priv.Contains("objectlock") || priv.Contains("objectlockoverride"))) throw new ObjectLockedException("User does not have object locking privileges");

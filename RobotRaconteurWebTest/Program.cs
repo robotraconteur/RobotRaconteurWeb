@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await AllowObjectLockPolicyTests.RunTestAllowObjectLockPolicy();
                         await PreAuthMessageLimitTests.RunTestPreAuthMessageLimit();
                         await SkelObjectTypeTest.TestSkelObjectTypeName();
 
