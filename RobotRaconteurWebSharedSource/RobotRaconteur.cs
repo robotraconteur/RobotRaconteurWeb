@@ -1626,7 +1626,7 @@ namespace RobotRaconteurWeb
 
                                 lock (services)
                                 {
-                                    GetService(name).RemoveClient(se);
+                                    se.service.RemoveClient(se);
                                 }
                                 DeleteEndpoint(se);
                                 //eret.AddElement("servicedef", servicedef);
