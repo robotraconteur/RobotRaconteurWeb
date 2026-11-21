@@ -3130,6 +3130,11 @@ namespace RobotRaconteurWeb
                         case (byte)WebSocketOpcode.continuation:
                         case (byte)WebSocketOpcode.binary:
                             {
+                                if (data_len1 == 0)
+                                {
+                                    // Empty data frame, nothing to return. Read the next frame.
+                                    continue;
+                                }
                                 if ((ulong)count > data_len1) count = (int)data_len1;
                                 var r = await stream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
                                 if (r == 0)
@@ -3179,13 +3184,12 @@ namespace RobotRaconteurWeb
                                 }
                                 var h4 = new byte[data_len1];
                                 int h4_r = 0;
-                                do
+                                while (h4_r < h4.Length)
                                 {
                                     var h4_r1 = await stream.ReadAsync(h4, 0, h4.Length, cancellationToken).ConfigureAwait(false);
                                     if (h4_r1 == 0) throw new IOException("Connection closed");
                                     h4_r += h4_r1;
                                 }
-                                while (h4_r < h4.Length);
 
                                 if (recv_en_mask1)
                                 {

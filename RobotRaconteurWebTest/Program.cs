@@ -148,6 +148,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestTypeDefinitionMultiDimSingleToString();
 
+                        await WebSocketFrameTests.TestWebSocketZeroLengthFrames();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
