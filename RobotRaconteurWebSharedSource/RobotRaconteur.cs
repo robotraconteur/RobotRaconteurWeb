@@ -948,6 +948,12 @@ namespace RobotRaconteurWeb
                 return new int[] { (int)(data) };
             }
 
+            if (t == typeof(CDouble) || t == typeof(CSingle) ||
+                (is_array && (t.GetElementType() == typeof(CDouble) || t.GetElementType() == typeof(CSingle))))
+            {
+                return data;
+            }
+
             if (t == typeof(MultiDimArray))
             {
                 return PackMultiDimArray((MultiDimArray)data);
@@ -1000,6 +1006,9 @@ namespace RobotRaconteurWeb
                 case DataTypes.uint32_t:
                 case DataTypes.int64_t:
                 case DataTypes.uint64_t:
+                case DataTypes.cdouble_t:
+                case DataTypes.csingle_t:
+                case DataTypes.bool_t:
                 case DataTypes.string_t:
                     return me.Data;
                 case DataTypes.multidimarray_t:

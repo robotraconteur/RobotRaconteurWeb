@@ -141,6 +141,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestConstantSignedZero();
 
+                        MessageSerializationTest.TestVarValueComplexBool();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

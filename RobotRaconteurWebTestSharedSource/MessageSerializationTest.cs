@@ -324,5 +324,38 @@ namespace RobotRaconteurTest
                 RRAssert.IsTrue(io_error);
             }
         }
+
+        // Pack data as a varvalue element and set its element type as when the message is sent
+        static MessageElement VarValueElement(RobotRaconteurNode node, object data)
+        {
+            var me = new MessageElement("value", node.PackVarType(data, null));
+            me.UpdateData();
+            return me;
+        }
+
+        public static void TestVarValueComplexBool()
+        {
+            // varvalue must round trip complex and bool arrays
+            var node = new RobotRaconteurNode();
+            var cd = new CDouble[] { new CDouble(1, 2), new CDouble(3, 4) };
+            var cs = new CSingle[] { new CSingle(5, 6) };
+            var b = new bool[] { true, false, true };
+
+            var cd2 = (CDouble[])node.UnpackVarType(VarValueElement(node, cd), null);
+            RRAssert.AreEqual(cd2.Length, 2);
+            RRAssert.AreEqual(cd2[0], cd[0]);
+            RRAssert.AreEqual(cd2[1], cd[1]);
+
+            var cs2 = (CSingle[])node.UnpackVarType(VarValueElement(node, cs), null);
+            RRAssert.AreEqual(cs2.Length, 1);
+            RRAssert.AreEqual(cs2[0], cs[0]);
+
+            var b2 = (bool[])node.UnpackVarType(VarValueElement(node, b), null);
+            RRAssert.AreEqual(b2.Length, 3);
+            RRAssert.IsTrue(b2[0] && !b2[1] && b2[2]);
+            node.Shutdown();
+
+            RRWebTest.WriteLine("MessageSerializationTest.TestVarValueComplexBool passed");
+        }
     }
 }
