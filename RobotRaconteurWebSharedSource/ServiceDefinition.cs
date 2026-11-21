@@ -2337,10 +2337,11 @@ namespace RobotRaconteurWeb
             if (((object)a == null) || ((object)b == null)) return false;
 
             if (a.Name != b.Name) return false;
+            if (a.Type != b.Type) return false;
             if (a.TypeString != b.TypeString) return false;
             if (a.ArrayType != b.ArrayType) return false;
             if (a.ArrayVarLength != b.ArrayVarLength) return false;
-            if (a.ArrayLength != b.ArrayLength) return false;
+            if (!a.ArrayLength.SequenceEqual(b.ArrayLength)) return false;
             if (a.ContainerType != b.ContainerType) return false;
             return true;
         }

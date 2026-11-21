@@ -193,5 +193,23 @@ namespace RobotRaconteurTest
             RRAssert.ThrowsException<ServiceDefinitionParseException>(() => c.FromString("constant int8 c1 0xZ"));
             RRWebTest.WriteLine("RobDefTest.TestConstantSignedZero passed");
         }
+
+        public static void TestTypeDefinitionEquality()
+        {
+            // TypeDefinition == must compare by value, including Type and ArrayLength contents
+            var a = new TypeDefinition();
+            a.FromString("double[3] x");
+            var b = new TypeDefinition();
+            b.FromString("double[3] x");
+            RRAssert.IsTrue(a == b);
+            RRAssert.IsTrue(a.Equals(b));
+            var c = new TypeDefinition();
+            c.FromString("double[4] x");
+            RRAssert.IsTrue(a != c);
+            var d = new TypeDefinition();
+            d.FromString("int32[3] x");
+            RRAssert.IsTrue(a != d);
+            RRWebTest.WriteLine("RobDefTest.TestTypeDefinitionEquality passed");
+        }
     }
 }
