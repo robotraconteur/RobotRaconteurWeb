@@ -1528,7 +1528,7 @@ namespace RobotRaconteurWeb
                                     component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
                                     service_path: e.ServicePath, member: e.MemberName);
 #endif
-                                eret.AddElement("errorname", "RobotRaconteur.ObjectNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ObjectNotFound");
                                 eret.AddElement("errorstring", "Object not found");
                                 eret.Error = MessageErrorType.ObjectNotFound;
                             }
@@ -1570,7 +1570,7 @@ namespace RobotRaconteurWeb
                                     component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
                                     service_path: e.ServicePath, member: e.MemberName);
 #endif
-                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFound");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                             }
@@ -1610,7 +1610,7 @@ namespace RobotRaconteurWeb
                                     component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
                                     service_path: e.ServicePath, member: e.MemberName);
 #endif
-                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFound");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                             }
@@ -1646,7 +1646,7 @@ namespace RobotRaconteurWeb
                                     component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
                                     service_path: e.ServicePath, member: e.MemberName);
 #endif
-                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFound");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                             }
@@ -1725,7 +1725,7 @@ namespace RobotRaconteurWeb
                                             endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
                                                                         member: e.MemberName);
                                 eret.elements.Clear();
-                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFound");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                                 break;
@@ -1812,7 +1812,7 @@ namespace RobotRaconteurWeb
                                             endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
                                                                         member: e.MemberName);
                                 eret.elements.Clear();
-                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFound");
                                 eret.AddElement("errorstring", "Service factory configuration error");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                                 break;
@@ -1867,7 +1867,7 @@ namespace RobotRaconteurWeb
                                         endpoint: m.header.ReceiverEndpoint, service_path: e.ServicePath,
                                                                     member: e.MemberName);
                                 eret.elements.Clear();
-                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFoundException");
+                                eret.AddElement("errorname", "RobotRaconteur.ServiceNotFound");
                                 eret.AddElement("errorstring", "Service not found");
                                 eret.Error = MessageErrorType.ServiceNotFound;
                                 break;
