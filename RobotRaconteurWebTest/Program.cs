@@ -137,6 +137,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestConstantInt64();
 
+                        RobDefTest.TestConstantSignedRange();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

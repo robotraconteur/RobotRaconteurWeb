@@ -166,5 +166,19 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(c.Value, "1234");
             RRWebTest.WriteLine("RobDefTest.TestConstantInt64 passed");
         }
+
+        public static void TestConstantSignedRange()
+        {
+            // Signed constants outside the range of their type must be rejected
+            var c = new ConstantDefinition((ServiceDefinition)null);
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => c.FromString("constant int8 c1 1000"));
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => c.FromString("constant int8 c1 -129"));
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => c.FromString("constant int16 c1 32768"));
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() => c.FromString("constant int32 c1 -2147483649"));
+            c.FromString("constant int8 c1 -128");
+            c.FromString("constant int8 c1 127");
+            c.FromString("constant int32 c1 -2147483648");
+            RRWebTest.WriteLine("RobDefTest.TestConstantSignedRange passed");
+        }
     }
 }

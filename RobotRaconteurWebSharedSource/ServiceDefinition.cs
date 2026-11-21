@@ -2742,7 +2742,7 @@ namespace RobotRaconteurWeb
                     val2 = Convert.ToInt64(val.TrimStart('0'), b);
                 }
 
-                if (val2 < min_value && val2 > max_value)
+                if (val2 < min_value || val2 > max_value)
                 {
                     return false;
                 }
