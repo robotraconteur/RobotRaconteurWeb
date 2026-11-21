@@ -25,11 +25,25 @@ namespace RobotRaconteurTest
 {
     public static class MessageSerializationTest
     {
+        // Seed from ROBOTRACONTEUR_TEST_SEED if set, otherwise from the clock. The seed is printed so a
+        // failure can be reproduced.
+        static uint GetRandomSeed()
+        {
+            uint seed;
+            var seed_env = Environment.GetEnvironmentVariable("ROBOTRACONTEUR_TEST_SEED");
+            if (seed_env == null || !uint.TryParse(seed_env, out seed))
+            {
+                seed = (uint)DateTime.Now.Ticks;
+            }
+            Console.WriteLine("Message serialization random test seed: {0}", seed);
+            return seed;
+        }
 
         static public void RandomTest()
         {
             int iterations = 100;
-            var rng = new LFSRSeqGen((uint)DateTime.Now.Ticks, "message_serialization_random_test");
+            uint seed = GetRandomSeed();
+            var rng = new LFSRSeqGen(seed, "message_serialization_random_test");
 
             for (int i = 0; i < iterations; i++)
             {
@@ -42,7 +56,7 @@ namespace RobotRaconteurTest
                 using (var w = new ArrayBinaryWriter(w1, (int)messageSize))
                 {
                     m.Write(w);
-                    RRAssert.Equals(w.Position, m.ComputeSize());
+                    RRAssert.AreEqual(w.Position, m.ComputeSize());
                 }
 
                 var r1 = new MemoryStream(buf);
@@ -85,7 +99,8 @@ namespace RobotRaconteurTest
         static public void RandomTest4()
         {
             int iterations = 100;
-            var rng = new LFSRSeqGen((uint)DateTime.Now.Ticks, "message_serialization_random_test");
+            uint seed = GetRandomSeed();
+            var rng = new LFSRSeqGen(seed, "message_serialization_random_test");
 
             for (int i = 0; i < iterations; i++)
             {
@@ -295,8 +310,8 @@ namespace RobotRaconteurTest
 
         static public void RunMessageTests()
         {
-            /*Test();
-            RandomTest();*/
+            Test();
+            RandomTest();
             Test4();
             RandomTest4();
             TestReadString8LengthCheck();
