@@ -961,12 +961,6 @@ namespace RobotRaconteurWeb
                 r1 = streamop_ret;
                 streamop_ret = null;
 
-                if (streamop_ret != null)
-                {
-                    streamop_ret.TrySetException(new ConnectionException("Transport connection closed"));
-                    streamop_ret = null;
-                }
-
                 foreach (var t in CheckStreamCapability_queue)
                 {
                     //t.TrySetException(new ConnectionException("Transport connection closed"));
