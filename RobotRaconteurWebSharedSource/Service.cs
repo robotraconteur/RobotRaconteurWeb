@@ -625,8 +625,26 @@ namespace RobotRaconteurWeb
 
         readonly Dictionary<string, Task<ServiceSkel>> get_sub_obj_tasks = new Dictionary<string, Task<ServiceSkel>>();
 
+        // Service path with every index in the encoding EncodeServicePathIndex() produces, so that one object
+        // has one skel (svc.objs[1] and svc.objs[%31] are the same object)
+        internal static string CanonicalServicePath(string servicepath)
+        {
+            if (servicepath == null || !servicepath.Contains("[")) return servicepath;
+            string[] p = servicepath.Split(new char[] { '.' });
+            for (int i = 0; i < p.Length; i++)
+            {
+                int b = p[i].IndexOf('[');
+                if (b < 0) continue;
+                if (!p[i].EndsWith("]") || b == 0) throw new ServiceException("Invalid service path");
+                string ind = p[i].Substring(b + 1, p[i].Length - b - 2);
+                p[i] = p[i].Substring(0, b) + "[" + ServicePathUtil.EncodeServicePathIndex(ServicePathUtil.DecodeServicePathIndex(ind)) + "]";
+            }
+            return String.Join(".", p);
+        }
+
         public virtual async Task<ServiceSkel> GetObjectSkel(string servicepath)
         {
+            servicepath = CanonicalServicePath(servicepath);
 
             //object obj = null;
             string[] p = servicepath.Split(new char[] { '.' });
@@ -1602,6 +1620,7 @@ namespace RobotRaconteurWeb
         {
 
             if (path == ServiceName) throw new ServiceException("Root object cannot be released");
+            path = CanonicalServicePath(path);
 
             lock (skels)
             {
@@ -1671,6 +1690,7 @@ namespace RobotRaconteurWeb
         {
 
             if (path == ServiceName) throw new ServiceException("Root object cannot be released");
+            path = CanonicalServicePath(path);
 
             lock (skels)
             {

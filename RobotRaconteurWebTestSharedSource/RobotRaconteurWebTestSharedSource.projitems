@@ -141,6 +141,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AllowObjectLockPolicyTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)LockReleaseOnLogoutTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)ServicePathAliasTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRAssert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRWebTest.cs" />
