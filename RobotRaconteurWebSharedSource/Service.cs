@@ -169,8 +169,34 @@ namespace RobotRaconteurWeb
             RRContext.SendEvent(m);
         }
 
+        // Shutdown functions of the WireServer / PipeServer members of this skel
+        private readonly List<Action> member_server_shutdown = new List<Action>();
+
+        internal void AddMemberServerShutdown(Action shutdown)
+        {
+            lock (member_server_shutdown)
+            {
+                member_server_shutdown.Add(shutdown);
+            }
+        }
+
         public void ReleaseObject()
         {
+            Action[] shutdowns;
+            lock (member_server_shutdown)
+            {
+                shutdowns = member_server_shutdown.ToArray();
+                member_server_shutdown.Clear();
+            }
+            foreach (var shutdown in shutdowns)
+            {
+                try
+                {
+                    shutdown();
+                }
+                catch (Exception) { }
+            }
+
             UnregisterEvents(uncastobj);
             uncastobj = null;
             m_context = null;

@@ -968,6 +968,7 @@ namespace RobotRaconteurWeb
         {
             m_Name = name;
             this.skel = skel;
+            skel?.AddMemberServerShutdown(Shutdown);
         }
 
         protected override async Task SendPipePacket(T data, int index, uint packetnumber, bool requestack, Endpoint e = null, CancellationToken cancel = default(CancellationToken))

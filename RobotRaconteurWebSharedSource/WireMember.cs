@@ -1136,6 +1136,7 @@ namespace RobotRaconteurWeb
         {
             m_MemberName = name;
             this.skel = skel;
+            skel?.AddMemberServerShutdown(Shutdown);
 
         }
 
