@@ -793,7 +793,8 @@ namespace RobotRaconteurWeb
                     lock (rec_wait)
                     {
                         uint t_id = m.RequestID;
-                        if (rec_wait.ContainsKey(t_id))
+                        // Only the endpoint the callback was sent to may answer it
+                        if (rec_wait.ContainsKey(t_id) && Object.ReferenceEquals(rec_wait[t_id].Item2, c))
                         {
                             r = rec_wait[t_id].Item1;
                         }
