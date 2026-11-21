@@ -325,9 +325,19 @@ namespace RobotRaconteurWeb
 
         internal void NodeDetected(NodeDiscoveryInfo n)
         {
+            if (n.NodeID == null || n.NodeID.IsAnyNode)
+            {
+                return;
+            }
+
             if (n.ServiceStateNonce != null && n.ServiceStateNonce.Length > 32)
             {
                 //TODO: Log service state nonce invalid
+                return;
+            }
+
+            if (n.NodeName != null && n.NodeName.Length > 128)
+            {
                 return;
             }
 
@@ -344,7 +354,7 @@ namespace RobotRaconteurWeb
                         {
                             if (!i.URLs.Any(x => x.URL == url.URL))
                             {
-                                if (i.URLs.Count > 256)
+                                if (i.URLs.Count > 256 || url.URL == null || url.URL.Length > 256)
                                 {
                                     continue;
                                 }
@@ -413,6 +423,39 @@ namespace RobotRaconteurWeb
                             // TODO: log ignored node
                             return;
                         }
+
+                        // Validate the URLs of a first-seen node as for a known node
+                        var valid_urls = new List<NodeDiscoveryInfoURL>();
+                        foreach (var url in n.URLs)
+                        {
+                            if (valid_urls.Count >= 256 || url.URL == null || url.URL.Length > 256)
+                            {
+                                continue;
+                            }
+                            if (valid_urls.Any(x => x.URL == url.URL))
+                            {
+                                continue;
+                            }
+                            try
+                            {
+                                var uu = TransportUtil.ParseConnectionUrl(url.URL);
+                                if (uu.nodeid != n.NodeID)
+                                {
+                                    continue;
+                                }
+                            }
+                            catch
+                            {
+                                continue;
+                            }
+                            valid_urls.Add(url);
+                        }
+
+                        if (valid_urls.Count == 0)
+                        {
+                            return;
+                        }
+                        n.URLs = valid_urls;
 
                         var storage = new Discovery_nodestorage();
                         storage.info = n;

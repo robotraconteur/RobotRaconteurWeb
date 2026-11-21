@@ -29,6 +29,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServiceLockSessionTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)MemoryMaxTransferSizeTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)DiscoveryAnnounceValidationTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultiDimArrayTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRAssert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RRWebTest.cs" />

@@ -2403,7 +2403,7 @@ namespace RobotRaconteurWeb
                 int count = recvsock.EndReceiveFrom(a, ref ep);
                 string stringData = Encoding.ASCII.GetString(recvbuf, 0, count);
 
-                NodeAnnounceReceived(stringData);
+                NodeAnnounceReceived(stringData, ep);
             }
             catch (Exception e)
             {
@@ -2430,7 +2430,7 @@ namespace RobotRaconteurWeb
                 int count = recvsockV6.EndReceiveFrom(a, ref ep);
                 string stringData = Encoding.ASCII.GetString(recvbufV6, 0, count);
 
-                NodeAnnounceReceived(stringData);
+                NodeAnnounceReceived(stringData, ep);
                 //Console.WriteLine(stringData);
 
             }
@@ -2451,15 +2451,70 @@ namespace RobotRaconteurWeb
 
         }
 
-        private void NodeAnnounceReceived(string packet)
+        // Same checks as Core IPNodeDiscovery::NodeAnnounceReceived: the announced URL must be an IP
+        // address that is loopback, or link/site local IPv6, or IPv4 in the sender's /16
+        private bool NodeAnnounceSenderValid(string packet, EndPoint sender)
+        {
+            try
+            {
+                string[] lines = packet.Split(new char[] { '\n' });
+                if (lines.Length < 3) return false;
+                string[] idline = lines[1].Split(new char[] { ',' });
+                NodeID id = new NodeID(idline[0]);
+                if (id == parent.node.NodeID) return false;
+
+                string url = lines[2];
+                if (url.Length > 256) return false;
+
+                var u = TransportUtil.ParseConnectionUrl(url);
+                string u_host = u.host;
+                if (u_host.StartsWith("[") && u_host.EndsWith("]"))
+                {
+                    u_host = u_host.Substring(1, u_host.Length - 2);
+                }
+                IPAddress addr;
+                if (!IPAddress.TryParse(u_host, out addr)) return false;
+                if (IPAddress.IsLoopback(addr)) return true;
+
+                var sender_ip = sender as IPEndPoint;
+                if (sender_ip == null) return false;
+                IPAddress sender_addr = sender_ip.Address;
+                if (sender_addr.IsIPv4MappedToIPv6) sender_addr = sender_addr.MapToIPv4();
+                if (addr.IsIPv4MappedToIPv6) addr = addr.MapToIPv4();
+
+                if (addr.AddressFamily != sender_addr.AddressFamily) return false;
+
+                if (addr.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+                    return addr.IsIPv6LinkLocal || addr.IsIPv6SiteLocal;
+                }
+
+                if (addr.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    byte[] a1 = addr.GetAddressBytes();
+                    byte[] a2 = sender_addr.GetAddressBytes();
+                    return a1[0] == a2[0] && a1[1] == a2[1];
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void NodeAnnounceReceived(string packet, EndPoint sender)
         {
             if (listening)
             {
                 string seed = "Robot Raconteur Node Discovery Packet";
                 if (packet.Substring(0, seed.Length) == seed)
                 {
-                    //if (!IPAddress.Parse(packet.Split(new char[] {'\n'})[1]).GetAddressBytes().SequenceEqual(node.NodeID))
-                    parent.node.NodeAnnouncePacketReceived(packet);
+                    if (NodeAnnounceSenderValid(packet, sender))
+                    {
+                        parent.node.NodeAnnouncePacketReceived(packet);
+                    }
                 }
             }
 
