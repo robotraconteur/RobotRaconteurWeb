@@ -857,8 +857,8 @@ namespace RobotRaconteurTest
                         var a2 = m2.CastData<Array>();
                         RRAssert.Equals(a1.Length, m1.DataCount);
                         RRAssert.Equals(a2.Length, m2.DataCount);
-                        RRAssert.Equals(DataTypeUtil.TypeIDFromType(a1.GetType()), m1.ElementType);
-                        RRAssert.Equals(DataTypeUtil.TypeIDFromType(a2.GetType()), m2.ElementType);
+                        RRAssert.Equals(DataTypeUtil.TypeIDFromType(a1.GetType().GetElementType()), m1.ElementType);
+                        RRAssert.Equals(DataTypeUtil.TypeIDFromType(a2.GetType().GetElementType()), m2.ElementType);
                         RRAssert.IsTrue(a1.Cast<object>().SequenceEqual(a2.Cast<object>()));
                         break;
                     }
