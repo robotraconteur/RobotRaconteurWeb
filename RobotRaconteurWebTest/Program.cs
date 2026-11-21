@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await PreAuthMessageLimitTests.RunTestPreAuthMessageLimit();
                         await SkelObjectTypeTest.TestSkelObjectTypeName();
 
                         await RobotRaconteurSubTest.DefaultClientTest.TestDefaultClientSkipsConnecting();

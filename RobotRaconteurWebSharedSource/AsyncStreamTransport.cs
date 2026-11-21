@@ -267,6 +267,20 @@ namespace RobotRaconteurWeb
                         throw new ProtocolException("Received too large a message");
                     }
 
+                    if (!recv_large_transfer_authorized)
+                    {
+                        if (IsLargeTransferAuthorized())
+                        {
+                            recv_large_transfer_authorized = true;
+                        }
+                        else if (meslength > 512 * 1024)
+                        {
+                            RRLogFuncs.LogDebug(string.Format("Received too large a message {0} before authorized", meslength),
+                                node, RobotRaconteur_LogComponent.Transport, endpoint: LocalEndpoint);
+                            throw new ProtocolException("Received too large a message before authorized");
+                        }
+                    }
+
                     if (recbuf.Length < meslength)
                     {
                         byte[] newbuf = new byte[(int)(meslength * 1.2)];
@@ -898,6 +912,44 @@ namespace RobotRaconteurWeb
             }
 
 
+        }
+
+        private bool recv_large_transfer_authorized = false;
+
+        // Same rule as Core: messages larger than 512 KiB are only accepted once the connection has an
+        // endpoint pair, and for a service that requires a valid user, once the client has authenticated
+        protected virtual bool IsLargeTransferAuthorized()
+        {
+            uint local_ep;
+            uint remote_ep;
+            lock (this)
+            {
+                local_ep = m_LocalEndpoint;
+                remote_ep = m_RemoteEndpoint;
+            }
+            if (local_ep == 0 || remote_ep == 0)
+                return false;
+
+            Endpoint e;
+            lock (node.endpoints)
+            {
+                if (!node.endpoints.TryGetValue(local_ep, out e))
+                    return false;
+            }
+
+            if (e is ClientContext)
+                return true;
+
+            var s = e as ServerEndpoint;
+            if (s != null)
+            {
+                if (s.service.RequireValidUser)
+                {
+                    return s.AuthenticatedUsername != null;
+                }
+                return true;
+            }
+            return false;
         }
 
         private DateTime tlastsend;
