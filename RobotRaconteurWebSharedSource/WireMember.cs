@@ -1739,7 +1739,8 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                if (!in_value_valid) throw new InvalidOperationException("Value not set");
+                if (!in_value_valid || Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan))
+                    throw new InvalidOperationException("Value not set");
                 return in_value;
             }
         }
