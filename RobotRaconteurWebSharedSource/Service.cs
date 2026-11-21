@@ -1171,7 +1171,7 @@ namespace RobotRaconteurWeb
                         lock (ClientLockOp_lockobj)
                         {
                             if (skel.IsLocked) throw new ObjectLockedException("Object already locked");
-                            KeyValuePair<string, ServiceSkel>[] sskels = (skels.Where(x => x.Key.StartsWith(servicepath)).ToArray());
+                            KeyValuePair<string, ServiceSkel>[] sskels = (skels.Where(x => x.Key == servicepath || x.Key.StartsWith(servicepath + ".")).ToArray());
                             if (sskels.Any(x => x.Value.IsLocked)) throw new ObjectLockedException("Object already locked");
 
                             ObjectLock o = new ObjectLock(current_user.Username, skel);
@@ -1190,7 +1190,7 @@ namespace RobotRaconteurWeb
                         lock (ClientLockOp_lockobj)
                         {
                             if (skel.IsLocked) throw new ObjectLockedException("Object already locked");
-                            KeyValuePair<string, ServiceSkel>[] sskels = (skels.Where(x => x.Key.StartsWith(servicepath)).ToArray());
+                            KeyValuePair<string, ServiceSkel>[] sskels = (skels.Where(x => x.Key == servicepath || x.Key.StartsWith(servicepath + ".")).ToArray());
                             if (sskels.Any(x => x.Value.IsLocked)) throw new ObjectLockedException("Object already locked");
 
                             ObjectLock o = new ObjectLock(current_user.Username, skel, e.LocalEndpoint);
