@@ -2411,10 +2411,12 @@ namespace RobotRaconteurWeb
 
         private void recvsock_receivecallback(IAsyncResult a)
         {
+            // Use the socket this receive was started on; InitUDPRecvSockets may have replaced recvsock
+            var sock = (Socket)a.AsyncState;
             try
             {
                 EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
-                int count = recvsock.EndReceiveFrom(a, ref ep);
+                int count = sock.EndReceiveFrom(a, ref ep);
                 string stringData = Encoding.ASCII.GetString(recvbuf, 0, count);
 
                 NodeAnnounceReceived(stringData, ep);
@@ -2424,9 +2426,12 @@ namespace RobotRaconteurWeb
                 //Console.WriteLine(e.ToString());
             }
 
+            // Stop this receive loop when the socket was replaced; the new socket has its own
+            if (!Object.ReferenceEquals(sock, recvsock)) return;
+
             try
             {
-                recvsock.BeginReceiveFrom(recvbuf, 0, 4096, SocketFlags.None, ref recvep, new AsyncCallback(recvsock_receivecallback), recvsock);
+                sock.BeginReceiveFrom(recvbuf, 0, 4096, SocketFlags.None, ref recvep, new AsyncCallback(recvsock_receivecallback), sock);
 
             }
             catch (Exception e)
@@ -2438,10 +2443,12 @@ namespace RobotRaconteurWeb
 
         private void recvsockV6_receivecallback(IAsyncResult a)
         {
+            // Use the socket this receive was started on; InitUDPRecvSockets may have replaced recvsockV6
+            var sock = (Socket)a.AsyncState;
             try
             {
                 EndPoint ep = new IPEndPoint(IPAddress.IPv6Any, 0);
-                int count = recvsockV6.EndReceiveFrom(a, ref ep);
+                int count = sock.EndReceiveFrom(a, ref ep);
                 string stringData = Encoding.ASCII.GetString(recvbufV6, 0, count);
 
                 NodeAnnounceReceived(stringData, ep);
@@ -2453,9 +2460,12 @@ namespace RobotRaconteurWeb
                 //Console.WriteLine(e.ToString());
             }
 
+            // Stop this receive loop when the socket was replaced; the new socket has its own
+            if (!Object.ReferenceEquals(sock, recvsockV6)) return;
+
             try
             {
-                recvsockV6.BeginReceiveFrom(recvbufV6, 0, 4096, SocketFlags.None, ref recvepV6, new AsyncCallback(recvsockV6_receivecallback), recvsockV6);
+                sock.BeginReceiveFrom(recvbufV6, 0, 4096, SocketFlags.None, ref recvepV6, new AsyncCallback(recvsockV6_receivecallback), sock);
 
             }
             catch (Exception e)
