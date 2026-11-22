@@ -248,6 +248,8 @@ namespace RobotRaconteurTest
 
                         await TcpDiscoveryListenRestartTest.TestDiscoveryListeningRestart();
 
+                        await TcpWebSocketTargetNodeTest.TestWebSocketConnectChecksNodeID();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

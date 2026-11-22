@@ -1876,8 +1876,8 @@ namespace RobotRaconteurWeb
             Uri u2 = new Uri(url.ReplaceFirst(u.scheme + "://", http_scheme + "://"));
 
 
-            NodeID target_nodeid = null;
-            string target_nodename = null;
+            NodeID target_nodeid = u.nodeid;
+            string target_nodename = u.nodename;
 
             /*if (noden.Contains('[') || noden.Contains('{'))
             {
