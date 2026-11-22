@@ -1498,7 +1498,7 @@ namespace RobotRaconteurWeb
 
             lock (skels)
             {
-                string[] objkeys = skels.Keys.Where(x => x.StartsWith(path)).ToArray();
+                string[] objkeys = skels.Keys.Where(x => x == path || x.StartsWith(path + ".")).ToArray();
                 if (objkeys.Count() == 0) throw new ServiceException("Unknown service path");
 
                 foreach (string path1 in objkeys)
@@ -1567,7 +1567,7 @@ namespace RobotRaconteurWeb
 
             lock (skels)
             {
-                string[] objkeys = skels.Keys.Where(x => x.StartsWith(path)).ToArray();
+                string[] objkeys = skels.Keys.Where(x => x == path || x.StartsWith(path + ".")).ToArray();
                 if (objkeys.Count() == 0) throw new ServiceException("Unknown service path");
 
                 foreach (string path1 in objkeys)
