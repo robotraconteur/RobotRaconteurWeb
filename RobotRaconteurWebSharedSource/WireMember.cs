@@ -1383,6 +1383,9 @@ namespace RobotRaconteurWeb
         {
             lock (connected_wires_lock)
             {
+                // A repeated WireConnectReq from a connected client reuses its connection, do not add it twice
+                if (connected_wires.Any(x => x.connection == ep))
+                    return;
                 connected_connection c = new connected_connection(ep);
                 ep.WireCloseCallback = delegate (Wire<T>.WireConnection w2) { ConnectionClosed(c); };
                 connected_wires.Add(c);
@@ -1625,6 +1628,9 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
+                // A repeated WireConnectReq from the active client reuses its connection, keep it
+                if (active_connection != null && active_connection.connection == ep)
+                    return;
                 if (active_connection != null)
                 {
                     try
