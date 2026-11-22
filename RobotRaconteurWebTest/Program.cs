@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await CheckServiceCapabilityTest.TestCheckServiceCapability();
+
                         await RobotRaconteurWebTest.FindServiceByTypeIndexTests.RunTestFindServiceByTypeSkippedNode();
                         await RobotRaconteurWebTest.FindNodeUrlTests.RunTestFindNodeUrls();
                         await ServicePathReleasedTest.TestServicePathReleasedSeparator();
@@ -290,6 +292,11 @@ namespace RobotRaconteurTest
                 case "servicepathreleased":
                     {
                         await ServicePathReleasedTest.TestServicePathReleasedSeparator();
+                        break;
+                    }
+                case "checkcapability":
+                    {
+                        await CheckServiceCapabilityTest.TestCheckServiceCapability();
                         break;
                     }
                 case "message":

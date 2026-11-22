@@ -438,7 +438,7 @@ namespace RobotRaconteurWeb
                         Task.Run(a).IgnoreResult();
                     }
                 }
-                else if (m.EntryType == MessageEntryType.PropertyGetRes || m.EntryType == MessageEntryType.PropertySetRes || m.EntryType == MessageEntryType.FunctionCallRes || m.EntryType == MessageEntryType.ObjectTypeNameRet || m.EntryType == MessageEntryType.ConnectClientRet || m.EntryType == MessageEntryType.ConnectClientCombinedRet || m.EntryType == MessageEntryType.DisconnectClientRet || m.EntryType == MessageEntryType.GetServiceDescRet || (m.EntryType >= MessageEntryType.PipeConnectReq && m.EntryType <= MessageEntryType.PipeDisconnectRet) || m.EntryType == MessageEntryType.ClientSessionOpRet || m.EntryType == MessageEntryType.WireConnectRet || m.EntryType == MessageEntryType.WireDisconnectRet || m.EntryType == MessageEntryType.MemoryReadRet || m.EntryType == MessageEntryType.MemoryWriteRet || m.EntryType == MessageEntryType.MemoryGetParamRet || m.EntryType == MessageEntryType.WirePeekInValueRet || m.EntryType == MessageEntryType.WirePeekOutValueRet || m.EntryType == MessageEntryType.WirePokeOutValueRet || m.EntryType == MessageEntryType.GeneratorNextRes)
+                else if (m.EntryType == MessageEntryType.PropertyGetRes || m.EntryType == MessageEntryType.PropertySetRes || m.EntryType == MessageEntryType.FunctionCallRes || m.EntryType == MessageEntryType.ObjectTypeNameRet || m.EntryType == MessageEntryType.ConnectClientRet || m.EntryType == MessageEntryType.ConnectClientCombinedRet || m.EntryType == MessageEntryType.DisconnectClientRet || m.EntryType == MessageEntryType.GetServiceDescRet || (m.EntryType >= MessageEntryType.PipeConnectReq && m.EntryType <= MessageEntryType.PipeDisconnectRet) || m.EntryType == MessageEntryType.ClientSessionOpRet || m.EntryType == MessageEntryType.ServiceCheckCapabilityRet || m.EntryType == MessageEntryType.WireConnectRet || m.EntryType == MessageEntryType.WireDisconnectRet || m.EntryType == MessageEntryType.MemoryReadRet || m.EntryType == MessageEntryType.MemoryWriteRet || m.EntryType == MessageEntryType.MemoryGetParamRet || m.EntryType == MessageEntryType.WirePeekInValueRet || m.EntryType == MessageEntryType.WirePeekOutValueRet || m.EntryType == MessageEntryType.WirePokeOutValueRet || m.EntryType == MessageEntryType.GeneratorNextRes)
                 {
                     // Console.WriteLine("Got " + m.TransactionID + " " + m.EntryType + " " + m.MemberName);
                     TaskCompletionSource<MessageEntry> r = null;
@@ -1179,7 +1179,7 @@ namespace RobotRaconteurWeb
             MessageEntry m = new MessageEntry(MessageEntryType.ServiceCheckCapabilityReq, name);
             m.ServicePath = m_ServiceName;
             MessageEntry ret = await ProcessRequest(m, cancel).ConfigureAwait(false);
-            uint res = ret.FindElement("return").CastData<uint>();
+            uint res = ret.FindElement("return").CastData<uint[]>()[0];
             return res;
         }
 
