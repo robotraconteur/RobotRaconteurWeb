@@ -600,5 +600,28 @@ namespace RobotRaconteurTest
             ServiceDefinitionUtil.VerifyServiceDefinitions(defs2);
             RRWebTest.WriteLine("RobDefTest.TestImplementsEventMismatch passed");
         }
+
+        public static void TestEnumFirstValueRequired()
+        {
+            // The "first value must be specified" test used Values (just cleared) instead of the list being built,
+            // so it never fired and values3.Last() threw InvalidOperationException ("Sequence contains no elements")
+            var e1 = new EnumDefinition((ServiceDefinition)null);
+            string msg = null;
+            try
+            {
+                e1.FromString("enum e\na, b = 2\nend\n");
+            }
+            catch (ServiceDefinitionParseException ex)
+            {
+                msg = ex.ShortMessage;
+            }
+            RRAssert.AreEqual(msg, "Enum first value must be specified");
+            var d2 = new ServiceDefinition();
+            d2.FromString("service t7.enum2\nstdver 0.10\n\nenum e\na = 1, b, c = 0x10, d\nend\n");
+            var e = d2.Enums["e"];
+            RRAssert.AreEqual(e.Values[1].Value, 2);
+            RRAssert.AreEqual(e.Values[3].Value, 17);
+            RRWebTest.WriteLine("RobDefTest.TestEnumFirstValueRequired passed");
+        }
     }
 }

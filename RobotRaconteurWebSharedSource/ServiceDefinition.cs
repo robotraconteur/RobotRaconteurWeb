@@ -3141,7 +3141,7 @@ namespace RobotRaconteurWeb
                 }
                 else
                 {
-                    if (Values.Count == 1)
+                    if (values3.Count == 0)
                     {
                         throw new ServiceDefinitionParseException("Enum first value must be specified", working_info);
                     }

@@ -234,6 +234,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestImplementsEventMismatch();
 
+                        RobDefTest.TestEnumFirstValueRequired();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
