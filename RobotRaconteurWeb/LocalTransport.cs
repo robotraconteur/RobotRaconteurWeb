@@ -418,6 +418,7 @@ namespace RobotRaconteurWeb
 
             Socket socket = null;
             UnixDomainSocketEndPoint ep = null;
+            string socket_fname = null;
 
             var node_dirs = node.NodeDirectories;
 
@@ -482,6 +483,7 @@ namespace RobotRaconteurWeb
                         ep = new UnixDomainSocketEndPoint(pipename);
                         socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                         socket.Bind(ep);
+                        socket_fname = pipename;
                         socket.Listen(16);
                         break;
                     }
@@ -563,6 +565,24 @@ namespace RobotRaconteurWeb
                 h_pid_name_s?.Dispose();
                 h_info_id_s?.Dispose();
                 h_info_name_s?.Dispose();
+
+                if (socket != null)
+                {
+                    try
+                    {
+                        socket.Dispose();
+                        if (socket_fname != null)
+                        {
+                            File.Delete(socket_fname);
+                        }
+                    }
+                    catch (Exception) { }
+                }
+
+                lock (this)
+                {
+                    serverstarted = false;
+                }
 
                 throw;
             }

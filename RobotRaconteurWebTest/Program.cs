@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        LocalStartFailTests.RunTestLocalStartFailureCleanup();
                         await SubObjectCurrentPathTest.TestFirstSubObjectRequestCurrentPath();
 
                         await LocalListenCloseTests.RunTestLocalCloseRemovesSocket();
