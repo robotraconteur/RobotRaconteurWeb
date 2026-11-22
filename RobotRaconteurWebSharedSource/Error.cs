@@ -706,6 +706,74 @@ namespace RobotRaconteurWeb
         {
         }
     }
+
+    /// <summary>
+    /// The exception that is thrown when an invalid configuration is specified.
+    /// </summary>
+    [PublicApi]
+    public class InvalidConfigurationException : RobotRaconteurException
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidConfigurationException"/> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        [PublicApi]
+        public InvalidConfigurationException(string message)
+            : base(MessageErrorType.InvalidConfiguration, "RobotRaconteur.InvalidConfiguration", message)
+        {
+        }
+    }
+
+    /// <summary>
+    /// The exception that is thrown when an object is in an invalid state for the operation.
+    /// </summary>
+    [PublicApi]
+    public class InvalidStateException : RobotRaconteurException
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidStateException"/> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        [PublicApi]
+        public InvalidStateException(string message)
+            : base(MessageErrorType.InvalidState, "RobotRaconteur.InvalidState", message)
+        {
+        }
+    }
+
+    /// <summary>
+    /// The exception that is thrown when an operation has timed out.
+    /// </summary>
+    [PublicApi]
+    public class OperationTimeoutException : RobotRaconteurException
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OperationTimeoutException"/> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        [PublicApi]
+        public OperationTimeoutException(string message)
+            : base(MessageErrorType.OperationTimeout, "RobotRaconteur.OperationTimeout", message)
+        {
+        }
+    }
+
+    /// <summary>
+    /// The exception that is thrown when an operation has been cancelled.
+    /// </summary>
+    [PublicApi]
+    public class OperationCancelledException : RobotRaconteurException
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OperationCancelledException"/> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        [PublicApi]
+        public OperationCancelledException(string message)
+            : base(MessageErrorType.OperationCancelled, "RobotRaconteur.OperationCancelled", message)
+        {
+        }
+    }
 #pragma warning disable 1591
     public class RobotRaconteurExceptionUtil
     {
@@ -925,6 +993,18 @@ namespace RobotRaconteurWeb
 
                 case MessageErrorType.StopIteration:
                     return new StopIterationException(errorstring);
+
+                case MessageErrorType.InvalidConfiguration:
+                    return new InvalidConfigurationException(errorstring);
+
+                case MessageErrorType.InvalidState:
+                    return new InvalidStateException(errorstring);
+
+                case MessageErrorType.OperationTimeout:
+                    return new OperationTimeoutException(errorstring);
+
+                case MessageErrorType.OperationCancelled:
+                    return new OperationCancelledException(errorstring);
 
             }
 

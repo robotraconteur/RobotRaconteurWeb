@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        ErrorCodesTest.TestCoreErrorCodes();
+
                         await ExtraImportsTest.TestExtraImportsElementName();
 
                         RobotRaconteurSubTest.AttributeRegexFullMatchTest.TestAttributeRegexFullMatch();
@@ -489,6 +491,11 @@ namespace RobotRaconteurTest
                 case "extraimports":
                     {
                         await ExtraImportsTest.TestExtraImportsElementName();
+                        break;
+                    }
+                case "errorcodes":
+                    {
+                        ErrorCodesTest.TestCoreErrorCodes();
                         break;
                     }
                 case "message":

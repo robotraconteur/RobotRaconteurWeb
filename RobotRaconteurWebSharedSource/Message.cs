@@ -535,6 +535,12 @@ namespace RobotRaconteurWeb
         /// <summary>key not found</summary>
         KeyNotFound,
 
+        /// <summary>invalid configuration specified</summary>
+        InvalidConfiguration,
+
+        /// <summary>invalid state</summary>
+        InvalidState,
+
         /// <summary>error occurred on remote node</summary>
         RemoteError = 100,
 
@@ -564,6 +570,12 @@ namespace RobotRaconteurWeb
 
         /// <summary>stop generator iteration (generator only)</summary>
         StopIteration,
+
+        /// <summary>the operation has timed out</summary>
+        OperationTimeout,
+
+        /// <summary>the operation has been cancelled</summary>
+        OperationCancelled,
 
         /// <summary>authentication has failed</summary>
         AuthenticationError = 150,

@@ -88,6 +88,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AttributeRegexFullMatchTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)ExtraImportsTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)ErrorCodesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 
