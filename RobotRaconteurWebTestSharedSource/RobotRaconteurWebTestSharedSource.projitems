@@ -72,6 +72,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)LocalStartFailTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)NodeDirectoriesPrefixTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)NodeDirectoriesLockTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceLockAsyncTests.cs" />

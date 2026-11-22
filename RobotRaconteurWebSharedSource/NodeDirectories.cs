@@ -946,7 +946,10 @@ namespace RobotRaconteurWeb
                     catch (Exception)
                     {
                         h.Dispose();
-                        throw;
+                        // The callers recognise a lock held elsewhere by ENOLCK, as Core reports any
+                        // fcntl(F_SETLK) failure (.NET reports EAGAIN/EACCES here)
+                        error_code = (int)Mono.Unix.Native.Errno.ENOLCK;
+                        return false;
                     }
 
                     f = h;
