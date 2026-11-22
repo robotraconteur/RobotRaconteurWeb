@@ -498,7 +498,7 @@ namespace RobotRaconteurWeb
         /// <param name="message">The error message that explains the reason for the exception.</param>
         [PublicApi]
         public ServiceDefinitionException(string message)
-            : base(MessageErrorType.ServiceDefinitionError, "RobotRaconteur.SystemDefinitionError", message)
+            : base(MessageErrorType.ServiceDefinitionError, "RobotRaconteur.ServiceDefinitionError", message)
         {
         }
     }

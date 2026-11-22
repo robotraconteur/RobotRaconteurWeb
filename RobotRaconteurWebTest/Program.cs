@@ -296,6 +296,8 @@ namespace RobotRaconteurTest
 
                         await WebSocketFrameTests.TestWebSocketStrictServer();
 
+                        RobDefTest.TestServiceDefinitionExceptionErrorName();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

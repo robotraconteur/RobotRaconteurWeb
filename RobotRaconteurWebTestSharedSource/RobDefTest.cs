@@ -650,5 +650,15 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(ConstantAccepted2("constant int32[] a {5, 6}"));
             RRWebTest.WriteLine("RobDefTest.TestFloatConstantLeadingDecimalPoint passed");
         }
+
+        public static void TestServiceDefinitionExceptionErrorName()
+        {
+            // The error name sent for ServiceDefinitionError was "RobotRaconteur.SystemDefinitionError"; Core uses
+            // "RobotRaconteur.ServiceDefinitionError"
+            var e = new ServiceDefinitionException("test");
+            RRAssert.AreEqual(e.ErrorCode, MessageErrorType.ServiceDefinitionError);
+            RRAssert.AreEqual(e.Error, "RobotRaconteur.ServiceDefinitionError");
+            RRWebTest.WriteLine("RobDefTest.TestServiceDefinitionExceptionErrorName passed");
+        }
     }
 }
