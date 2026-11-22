@@ -2572,6 +2572,18 @@ namespace RobotRaconteurWeb
                 return "public const string " + FixName(c.Name) + "=\"" + str_res + "\";";
             }
 
+            if (t.Type == DataTypes.single_t)
+            {
+                // A literal without suffix is a double, which does not convert implicitly to float
+                if (t.ArrayType == DataTypes_ArrayTypes.none)
+                {
+                    return "public const " + c1.cs_type + " " + FixName(c.Name) + "=" + c.Value.Trim() + "F;";
+                }
+                var v = c.Value.Trim(' ', '\t', '{', '}').Trim();
+                var v2 = v.Length == 0 ? new string[0] : v.Split(',').Select(x => x.Trim() + "F").ToArray();
+                return "public static readonly " + c1.cs_type + "[] " + FixName(c.Name) + "={" + String.Join(", ", v2) + "};";
+            }
+
             if (t.ArrayType == DataTypes_ArrayTypes.none)
             {
                 return "public const " + c1.cs_type + " " + FixName(c.Name) + "=" + c.Value + ";";

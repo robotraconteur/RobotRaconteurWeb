@@ -184,6 +184,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestGenSkelKeywordObjectName();
 
+                        RobDefTest.TestGenSingleConstants();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

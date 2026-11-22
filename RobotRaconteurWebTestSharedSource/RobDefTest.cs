@@ -421,5 +421,28 @@ namespace RobotRaconteurTest
             RRAssert.IsFalse(gen.Contains("(lock)"));
             RRWebTest.WriteLine("RobDefTest.TestGenSkelKeywordObjectName passed");
         }
+
+        public static void TestGenSingleConstants()
+        {
+            // "constant single f1 1.5" was written as "public const float f1=1.5;", which does not compile (a
+            // literal without suffix is a double)
+            var c2 = new Dictionary<string, ConstantDefinition>();
+            var c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant single f1 1.5");
+            RRAssert.AreEqual(CSharpServiceLangGen.convert_constant(c, c2, null), "public const float f1=1.5F;");
+            c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant single[] fa {1.5, -2, 3e2}");
+            RRAssert.AreEqual(CSharpServiceLangGen.convert_constant(c, c2, null),
+                              "public static readonly float[] fa={1.5F, -2F, 3e2F};");
+            c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant single[] fe {}");
+            RRAssert.AreEqual(CSharpServiceLangGen.convert_constant(c, c2, null),
+                              "public static readonly float[] fe={};");
+            // Other types are unchanged
+            c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant double d1 1.5");
+            RRAssert.AreEqual(CSharpServiceLangGen.convert_constant(c, c2, null), "public const double d1=1.5;");
+            RRWebTest.WriteLine("RobDefTest.TestGenSingleConstants passed");
+        }
     }
 }
