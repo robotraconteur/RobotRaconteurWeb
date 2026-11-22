@@ -1239,7 +1239,8 @@ namespace RobotRaconteurWeb
                     {
                         var info2 = e.service_info2;
                         if (info.NodeName != info2.NodeName || info2.Name != info.Name ||
-                            info2.RootObjectType != info.RootObjectType || info2.ConnectionURL != info.ConnectionURL ||
+                            info2.RootObjectType != info.RootObjectType ||
+                            !(info2.ConnectionURL ?? new string[0]).SequenceEqual(info.ConnectionURL ?? new string[0]) ||
                             !new HashSet<string>(info.RootObjectImplements).SetEquals(new HashSet<string>(info2.RootObjectImplements)))
                         {
                             e.service_info2 = info;
