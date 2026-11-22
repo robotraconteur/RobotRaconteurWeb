@@ -206,7 +206,8 @@ namespace RobotRaconteurWeb
             string rr_sys_prefix = Environment.GetEnvironmentVariable("ROBOTRACONTEUR_SYSTEM_PREFIX");
             if (!string.IsNullOrEmpty(rr_sys_prefix))
             {
-                return Path.Combine(rr_sys_prefix, default_dir);
+                // default_dir is absolute; Path.Combine would discard the prefix
+                return Path.Combine(rr_sys_prefix, default_dir.TrimStart('/'));
             }
 
             return default_dir;

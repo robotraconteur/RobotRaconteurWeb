@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        NodeDirectoriesPrefixTests.RunTestSystemPrefix();
                         LocalStartFailTests.RunTestLocalStartFailureCleanup();
                         await SubObjectCurrentPathTest.TestFirstSubObjectRequestCurrentPath();
 
