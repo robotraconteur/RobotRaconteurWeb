@@ -239,6 +239,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestFloatConstantLeadingDecimalPoint();
 
+                        await TcpDiscoveryListenRestartTest.TestDiscoveryListeningRestart();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

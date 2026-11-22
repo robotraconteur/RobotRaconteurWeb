@@ -24,6 +24,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamStartTlsTimeoutTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamStartTlsErrorTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)TcpDiscoveryListenRestartTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AttributesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServicePathTest.cs" />
 

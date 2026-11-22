@@ -2565,17 +2565,30 @@ namespace RobotRaconteurWeb
 
         public void StopListeningForNodes()
         {
-            try
+            listen_flags = 0;
+            if (broadcasting)
             {
-                recvsock?.Close();
+                // The receive sockets also receive the discovery requests for the announcer: keep them,
+                // only drop the flags that were needed for listening
+                InitUDPRecvSockets();
             }
-            catch (Exception) { }
+            else
+            {
+                try
+                {
+                    recvsock?.Close();
+                }
+                catch (Exception) { }
 
-            try
-            {
-                recvsockV6.Close();
+                try
+                {
+                    recvsockV6?.Close();
+                }
+                catch (Exception) { }
+
+                // Make the next StartListeningForNodes create new sockets
+                listen_socket_flags = 0;
             }
-            catch (Exception) { }
 
             listening = false;
             var t = discovery_request_timer;
