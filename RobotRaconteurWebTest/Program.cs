@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await PullServiceDefsCycleTest.TestPullServiceDefinitionImportCycle();
+
                         CommandLineConfigParserTests.RunTestCommandLineOptions();
                         await TransportListenerLeakTest.TestTransportListenerRemoved();
 
@@ -365,6 +367,11 @@ namespace RobotRaconteurTest
                 case "transportlistenerleak":
                     {
                         await TransportListenerLeakTest.TestTransportListenerRemoved();
+                        break;
+                    }
+                case "pulldefscycle":
+                    {
+                        await PullServiceDefsCycleTest.TestPullServiceDefinitionImportCycle();
                         break;
                     }
                 case "message":

@@ -1260,29 +1260,27 @@ namespace RobotRaconteurWeb
         protected async Task<ServiceDefinition[]> PullServiceDefinitionAndImports(string servicetype, CancellationToken cancel)
         {
             var defs = new List<ServiceDefinition>();
+            await PullServiceDefinitionAndImports2(servicetype, defs, cancel).ConfigureAwait(false);
+            return defs.ToArray();
+        }
+
+        // defs is shared by the whole recursion, so definitions that import each other are pulled only once
+        private async Task PullServiceDefinitionAndImports2(string servicetype, List<ServiceDefinition> defs, CancellationToken cancel)
+        {
             var root = await PullServiceDefinition(servicetype, cancel).ConfigureAwait(false);
-            defs.Add(root);
-            if (root.Imports.Count == 0)
+            if (defs.Count(x => x.Name == root.Name) != 0)
             {
-                return defs.ToArray();
+                return;
             }
+            defs.Add(root);
 
             foreach (var i in root.Imports)
             {
                 if (defs.Count(x => x.Name == i) == 0)
                 {
-                    var defs2 = await PullServiceDefinitionAndImports(i, cancel).ConfigureAwait(false);
-                    foreach (var d in defs2)
-                    {
-                        if (defs.Count(x => x.Name == d.Name) == 0)
-                        {
-                            defs.Add(d);
-                        }
-                    }
+                    await PullServiceDefinitionAndImports2(i, defs, cancel).ConfigureAwait(false);
                 }
             }
-
-            return defs.ToArray();
         }
 
         protected readonly Dictionary<string, ServiceFactory> pulled_service_types = new Dictionary<string, ServiceFactory>();
