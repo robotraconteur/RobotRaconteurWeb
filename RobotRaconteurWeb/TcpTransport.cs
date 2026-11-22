@@ -489,6 +489,11 @@ namespace RobotRaconteurWeb
 
         internal void AcceptSocket(TcpClient tcpc)
         {
+            if (!transportopen)
+            {
+                tcpc.Close();
+                return;
+            }
             ClientConnected2(tcpc).IgnoreResult();
         }
 
@@ -3530,6 +3535,7 @@ namespace RobotRaconteurWeb
         private readonly object thisLock = new object();
         private bool open = false;
         private Stream localSocket;
+        private Socket unixSocket;
         private int port;
         private bool sharerConnected;
         private readonly ManualResetEvent delayEvent = new ManualResetEvent(false);
@@ -3565,6 +3571,13 @@ namespace RobotRaconteurWeb
                     return;
                 open = false;
                 cancelSource.Cancel();
+                // The token does not interrupt the blocking Receive / recvmsg on Unix; shut the socket
+                // down so the client thread returns (it disposes the socket itself)
+                try
+                {
+                    unixSocket?.Shutdown(SocketShutdown.Both);
+                }
+                catch { }
             }
         }
 
@@ -3652,6 +3665,15 @@ namespace RobotRaconteurWeb
                             RRLogFuncs.LogDebug($"TcpTransport port sharer connecting named pipe to: \"{fname}\"");
 
                             socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                            lock (thisLock)
+                            {
+                                if (!open)
+                                {
+                                    socket.Dispose();
+                                    break;
+                                }
+                                unixSocket = socket;
+                            }
                             {
                                 await Task.Run(() => socket.Connect(new UnixDomainSocketEndPoint(fname)));
                                 //localSocket = new NetworkStream(socket, true);
@@ -3789,6 +3811,7 @@ namespace RobotRaconteurWeb
                     lock (thisLock)
                     {
                         RRLogFuncs.LogInfo("TcpTransport port sharer disconnected");
+                        unixSocket = null;
                         sharerConnected = false;
                         localSocket?.Dispose();
                         localSocket = null;
