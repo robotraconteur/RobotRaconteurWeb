@@ -459,7 +459,8 @@ namespace RobotRaconteurWeb
             const string uuidRegexStr = @"\{?([a-fA-F0-9]{8})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{4})-?([a-fA-F0-9]{12})\}?";
 
             var identO = new StringWriter();
-            var nameRegex = new Regex(nameRegexStr);
+            // Identifiers must match the whole text, as Core's regex_match does
+            var nameRegex = new Regex($"\\A(?:{nameRegexStr})\\z");
             if (!string.IsNullOrEmpty(name))
             {
                 if (!nameRegex.IsMatch(name))
@@ -474,7 +475,7 @@ namespace RobotRaconteurWeb
                 identO.Write($"(?:{nameRegexStr}\\|)?");
             }
 
-            var uuidRegex = new Regex(uuidRegexStr);
+            var uuidRegex = new Regex($"\\A(?:{uuidRegexStr})\\z");
             bool zeroUuid = true;
             if (!string.IsNullOrEmpty(uuidString))
             {
@@ -519,7 +520,7 @@ namespace RobotRaconteurWeb
                 identO.Write($"(?:\\|{uuidRegexStr})?");
             }
 
-            return new Regex(identO.ToString());
+            return new Regex($"\\A(?:{identO})\\z");
         }
 
 
@@ -537,7 +538,7 @@ namespace RobotRaconteurWeb
                 return IdentifierToRegex("", "");
             }
 
-            var combinedRegex = new Regex(combinedRegexStr);
+            var combinedRegex = new Regex($"\\A(?:{combinedRegexStr})\\z");
             var combinedMatch = combinedRegex.Match(combinedString);
             if (combinedMatch.Success)
             {
@@ -546,7 +547,7 @@ namespace RobotRaconteurWeb
                 return IdentifierToRegex(nameSub, uuidSub);
             }
 
-            var uuidRegex = new Regex(uuidRegexStr);
+            var uuidRegex = new Regex($"\\A(?:{uuidRegexStr})\\z");
             if (uuidRegex.IsMatch(combinedString))
             {
                 return IdentifierToRegex("", combinedString);

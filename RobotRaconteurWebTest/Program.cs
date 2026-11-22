@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        RobotRaconteurSubTest.IdentifierFullMatchTest.TestIdentifierFullMatch();
+
                         await RobotRaconteurSubTest.Wires.SubscriptionUpdateFilterTest.TestUpdateServiceByTypeDisconnectsFiltered();
 
                         MessageSerializationTest.TestPackEnumContainers();
@@ -408,6 +410,11 @@ namespace RobotRaconteurTest
                 case "subupdatefilter":
                     {
                         await RobotRaconteurSubTest.Wires.SubscriptionUpdateFilterTest.TestUpdateServiceByTypeDisconnectsFiltered();
+                        break;
+                    }
+                case "identifierfullmatch":
+                    {
+                        RobotRaconteurSubTest.IdentifierFullMatchTest.TestIdentifierFullMatch();
                         break;
                     }
                 case "message":

@@ -68,6 +68,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)PulledServiceTypesTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionUpdateFilterTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)IdentifierFullMatchTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 
