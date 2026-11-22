@@ -1581,6 +1581,7 @@ namespace RobotRaconteurWeb
 
         if (cert == null)
         {
+            mmret.Error = MessageErrorType.ConnectionError;
             mmret.AddElement("errorname", "RobotRaconteur.ConnectionError");
             mmret.AddElement("errorstring", "Server certificate not loaded");
             await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
@@ -1610,6 +1611,7 @@ namespace RobotRaconteurWeb
 
         if (!good)
         {
+            mmret.Error = MessageErrorType.NodeNotFound;
             mmret.AddElement("errorname", "RobotRaconteur.NodeNotFound");
             mmret.AddElement("errorstring", "Node not found");
             await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
@@ -1624,8 +1626,13 @@ namespace RobotRaconteurWeb
             if(mutualauth1.CastData<string>().ToLower()=="true")
             {
                 mutualauth=true;
+                // Confirm mutual authentication to the client, which requires it when it has a certificate
+                mmret.AddElement("mutualauth", "true");
             }
         }
+
+        // Identity expected in the client certificate
+        handshake_host = "Robot Raconteur Node " + m.header.SenderNodeID.ToString();
 
         try
         {
@@ -1696,6 +1703,8 @@ namespace RobotRaconteurWeb
 
             clienthandshake_recv_task.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
             var mret = await clienthandshake_recv_task.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
+            if (mret.entries.Count == 1 && mret.entries[0].Error != MessageErrorType.None)
+                throw RobotRaconteurExceptionUtil.MessageEntryToException(mret.entries[0]);
             NodeID recv_nodeid = mret.header.SenderNodeID;
             string recv_nodename = mret.header.SenderNodeName;
             if (!target_nodeid.IsAnyNode && target_nodeid != recv_nodeid)

@@ -229,6 +229,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestVerifyWithoutStdver();
 
+                        await AsyncStreamStartTlsErrorTest.TestStartTlsErrorReplyReported();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
