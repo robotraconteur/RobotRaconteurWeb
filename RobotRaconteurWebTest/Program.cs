@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await TransportListenerLeakTest.TestTransportListenerRemoved();
+
                         NodeDirectoriesNodeIdStoreTests.RunTestOversizedNameFileReplaced();
                         NodeDirectoriesNameFdTests.RunTestNameFileClosedAfterStart();
                         await GeneratorCleanupTest.TestGeneratorCleanup();
@@ -355,6 +357,11 @@ namespace RobotRaconteurTest
                 case "generatorcleanup":
                     {
                         await GeneratorCleanupTest.TestGeneratorCleanup();
+                        break;
+                    }
+                case "transportlistenerleak":
+                    {
+                        await TransportListenerLeakTest.TestTransportListenerRemoved();
                         break;
                     }
                 case "message":

@@ -56,6 +56,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)SubObjectCurrentPathTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)GeneratorCleanupTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)TransportListenerLeakTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 

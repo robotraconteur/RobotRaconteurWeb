@@ -633,13 +633,17 @@ namespace RobotRaconteurWeb
 
             ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionConnected, null);
 
-            c.TransportListeners += delegate (Transport _, TransportListenerEventType evt, object param)
+            Transport.TransportListenerDelegate transport_listener = null;
+            transport_listener = delegate (Transport t, TransportListenerEventType evt, object param)
             {
                 if (evt == TransportListenerEventType.TransportConnectionClosed && ((uint)param) == LocalEndpoint)
                 {
+                    // The connection is closed, remove the listener so the transport does not keep this context
+                    t.TransportListeners -= transport_listener;
                     Task.Run(() => ClientServiceListener?.Invoke(this, ClientServiceListenerEventType.TransportConnectionClosed, null));
                 }
             };
+            c.TransportListeners += transport_listener;
 
             try
             {
@@ -858,6 +862,8 @@ namespace RobotRaconteurWeb
                     TransportConnection.Close();
                 }
                 catch { }
+
+                c.TransportListeners -= transport_listener;
 
                 m_Connected = false;
                 throw e;
