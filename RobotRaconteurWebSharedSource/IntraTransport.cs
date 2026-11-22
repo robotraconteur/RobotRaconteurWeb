@@ -470,6 +470,32 @@ namespace RobotRaconteurWeb
             var now = DateTime.UtcNow;
             var o = new List<NodeDiscoveryInfo>();
 
+            // Same as Core IntraTransport::AsyncGetDetectedNodes: report the peers that are servers
+            lock (peer_transports)
+            {
+                foreach (var transport1 in peer_transports)
+                {
+                    if (!transport1.TryGetTarget(out var transport))
+                    {
+                        continue;
+                    }
+
+                    if (!transport.IsServer)
+                    {
+                        continue;
+                    }
+
+                    var n = new NodeDiscoveryInfo();
+                    if (transport.TryGetNodeInfo(out n.NodeID, out n.NodeName, out n.ServiceStateNonce))
+                    {
+                        var u = new NodeDiscoveryInfoURL();
+                        u.URL = "rr+intra:///?nodeid=" + n.NodeID.ToString("B") + "&service=RobotRaconteurServiceIndex";
+                        u.LastAnnounceTime = now;
+                        n.URLs.Add(u);
+                        o.Add(n);
+                    }
+                }
+            }
 
             return Task.FromResult(o);
         }
