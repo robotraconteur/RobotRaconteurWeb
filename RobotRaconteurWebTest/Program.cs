@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await MemoryMaxTransferTest.TestMemoryReadCountLimit();
+
                         TmpUserRunDirTests.RunTestTmpUserRunDirSecure();
                         await TcpSilentConnectionTests.RunTestSilentConnectionClosed();
                         DiscoveryAnnounceValidationTests.RunTestAnnounceValidation();
@@ -230,6 +232,11 @@ namespace RobotRaconteurTest
                 case "memoryreply":
                     {
                         await MemoryReplyTest.TestMemoryWriteReplyType();
+                        break;
+                    }
+                case "memorymaxtransfer":
+                    {
+                        await MemoryMaxTransferTest.TestMemoryReadCountLimit();
                         break;
                     }
                 case "message":

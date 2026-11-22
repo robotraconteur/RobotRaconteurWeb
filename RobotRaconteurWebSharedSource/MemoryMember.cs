@@ -395,6 +395,10 @@ namespace RobotRaconteurWeb
 
                         ulong memorypos = m.FindElement("memorypos").CastData<ulong[]>()[0];
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
+                        // Enforce MaxTransferSize before DoRead allocates count elements
+                        uint max_transfer_size = skel.rr_node.MemoryMaxTransferSize;
+                        if (element_size == 0 || count > max_transfer_size / element_size)
+                            throw new ArgumentException("Memory read count exceeds maximum transfer size");
                         var data = await DoRead(memorypos, 0, count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);
                         ret.AddElement("memorypos", memorypos);
@@ -412,6 +416,9 @@ namespace RobotRaconteurWeb
 
                         ulong memorypos = m.FindElement("memorypos").CastData<ulong[]>()[0];
                         ulong count = m.FindElement("count").CastData<ulong[]>()[0];
+                        uint max_transfer_size = skel.rr_node.MemoryMaxTransferSize;
+                        if (element_size == 0 || count > max_transfer_size / element_size)
+                            throw new ArgumentException("Memory write count exceeds maximum transfer size");
                         var data = m.FindElement("data").Data;
                         await DoWrite(memorypos, data, 0, count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryWriteRet, MemberName);
@@ -509,6 +516,19 @@ namespace RobotRaconteurWeb
 
                         ulong[] memorypos = m.FindElement("memorypos").CastData<ulong[]>();
                         ulong[] count = m.FindElement("count").CastData<ulong[]>();
+                        // Enforce MaxTransferSize before DoRead allocates elem_count elements (overflow safe)
+                        uint max_transfer_size = skel.rr_node.MemoryMaxTransferSize;
+                        ulong max_elems = element_size == 0 ? 0 : max_transfer_size / element_size;
+                        if (!count.Contains((ulong)0))
+                        {
+                            ulong n = 1;
+                            foreach (var c in count)
+                            {
+                                if (c > max_elems / n)
+                                    throw new ArgumentException("Memory read count exceeds maximum transfer size");
+                                n *= c;
+                            }
+                        }
                         ulong elem_count = count.Aggregate((ulong)1, (x, y) => x * y);
                         var data = await DoRead(memorypos, new ulong[count.Length], count, elem_count, mem).ConfigureAwait(false);
                         var ret = new MessageEntry(MessageEntryType.MemoryReadRet, MemberName);

@@ -20,6 +20,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ConnectServiceTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)ConnectFailureTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)MemoryMaxTransferTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
