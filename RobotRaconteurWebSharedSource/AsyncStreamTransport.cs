@@ -1763,7 +1763,7 @@ namespace RobotRaconteurWeb
         bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (this.is_server && certificate == null) return true;
-            if (sslPolicyErrors != SslPolicyErrors.RemoteCertificateChainErrors)
+            if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateChainErrors) == 0)
             {
                 return RemoteCertificateValidationCallback2(chain, false);
             }
