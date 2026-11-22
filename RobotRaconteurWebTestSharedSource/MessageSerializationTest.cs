@@ -463,5 +463,51 @@ namespace RobotRaconteurTest
             node.Shutdown();
             Console.WriteLine("MessageSerializationTest.TestVarValueNestedContainers passed");
         }
+
+        // Send packed container data through a message and return the received element data
+        static object RoundTripElementData(object packed)
+        {
+            var m = CreateMessage();
+            m.header = CreateMessageHeader();
+            var e = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            e.AddElement("value", packed);
+            m.entries.Add(e);
+            uint messageSize = m.ComputeSize4();
+            var buf = new byte[messageSize];
+            using (var w = new ArrayBinaryWriter(new MemoryStream(buf), (int)messageSize))
+            {
+                m.Write4(w);
+            }
+            var m2 = CreateMessage();
+            using (var r = new ArrayBinaryReader(new MemoryStream(buf), (int)messageSize))
+            {
+                m2.Read4(r);
+            }
+            return m2.entries[0].FindElement("value").Data;
+        }
+
+        public static void TestPackEnumContainers()
+        {
+            // Lists and maps of an enum type must pack (as int32) and unpack
+            var node = new RobotRaconteurNode();
+            var l = new List<DayOfWeek>() { DayOfWeek.Monday, DayOfWeek.Friday };
+            var l2 = (List<DayOfWeek>)node.UnpackListType<DayOfWeek>(RoundTripElementData(node.PackListType<DayOfWeek>(l, null)), null);
+            RRAssert.AreEqual(l2.Count, 2);
+            RRAssert.IsTrue(l2[0] == DayOfWeek.Monday && l2[1] == DayOfWeek.Friday);
+
+            var d = new Dictionary<string, DayOfWeek>();
+            d.Add("a", DayOfWeek.Sunday);
+            d.Add("b", DayOfWeek.Saturday);
+            var d2 = (Dictionary<string, DayOfWeek>)node.UnpackMapType<string, DayOfWeek>(RoundTripElementData(node.PackMapType<string, DayOfWeek>(d, null)), null);
+            RRAssert.AreEqual(d2.Count, 2);
+            RRAssert.IsTrue(d2["a"] == DayOfWeek.Sunday && d2["b"] == DayOfWeek.Saturday);
+
+            var v = new Dictionary<int, DayOfWeek>();
+            v.Add(5, DayOfWeek.Tuesday);
+            var v2 = (Dictionary<int, DayOfWeek>)node.UnpackMapType<int, DayOfWeek>(RoundTripElementData(node.PackMapType<int, DayOfWeek>(v, null)), null);
+            RRAssert.IsTrue(v2[5] == DayOfWeek.Tuesday);
+            node.Shutdown();
+            Console.WriteLine("MessageSerializationTest.TestPackEnumContainers passed");
+        }
     }
 }

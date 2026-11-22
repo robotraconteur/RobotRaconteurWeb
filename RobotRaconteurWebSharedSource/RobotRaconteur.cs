@@ -492,6 +492,12 @@ namespace RobotRaconteurWeb
                 return MessageElementUtil.NewMessageElement(name, new T[] { data });
             }
 
+            if (t.IsEnum)
+            {
+                // Enums are sent as int32, as PackVarType does
+                return MessageElementUtil.NewMessageElement(name, new int[] { Convert.ToInt32(data) });
+            }
+
             if (is_array && t.GetElementType().IsPrimitive)
             {
                 return MessageElementUtil.NewMessageElement(name, data);
@@ -589,6 +595,12 @@ namespace RobotRaconteurWeb
             if (t.IsPrimitive)
             {
                 return MessageElementUtil.NewMessageElement(num, new T[] { data });
+            }
+
+            if (t.IsEnum)
+            {
+                // Enums are sent as int32, as PackVarType does
+                return MessageElementUtil.NewMessageElement(num, new int[] { Convert.ToInt32(data) });
             }
 
             if (is_array && t.GetElementType().IsPrimitive)

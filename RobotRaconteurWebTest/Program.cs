@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        MessageSerializationTest.TestPackEnumContainers();
+
                         PasswordFileNullCredentialTests.RunTestNullCredentials();
                         PasswordFileParseTests.RunTestPasswordFileWhitespace();
                         MessageSerializationTest.TestVarValueNestedContainers();
@@ -394,6 +396,11 @@ namespace RobotRaconteurTest
                 case "varvaluenested":
                     {
                         MessageSerializationTest.TestVarValueNestedContainers();
+                        break;
+                    }
+                case "packenum":
+                    {
+                        MessageSerializationTest.TestPackEnumContainers();
                         break;
                     }
                 case "message":
