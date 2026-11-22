@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await RobotRaconteurWebTest.FindServiceByTypeIndexTests.RunTestFindServiceByTypeSkippedNode();
                         await RobotRaconteurWebTest.FindNodeUrlTests.RunTestFindNodeUrls();
                         await ServicePathReleasedTest.TestServicePathReleasedSeparator();
 

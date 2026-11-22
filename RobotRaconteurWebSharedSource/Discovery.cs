@@ -614,6 +614,7 @@ namespace RobotRaconteurWeb
             }
 
             var info_wait = new List<Task<Tuple<byte[], string, Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>>>();
+            var info_wait_nodeids = new List<string>();
 
             for (int i = 0; i < nodeids.Count; i++)
             {
@@ -639,6 +640,7 @@ namespace RobotRaconteurWeb
                     if (urls.Count > 0)
                     {
                         info_wait.Add(DoFindServiceByType(urls.ToArray(), cancel));
+                        info_wait_nodeids.Add(nodeids[i]);
                     }
                 }
                 catch (Exception)
@@ -668,7 +670,7 @@ namespace RobotRaconteurWeb
             }
             catch (Exception) { }
 
-            for (int i = 0; i < nodeids.Count; i++)
+            for (int i = 0; i < info_wait.Count; i++)
             {
 
                 try
@@ -710,7 +712,7 @@ namespace RobotRaconteurWeb
                     {
                         lock (m_DiscoveredNodes)
                         {
-                            m_DiscoveredNodes.Remove(nodeids[i]);
+                            m_DiscoveredNodes.Remove(info_wait_nodeids[i]);
                         }
                     }
                     catch { }
