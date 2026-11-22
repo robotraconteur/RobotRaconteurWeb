@@ -3634,10 +3634,16 @@ namespace RobotRaconteurWeb
 
                             var pipeClient = new NamedPipeClientStream(".", fname2, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.Identification);
 
+                            try
                             {
                                 pipeClient.Connect(2000);
                                 pipeClient.ReadMode = PipeTransmissionMode.Message;
                                 localSocket = pipeClient;
+                            }
+                            catch
+                            {
+                                pipeClient.Dispose();
+                                throw;
                             }
                         }
                         else
@@ -3772,6 +3778,12 @@ namespace RobotRaconteurWeb
                     catch (Exception exp)
                     {
                         RRLogFuncs.LogWarning($"TcpTransport port sharer connect failed: {exp.Message}");
+                        // The socket is not disposed by the using block when the connect itself failed
+                        try
+                        {
+                            socket?.Dispose();
+                        }
+                        catch { }
                     }
 
                     lock (thisLock)
