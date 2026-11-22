@@ -73,8 +73,8 @@ class Reynard_impl : Reynard_default_impl, IDisposable
     {
         var socket_res = await _communicate("STATE", "STATE");
         var ret = new double[2];
-        ret[0] = double.Parse(socket_res[0]) * 1e-3;
-        ret[1] = double.Parse(socket_res[1]) * 1e-3;
+        ret[0] = double.Parse(socket_res[1]) * 1e-3;
+        ret[1] = double.Parse(socket_res[2]) * 1e-3;
         return ret;
     }
 
@@ -108,9 +108,9 @@ class Reynard_impl : Reynard_default_impl, IDisposable
     {
         var socket_res = await _communicate("STATE", "STATE");
 
-        return new double[] { double.Parse(socket_res[2]) * (Math.PI / 180.0),
-                              double.Parse(socket_res[3]) * (Math.PI / 180.0),
-                              double.Parse(socket_res[4]) * (Math.PI / 180.0) };
+        return new double[] { double.Parse(socket_res[3]) * (Math.PI / 180.0),
+                              double.Parse(socket_res[4]) * (Math.PI / 180.0),
+                              double.Parse(socket_res[5]) * (Math.PI / 180.0) };
     }
     public override async Task drive_robot(double vel_x, double vel_y, double timeout, bool wait, CancellationToken cancel=default(CancellationToken))
 
