@@ -168,6 +168,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestNumberParseException();
 
+                        RobDefTest.TestConstantIntegerValues();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

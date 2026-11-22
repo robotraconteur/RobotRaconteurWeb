@@ -2747,25 +2747,17 @@ namespace RobotRaconteurWeb
                         return false;
                 }
 
-                long val2;
-                if (val.StartsWith("-0x"))
+                // Parse the magnitude as unsigned so the range check also works for int64 and for hex digits
+                // with the high bit set (Convert.ToInt64(s, 16) would return a negative two's complement value)
+                bool negative = val.StartsWith("-");
+                string mag_str = val.TrimStart('+', '-');
+                if (mag_str.StartsWith("0x"))
                 {
-                    val2 = -Convert.ToInt64(val.Substring(3), b);
+                    mag_str = mag_str.Substring(2);
                 }
-                else
-                {
-                    if (val.StartsWith("+0x"))
-                    {
-                        val = val.Substring(3);
-                    }
-                    else if (val.StartsWith("0x"))
-                    {
-                        val = val.Substring(2);
-                    }
-                    val2 = Convert.ToInt64(val, b);
-                }
+                ulong mag = Convert.ToUInt64(mag_str, b);
 
-                if (val2 < min_value || val2 > max_value)
+                if (negative ? mag > (ulong)(-(min_value + 1)) + 1 : mag > (ulong)max_value)
                 {
                     return false;
                 }

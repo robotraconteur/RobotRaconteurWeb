@@ -294,5 +294,52 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(t.ArrayLength[1], 4);
             RRWebTest.WriteLine("RobDefTest.TestNumberParseException passed");
         }
+
+        static bool ConstantAccepted(string s)
+        {
+            try
+            {
+                new ConstantDefinition((ServiceDefinition)null).FromString(s);
+                return true;
+            }
+            catch (ServiceDefinitionParseException)
+            {
+                return false;
+            }
+        }
+
+        public static void TestConstantIntegerValues()
+        {
+            // int64 constants were rejected (the signed range switch had uint64 for int64)
+            RRAssert.IsTrue(ConstantAccepted("constant int64 x 5"));
+            RRAssert.IsTrue(ConstantAccepted("constant int64 x -9223372036854775808"));
+            RRAssert.IsTrue(ConstantAccepted("constant int64 x 9223372036854775807"));
+            RRAssert.IsTrue(ConstantAccepted("constant int64 x 0x7FFFFFFFFFFFFFFF"));
+            RRAssert.IsFalse(ConstantAccepted("constant int64 x 9223372036854775808"));
+            RRAssert.IsFalse(ConstantAccepted("constant int64 x 0x8000000000000000"));
+            RRAssert.IsTrue(ConstantAccepted("constant int64[] x {1, -2, 0x3}"));
+            // The value zero threw ArgumentOutOfRangeException (leading zeros were trimmed to an empty string)
+            RRAssert.IsTrue(ConstantAccepted("constant int32 z 0"));
+            RRAssert.IsTrue(ConstantAccepted("constant int16 z 0x0"));
+            RRAssert.IsTrue(ConstantAccepted("constant int8 z -0x0"));
+            RRAssert.IsTrue(ConstantAccepted("constant int32[] z {0, 1}"));
+            // Signed constants were not range checked (&& for ||)
+            RRAssert.IsTrue(ConstantAccepted("constant int8 n 127"));
+            RRAssert.IsTrue(ConstantAccepted("constant int8 n -128"));
+            RRAssert.IsTrue(ConstantAccepted("constant int8 n -0x80"));
+            RRAssert.IsFalse(ConstantAccepted("constant int8 n 200"));
+            RRAssert.IsFalse(ConstantAccepted("constant int8 n -129"));
+            RRAssert.IsFalse(ConstantAccepted("constant int8 n 0x80"));
+            RRAssert.IsFalse(ConstantAccepted("constant int16 n 99999"));
+            RRAssert.IsTrue(ConstantAccepted("constant int32 n 2147483647"));
+            RRAssert.IsTrue(ConstantAccepted("constant int32 n -2147483648"));
+            RRAssert.IsFalse(ConstantAccepted("constant int32 n 99999999999"));
+            RRAssert.IsFalse(ConstantAccepted("constant int32 n 0xFFFFFFFF"));
+            RRAssert.IsFalse(ConstantAccepted("constant int32[] n {1, 2147483648}"));
+            RRAssert.IsTrue(ConstantAccepted("constant int32 n +7"));
+            RRAssert.IsTrue(ConstantAccepted("constant uint8 n 255"));
+            RRAssert.IsFalse(ConstantAccepted("constant uint8 n 256"));
+            RRWebTest.WriteLine("RobDefTest.TestConstantIntegerValues passed");
+        }
     }
 }
