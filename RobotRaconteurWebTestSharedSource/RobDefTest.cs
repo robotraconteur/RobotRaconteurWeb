@@ -477,5 +477,40 @@ namespace RobotRaconteurTest
                               "Func<int, CancellationToken, Task<double[]>>");
             RRWebTest.WriteLine("RobDefTest.TestGenAsyncDelegateReturnType passed");
         }
+
+        static ServiceDefinitionParseInfo ParseErrorInfo(string robdef)
+        {
+            try
+            {
+                new ServiceDefinition().FromString(robdef);
+            }
+            catch (ServiceDefinitionParseException e)
+            {
+                return e.ParseInfo;
+            }
+            throw new Exception("Unit test failure: definition parsed without error");
+        }
+
+        public static void TestParseErrorLineNumbers()
+        {
+            // Line numbers started at 0 (one too low; Core starts at 1), and errors inside a struct / object block
+            // and all "Invalid constant definition" errors had neither the service name nor a line number
+            var i1 = ParseErrorInfo("service t7.lines\n\nstdver 0.10\n\nconstant int32 c 1.5\n");
+            RRAssert.AreEqual(i1.ServiceName, "t7.lines");
+            RRAssert.AreEqual(i1.LineNumber ?? -1, 5);
+            RRAssert.AreEqual(i1.Line, "constant int32 c 1.5");
+
+            var i2 = ParseErrorInfo("service t7.lines\nstdver 0.10\n\nobject o\nproperty double p\nproperty double q(\nend\n");
+            RRAssert.AreEqual(i2.ServiceName, "t7.lines");
+            RRAssert.AreEqual(i2.LineNumber ?? -1, 6);
+
+            var i3 = ParseErrorInfo("service t7.lines\nstdver 0.10\n\nobject o\nconstant int32 c 1.5\nend\n");
+            RRAssert.AreEqual(i3.ServiceName, "t7.lines");
+            RRAssert.AreEqual(i3.LineNumber ?? -1, 5);
+
+            var i4 = ParseErrorInfo("service t7.lines\nstdver 0.10\nbad line\n");
+            RRAssert.AreEqual(i4.LineNumber ?? -1, 3);
+            RRWebTest.WriteLine("RobDefTest.TestParseErrorLineNumbers passed");
+        }
     }
 }

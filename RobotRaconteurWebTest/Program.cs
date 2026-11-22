@@ -205,6 +205,8 @@ namespace RobotRaconteurTest
 
                         await AsyncStreamStreamOpCancelTest.TestCancelledQueuedStreamOpDoesNotStall();
 
+                        RobDefTest.TestParseErrorLineNumbers();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

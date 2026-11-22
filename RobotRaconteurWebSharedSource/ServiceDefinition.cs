@@ -208,7 +208,7 @@ namespace RobotRaconteurWeb
                     l2 = is_.ReadLine();
                     if (l2 == null)
                         return false;
-                    parse_info.LineNumber = (parse_info.LineNumber ?? -1) + 1;
+                    parse_info.LineNumber = (parse_info.LineNumber ?? 0) + 1;
                     parse_info.Line = null;
 
                     l2 = l2.TrimEnd(new char[] { '\r' });
@@ -905,6 +905,11 @@ namespace RobotRaconteurWeb
         public void FromReader(TextReader s, ref List<Exception> warnings, ServiceDefinitionParseInfo? parse_info = null)
         {
             Reset();
+
+            if (parse_info != null)
+            {
+                ParseInfo = parse_info.Value;
+            }
 
             var start_struct_regex = new Regex("^[ \\t]*struct[ \\t]+(\\w+)[ \\t]*$");
             var start_pod_regex = new Regex("^[ \\t]*pod[ \\t]+(\\w+)[ \\t]*$");
@@ -2662,6 +2667,14 @@ namespace RobotRaconteurWeb
         public void FromString(string s, ServiceDefinitionParseInfo? parse_info = null)
         {
             Reset();
+
+            if (parse_info != null)
+            {
+                ParseInfo = parse_info.Value;
+            }
+
+            if (ParseInfo.Line == null)
+                ParseInfo.Line = s;
 
             var r = new Regex("^[ \\t]*constant[ \\t]+(" + detail.ServiceDefinitionUtil.RR_TYPE2_REGEX + ")[ \\t]+(" + detail.ServiceDefinitionUtil.RR_NAME_REGEX + ")[ \\t]+([^\\s](?:[ -~\\t]*[^\\s])?)[ \\t]*$");
             var r_match = r.Match(s);
