@@ -639,13 +639,14 @@ namespace RobotRaconteurWeb
 
                 if (pause_task1 == null)
                 {
-                    if (send_queue.Count > 0)
+                    bool next_started = false;
+                    while (send_queue.Count > 0 && !next_started)
                     {
                         var t = send_queue[0];
                         send_queue.RemoveAt(0);
-                        t.Item1.TrySetResult(0);
+                        next_started = t.Item1.TrySetResult(0);
                     }
-                    else
+                    if (!next_started)
                     {
                         sending = false;
                     }
@@ -845,24 +846,28 @@ namespace RobotRaconteurWeb
             }
             finally
             {
-                TaskCompletionSource<int> next_send = null;
-                lock (this)
+                while (true)
                 {
-                    if (send_queue.Count > 0)
+                    TaskCompletionSource<int> next_send = null;
+                    lock (this)
                     {
-                        var t = send_queue[0];
-                        send_queue.RemoveAt(0);
-                        next_send = t.Item1;
+                        if (send_queue.Count > 0)
+                        {
+                            var t = send_queue[0];
+                            send_queue.RemoveAt(0);
+                            next_send = t.Item1;
+                        }
+                        else
+                        {
+                            sending = false;
+                        }
                     }
-                    else
-                    {
-                        sending = false;
-                    }
-                }
 
-                if (next_send != null)
-                {
-                    next_send.TrySetResult(0);
+                    // Skip queued senders that were already cancelled, otherwise nobody continues sending
+                    if (next_send == null || next_send.TrySetResult(0))
+                    {
+                        break;
+                    }
                 }
 
 

@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamTransportTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamSendQueueCancelTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AttributesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServicePathTest.cs" />
 
