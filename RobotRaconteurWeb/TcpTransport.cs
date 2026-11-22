@@ -2767,10 +2767,11 @@ namespace RobotRaconteurWeb
                     {
                         if (GetUseIPv4(flags))
                         {
+                            Socket sock = null;
                             try
                             {
                                 string packetdata = packet_gen(scheme, binfo);
-                                Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                                sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                                 sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                                 IPEndPoint local_endpoint = new IPEndPoint(binfo.AdapterEndPoint.Address, ANNOUNCE_PORT);
                                 IPEndPoint broadcast_endpoint = new IPEndPoint(binfo.AdapterBroadcastAddress, ANNOUNCE_PORT);
@@ -2783,9 +2784,12 @@ namespace RobotRaconteurWeb
                                     return sock.BeginSendTo(data, 0, data.Length, SocketFlags.None, broadcast_endpoint, cb, state);
                                 },
                                         sock.EndSendTo, sock).ConfigureAwait(false);
-                                sock.Close();
                             }
                             catch { }
+                            finally
+                            {
+                                sock?.Close();
+                            }
                         }
                     }
                     else
@@ -2794,12 +2798,13 @@ namespace RobotRaconteurWeb
                         if (!binfo.AdapterEndPoint.Address.IsIPv6LinkLocal)
                             continue;
 
+                        Socket sock = null;
                         try
                         {
                             var IPv6MulticastBroadcastAddresses = GetIPv6MulticastAddresses(flags);
 
                             string packetdata = packet_gen(scheme, binfo);
-                            Socket sock = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
+                            sock = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
                             //sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                             IPEndPoint local_endpoint = new IPEndPoint(binfo.AdapterEndPoint.Address, ANNOUNCE_PORT);
 
@@ -2848,13 +2853,14 @@ namespace RobotRaconteurWeb
                                 }
                                 catch { }
                             }
-
-
-                            sock.Close();
                         }
                         catch
                         {
 
+                        }
+                        finally
+                        {
+                            sock?.Close();
                         }
 
                     }
