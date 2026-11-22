@@ -314,6 +314,7 @@ namespace RobotRaconteurTest
             RandomTest();
             Test4();
             RandomTest4();
+            TestElementExtendedLength();
             TestReadString8LengthCheck();
             TestNestingDepth();
             TestElementCount();
@@ -371,6 +372,49 @@ namespace RobotRaconteurTest
             node.Shutdown();
 
             RRWebTest.WriteLine("MessageSerializationTest.TestVarValueComplexBool passed");
+        }
+
+        static public void TestElementExtendedLength()
+        {
+            // An element Extended length larger than the message must be rejected before allocating
+            var m = CreateMessage();
+            m.header = CreateMessageHeader();
+            var e = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            var el = new MessageElement("a", null);
+            el.Extended = new byte[70000];
+            e.elements.Add(el);
+            m.entries.Add(e);
+
+            uint messageSize = m.ComputeSize4();
+            var buf = new byte[messageSize];
+            using (var w = new ArrayBinaryWriter(new MemoryStream(buf), (int)messageSize))
+            {
+                m.Write4(w);
+            }
+
+            // 70000 is encoded as uint_x 0xFE + little-endian uint32; claim 0x10000000 (256 MiB) instead
+            byte[] pattern = new byte[] { 0xFE, 0x70, 0x11, 0x01, 0x00 };
+            int pos = -1;
+            for (int i = 0; i + pattern.Length <= buf.Length && pos < 0; i++)
+            {
+                if (buf[i] == 0xFE && buf.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
+                    pos = i;
+            }
+            RRAssert.IsTrue(pos >= 0);
+            Array.Copy(BitConverter.GetBytes((uint)0x10000000), 0, buf, pos + 1, 4);
+
+            long before = GC.GetTotalAllocatedBytes(true);
+            RRAssert.ThrowsException<IOException>(() =>
+            {
+                using (var r = new ArrayBinaryReader(new MemoryStream(buf), buf.Length))
+                {
+                    var m2 = CreateMessage();
+                    m2.Read4(r);
+                }
+            });
+            long allocated = GC.GetTotalAllocatedBytes(true) - before;
+            RRAssert.IsTrue(allocated < 64L * 1024 * 1024);
+            Console.WriteLine("MessageSerializationTest.TestElementExtendedLength passed");
         }
     }
 }

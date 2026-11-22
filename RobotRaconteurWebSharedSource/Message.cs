@@ -2776,10 +2776,10 @@ namespace RobotRaconteurWeb
             if ((ElementFlags & (byte)MessageElementFlags.Extended) != 0)
             {
                 uint l = r.ReadUintX();
+                if (l > r.DistanceFromLimit) throw new IOException("Error reading message");
                 Extended = new byte[l];
                 if (l != 0)
                 {
-                    Extended = new byte[l];
                     for (int i = 0; i < Extended.Length; i++)
                         Extended[i] = r.ReadByte();
                 }
