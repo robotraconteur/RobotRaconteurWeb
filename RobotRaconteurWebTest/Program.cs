@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        CommandLineConfigParserTests.RunTestCommandLineOptions();
                         await TransportListenerLeakTest.TestTransportListenerRemoved();
 
                         NodeDirectoriesNodeIdStoreTests.RunTestOversizedNameFileReplaced();

@@ -280,12 +280,38 @@ namespace RobotRaconteurWeb
         public RobotRaconteurNodeSetupFlags AllowedOverrides { get; set; }
 
         private OptionSet optionSet;
+        private Dictionary<string, string> parsedOptions;
 
-        public FillOptionsDescriptionAddHelper(OptionSet optionSet, string prefix, RobotRaconteurNodeSetupFlags allowedOverrides)
+        public FillOptionsDescriptionAddHelper(OptionSet optionSet, string prefix, RobotRaconteurNodeSetupFlags allowedOverrides, Dictionary<string, string> parsedOptions)
         {
             this.optionSet = optionSet;
             this.Prefix = prefix;
             this.AllowedOverrides = allowedOverrides;
+            this.parsedOptions = parsedOptions;
+        }
+
+        // Store the value under the prefixed name, which is what the CommandLineConfigParser getters look up
+        private void Store<T>(string combinedName, string v)
+        {
+            if (typeof(T) == typeof(bool) && v != null)
+            {
+                switch (v.Trim().ToLowerInvariant())
+                {
+                    case "true":
+                    case "1":
+                    case "yes":
+                    case "on":
+                        v = "true";
+                        break;
+                    case "false":
+                    case "0":
+                    case "no":
+                    case "off":
+                        v = "false";
+                        break;
+                }
+            }
+            parsedOptions[combinedName] = v;
         }
 
         public void Add<T>(string name, string descr, RobotRaconteurNodeSetupFlags flag)
@@ -293,14 +319,14 @@ namespace RobotRaconteurWeb
             if ((flag & AllowedOverrides) != 0)
             {
                 string combinedName = Prefix + name;
-                optionSet.Add(combinedName + "=", descr, v => { /* You can add logic here to store/process 'v' */ });
+                optionSet.Add(combinedName + "=", descr, v => Store<T>(combinedName, v));
             }
         }
 
         public void Add<T>(string name, string descr)
         {
             string combinedName = Prefix + name;
-            optionSet.Add(combinedName + "=", descr, v => { /* You can add logic here to store/process 'v' */ });
+            optionSet.Add(combinedName + "=", descr, v => Store<T>(combinedName, v));
         }
     }
 #endif
@@ -401,7 +427,7 @@ namespace RobotRaconteurWeb
         public void AddStringOption(string name, string descr)
         {
 #if !ROBOTRACONTEUR_H5
-            desc.Add(prefix + name + "=", descr, v => parsedOptions[name] = v);
+            desc.Add(prefix + name + "=", descr, v => parsedOptions[prefix + name] = v);
 #endif
         }
         /**
@@ -416,7 +442,7 @@ namespace RobotRaconteurWeb
         public void AddBoolOption(string name, string descr)
         {
 #if !ROBOTRACONTEUR_H5
-            desc.Add(prefix + name, descr, v => parsedOptions[name] = v != null ? "true" : "false");
+            desc.Add(prefix + name, descr, v => parsedOptions[prefix + name] = v != null ? "true" : "false");
 #endif
         }
 
@@ -432,7 +458,7 @@ namespace RobotRaconteurWeb
         public void AddIntOption(string name, string descr)
         {
 #if !ROBOTRACONTEUR_H5
-            desc.Add(prefix + name + "=", descr, (int v) => parsedOptions[name] = v.ToString());
+            desc.Add(prefix + name + "=", descr, (int v) => parsedOptions[prefix + name] = v.ToString());
 #endif
         }
 
@@ -665,7 +691,7 @@ namespace RobotRaconteurWeb
 #if !ROBOTRACONTEUR_H5
         internal void FillOptionsDescription(OptionSet optionSet, RobotRaconteurNodeSetupFlags allowedOverrides, string prefix)
         {
-            var h = new FillOptionsDescriptionAddHelper(optionSet, prefix, allowedOverrides);
+            var h = new FillOptionsDescriptionAddHelper(optionSet, prefix, allowedOverrides, parsedOptions);
 
             h.Add<bool>("discovery-listening-enable", "enable node discovery listening",
                 RobotRaconteurNodeSetupFlags.EnableNodeDiscoveryListening);

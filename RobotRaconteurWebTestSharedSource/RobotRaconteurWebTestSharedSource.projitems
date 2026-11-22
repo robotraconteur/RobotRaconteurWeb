@@ -84,6 +84,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)NodeDirectoriesNameFdTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)NodeDirectoriesNodeIdStoreTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)CommandLineConfigParserTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceLockAsyncTests.cs" />
