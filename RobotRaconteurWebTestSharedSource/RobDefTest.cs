@@ -402,5 +402,24 @@ namespace RobotRaconteurTest
             ServiceDefinitionUtil.VerifyServiceDefinitions(defs3);
             RRWebTest.WriteLine("RobDefTest.TestRecursiveImplementsAndImportsNotThroughRoot passed");
         }
+
+        public static void TestGenSkelKeywordObjectName()
+        {
+            // An object named after a C# keyword gave a class lock__skel with a constructor lock_skel and casts to
+            // (lock), which does not compile
+            var d = new ServiceDefinition();
+            d.FromString("service t7.gen1\nstdver 0.10\n\nobject lock\nproperty double p\npipe double pp\nend\n");
+            var w = new StringWriter();
+            CSharpServiceLangGen.GenerateServiceFactory(d, "", w);
+            CSharpServiceLangGen.GenerateSkel(d.Objects["lock"], w);
+            var gen = w.ToString();
+            RRAssert.IsTrue(gen.Contains("case \"lock\":"));
+            RRAssert.IsTrue(gen.Contains("return new lock__skel(path,(lock_)obj,context);"));
+            RRAssert.IsTrue(gen.Contains("public class lock__skel : ServiceSkel {"));
+            RRAssert.IsTrue(gen.Contains("public lock__skel(string p,lock_ o,ServerContext c)"));
+            RRAssert.IsTrue(gen.Contains("lock_ castobj=(lock_)o;"));
+            RRAssert.IsFalse(gen.Contains("(lock)"));
+            RRWebTest.WriteLine("RobDefTest.TestGenSkelKeywordObjectName passed");
+        }
     }
 }

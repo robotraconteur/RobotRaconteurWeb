@@ -1197,7 +1197,7 @@ namespace RobotRaconteurWeb
             {
                 string objname = e.Name;
                 w2.WriteLine("    case \"" + objname + "\":");
-                w2.WriteLine("    return new " + objname + "_skel(path,(" + objname + ")obj,context);");
+                w2.WriteLine("    return new " + FixName(objname) + "_skel(path,(" + FixName(objname) + ")obj,context);");
             }
             w2.WriteLine("    default:");
             w2.WriteLine("    break;");
@@ -1822,7 +1822,7 @@ namespace RobotRaconteurWeb
         {
             w2.WriteLine("public class " + FixName(e.Name) + "_skel : ServiceSkel {");
             w2.WriteLine("    protected " + FixName(e.Name) + " obj;");
-            w2.WriteLine("    public " + e.Name + "_skel(string p," + FixName(e.Name) + " o,ServerContext c) : base(p,o,c) { obj=(" + FixName(e.Name) + ")o; }");
+            w2.WriteLine("    public " + FixName(e.Name) + "_skel(string p," + FixName(e.Name) + " o,ServerContext c) : base(p,o,c) { obj=(" + FixName(e.Name) + ")o; }");
             w2.WriteLine("    public override void ReleaseCastObject() { ");
             w2.WriteLine("    }");
 
@@ -2072,7 +2072,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    public override void InitPipeServers(object o) {");
             w2.WriteLine("    if (this.rr_InitPipeServersRun) return;");
             w2.WriteLine("    this.rr_InitPipeServersRun=true;");
-            w2.WriteLine("    " + e.Name + " castobj=(" + e.Name + ")o;");
+            w2.WriteLine("    " + FixName(e.Name) + " castobj=(" + FixName(e.Name) + ")o;");
 
             foreach (var m in MemberIter<PipeDefinition>(e))
             {
