@@ -560,5 +560,27 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(d2.Objects["o"].Constants["c"].Value, "5");
             RRWebTest.WriteLine("RobDefTest.TestEntryConstantsToString passed");
         }
+
+        public static void TestVerifyWithoutStdver()
+        {
+            // VerifyVersionSupport compared the StdVer struct with null, which is never true, so a definition
+            // without stdver that uses a member modifier, constant, using or enum failed verification ("standard
+            // version 0.9 or greater required"); Core skips the check when the version is unset
+            var defs = ParseDefs2("service t7.nostdver\n\nconstant int32 c 5\n\nobject o\nproperty double p [readonly]\nend\n");
+            ServiceDefinitionUtil.VerifyServiceDefinitions(defs);
+            // A definition with an older stdver is still checked
+            var defs2 = ParseDefs2("service t7.oldstdver\noption version 0.8\n\nobject o\nproperty double p [readonly]\nend\n");
+            RRAssert.ThrowsException<ServiceDefinitionException>(() => ServiceDefinitionUtil.VerifyServiceDefinitions(defs2));
+            RRWebTest.WriteLine("RobDefTest.TestVerifyWithoutStdver passed");
+        }
+
+        static Dictionary<string, ServiceDefinition> ParseDefs2(string text)
+        {
+            var d = new ServiceDefinition();
+            d.FromString(text);
+            var defs = new Dictionary<string, ServiceDefinition>();
+            defs.Add(d.Name, d);
+            return defs;
+        }
     }
 }

@@ -3342,7 +3342,7 @@ namespace RobotRaconteurWeb
         internal static void VerifyVersionSupport(ServiceDefinition def, uint major, uint minor, string msg)
         {
             var def_version = def.StdVer;
-            if (def_version == null)
+            if (!(bool)def_version)
                 return;
 
             if (def_version < new RobotRaconteurVersion(major, minor))
