@@ -256,13 +256,47 @@ namespace RobotRaconteurWeb
                     throw new InvalidOperationException("Invalid generator");
                 }
                 gen.last_access_time = DateTime.UtcNow;
+                if (m.Error != MessageErrorType.None)
+                {
+                    // Closed or aborted: destroy in 30 seconds (CleanupGenerators), as Core does
+                    gen.last_access_time -= (GeneratorIdleTimeout - TimeSpan.FromSeconds(30));
+                }
             }
 
             if (gen.Endpoint != ep.LocalEndpoint)
             {
                 throw new InvalidOperationException("Invalid generator");
             }
-            return await gen.CallNext(m).ConfigureAwait(false);
+            try
+            {
+                return await gen.CallNext(m).ConfigureAwait(false);
+            }
+            catch
+            {
+                // The generator finished (StopIteration) or failed: destroy it
+                lock (generators)
+                {
+                    if (generators.TryGetValue(index, out var gen2) && gen2 == gen)
+                    {
+                        generators.Remove(index);
+                    }
+                }
+                throw;
+            }
+        }
+
+        static readonly TimeSpan GeneratorIdleTimeout = TimeSpan.FromMinutes(10);
+
+        internal void CleanupGenerators()
+        {
+            DateTime destroy_time = DateTime.UtcNow - GeneratorIdleTimeout;
+            lock (generators)
+            {
+                foreach (var k in generators.Where(x => x.Value.last_access_time < destroy_time).Select(x => x.Key).ToArray())
+                {
+                    generators.Remove(k);
+                }
+            }
         }
 
         public virtual string GetObjectType()
@@ -1458,6 +1492,16 @@ namespace RobotRaconteurWeb
                     c.PeriodicCleanupTask();
                 }
 
+            }
+
+            ServiceSkel[] skels1;
+            lock (skels)
+            {
+                skels1 = skels.Values.ToArray();
+            }
+            foreach (var s in skels1)
+            {
+                s.CleanupGenerators();
             }
 
 

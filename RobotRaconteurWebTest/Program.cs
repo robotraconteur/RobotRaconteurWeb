@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await GeneratorCleanupTest.TestGeneratorCleanup();
+
                         NodeDirectoriesLockTests.RunTestNodeNameLockInUse();
                         NodeDirectoriesPrefixTests.RunTestSystemPrefix();
                         LocalStartFailTests.RunTestLocalStartFailureCleanup();
@@ -346,6 +348,11 @@ namespace RobotRaconteurTest
                 case "subobjcurrentpath":
                     {
                         await SubObjectCurrentPathTest.TestFirstSubObjectRequestCurrentPath();
+                        break;
+                    }
+                case "generatorcleanup":
+                    {
+                        await GeneratorCleanupTest.TestGeneratorCleanup();
                         break;
                     }
                 case "message":

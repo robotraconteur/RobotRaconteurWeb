@@ -399,6 +399,7 @@ namespace RobotRaconteurWeb
             this.index = index;
             this.skel = skel;
             this.ep = ep;
+            this.last_access_time = DateTime.UtcNow;
         }
 
         public uint Endpoint { get => ep.LocalEndpoint; }
