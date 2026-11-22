@@ -309,7 +309,13 @@ namespace RobotRaconteurWeb
 
             foreach (string l in lines)
             {
-                string[] g = l.Split(null);
+                // Columns are separated by any run of whitespace, as in Core
+                string l1 = l.Trim();
+                if (l1.Length == 0)
+                {
+                    continue;
+                }
+                string[] g = l1.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
                 User u = new User();
                 u.username = g[0];
                 u.passwordhash = g[1];

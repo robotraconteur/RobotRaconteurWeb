@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        PasswordFileParseTests.RunTestPasswordFileWhitespace();
                         MessageSerializationTest.TestVarValueNestedContainers();
 
                         TimeSpecCompareTests.RunTestTimeSpecCompare();
