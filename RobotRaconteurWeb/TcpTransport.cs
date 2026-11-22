@@ -1975,21 +1975,41 @@ namespace RobotRaconteurWeb
 
                     }
 
-                    try
-                    {
-                        await Task.WhenAny(wait_tasks.Select(x => x.Item1)).AwaitWithTimeout(parenttransport.DefaultConnectTimeout).ConfigureAwait(false);
-                    }
-                    catch { }
+                    // Wait until one connect succeeded; a connect that failed on one interface is skipped
+                    var active_wait_tasks = new List<Tuple<Task, ClientWebSocket>>(wait_tasks);
+                    var connect_deadline = DateTime.UtcNow.AddMilliseconds(parenttransport.DefaultConnectTimeout);
 
                     Tuple<Task, ClientWebSocket> found = null;
-                    foreach (var t in wait_tasks)
+                    while (active_wait_tasks.Count > 0 && found == null)
                     {
-                        if (t.Item1.IsCompleted && found == null)
+                        int remaining = (int)Math.Max(0, (connect_deadline - DateTime.UtcNow).TotalMilliseconds);
+                        try
                         {
-                            found = t;
-                            websocket = t.Item2;
+                            await Task.WhenAny(active_wait_tasks.Select(x => x.Item1)).AwaitWithTimeout(remaining).ConfigureAwait(false);
+                        }
+                        catch { }
+
+                        active_wait_tasks.Clear();
+
+                        foreach (var t in wait_tasks)
+                        {
+                            if (t.Item1.IsCompleted && !t.Item1.IsFaulted && !t.Item1.IsCanceled && found == null)
+                            {
+                                found = t;
+                                websocket = t.Item2;
+                                break;
+                            }
+
+                            if (!t.Item1.IsCompleted)
+                            {
+                                active_wait_tasks.Add(t);
+                            }
                         }
 
+                        if (DateTime.UtcNow >= connect_deadline)
+                        {
+                            break;
+                        }
                     }
 
                     foreach (var t in wait_tasks)
