@@ -758,6 +758,8 @@ namespace RobotRaconteurWeb
                 case DataTypes.dictionary_t:
                     {
                         var t = typeof(T);
+                        // varvalue container (object has no generic arguments)
+                        if (t == typeof(object)) return (T)UnpackVarType(e, context);
                         var method = typeof(RobotRaconteurNode).GetMethod("UnpackMapType");
                         var dict_params = t.GetGenericArguments();
                         var generic = method.MakeGenericMethod(dict_params);
@@ -766,6 +768,8 @@ namespace RobotRaconteurWeb
                 case DataTypes.list_t:
                     {
                         var t = typeof(T);
+                        // varvalue container (object has no generic arguments)
+                        if (t == typeof(object)) return (T)UnpackVarType(e, context);
                         var method = typeof(RobotRaconteurNode).GetMethod("UnpackListType");
                         var list_params = t.GetGenericArguments();
                         var generic = method.MakeGenericMethod(list_params);

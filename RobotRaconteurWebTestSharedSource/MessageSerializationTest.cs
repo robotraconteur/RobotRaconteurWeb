@@ -416,5 +416,52 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(allocated < 64L * 1024 * 1024);
             Console.WriteLine("MessageSerializationTest.TestElementExtendedLength passed");
         }
+
+        public static void TestVarValueNestedContainers()
+        {
+            // A varvalue map or list that holds another map or list must unpack
+            var node = new RobotRaconteurNode();
+            var inner_map = new Dictionary<string, object>();
+            inner_map.Add("x", new int[] { 2 });
+            var inner_list = new List<object>();
+            inner_list.Add(new double[] { 1.5 });
+            inner_list.Add("s");
+            var inner_vector = new Dictionary<int, object>();
+            inner_vector.Add(3, new uint[] { 4 });
+            var v = new Dictionary<string, object>();
+            v.Add("m", inner_map);
+            v.Add("l", inner_list);
+            v.Add("v", inner_vector);
+
+            // Send it through a message as a varvalue element
+            var m = CreateMessage();
+            m.header = CreateMessageHeader();
+            var e = new MessageEntry(MessageEntryType.FunctionCallReq, "f");
+            e.AddElement("value", node.PackVarType(v, null));
+            m.entries.Add(e);
+            uint messageSize = m.ComputeSize4();
+            var buf = new byte[messageSize];
+            using (var w = new ArrayBinaryWriter(new MemoryStream(buf), (int)messageSize))
+            {
+                m.Write4(w);
+            }
+            var m2 = CreateMessage();
+            using (var r = new ArrayBinaryReader(new MemoryStream(buf), (int)messageSize))
+            {
+                m2.Read4(r);
+            }
+
+            var v2 = (Dictionary<string, object>)node.UnpackVarType(m2.entries[0].FindElement("value"), null);
+            var inner_map2 = (Dictionary<string, object>)v2["m"];
+            RRAssert.AreEqual(((int[])inner_map2["x"])[0], 2);
+            var inner_list2 = (List<object>)v2["l"];
+            RRAssert.AreEqual(inner_list2.Count, 2);
+            RRAssert.AreEqual(((double[])inner_list2[0])[0], 1.5);
+            RRAssert.AreEqual((string)inner_list2[1], "s");
+            var inner_vector2 = (Dictionary<int, object>)v2["v"];
+            RRAssert.AreEqual(((uint[])inner_vector2[3])[0], (uint)4);
+            node.Shutdown();
+            Console.WriteLine("MessageSerializationTest.TestVarValueNestedContainers passed");
+        }
     }
 }

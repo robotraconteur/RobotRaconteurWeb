@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        MessageSerializationTest.TestVarValueNestedContainers();
+
                         TimeSpecCompareTests.RunTestTimeSpecCompare();
                         await WallTimerEventTests.RunTestWallTimerEvents();
                         await WallRateSleepTests.RunTestWallRateLateSleep();
@@ -385,6 +387,11 @@ namespace RobotRaconteurTest
                 case "pulledservicetypes":
                     {
                         await PulledServiceTypesTest.TestPulledServiceTypesDefinitionText();
+                        break;
+                    }
+                case "varvaluenested":
+                    {
+                        MessageSerializationTest.TestVarValueNestedContainers();
                         break;
                     }
                 case "message":
