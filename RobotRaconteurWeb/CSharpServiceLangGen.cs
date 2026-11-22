@@ -1818,6 +1818,8 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    public " + FixName(e.Name) + "_skel(string p," + FixName(e.Name) + " o,ServerContext c) : base(p,o,c) { obj=(" + FixName(e.Name) + ")o; }");
             w2.WriteLine("    public override void ReleaseCastObject() { ");
             w2.WriteLine("    }");
+            // The Robot Raconteur object type, not derived from the (possibly escaped) C# class name
+            w2.WriteLine("    public override string GetObjectType() { return \"" + e.ServiceDefinition.Name + "." + e.Name + "\"; }");
 
             w2.WriteLine("    public override async Task<MessageEntry> CallGetProperty(MessageEntry m) {");
             w2.WriteLine("    string ename=m.MemberName;");

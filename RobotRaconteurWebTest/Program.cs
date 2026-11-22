@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await SkelObjectTypeTest.TestSkelObjectTypeName();
+
                         await RobotRaconteurSubTest.DefaultClientTest.TestDefaultClientSkipsConnecting();
 
                         await RobotRaconteurSubTest.ServiceInfo2RefreshTest.TestServiceInfo2RefreshSameUrls();
@@ -443,6 +445,11 @@ namespace RobotRaconteurTest
                 case "defaultclient":
                     {
                         await RobotRaconteurSubTest.DefaultClientTest.TestDefaultClientSkipsConnecting();
+                        break;
+                    }
+                case "skelobjecttype":
+                    {
+                        await SkelObjectTypeTest.TestSkelObjectTypeName();
                         break;
                     }
                 case "message":

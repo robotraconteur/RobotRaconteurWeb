@@ -301,7 +301,9 @@ namespace RobotRaconteurWeb
 
         public virtual string GetObjectType()
         {
-            return Regex.Replace(GetType().ToString(), "_skel", "");
+            // Generated skels override this with the object type; otherwise remove only the "_skel" suffix
+            string t = GetType().ToString();
+            return t.EndsWith("_skel") ? t.Substring(0, t.Length - "_skel".Length) : t;
         }
 
         public string GetObjectType(RobotRaconteurVersion client_version)
@@ -568,7 +570,7 @@ namespace RobotRaconteurWeb
             m_ServiceName = name;
             ServiceSkel s = ServiceDef.CreateSkel(name, o, this);
 
-            m_RootObjectType = s.GetType().ToString().Replace("_skel", "");
+            m_RootObjectType = s.GetObjectType();
             base_object_set = true;
             lock (skels)
             {
