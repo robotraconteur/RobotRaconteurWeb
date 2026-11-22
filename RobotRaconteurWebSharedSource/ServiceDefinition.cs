@@ -857,7 +857,7 @@ namespace RobotRaconteurWeb
                 o.WriteLine("    option {0}", option);
             }
 
-            foreach (var constant in Constants)
+            foreach (var constant in Constants.Values)
             {
                 o.WriteLine("    {0}", constant.ToString());
             }

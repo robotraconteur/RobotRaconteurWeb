@@ -217,6 +217,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestMemberParentheses();
 
+                        RobDefTest.TestEntryConstantsToString();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

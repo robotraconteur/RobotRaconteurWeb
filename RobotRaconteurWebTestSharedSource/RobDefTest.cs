@@ -545,5 +545,20 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(MemberAccepted("pipe double[] p1"));
             RRWebTest.WriteLine("RobDefTest.TestMemberParentheses passed");
         }
+
+        public static void TestEntryConstantsToString()
+        {
+            // ServiceEntryDefinition.ToWriter wrote the key / value pair ("[c, constant int32 c 5]") for a constant
+            // inside an object, so ToString() could not be parsed back
+            var d = new ServiceDefinition();
+            d.FromString("service t7.entryconst\nstdver 0.10\n\nobject o\nconstant int32 c 5\nproperty double p\nend\n");
+            var s = d.ToString();
+            RRAssert.IsTrue(s.Contains("    constant int32 c 5\n"));
+            RRAssert.IsFalse(s.Contains("[c, "));
+            var d2 = new ServiceDefinition();
+            d2.FromString(s);
+            RRAssert.AreEqual(d2.Objects["o"].Constants["c"].Value, "5");
+            RRWebTest.WriteLine("RobDefTest.TestEntryConstantsToString passed");
+        }
     }
 }
