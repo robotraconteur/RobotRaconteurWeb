@@ -198,6 +198,23 @@ namespace RobotRaconteurTest
             ExpectRangeRejected(() => a.AssignSubArray(pos, b, pos, count));
             Console.WriteLine("MultiDimArrayTest.TestCopyRangeOverflow passed");
         }
+
+        public static void TestZeroCountCopiesNothing()
+        {
+            // A zero count in a dimension other than the first copied row after row until Array.Copy threw
+            var a = new MultiDimArray(new uint[] { 5, 4 }, new double[20]);
+            var b = new MultiDimArray(new uint[] { 5, 4 }, Enumerable.Range(1, 20).Select(x => (double)x).ToArray());
+            a.AssignSubArray(new uint[] { 0, 0 }, b, new uint[] { 0, 0 }, new uint[] { 5, 0 });
+            RRAssert.IsTrue(((double[])a.Array_).All(x => x == 0));
+            a.AssignSubArray(new uint[] { 0, 0 }, b, new uint[] { 0, 0 }, new uint[] { 0, 4 });
+            RRAssert.IsTrue(((double[])a.Array_).All(x => x == 0));
+            b.RetrieveSubArray(new uint[] { 0, 0 }, a, new uint[] { 0, 0 }, new uint[] { 5, 0 });
+            RRAssert.IsTrue(((double[])a.Array_).All(x => x == 0));
+            // Non-zero counts still copy
+            a.AssignSubArray(new uint[] { 0, 1 }, b, new uint[] { 0, 1 }, new uint[] { 5, 2 });
+            RRAssert.AreEqual(((double[])a.Array_).Count(x => x != 0), 10);
+            RRWebTest.WriteLine("MultiDimArrayTest.TestZeroCountCopiesNothing passed");
+        }
     }
 #endif
 }

@@ -91,7 +91,8 @@ namespace RobotRaconteurWeb
             o.memb_pos = memb_pos;
             o.count = count;
             o.current_count = new uint[count.Length];
-            o.done = false;
+            // A zero count in any dimension selects no elements
+            o.done = Array.IndexOf(count, 0u) >= 0;
             o.stridea = stridea;
             o.strideb = strideb;
             return o;
