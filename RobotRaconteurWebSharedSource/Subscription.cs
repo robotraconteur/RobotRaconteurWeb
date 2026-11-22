@@ -1452,9 +1452,10 @@ namespace RobotRaconteurWeb
                 foreach (var c in clients.Values)
                 {
                     c.claimed = false;
-                    if (c.client != null)
+                    var client = c.client;
+                    if (client != null)
                     {
-                        Task.Run(() => node.DisconnectService(c)).IgnoreResult();
+                        Task.Run(() => node.DisconnectService(client)).IgnoreResult();
                     }
                 }
 
@@ -1485,9 +1486,10 @@ namespace RobotRaconteurWeb
                 foreach (var c in clients.Values)
                 {
                     c.claimed = false;
-                    if (c.client != null)
+                    var client = c.client;
+                    if (client != null)
                     {
-                        Task.Run(() => node.DisconnectService(c)).IgnoreResult();
+                        Task.Run(() => node.DisconnectService(client)).IgnoreResult();
                     }
                 }
 
@@ -2279,7 +2281,7 @@ of pipes and wires can be managed automatically.
                         info.Name = c.service_name;
                         info.RootObjectType = c.service_type;
                         info.ConnectionURL = c.urls;
-                        info.Attributes = node.GetServiceAttributes(c);
+                        info.Attributes = node.GetServiceAttributes(c.client);
 
                         c.erase = true;
 
@@ -2288,15 +2290,16 @@ of pipes and wires can be managed automatically.
 
                         bool connect = SubscriptionFilterUtil.FilterService(service_types, this.filter, node_storage, info, out var filter_res_urls, out var filter_res, out var filter_node);
 
-                        if (!connect)
+                        if (!connect && !c.claimed)
                         {
+                            var client = c.client;
                             try
                             {
                                 _ = Task.Run(delegate ()
                                 {
                                     try
                                     {
-                                        node.DisconnectService(c).IgnoreResult();
+                                        node.DisconnectService(client).IgnoreResult();
                                     }
                                     catch { }
                                 });

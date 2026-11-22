@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await RobotRaconteurSubTest.Wires.SubscriptionUpdateFilterTest.TestUpdateServiceByTypeDisconnectsFiltered();
+
                         MessageSerializationTest.TestPackEnumContainers();
 
                         PasswordFileNullCredentialTests.RunTestNullCredentials();
@@ -401,6 +403,11 @@ namespace RobotRaconteurTest
                 case "packenum":
                     {
                         MessageSerializationTest.TestPackEnumContainers();
+                        break;
+                    }
+                case "subupdatefilter":
+                    {
+                        await RobotRaconteurSubTest.Wires.SubscriptionUpdateFilterTest.TestUpdateServiceByTypeDisconnectsFiltered();
                         break;
                     }
                 case "message":
