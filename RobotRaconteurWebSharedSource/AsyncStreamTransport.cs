@@ -1840,18 +1840,7 @@ namespace RobotRaconteurWeb
                 chain0.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
             }
 
-            List<X509Certificate2> rootcerts = new List<X509Certificate2>();
-            string[] root_cert_names = new string[] { "Robot_Raconteur_Node_Root_CA.cer", "Robot_Raconteur_Node_Root_CA2.cer" };
-
-            foreach (var root_cert_name in root_cert_names)
-            {
-                using (var root_cert_stream1 = typeof(AsyncStreamTransport).Assembly.GetManifestResourceStream("RobotRaconteurWeb.Data." + root_cert_name))
-                using (var root_cert_stream = new MemoryStream())
-                {
-                    root_cert_stream1.CopyTo(root_cert_stream);
-                    rootcerts.Add(new X509Certificate2(root_cert_stream.ToArray()));
-                }
-            }
+            List<X509Certificate2> rootcerts = LoadEmbeddedRootCerts();
 
             foreach (var rootcert in rootcerts)
             {
@@ -1874,8 +1863,33 @@ namespace RobotRaconteurWeb
             return RemoteCertificateValidationCallback2(chain0, true);
         }
 
+        static List<X509Certificate2> LoadEmbeddedRootCerts()
+        {
+            List<X509Certificate2> rootcerts = new List<X509Certificate2>();
+            string[] root_cert_names = new string[] { "Robot_Raconteur_Node_Root_CA.cer", "Robot_Raconteur_Node_Root_CA2.cer" };
+
+            foreach (var root_cert_name in root_cert_names)
+            {
+                using (var root_cert_stream1 = typeof(AsyncStreamTransport).Assembly.GetManifestResourceStream("RobotRaconteurWeb.Data." + root_cert_name))
+                using (var root_cert_stream = new MemoryStream())
+                {
+                    root_cert_stream1.CopyTo(root_cert_stream);
+                    rootcerts.Add(new X509Certificate2(root_cert_stream.ToArray()));
+                }
+            }
+            return rootcerts;
+        }
+
     bool RemoteCertificateValidationCallback2(X509Chain chain, bool embedded_root)
     {
+
+        // The chain must end in one of the embedded Robot Raconteur root certificates, also when the
+        // operating system trusts another root
+        var chain_root = chain.ChainElements[chain.ChainElements.Count - 1].Certificate;
+        if (!LoadEmbeddedRootCerts().Any(x => x.Thumbprint == chain_root.Thumbprint))
+        {
+            return false;
+        }
 
 
         if (chain.ChainElements[0].Certificate.Subject != "CN=" + handshake_host)
@@ -1946,8 +1960,8 @@ namespace RobotRaconteurWeb
 
                 if (oid != rr_oid)
                 {
-                    //TODO: re-enable this oid check
-                    //return false;
+                    // Unknown critical extension or wrong certificate role
+                    return false;
                 }
                 else
                 {
@@ -1955,8 +1969,7 @@ namespace RobotRaconteurWeb
                 }
             }
 
-            //TODO: re-enable this oid check
-            //if (!found_rr_oid) return false;
+            if (!found_rr_oid) return false;
 
         }
 
