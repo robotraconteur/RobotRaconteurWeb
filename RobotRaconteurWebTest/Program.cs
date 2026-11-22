@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await RobotRaconteurSubTest.DefaultClientTest.TestDefaultClientSkipsConnecting();
+
                         await RobotRaconteurSubTest.ServiceInfo2RefreshTest.TestServiceInfo2RefreshSameUrls();
 
                         await RobotRaconteurSubTest.Pipes.PipeSubscriptionBacklogTest.TestPipeSubscriptionMaxBacklog();
@@ -436,6 +438,11 @@ namespace RobotRaconteurTest
                 case "serviceinfo2refresh":
                     {
                         await RobotRaconteurSubTest.ServiceInfo2RefreshTest.TestServiceInfo2RefreshSameUrls();
+                        break;
+                    }
+                case "defaultclient":
+                    {
+                        await RobotRaconteurSubTest.DefaultClientTest.TestDefaultClientSkipsConnecting();
                         break;
                     }
                 case "message":

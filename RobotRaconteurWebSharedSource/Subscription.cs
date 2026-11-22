@@ -2036,20 +2036,18 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
-                var client_storage = clients.Values.FirstOrDefault();
-                if (client_storage == null)
+                // Return the first connected client, as Core does; earlier entries may still be connecting
+                foreach (var client_storage in clients.Values)
                 {
-                    client = default;
-                    return false;
+                    var ret = client_storage.client;
+                    if (ret != null)
+                    {
+                        client = (T)ret;
+                        return true;
+                    }
                 }
-                var ret = client_storage.client;
-                if (ret == null)
-                {
-                    client = default;
-                    return false;
-                }
-                client = (T)ret;
-                return true;
+                client = default;
+                return false;
             }
         }
 
