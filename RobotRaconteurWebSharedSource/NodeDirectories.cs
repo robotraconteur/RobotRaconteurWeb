@@ -679,7 +679,12 @@ namespace RobotRaconteurWeb
                 {
                     nodeid = NodeID.NewUniqueID();
                     string dat = nodeid.ToString();
-                    fd.Write(dat);
+                    // Truncate first: an oversized file would otherwise keep its length and get a new
+                    // NodeID on every start
+                    if (!fd.Reset() || !fd.Write(dat))
+                    {
+                        LogWarning($"Could not store NodeID for name \"{name}\", using a temporary NodeID", null, RobotRaconteur_LogComponent.Node, "NodeDirectories");
+                    }
                 }
                 else
                 {

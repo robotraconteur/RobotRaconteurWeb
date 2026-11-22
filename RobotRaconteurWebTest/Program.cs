@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        NodeDirectoriesNodeIdStoreTests.RunTestOversizedNameFileReplaced();
                         NodeDirectoriesNameFdTests.RunTestNameFileClosedAfterStart();
                         await GeneratorCleanupTest.TestGeneratorCleanup();
 
