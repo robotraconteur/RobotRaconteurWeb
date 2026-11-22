@@ -824,9 +824,9 @@ namespace RobotRaconteurWeb
                     e.AddElement("clientversion", RobotRaconteurNode.Version);
 
                     MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
-                    if (ret.Error != MessageErrorType.None) return null;
+                    if (ret.Error != MessageErrorType.None) throw RobotRaconteurExceptionUtil.MessageEntryToException(ret);
                     type = ret.FindElement("objecttype").CastData<string>();
-                    if (type == "") return new ObjectNotFoundException("Could not find object type"); ;
+                    if (type == "") throw new ObjectNotFoundException("Could not find object type");
 
 
                     if (objecttype != null)
