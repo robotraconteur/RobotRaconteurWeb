@@ -618,11 +618,14 @@ namespace RobotRaconteurWeb
 
         async Task<ServiceSkel> GetObjectSkel2(string ppath1, string objname, ServiceSkel skel)
         {
+            // Restore the values of the request that needs the sub-object instead of clearing them
+            var prev_service_path = m_CurrentServicePath;
+            var prev_server_context = m_CurrentServerContext;
             m_CurrentServicePath = ppath1;
             m_CurrentServerContext = this;
             object obj1 = await skel.GetSubObj(objname).ConfigureAwait(false);
-            m_CurrentServicePath = null;
-            m_CurrentServerContext = null;
+            m_CurrentServicePath = prev_service_path;
+            m_CurrentServerContext = prev_server_context;
 
             var ppath = String.Join(".", new string[] { ppath1, objname });
 

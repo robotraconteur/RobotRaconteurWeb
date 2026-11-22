@@ -46,6 +46,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)CheckServiceCapabilityTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)ReplyEntryTypeTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)SubObjectCurrentPathTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 

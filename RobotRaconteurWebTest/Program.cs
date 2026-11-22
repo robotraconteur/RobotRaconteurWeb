@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await SubObjectCurrentPathTest.TestFirstSubObjectRequestCurrentPath();
+
                         await LocalListenCloseTests.RunTestLocalCloseRemovesSocket();
                         await LocalDiscoveryWatchTests.RunTestLocalDiscoveryDetectsNewServer();
                         await RobotRaconteurSubTest.IntraDetectedNodesTests.RunTestIntraGetDetectedNodes();
@@ -322,6 +324,11 @@ namespace RobotRaconteurTest
                 case "replyentrytype":
                     {
                         await ReplyEntryTypeTest.TestUnhandledReplyEntryType();
+                        break;
+                    }
+                case "subobjcurrentpath":
+                    {
+                        await SubObjectCurrentPathTest.TestFirstSubObjectRequestCurrentPath();
                         break;
                     }
                 case "message":
