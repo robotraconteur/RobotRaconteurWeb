@@ -3860,7 +3860,7 @@ namespace RobotRaconteurWeb
                 }
             }
 
-            return fname.Trim();
+            return fname?.Trim();
         }
     }
 
