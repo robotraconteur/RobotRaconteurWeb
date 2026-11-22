@@ -709,6 +709,8 @@ namespace RobotRaconteurWeb
                 else
                 {
                     res.fd = fd_run;
+                    // The name file is only needed to read or store the NodeID; Core closes it here
+                    fd.Dispose();
                 }
                 return res;
             }
