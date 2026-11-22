@@ -892,10 +892,10 @@ namespace RobotRaconteurWeb
                 {
                     h_info.Info[e.Key] = e.Value;
                 }
-            }
 
-            h_info.Reset();
-            h_info.WriteInfo();
+                h_info.Reset();
+                h_info.WriteInfo();
+            }
         }
     }
 
