@@ -1485,6 +1485,8 @@ namespace RobotRaconteurWeb
         {
             var w = new FileSystemWatcher();
             w.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName;
+            // The info files are in by-nodeid/ and by-nodename/ (one level further down for the public path)
+            w.IncludeSubdirectories = true;
             w.Changed += OnChanged;
             w.Created += OnChanged;
             w.Deleted += OnChanged;
@@ -1511,10 +1513,18 @@ namespace RobotRaconteurWeb
             }
             catch (Exception) { }
 
+            // Initial scan, and a periodic one so that found nodes do not expire from the
+            // discovery cache (60 s), as Core LocalTransportDiscovery does (55 s)
+            OnChanged(null, null);
+            PeriodicTask.Run(() => OnChanged(null, null), TimeSpan.FromSeconds(55), refresh_cancel.Token).IgnoreResult();
+
         }
+
+        CancellationTokenSource refresh_cancel = new CancellationTokenSource();
 
         public void Dispose()
         {
+            refresh_cancel.Cancel();
             file_watcher_public?.Dispose();
             file_watcher_private?.Dispose();
         }
