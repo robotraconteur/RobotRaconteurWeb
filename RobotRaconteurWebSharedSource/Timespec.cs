@@ -144,7 +144,7 @@ namespace RobotRaconteurWeb
                         long diff_ticks = ticks - start_ticks;
                         long diff_secs = diff_ticks / ticks_per_second;
 
-                        long diff_nanosecs = ((diff_ticks * (long)1e9) / ticks_per_second) % (long)1e9;
+                        long diff_nanosecs = ((diff_ticks % ticks_per_second) * (long)1e9) / ticks_per_second;
 
 
 
