@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        ScanAssembliesTests.RunTestScanWithPreregisteredType();
                         await PullServiceDefsCycleTest.TestPullServiceDefinitionImportCycle();
 
                         CommandLineConfigParserTests.RunTestCommandLineOptions();

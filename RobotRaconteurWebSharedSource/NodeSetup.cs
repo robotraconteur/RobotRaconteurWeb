@@ -912,6 +912,12 @@ namespace RobotRaconteurWeb
                     var scanned_types = ScanAssembliesForServiceTypes(node);
                     foreach (var t in scanned_types)
                     {
+                        // Skip types already registered (for example passed in serviceTypes):
+                        // RegisterServiceType throws on a duplicate, which ended the loop
+                        if (node.TryGetServiceType(t.GetServiceName(), out var _))
+                        {
+                            continue;
+                        }
                         node.RegisterServiceType(t);
                     }
                 }
@@ -1296,8 +1302,26 @@ namespace RobotRaconteurWeb
 
             var assignableType = typeof(ServiceFactory);
 
+            // One assembly with types that cannot be loaded, or one factory that cannot be
+            // constructed, must not stop the scan of the others
             var scanners = AppDomain.CurrentDomain.GetAssemblies().ToList()
-                .SelectMany(x => x.GetTypes())
+                .SelectMany(x =>
+                {
+                    try
+                    {
+                        return x.GetTypes();
+                    }
+#if !ROBOTRACONTEUR_H5
+                    catch (System.Reflection.ReflectionTypeLoadException e)
+                    {
+                        return e.Types.Where(t => t != null).ToArray();
+                    }
+#endif
+                    catch (Exception)
+                    {
+                        return new Type[0];
+                    }
+                })
                 .Where(t => assignableType.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract).ToList();
 
             foreach (Type type in scanners)
@@ -1306,7 +1330,16 @@ namespace RobotRaconteurWeb
                 {
                     continue;
                 }
-                var service_factory = Activator.CreateInstance(type, node, (ClientContext)null) as ServiceFactory;
+                ServiceFactory service_factory;
+                try
+                {
+                    service_factory = Activator.CreateInstance(type, node, (ClientContext)null) as ServiceFactory;
+                }
+                catch (Exception e)
+                {
+                    LogDebug($"Could not create service factory {type.FullName}: {e.Message}", node, RobotRaconteur_LogComponent.Node, "NodeSetup");
+                    continue;
+                }
                 if (service_factory != null)
                 {
                     o.Add(service_factory);
