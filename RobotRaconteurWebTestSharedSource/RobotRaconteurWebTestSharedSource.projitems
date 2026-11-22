@@ -28,6 +28,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)TcpDiscoveryListenRestartTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)TcpWebSocketTargetNodeTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)TcpWebSocketHeaderCaseTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AttributesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServicePathTest.cs" />
 

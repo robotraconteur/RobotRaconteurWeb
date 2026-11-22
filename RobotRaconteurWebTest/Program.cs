@@ -255,6 +255,8 @@ namespace RobotRaconteurTest
 
                         await TcpWebSocketTargetNodeTest.TestWebSocketConnectChecksNodeID();
 
+                        await TcpWebSocketHeaderCaseTest.TestWebSocketHandshakeHeaderCase();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

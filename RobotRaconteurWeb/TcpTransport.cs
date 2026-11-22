@@ -559,7 +559,8 @@ namespace RobotRaconteurWeb
 
                     int trycount2 = 0;
 
-                    var request = new Dictionary<string, string>();
+                    // HTTP header names are case-insensitive
+                    var request = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     string path = null;
 
                     while (true)
@@ -626,9 +627,10 @@ namespace RobotRaconteurWeb
                         {
                             var f = line.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
-                            if ((f[0] == "Sec-WebSocket-Protocol" || f[0] == "Sec-WebSocket-Version") && request.ContainsKey(f[0]))
+                            // A repeated header is combined into one comma-separated value
+                            if (request.ContainsKey(f[0].Trim()))
                             {
-                                request[f[0]] = request[f[0]] + ", " + f[1].Trim();
+                                request[f[0].Trim()] = request[f[0].Trim()] + ", " + f[1].Trim();
                             }
                             else
                             {
