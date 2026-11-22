@@ -72,6 +72,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)IdentifierFullMatchTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)SubscriptionManagerEnableTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)PipeSubscriptionBacklogTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 

@@ -3448,6 +3448,15 @@ an exception.
                                     recv_packets.Enqueue(Tuple.Create<object, object>(ev_ep.ReceivePacket(), ev_ep));
                                 }
 
+                                // Keep at most max_recv_packets (max_backlog) packets, dropping the oldest, as Core does
+                                if (max_recv_packets >= 0)
+                                {
+                                    while (recv_packets.Count > max_recv_packets)
+                                    {
+                                        recv_packets.Dequeue();
+                                    }
+                                }
+
                                 recv_packets_waiter.NotifyAll(true);
 
 

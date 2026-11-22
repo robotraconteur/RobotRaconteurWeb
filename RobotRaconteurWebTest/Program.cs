@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await RobotRaconteurSubTest.Pipes.PipeSubscriptionBacklogTest.TestPipeSubscriptionMaxBacklog();
+
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerEnableTest.TestEnableDisabledByType();
 
                         RobotRaconteurSubTest.IdentifierFullMatchTest.TestIdentifierFullMatch();
@@ -422,6 +424,11 @@ namespace RobotRaconteurTest
                 case "submanagerenable":
                     {
                         await RobotRaconteurSubTest.Manager.SubscriptionManagerEnableTest.TestEnableDisabledByType();
+                        break;
+                    }
+                case "pipesubbacklog":
+                    {
+                        await RobotRaconteurSubTest.Pipes.PipeSubscriptionBacklogTest.TestPipeSubscriptionMaxBacklog();
                         break;
                     }
                 case "message":
