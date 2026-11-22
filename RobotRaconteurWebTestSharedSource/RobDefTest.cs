@@ -363,5 +363,44 @@ namespace RobotRaconteurTest
             RRAssert.IsTrue(gen.Contains("\\u00E9\\u0001A"));
             RRWebTest.WriteLine("RobDefTest.TestConstantStringUnicodeEscape passed");
         }
+
+        static Dictionary<string, ServiceDefinition> ParseDefs(params string[] texts)
+        {
+            var defs = new Dictionary<string, ServiceDefinition>();
+            foreach (var t in texts)
+            {
+                var d = new ServiceDefinition();
+                d.FromString(t);
+                defs.Add(d.Name, d);
+            }
+            return defs;
+        }
+
+        public static void TestRecursiveImplementsAndImportsNotThroughRoot()
+        {
+            // A cycle that does not return to the object (or definition) being verified recursed until the stack
+            // overflowed, which ends the process
+            var defs1 = ParseDefs("service t7.impl\nstdver 0.10\n\nobject a\nimplements b\nproperty double p\nend\n\n" +
+                                  "object b\nimplements c\nproperty double p\nend\n\n" +
+                                  "object c\nimplements b\nproperty double p\nend\n");
+            RRAssert.ThrowsException<ServiceDefinitionVerifyException>(
+                () => ServiceDefinitionUtil.VerifyServiceDefinitions(defs1));
+
+            var defs2 = ParseDefs("service t7.a\nstdver 0.10\nimport t7.b\n\nobject oa\nproperty double p\nend\n",
+                                  "service t7.b\nstdver 0.10\nimport t7.c\n\nobject ob\nproperty double p\nend\n",
+                                  "service t7.c\nstdver 0.10\nimport t7.b\n\nobject oc\nproperty double p\nend\n");
+            RRAssert.ThrowsException<ServiceDefinitionVerifyException>(
+                () => ServiceDefinitionUtil.VerifyServiceDefinitions(defs2));
+
+            // Diamonds are not cycles
+            var defs3 = ParseDefs("service t7.a\nstdver 0.10\nimport t7.b\nimport t7.c\n\nobject oa\nproperty double p\nend\n",
+                                  "service t7.b\nstdver 0.10\nimport t7.c\n\nobject ob\nproperty double p\nend\n",
+                                  "service t7.c\nstdver 0.10\n\nobject oc\nproperty double p\nend\n",
+                                  "service t7.impl\nstdver 0.10\n\nobject a\nimplements b\nimplements c\nproperty double p\nend\n\n" +
+                                  "object b\nimplements c\nproperty double p\nend\n\n" +
+                                  "object c\nproperty double p\nend\n");
+            ServiceDefinitionUtil.VerifyServiceDefinitions(defs3);
+            RRWebTest.WriteLine("RobDefTest.TestRecursiveImplementsAndImportsNotThroughRoot passed");
+        }
     }
 }

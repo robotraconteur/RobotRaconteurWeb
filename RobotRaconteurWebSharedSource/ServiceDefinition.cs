@@ -3945,13 +3945,16 @@ namespace RobotRaconteurWeb
             public List<rrimplements> implements = new List<rrimplements>();
         };
 
-        internal static rrimplements get_implements(ServiceEntryDefinition obj, ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, string rootobj = "")
+        internal static rrimplements get_implements(ServiceEntryDefinition obj, ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, string rootobj = "", HashSet<string> parent_objs = null)
         {
             var out_ = new rrimplements();
             out_.obj = obj;
             out_.name = def.Name + "." + obj.Name;
 
             if (rootobj == "") rootobj = out_.name;
+
+            parent_objs = parent_objs == null ? new HashSet<string>() : new HashSet<string>(parent_objs);
+            parent_objs.Add(out_.name);
 
             foreach (var e in obj.Implements)
 
@@ -3966,7 +3969,9 @@ namespace RobotRaconteurWeb
 
                     if (rootobj == (def.Name + "." + obj2.Name)) throw new ServiceDefinitionVerifyException("Recursive implements between \"" + rootobj + "\" and \"" + def.Name + "." + obj2.Name + "\"", obj.ParseInfo);
 
-                    rrimplements imp2 = get_implements(obj2, def, defs, rootobj);
+                    if (parent_objs.Contains(def.Name + "." + obj2.Name)) throw new ServiceDefinitionVerifyException("Recursive implements between \"" + out_.name + "\" and \"" + def.Name + "." + obj2.Name + "\"", obj.ParseInfo);
+
+                    rrimplements imp2 = get_implements(obj2, def, defs, rootobj, parent_objs);
                     out_.implements.Add(imp2);
                 }
                 else
@@ -3983,7 +3988,9 @@ namespace RobotRaconteurWeb
 
                     if (rootobj == (def2.Name + "." + obj2.Name)) throw new ServiceDefinitionVerifyException("Recursive implements between \"" + rootobj + "\" and \"" + def2.Name + "." + obj2.Name + "\"", obj.ParseInfo);
 
-                    rrimplements imp2 = get_implements(obj2, def2, defs, rootobj);
+                    if (parent_objs.Contains(def2.Name + "." + obj2.Name)) throw new ServiceDefinitionVerifyException("Recursive implements between \"" + out_.name + "\" and \"" + def2.Name + "." + obj2.Name + "\"", obj.ParseInfo);
+
+                    rrimplements imp2 = get_implements(obj2, def2, defs, rootobj, parent_objs);
                     out_.implements.Add(imp2);
                 }
 
@@ -4424,7 +4431,7 @@ namespace RobotRaconteurWeb
             public List<rrimports> imported = new List<rrimports>();
         };
 
-        internal static rrimports get_imports(ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, ServiceDefinition rootdef = null)
+        internal static rrimports get_imports(ServiceDefinition def, Dictionary<string, ServiceDefinition> defs, ServiceDefinition rootdef = null, HashSet<string> parent_defs = null)
         {
             rrimports out_ = new rrimports();
             out_.def = def;
@@ -4432,13 +4439,17 @@ namespace RobotRaconteurWeb
 
             if (rootdef == null) rootdef = def;
 
+            parent_defs = parent_defs == null ? new HashSet<string>() : new HashSet<string>(parent_defs);
+            parent_defs.Add(def.Name);
+
             foreach (var e in def.Imports)
 
             {
                 ServiceDefinition def2;
                 if (!defs.TryGetValue(e, out def2)) throw new ServiceDefinitionVerifyException("Service definition \"" + e + "\" not found", def.ParseInfo);
                 if (def2.Name == rootdef.Name) throw new ServiceDefinitionVerifyException("Recursive imports between \"" + def.Name + "\" and \"" + rootdef.Name + "\"", def.ParseInfo);
-                rrimports imp2 = get_imports(def2, defs, rootdef);
+                if (parent_defs.Contains(def2.Name)) throw new ServiceDefinitionVerifyException("Recursive imports between \"" + def.Name + "\" and \"" + def2.Name + "\"", def.ParseInfo);
+                rrimports imp2 = get_imports(def2, defs, rootdef, parent_defs);
                 out_.imported.Add(imp2);
             }
 
