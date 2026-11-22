@@ -1694,7 +1694,8 @@ namespace RobotRaconteurWeb
             var mstream_buf = m_mstream.ToArray();
             await basestream.WriteAsync(mstream_buf, 0, mstream_buf.Length).ConfigureAwait(false);
 
-            var mret = await clienthandshake_recv_task.Task.ConfigureAwait(false);
+            clienthandshake_recv_task.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
+            var mret = await clienthandshake_recv_task.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
             NodeID recv_nodeid = mret.header.SenderNodeID;
             string recv_nodename = mret.header.SenderNodeName;
             if (!target_nodeid.IsAnyNode && target_nodeid != recv_nodeid)

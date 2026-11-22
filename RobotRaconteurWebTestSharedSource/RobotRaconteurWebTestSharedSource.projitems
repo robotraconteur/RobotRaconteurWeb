@@ -20,6 +20,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamStreamOpReplyTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamSingleEndpointTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamStartTlsTimeoutTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AttributesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServicePathTest.cs" />
 

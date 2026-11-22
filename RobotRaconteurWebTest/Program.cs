@@ -224,6 +224,8 @@ namespace RobotRaconteurTest
 
                         await AsyncStreamSingleEndpointTest.TestSecondConnectClientClosesConnection();
 
+                        await AsyncStreamStartTlsTimeoutTest.TestSilentServerStartTlsTimesOut();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
