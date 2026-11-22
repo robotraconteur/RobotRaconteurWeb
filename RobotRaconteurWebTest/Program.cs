@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await CurrentEndpointAsyncTest.TestCurrentEndpointAfterAwait();
+
                         await ServicePathAliasTests.RunTestServicePathAliasLock();
                         await LockReleaseOnLogoutTests.RunTestLockReleaseOnLogout();
                         await AllowObjectLockPolicyTests.RunTestAllowObjectLockPolicy();
@@ -468,6 +470,11 @@ namespace RobotRaconteurTest
                 case "skelobjecttype":
                     {
                         await SkelObjectTypeTest.TestSkelObjectTypeName();
+                        break;
+                    }
+                case "currentendpointasync":
+                    {
+                        await CurrentEndpointAsyncTest.TestCurrentEndpointAfterAwait();
                         break;
                     }
                 case "message":

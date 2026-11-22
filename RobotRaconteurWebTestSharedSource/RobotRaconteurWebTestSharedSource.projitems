@@ -82,6 +82,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DefaultClientTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)SkelObjectTypeTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)CurrentEndpointAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 

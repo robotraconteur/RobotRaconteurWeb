@@ -758,8 +758,14 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public static ServerContext CurrentServerContext { get { return m_CurrentServerContext; } }
-        [ThreadStatic()]
+#if !ROBOTRACONTEUR_H5
+        // AsyncLocal so the value stays valid after an await in the request
+        private static readonly AsyncLocal<ServerContext> m_CurrentServerContext_local = new AsyncLocal<ServerContext>();
+        private static ServerContext m_CurrentServerContext { get { return m_CurrentServerContext_local.Value; } set { m_CurrentServerContext_local.Value = value; } }
+#else
+        [ThreadStatic]
         private static ServerContext m_CurrentServerContext;
+#endif
         /**
         <summary>
         Get the current object service path
@@ -775,8 +781,14 @@ namespace RobotRaconteurWeb
 
         [PublicApi]
         public static string CurrentServicePath { get { return m_CurrentServicePath; } }
-        [ThreadStatic()]
+#if !ROBOTRACONTEUR_H5
+        // AsyncLocal so the value stays valid after an await in the request
+        private static readonly AsyncLocal<string> m_CurrentServicePath_local = new AsyncLocal<string>();
+        private static string m_CurrentServicePath { get { return m_CurrentServicePath_local.Value; } set { m_CurrentServicePath_local.Value = value; } }
+#else
+        [ThreadStatic]
         private static string m_CurrentServicePath;
+#endif
 
 
         public virtual async Task<MessageEntry> ProcessMessageEntry(MessageEntry m, ServerEndpoint c)
@@ -2231,8 +2243,14 @@ namespace RobotRaconteurWeb
     {
         protected internal readonly ServerContext service;
 
+#if !ROBOTRACONTEUR_H5
+        // AsyncLocal so the value stays valid after an await in the request
+        private static readonly AsyncLocal<ServerEndpoint> m_CurrentEndpoint_local = new AsyncLocal<ServerEndpoint>();
+        private static ServerEndpoint m_CurrentEndpoint { get { return m_CurrentEndpoint_local.Value; } set { m_CurrentEndpoint_local.Value = value; } }
+#else
         [ThreadStatic]
         private static ServerEndpoint m_CurrentEndpoint;
+#endif
         /**
         <summary>
         Returns the current server endpoint
@@ -2252,8 +2270,14 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public static ServerEndpoint CurrentEndpoint { get { return m_CurrentEndpoint; } }
 
+#if !ROBOTRACONTEUR_H5
+        // AsyncLocal so the value stays valid after an await in the request
+        private static readonly AsyncLocal<AuthenticatedUser> m_CurrentAuthenticatedUser_local = new AsyncLocal<AuthenticatedUser>();
+        private static AuthenticatedUser m_CurrentAuthenticatedUser { get { return m_CurrentAuthenticatedUser_local.Value; } set { m_CurrentAuthenticatedUser_local.Value = value; } }
+#else
         [ThreadStatic]
         private static AuthenticatedUser m_CurrentAuthenticatedUser;
+#endif
         /**
         <summary>
         Returns the current authenticated user
