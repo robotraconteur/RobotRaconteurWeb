@@ -444,5 +444,25 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(CSharpServiceLangGen.convert_constant(c, c2, null), "public const double d1=1.5;");
             RRWebTest.WriteLine("RobDefTest.TestGenSingleConstants passed");
         }
+
+        public static void TestGenKeywordWireNames()
+        {
+            // Strings compared with names on the wire must be the Robot Raconteur names, not the escaped C#
+            // identifiers: the indexed objref member name ("fixed_"), the objref type name ("t7.gen1.lock_") and
+            // the client callback dispatch label ("checked_", the service sends "checked")
+            var d = new ServiceDefinition();
+            d.FromString("service t7.gen1\nstdver 0.10\n\nobject lock\nproperty double p\nend\n\n" +
+                         "object o\nobjref lock{int32} fixed\nobjref lock while\ncallback void checked()\nend\n");
+            var w = new StringWriter();
+            CSharpServiceLangGen.GenerateStub(d.Objects["o"], w);
+            var gen = w.ToString();
+            RRAssert.IsTrue(gen.Contains("FindObjRefTyped(\"fixed\",ind.ToString(),\"t7.gen1.lock\",cancel)"));
+            RRAssert.IsTrue(gen.Contains("FindObjRefTyped(\"while\",\"t7.gen1.lock\",cancel)"));
+            RRAssert.IsTrue(gen.Contains("case \"checked\": {"));
+            RRAssert.IsFalse(gen.Contains("\"fixed_\""));
+            RRAssert.IsFalse(gen.Contains("\"checked_\""));
+            RRAssert.IsFalse(gen.Contains("lock_\""));
+            RRWebTest.WriteLine("RobDefTest.TestGenKeywordWireNames passed");
+        }
     }
 }

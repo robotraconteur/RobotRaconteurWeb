@@ -1612,11 +1612,11 @@ namespace RobotRaconteurWeb
 
                     string objecttype2 = "";
 
-                    string s2 = FixName(m.ObjectType);
+                    string s2 = m.ObjectType;
 
                     if (!s2.Contains('.'))
                     {
-                        objecttype2 = FixName(d.Name) + "." + s2;
+                        objecttype2 = d.Name + "." + s2;
                     }
                     else
                     {
@@ -1628,7 +1628,7 @@ namespace RobotRaconteurWeb
                     if (GetObjRefIndType(m, out indtype))
                     {
                         w2.WriteLine("    public async Task<" + objtype + "> get_" + FixName(m.Name) + "(" + indtype + " ind, CancellationToken cancel=default(CancellationToken)) {");
-                        w2.WriteLine("    return (" + objtype + ")await FindObjRefTyped(\"" + FixName(m.Name) + "\",ind.ToString(),\"" + objecttype2 + "\",cancel).ConfigureAwait(false);");
+                        w2.WriteLine("    return (" + objtype + ")await FindObjRefTyped(\"" + m.Name + "\",ind.ToString(),\"" + objecttype2 + "\",cancel).ConfigureAwait(false);");
                         w2.WriteLine("    }");
                     }
                     else
@@ -1752,7 +1752,7 @@ namespace RobotRaconteurWeb
                 var params_ = String.Join(", ", pars);
                 //w.WriteLine(String.Format("    public {1}{2} {0}({3}) {{", t2));
 
-                w2.WriteLine("    case \"" + FixName(m.Name) + "\": {");
+                w2.WriteLine("    case \"" + m.Name + "\": {");
 
                 foreach (TypeDefinition pt in m.Parameters)
                 {
