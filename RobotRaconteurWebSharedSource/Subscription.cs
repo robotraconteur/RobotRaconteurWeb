@@ -3961,6 +3961,13 @@ an exception.
                 }
             }
 
+            // A subscription created disabled or empty is not yet known to discovery: register it so it receives
+            // NodeUpdated for nodes found later and is closed by Discovery.Shutdown
+            if (sub.details.Enabled)
+            {
+                d.AddSubscription(sub.sub);
+            }
+
             Task.Run(() => d.DoUpdateAllDetectedServices(sub.sub)).IgnoreResult();
         }
 

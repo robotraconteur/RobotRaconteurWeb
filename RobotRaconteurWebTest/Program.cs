@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await RobotRaconteurSubTest.Manager.SubscriptionManagerEnableTest.TestEnableDisabledByType();
+
                         RobotRaconteurSubTest.IdentifierFullMatchTest.TestIdentifierFullMatch();
 
                         await RobotRaconteurSubTest.Wires.SubscriptionUpdateFilterTest.TestUpdateServiceByTypeDisconnectsFiltered();
@@ -415,6 +417,11 @@ namespace RobotRaconteurTest
                 case "identifierfullmatch":
                     {
                         RobotRaconteurSubTest.IdentifierFullMatchTest.TestIdentifierFullMatch();
+                        break;
+                    }
+                case "submanagerenable":
+                    {
+                        await RobotRaconteurSubTest.Manager.SubscriptionManagerEnableTest.TestEnableDisabledByType();
                         break;
                     }
                 case "message":

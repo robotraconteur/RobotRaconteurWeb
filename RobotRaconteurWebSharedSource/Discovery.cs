@@ -1083,6 +1083,18 @@ namespace RobotRaconteurWeb
 
         List<IServiceSubscription> subscriptions = new List<IServiceSubscription>();
 
+        // Register a subscription created without SubscribeServiceByType / DoSubscribe (no-op if already registered)
+        internal void AddSubscription(IServiceSubscription s)
+        {
+            lock (subscriptions)
+            {
+                if (!subscriptions.Contains(s))
+                {
+                    subscriptions.Add(s);
+                }
+            }
+        }
+
         internal ServiceSubscription SubscribeService(string[] url, string username = null, Dictionary<string, object> credentials = null, string objecttype = null)
         {
             var s = new ServiceSubscription(this);
