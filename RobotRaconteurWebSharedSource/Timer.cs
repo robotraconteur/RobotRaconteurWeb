@@ -318,7 +318,12 @@ namespace RobotRaconteurWeb
             var p2 = last_time + TimeSpan.FromMilliseconds(period);
             try
             {
-                await Task.Delay((int)(p2 - node.UtcNow).TotalMilliseconds).ConfigureAwait(false);
+                // Do not wait when late: Task.Delay(-1) would wait forever
+                int delay = (int)(p2 - node.UtcNow).TotalMilliseconds;
+                if (delay > 0)
+                {
+                    await Task.Delay(delay).ConfigureAwait(false);
+                }
             }
             catch { }
             last_time = p2;
