@@ -759,11 +759,11 @@ namespace RobotRaconteurWeb
                             string short_url;
                             if (u.port == -1)
                             {
-                                short_url = u.scheme + "//" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
+                                short_url = u.scheme + "://" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
                             }
                             else
                             {
-                                short_url = u.scheme + "//" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
+                                short_url = u.scheme + "://" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
                             }
 
                             c.Add(short_url);
@@ -820,11 +820,11 @@ namespace RobotRaconteurWeb
                                 string short_url;
                                 if (u.port == -1)
                                 {
-                                    short_url = u.scheme + "//" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
+                                    short_url = u.scheme + "://" + u.host + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
                                 }
                                 else
                                 {
-                                    short_url = u.scheme + "//" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
+                                    short_url = u.scheme + "://" + u.host + ":" + u.port + u.path + "?nodeid=" + nodeid_str.Trim(new char[] { '{', '}' });
                                 }
 
                                 c.Add(short_url);

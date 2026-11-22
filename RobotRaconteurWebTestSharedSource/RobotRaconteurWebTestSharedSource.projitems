@@ -38,6 +38,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)FindServiceByTypeDisconnectTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)FindNodeUrlTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceLockAsyncTests.cs" />
