@@ -1761,13 +1761,16 @@ namespace RobotRaconteurWeb
                     }
 
                     var active_wait_tasks = new List<Tuple<Task, TcpClient>>(wait_tasks);
+                    var connect_deadline = DateTime.UtcNow.AddMilliseconds(parenttransport.DefaultConnectTimeout);
 
                     Tuple<Task, TcpClient> found = null;
                     while (active_wait_tasks.Count > 0 && found == null)
                     {
+                        // DefaultConnectTimeout limits the whole connect, not each round
+                        int remaining = (int)Math.Max(0, (connect_deadline - DateTime.UtcNow).TotalMilliseconds);
                         try
                         {
-                            await Task.WhenAny(active_wait_tasks.Select(x => x.Item1)).AwaitWithTimeout(parenttransport.DefaultConnectTimeout).ConfigureAwait(false);
+                            await Task.WhenAny(active_wait_tasks.Select(x => x.Item1)).AwaitWithTimeout(remaining).ConfigureAwait(false);
                         }
                         catch { }
 
@@ -1786,6 +1789,11 @@ namespace RobotRaconteurWeb
                             {
                                 active_wait_tasks.Add(t);
                             }
+                        }
+
+                        if (DateTime.UtcNow >= connect_deadline)
+                        {
+                            break;
                         }
                     }
 
