@@ -214,6 +214,8 @@ namespace RobotRaconteurTest
 
                         await AsyncStreamStreamOpReplyTest.TestStreamOpReplyForOtherCommandRejected();
 
+                        RobDefTest.TestMemberParentheses();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

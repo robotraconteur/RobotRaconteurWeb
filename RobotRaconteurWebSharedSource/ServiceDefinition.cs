@@ -1275,7 +1275,8 @@ namespace RobotRaconteurWeb
             public string MemberType;
             public string Name;
             public string DataType;
-            public List<string> Parameters = new List<string>();
+            // null when the member has no parentheses
+            public List<string> Parameters;
             public List<string> Modifiers = new List<string>();
         }
 
@@ -1355,7 +1356,7 @@ namespace RobotRaconteurWeb
 
             res = new MemberDefinition_ParseResults();
             res.Modifiers.Clear();
-            res.Parameters.Clear();
+            res.Parameters = null;
 
             var member_type_result = r_result.Groups[1];
             var data_type_result = r_result.Groups[2];
@@ -1420,7 +1421,7 @@ namespace RobotRaconteurWeb
             MemberDefinition_ParseResults parse_res = new MemberDefinition_ParseResults();
             MemberDefinition_FromStringFormat_common(ref parse_res, s1, member_types, def, parse_info);
 
-            if (parse_res.DataType == null || parse_res.Parameters.Count > 0) throw new ServiceDefinitionParseException("Format error for " + member_types[0], parse_info);
+            if (parse_res.DataType == null || parse_res.Parameters != null) throw new ServiceDefinitionParseException("Format error for " + member_types[0], parse_info);
             type = new TypeDefinition(def);
             type.FromString(parse_res.DataType, def.ParseInfo);
             type.Rename("value");

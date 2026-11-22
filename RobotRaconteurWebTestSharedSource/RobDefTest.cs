@@ -512,5 +512,38 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(i4.LineNumber ?? -1, 3);
             RRWebTest.WriteLine("RobDefTest.TestParseErrorLineNumbers passed");
         }
+
+        static bool MemberAccepted(string member)
+        {
+            try
+            {
+                new ServiceDefinition().FromString("service t7.members\nstdver 0.10\n\nobject o\n" + member + "\nend\n");
+                return true;
+            }
+            catch (ServiceDefinitionParseException)
+            {
+                return false;
+            }
+        }
+
+        public static void TestMemberParentheses()
+        {
+            // Parameters were initialised to an empty list, so missing parentheses on function / callback / event
+            // and empty parentheses on the other members were not detected
+            RRAssert.IsFalse(MemberAccepted("function double f"));
+            RRAssert.IsFalse(MemberAccepted("callback void cb"));
+            RRAssert.IsFalse(MemberAccepted("event e"));
+            RRAssert.IsFalse(MemberAccepted("property double p()"));
+            RRAssert.IsFalse(MemberAccepted("pipe double[] p1()"));
+            RRAssert.IsFalse(MemberAccepted("wire double w1()"));
+            RRAssert.IsTrue(MemberAccepted("function double f()"));
+            RRAssert.IsTrue(MemberAccepted("function double f(double a, int32 b)"));
+            RRAssert.IsTrue(MemberAccepted("callback void cb()"));
+            RRAssert.IsTrue(MemberAccepted("event e()"));
+            RRAssert.IsTrue(MemberAccepted("property double p"));
+            RRAssert.IsTrue(MemberAccepted("property double p [readonly]"));
+            RRAssert.IsTrue(MemberAccepted("pipe double[] p1"));
+            RRWebTest.WriteLine("RobDefTest.TestMemberParentheses passed");
+        }
     }
 }
