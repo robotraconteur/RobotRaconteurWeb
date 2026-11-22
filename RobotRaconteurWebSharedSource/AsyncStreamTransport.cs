@@ -130,19 +130,28 @@ namespace RobotRaconteurWeb
 
             if (!is_server)
             {
-                if (starttls)
+                try
                 {
+                    if (starttls)
+                    {
 #if !ROBOTRACONTEUR_H5
-                await DoClientTlsHandshake(cancel).ConfigureAwait(false);
+                    await DoClientTlsHandshake(cancel).ConfigureAwait(false);
 #else
-                    throw new NotImplementedException("TLS support not implemented");
+                        throw new NotImplementedException("TLS support not implemented");
 #endif
-                }
+                    }
 
-                NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
-                lock (this)
+                    NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
+                    lock (this)
+                    {
+                        m_RemoteNodeID = rid;
+                    }
+                }
+                catch (Exception)
                 {
-                    m_RemoteNodeID = rid;
+                    // Do not leave the stream and the receive loop running after a failed connect
+                    Close();
+                    throw;
                 }
             }
 
