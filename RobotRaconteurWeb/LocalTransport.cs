@@ -504,7 +504,7 @@ namespace RobotRaconteurWeb
                 info.Add("nodename", name);
                 info.Add("nodeid", nodeid.ToString());
                 info.Add("socket", pipename);
-                //TODO: info.Add("ServiceStateNonce", node.GetServiceStateNonce());
+                info.Add("ServiceStateNonce", node.ServiceStateNonce ?? "");
 
                 h_pid_id_s = NodeDirectoriesUtil.CreatePidFile(pid_id_fname, false);
                 h_pid_name_s = NodeDirectoriesUtil.CreatePidFile(pid_name_fname, true);
@@ -702,6 +702,29 @@ namespace RobotRaconteurWeb
         }
 
         LocalTransportFDs fds = new LocalTransportFDs();
+
+        public override void LocalNodeServicesChanged()
+        {
+            NodeDirectoriesFD h_info_id_s = fds.h_info_id_s;
+            NodeDirectoriesFD h_info_name_s = fds.h_info_name_s;
+
+            if (h_info_id_s == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var updated_info = new Dictionary<string, string>();
+                updated_info.Add("ServiceStateNonce", node.ServiceStateNonce ?? "");
+                NodeDirectoriesUtil.RefreshInfoFile(h_info_id_s, updated_info);
+                if (h_info_name_s != null)
+                {
+                    NodeDirectoriesUtil.RefreshInfoFile(h_info_name_s, updated_info);
+                }
+            }
+            catch (Exception) { }
+        }
 #pragma warning restore 1591
         /**
         <summary>

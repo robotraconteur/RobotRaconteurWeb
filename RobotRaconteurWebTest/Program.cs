@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        ServiceStateNonceTests.RunTestAnnounceNonce(); await ServiceStateNonceTests.RunTestLocalInfoFileNonce();
                         await CheckServiceCapabilityTest.TestCheckServiceCapability();
 
                         await RobotRaconteurWebTest.FindServiceByTypeIndexTests.RunTestFindServiceByTypeSkippedNode();

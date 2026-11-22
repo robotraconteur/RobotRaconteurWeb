@@ -305,9 +305,27 @@ namespace RobotRaconteurWeb
                         }
                         string url = lines[2];
 
+                        // Attribute lines "name: value" after the URL, as in Core
+                        string services_nonce = null;
+                        for (int j = 3; j < lines.Length; j++)
+                        {
+                            int sep = lines[j].IndexOf(':');
+                            if (sep <= 0)
+                            {
+                                continue;
+                            }
+                            string attr_name = lines[j].Substring(0, sep).Trim();
+                            string attr_value = lines[j].Substring(sep + 1).Trim();
+                            if (attr_name == "ServiceStateNonce" && attr_value.Length < 32)
+                            {
+                                services_nonce = attr_value;
+                            }
+                        }
+
                         NodeDiscoveryInfo i = new NodeDiscoveryInfo();
                         i.NodeID = nodeid;
                         i.NodeName = nodename;
+                        i.ServiceStateNonce = services_nonce;
                         NodeDiscoveryInfoURL u = new NodeDiscoveryInfoURL();
                         u.URL = url;
                         u.LastAnnounceTime = DateTime.UtcNow;
