@@ -190,6 +190,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestGenKeywordWireNames();
 
+                        RobDefTest.TestGenAsyncDelegateReturnType();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

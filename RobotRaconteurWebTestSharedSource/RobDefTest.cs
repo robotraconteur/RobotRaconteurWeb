@@ -464,5 +464,18 @@ namespace RobotRaconteurTest
             RRAssert.IsFalse(gen.Contains("lock_\""));
             RRWebTest.WriteLine("RobDefTest.TestGenKeywordWireNames passed");
         }
+
+        public static void TestGenAsyncDelegateReturnType()
+        {
+            // String.Format("Task<{1}{2}>", t1) had one argument and indexes 1 and 2, so it threw FormatException
+            // for any non-void return type
+            var r = new TypeDefinition();
+            r.FromString("double[] ret");
+            var p = new TypeDefinition();
+            p.FromString("int32 a");
+            RRAssert.AreEqual(CSharpServiceLangGen.str_pack_async_delegate(new List<TypeDefinition>() { p }, r),
+                              "Func<int, CancellationToken, Task<double[]>>");
+            RRWebTest.WriteLine("RobDefTest.TestGenAsyncDelegateReturnType passed");
+        }
     }
 }

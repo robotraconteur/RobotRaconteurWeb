@@ -317,7 +317,7 @@ namespace RobotRaconteurWeb
                 string[] paramtypes = new string[parameters.Count + 2];
 
                 var t1 = convert_type(rettype);
-                paramtypes[paramtypes.Length - 1] = String.Format("Task<{1}{2}>", t1);
+                paramtypes[paramtypes.Length - 1] = String.Format("Task<{0}{1}>", t1.cs_type, t1.cs_arr_type);
                 paramtypes[paramtypes.Length - 2] = "CancellationToken";
                 for (int i = 0; i < parameters.Count; i++)
                 {
