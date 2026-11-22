@@ -334,11 +334,14 @@ namespace RobotRaconteurWeb
 
         public override Task CloseTransportConnection(Endpoint e, CancellationToken cancel)
         {
+            AsyncStreamTransport c = null;
             lock (this)
             {
                 if (TransportConnections.ContainsKey(e.LocalEndpoint))
-                    TransportConnections[e.LocalEndpoint].Close();
+                    c = TransportConnections[e.LocalEndpoint];
             }
+            // Close outside the transport lock: the connection takes its own lock and then the transport lock
+            c?.Close();
             return Task.FromResult(0);
         }
 
