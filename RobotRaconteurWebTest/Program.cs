@@ -170,6 +170,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestConstantIntegerValues();
 
+                        RobDefTest.TestConstantStringUnicodeEscape();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

@@ -341,5 +341,27 @@ namespace RobotRaconteurTest
             RRAssert.IsFalse(ConstantAccepted("constant uint8 n 256"));
             RRWebTest.WriteLine("RobDefTest.TestConstantIntegerValues passed");
         }
+
+        public static void TestConstantStringUnicodeEscape()
+        {
+            // \uXXXX is big-endian (the code point in hex); the bytes were decoded little-endian, so e-acute
+            // (U+00E9) became U+E900 and \u0001 became U+0100
+            var c = new ConstantDefinition((ServiceDefinition)null);
+            c.FromString("constant string s \"\\u00e9\\u0001A\\u4E2D\\uD83D\\uDE00\"");
+            RRAssert.AreEqual(c.ValueToString(), "é\u0001A中\U0001F600");
+
+            RRAssert.AreEqual(ConstantDefinition.EscapeString("é"), "\\u00E9");
+            RRAssert.AreEqual(ConstantDefinition.EscapeString("\u0001"), "\\u0001");
+            // Characters above U+00FF were not escaped at all, so the result was not a valid string constant
+            RRAssert.AreEqual(ConstantDefinition.EscapeString("中\U0001F600"), "\\u4E2D\\uD83D\\uDE00");
+            var c2 = new ConstantDefinition((ServiceDefinition)null);
+            c2.FromString("constant string s \"" + ConstantDefinition.EscapeString("aé中\"") + "\"");
+            RRAssert.AreEqual(c2.ValueToString(), "aé中\"");
+
+            // The generator wrote the same swapped escapes into the C# string literal
+            var gen = CSharpServiceLangGen.convert_constant(c, new Dictionary<string, ConstantDefinition>(), null);
+            RRAssert.IsTrue(gen.Contains("\\u00E9\\u0001A"));
+            RRWebTest.WriteLine("RobDefTest.TestConstantStringUnicodeEscape passed");
+        }
     }
 }

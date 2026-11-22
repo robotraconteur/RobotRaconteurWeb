@@ -2514,7 +2514,7 @@ namespace RobotRaconteurWeb
             if (i == "\r") return "\\r";
             if (i == "\t") return "\\t";
 
-            var v = UnicodeEncoding.Unicode.GetBytes(i);
+            var v = UnicodeEncoding.BigEndianUnicode.GetBytes(i);
             var v2 = new StringWriter();
             for (int j = 0; j < v.Length; j += 2)
             {

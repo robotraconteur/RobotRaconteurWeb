@@ -2918,7 +2918,7 @@ namespace RobotRaconteurWeb
                     v3[j * 2] = Convert.ToByte(v, 16);
                     v3[j * 2 + 1] = Convert.ToByte(v2, 16);
                 }
-                return UnicodeEncoding.Unicode.GetString(v3);
+                return UnicodeEncoding.BigEndianUnicode.GetString(v3);
             }
 
             throw new InternalErrorException("Internal error");
@@ -2943,7 +2943,7 @@ namespace RobotRaconteurWeb
             if (i == "\r") return "\\r";
             if (i == "\t") return "\\t";
 
-            var v = UnicodeEncoding.Unicode.GetBytes(i);
+            var v = UnicodeEncoding.BigEndianUnicode.GetBytes(i);
             var v2 = new StringWriter();
             for (int j = 0; j < v.Length; j += 2)
             {
@@ -2954,7 +2954,7 @@ namespace RobotRaconteurWeb
 
         public static string EscapeString(string in_)
         {
-            var r_replace = new Regex("(\"|\\\\|\\/|[\\x00-\\x1F]|\\x7F|[\\x80-\\xFF]+)");
+            var r_replace = new Regex("(\"|\\\\|\\/|[\\x00-\\x1F]|\\x7F|[\\x80-\\uFFFF]+)");
             return r_replace.Replace(in_, ConstantDefinition_EscapeString_Formatter);
         }
 
