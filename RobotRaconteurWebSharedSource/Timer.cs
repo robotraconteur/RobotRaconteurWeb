@@ -239,7 +239,7 @@ namespace RobotRaconteurWeb
             {
                 e = new TimerEvent
                 {
-                    stopped = IsRunning,
+                    stopped = !IsRunning,
                     last_expected = this.last_time,
                     last_real = this.actual_last_time,
                     current_expected = last_time + TimeSpan.FromMilliseconds(Period),
@@ -247,7 +247,7 @@ namespace RobotRaconteurWeb
                 };
 
                 this.last_time = e.current_expected;
-                this.actual_last_time = e.last_real;
+                this.actual_last_time = e.current_real;
             }
             handler(e);
         }
