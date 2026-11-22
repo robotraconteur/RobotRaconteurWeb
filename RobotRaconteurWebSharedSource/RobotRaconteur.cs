@@ -2477,41 +2477,6 @@ namespace RobotRaconteurWeb
             return urls.First();
         }
 
-
-        /*public async Task<object> ConnectService(string[] urls, string username = null, object credentials = null, ClientContext.ClientServiceListenerDelegate listener = null, string objecttype = null, CancellationToken cancel = default(CancellationToken))
-        {
-            // cSpell: ignore urlsl
-            List<string> urlsl = urls.ToList();
-
-            while (urlsl.Count > 0 && !cancel.IsCancellationRequested)
-            {
-                string url = SelectRemoteNodeURL(urlsl.ToArray());
-
-                try
-                {
-                    return await ConnectService(url, username, credentials, listener, objecttype, cancel);
-                }
-                catch (Exception e)
-                {
-                    if (e is RobotRaconteurException)
-                    {
-                        if (!(e is ConnectionException || e is TimeoutException))
-                            throw e;
-
-                    }
-
-                };
-
-                urlsl.RemoveAll(x => (x == url));
-
-
-            }
-            throw new ConnectionException("Could not connect to service");
-
-        }*/
-
-
-
         private async Task UpdateDetectedNodes(CancellationToken cancel)
         {
             await m_Discovery.UpdateDetectedNodes(cancel).ConfigureAwait(false);
