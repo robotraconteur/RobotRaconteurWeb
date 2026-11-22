@@ -582,5 +582,23 @@ namespace RobotRaconteurTest
             defs.Add(d.Name, d);
             return defs;
         }
+
+        public static void TestImplementsEventMismatch()
+        {
+            // CompareMember tested ev2 where ev1 was meant: an implemented event matched against a member that is not
+            // an event dereferenced null (NullReferenceException from VerifyServiceDefinitions)
+            var d = new ServiceDefinition();
+            d.FromString("service t7.ev\nstdver 0.10\n\nobject b\nevent x()\nend\n\nobject a\nimplements b\nobjref b x\nend\n");
+            var defs = new Dictionary<string, ServiceDefinition>();
+            defs.Add(d.Name, d);
+            RRAssert.ThrowsException<ServiceDefinitionVerifyException>(() => ServiceDefinitionUtil.VerifyServiceDefinitions(defs));
+
+            var d2 = new ServiceDefinition();
+            d2.FromString("service t7.ev2\nstdver 0.10\n\nobject b\nevent x(double a)\nend\n\nobject a\nimplements b\nevent x(double a)\nend\n");
+            var defs2 = new Dictionary<string, ServiceDefinition>();
+            defs2.Add(d2.Name, d2);
+            ServiceDefinitionUtil.VerifyServiceDefinitions(defs2);
+            RRWebTest.WriteLine("RobDefTest.TestImplementsEventMismatch passed");
+        }
     }
 }

@@ -4123,7 +4123,7 @@ namespace RobotRaconteurWeb
 
             var ev1 = m1 as EventDefinition;
             var ev2 = m2 as EventDefinition;
-            if (ev2 != null)
+            if (ev1 != null)
             {
                 if (ev2 == null) return false;
 
