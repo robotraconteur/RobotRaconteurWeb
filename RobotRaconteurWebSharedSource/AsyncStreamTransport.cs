@@ -1346,6 +1346,11 @@ namespace RobotRaconteurWeb
 
                 Message streamop_ret1 = await streamop_ret.Task.AwaitWithTimeout(10000).ConfigureAwait(false);
 
+                if (streamop_ret1.entries[0].MemberName != command)
+                {
+                    throw new ProtocolException("Invalid StreamOp response");
+                }
+
                 return await UnpackStreamOpResponse(streamop_ret1.entries[0], streamop_ret1.header).ConfigureAwait(false);
             }
             finally

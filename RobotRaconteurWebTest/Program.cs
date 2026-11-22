@@ -212,6 +212,8 @@ namespace RobotRaconteurTest
 
                         await AsyncStreamConnectFailCloseTest.TestFailedConnectClosesStream();
 
+                        await AsyncStreamStreamOpReplyTest.TestStreamOpReplyForOtherCommandRejected();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

@@ -16,6 +16,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamStreamOpCancelTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamConnectFailCloseTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncStreamStreamOpReplyTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AttributesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServicePathTest.cs" />
 
