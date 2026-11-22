@@ -571,10 +571,21 @@ namespace RobotRaconteurWeb
         private async Task<Tuple<byte[], string, Dictionary<int, RobotRaconteurServiceIndex.ServiceInfo>>> DoFindServiceByType(string[] urls, CancellationToken cancel)
         {
             RobotRaconteurServiceIndex.ServiceIndex ind = (RobotRaconteurServiceIndex.ServiceIndex)await node.ConnectService(urls.ToArray(), cancel: cancel).ConfigureAwait(false);
-            var NodeID = ((ServiceStub)ind).RRContext.RemoteNodeID.ToByteArray();
-            var NodeName = ((ServiceStub)ind).RRContext.RemoteNodeName;
-            var inf = await ind.GetLocalNodeServices(cancel).ConfigureAwait(false);
-            return Tuple.Create(NodeID, NodeName, inf);
+            try
+            {
+                var NodeID = ((ServiceStub)ind).RRContext.RemoteNodeID.ToByteArray();
+                var NodeName = ((ServiceStub)ind).RRContext.RemoteNodeName;
+                var inf = await ind.GetLocalNodeServices(cancel).ConfigureAwait(false);
+                return Tuple.Create(NodeID, NodeName, inf);
+            }
+            finally
+            {
+                try
+                {
+                    await node.DisconnectService(ind).ConfigureAwait(false);
+                }
+                catch { }
+            }
         }
 
         public async Task<ServiceInfo2[]> FindServiceByType(string servicetype, string[] transportschemes)

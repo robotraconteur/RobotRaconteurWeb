@@ -208,6 +208,8 @@ namespace RobotRaconteurTest
 
                         await RobotRaconteurSubTest.ConnectFailureTests.TestFailedConnectDoesNotLeakEndpoint();
 
+                        await RobotRaconteurSubTest.FindServiceByTypeDisconnectTests.RunTestFindServiceByTypeDisconnects();
+
 
                         await RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriberFilter();
                         await RobotRaconteurSubTest.SubscriberFilterTests.RunSubscriberAttributeFilter();
