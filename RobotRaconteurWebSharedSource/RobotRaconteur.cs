@@ -1559,7 +1559,7 @@ namespace RobotRaconteurWeb
                                     var extra_imports = service.ExtraImports.ToList();
                                     if (extra_imports.Count > 0)
                                     {
-                                        eret.AddElement("extra_imports", PackListType<string>(extra_imports, null));
+                                        eret.AddElement("extraimports", PackListType<string>(extra_imports, null));
                                     }
                                 }
                                 eret.AddElement("servicedef", servicedef);
