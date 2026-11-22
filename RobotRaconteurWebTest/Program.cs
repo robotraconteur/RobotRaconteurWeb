@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        TimeSpecCompareTests.RunTestTimeSpecCompare();
                         await WallTimerEventTests.RunTestWallTimerEvents();
                         await WallRateSleepTests.RunTestWallRateLateSleep();
                         await PulledServiceTypesTest.TestPulledServiceTypesDefinitionText();

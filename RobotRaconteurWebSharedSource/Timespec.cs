@@ -331,7 +331,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public static bool operator <(TimeSpec t1, TimeSpec t2)
         {
-            return t2 >= t1;
+            return t2 > t1;
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public static bool operator <=(TimeSpec t1, TimeSpec t2)
         {
-            return t2 > t1;
+            return t2 >= t1;
         }
         /**
         <summary>
