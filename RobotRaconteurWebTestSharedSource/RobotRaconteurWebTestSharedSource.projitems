@@ -62,6 +62,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)TransportListenerLeakTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)PullServiceDefsCycleTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)PulledServiceTypesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 

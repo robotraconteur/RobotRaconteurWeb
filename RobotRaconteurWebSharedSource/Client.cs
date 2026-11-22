@@ -746,7 +746,7 @@ namespace RobotRaconteurWeb
                         {
                             lock (pulled_service_defs)
                             {
-                                var pulleddefs_str = pulled_service_defs.Select(x => x.ToString()).ToArray();
+                                var pulleddefs_str = pulled_service_defs.Values.Select(x => x.ToString()).ToArray();
 
                                 var di2 =
                                     node.DynamicServiceFactory.CreateServiceFactories(pulleddefs_str, this);

@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await PulledServiceTypesTest.TestPulledServiceTypesDefinitionText();
+
                         ScanAssembliesTests.RunTestScanWithPreregisteredType();
                         await PullServiceDefsCycleTest.TestPullServiceDefinitionImportCycle();
 
@@ -373,6 +375,11 @@ namespace RobotRaconteurTest
                 case "pulldefscycle":
                     {
                         await PullServiceDefsCycleTest.TestPullServiceDefinitionImportCycle();
+                        break;
+                    }
+                case "pulledservicetypes":
+                    {
+                        await PulledServiceTypesTest.TestPulledServiceTypesDefinitionText();
                         break;
                     }
                 case "message":
