@@ -245,6 +245,12 @@ namespace RobotRaconteurWeb
             ValueRegex = valueRegex;
             UseRegex = true;
         }
+        // The whole value must match, as Core's boost::regex_match does
+        static bool RegexFullMatch(Regex r, string value)
+        {
+            return Regex.IsMatch(value, $"\\A(?:{r})\\z", r.Options);
+        }
+
         /// <summary>
         /// Compare the attribute to a value
         /// </summary>
@@ -259,7 +265,7 @@ namespace RobotRaconteurWeb
             }
             if (UseRegex)
             {
-                return ValueRegex.IsMatch(value);
+                return RegexFullMatch(ValueRegex, value);
             }
             else
             {
@@ -282,7 +288,7 @@ namespace RobotRaconteurWeb
             }
             if (UseRegex)
             {
-                return ValueRegex.IsMatch(value);
+                return RegexFullMatch(ValueRegex, value);
             }
             else
             {

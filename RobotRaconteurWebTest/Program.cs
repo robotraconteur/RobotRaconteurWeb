@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        RobotRaconteurSubTest.AttributeRegexFullMatchTest.TestAttributeRegexFullMatch();
+
                         await CurrentEndpointAsyncTest.TestCurrentEndpointAfterAwait();
 
                         await ServicePathAliasTests.RunTestServicePathAliasLock();
@@ -475,6 +477,11 @@ namespace RobotRaconteurTest
                 case "currentendpointasync":
                     {
                         await CurrentEndpointAsyncTest.TestCurrentEndpointAfterAwait();
+                        break;
+                    }
+                case "attributeregexfullmatch":
+                    {
+                        RobotRaconteurSubTest.AttributeRegexFullMatchTest.TestAttributeRegexFullMatch();
                         break;
                     }
                 case "message":
