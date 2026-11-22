@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await PipeWaiterTest.TestPipeReceiveWaitReleasesWaiter();
+
                         await RobotRaconteurSubTest.Wires.WireRepeatConnectTest.TestWireRepeatConnect();
 
                         await MemoryMaxTransferTest.TestMemoryReadCountLimit();
@@ -246,6 +248,11 @@ namespace RobotRaconteurTest
                 case "wirerepeatconnect":
                     {
                         await RobotRaconteurSubTest.Wires.WireRepeatConnectTest.TestWireRepeatConnect();
+                        break;
+                    }
+                case "pipewaiter":
+                    {
+                        await PipeWaiterTest.TestPipeReceiveWaitReleasesWaiter();
                         break;
                     }
                 case "message":

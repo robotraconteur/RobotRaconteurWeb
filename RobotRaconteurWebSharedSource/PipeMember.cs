@@ -468,7 +468,10 @@ namespace RobotRaconteurWeb
                     waiter = recv_waiter.CreateWaiterTask(timeout, cancel);
                 }
 
-                await waiter.Task.ConfigureAwait(false);
+                using (waiter)
+                {
+                    await waiter.Task.ConfigureAwait(false);
+                }
 
                 lock (recv_lock)
                 {
