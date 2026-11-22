@@ -104,6 +104,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)TimeSpecCompareTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)PasswordFileParseTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)PasswordFileNullCredentialTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceLockAsyncTests.cs" />

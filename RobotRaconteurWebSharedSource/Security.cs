@@ -328,13 +328,14 @@ namespace RobotRaconteurWeb
 #pragma warning disable 1591
         public AuthenticatedUser AuthenticateUser(string username, Dictionary<string, object> credentials)
         {
-            if (!validusers.Keys.Contains(username)) throw new AuthenticationException("Invalid username or password");
+            if (username == null || !validusers.ContainsKey(username)) throw new AuthenticationException("Invalid username or password");
             string password;
             try
             {
                 password = (string)credentials["password"];
             }
             catch { throw new AuthenticationException("Password not supplied in credentials"); }
+            if (password == null) throw new AuthenticationException("Password not supplied in credentials");
 
             string passwordhash = MD5Hash(password);
 
