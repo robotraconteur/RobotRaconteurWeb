@@ -974,7 +974,6 @@ namespace RobotRaconteurWeb
 
 
         private Stream socket;
-        //public NetworkStream netstream;
 
         private LocalTransport parenttransport;
 
@@ -1000,10 +999,8 @@ namespace RobotRaconteurWeb
 
         public async Task Connect(Stream s, string connecturl, Endpoint e, CancellationToken cancel = default(CancellationToken))
         {
-            //LocalEndpoint = e.LocalEndpoint;
 
             socket = s;
-            //socket.Client.NoDelay = true;
             this.connecturl = connecturl;
             m_LocalEndpoint = e.LocalEndpoint;
 
@@ -1047,10 +1044,8 @@ namespace RobotRaconteurWeb
 
         public async Task Connect(Stream s, CancellationToken cancel = default(CancellationToken))
         {
-            //LocalEndpoint = e.LocalEndpoint;
 
             socket = s;
-            //socket.Client.NoDelay = true;
 
             m_Connected = true;
             await ConnectStream(socket, true, null, null, false, false, 30000, cancel).ConfigureAwait(false);

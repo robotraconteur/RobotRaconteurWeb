@@ -701,7 +701,6 @@ namespace RobotRaconteurWeb
                             i += t9.Item2 * e2_count;
 
                         }
-                        //w2 << "    public " + t8.cs_type + t8.cs_arr_type + " " + t8.name + ";");
                     }
 
                 }
@@ -742,7 +741,6 @@ namespace RobotRaconteurWeb
                             i += t9.Item2 * e2_count;
 
                         }
-                        //w2 << "    public " + t8.cs_type + t8.cs_arr_type + " " + t8.name + ";");
                     }
 
                     w2.WriteLine("    }");
@@ -1133,7 +1131,6 @@ namespace RobotRaconteurWeb
 
             w2.WriteLine("    public override IStructureStub FindStructureStub(string objecttype)");
             w2.WriteLine("    {");
-            //w2 << "    string objshort=RemovePath(objecttype);");
 
             foreach (var e in d.Structures)
             {
@@ -1145,7 +1142,6 @@ namespace RobotRaconteurWeb
 
             w2.WriteLine("    public override IPodStub FindPodStub(string objecttype)");
             w2.WriteLine("    {");
-            //w2 << "    string objshort=RemovePath(objecttype);");
 
             foreach (var e in d.Pods)
             {
@@ -1157,7 +1153,6 @@ namespace RobotRaconteurWeb
 
             w2.WriteLine("    public override INamedArrayStub FindNamedArrayStub(string objecttype)");
             w2.WriteLine("    {");
-            //w2 << "    string objshort=RemovePath(objecttype);");
 
             foreach (var e in d.NamedArrays)
             {
@@ -1258,7 +1253,6 @@ namespace RobotRaconteurWeb
                 t.name = m.Name;
                 w2.WriteLine("    s." + FixName(t.name) + " =" + str_unpack_message_element("MessageElement.FindElement(m.Elements,\"" + t.name + "\")", m.Type) + ";");
             }
-            //w2.WriteLine("    if ((s as T)==null) throw new DataTypeException(\"Incorrect structure cast\");");
             w2.WriteLine("    T st; try {st=(T)((object)s);} catch (InvalidCastException) {throw new DataTypeMismatchException(\"Wrong structuretype\");}");
             w2.WriteLine("    return st;");
             w2.WriteLine("    }");
@@ -1750,7 +1744,6 @@ namespace RobotRaconteurWeb
                 pars[pars.Length - 1] = "default(CancellationToken)";
 
                 var params_ = String.Join(", ", pars);
-                //w.WriteLine(String.Format("    public {1}{2} {0}({3}) {{", t2));
 
                 w2.WriteLine("    case \"" + m.Name + "\": {");
 

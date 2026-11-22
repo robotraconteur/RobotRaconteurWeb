@@ -84,7 +84,6 @@ namespace RobotRaconteurWeb
 
         public abstract string[] UrlSchemeString { get; }
 
-        //public abstract string Scheme { get; }
 
         public abstract bool CanConnectService(string url);
 

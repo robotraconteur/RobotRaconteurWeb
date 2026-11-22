@@ -1109,20 +1109,6 @@ namespace RobotRaconteurWeb
                     return DataTypes.string_t;
                 case TypeCode.Boolean:
                     return DataTypes.bool_t;
-                /*case "RobotRaconteurWeb.CDouble":
-                    return DataTypes.cdouble_t;
-                case "RobotRaconteurWeb.CSingle":
-                    return DataTypes.csingle_t;
-                case "RobotRaconteurWeb.MessageElementStructure":
-                    return DataTypes.structure_t;
-                case "RobotRaconteurWeb.MessageElementMap<int>":
-                    return DataTypes.vector_t;
-                case "RobotRaconteurWeb.MessageElementMap<string>":
-                    return DataTypes.dictionary_t;
-                case "RobotRaconteurWeb.MessageElementMultiDimArray":
-                    return DataTypes.multidimarray_t;
-                case "RobotRaconteurWeb.MessageElementList":
-                    return DataTypes.list_t;*/
                 case TypeCode.Object:
                     {
                         if (stype == typeof(CDouble))
@@ -2250,7 +2236,6 @@ namespace RobotRaconteurWeb
         {
             ElementName = name;
             Data = datin;
-            //UpdateData();
         }
 
         public MessageElement(int number, object datin)
@@ -2259,7 +2244,6 @@ namespace RobotRaconteurWeb
             Data = datin;
             ElementFlags &= (byte)~MessageElementFlags.ElementNameStr;
             ElementFlags |= (byte)MessageElementFlags.ElementNumber;
-            //UpdateData();
         }
 
         public Object Data
@@ -2272,7 +2256,6 @@ namespace RobotRaconteurWeb
             {
                 dat = value;
 
-                //UpdateData();
             }
 
         }

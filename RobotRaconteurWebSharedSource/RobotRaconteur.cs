@@ -227,7 +227,6 @@ namespace RobotRaconteurWeb
 
         internal Dictionary<uint, Transport> transports = new Dictionary<uint, Transport>();
 
-        //public Dictionary<uint, uint> endpoint_map=new Dictionary<uint,uint>;
 
         internal Dictionary<string, ServiceFactory> service_factories = new Dictionary<string, ServiceFactory>();
 
@@ -723,11 +722,6 @@ namespace RobotRaconteurWeb
                         MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.structure_t);
                         return UnpackStructure<T>(md, context);
                     }
-                /*case DataTypes.pod_t:
-                    using (MessageElementData md = (MessageElementData)e.Data)
-                    {
-                        return (T)UnpackPod(md);
-                    }*/
                 case DataTypes.pod_array_t:
                     {
                         MessageElementNestedElementList md = e.CastDataToNestedList(DataTypes.pod_array_t);
@@ -1037,7 +1031,6 @@ namespace RobotRaconteurWeb
                         MessageElementNestedElementList md = me.CastDataToNestedList();
                         return UnpackStructure<object>(md, context);
                     }
-                //case DataTypes.pod_t:
                 case DataTypes.pod_array_t:
                 case DataTypes.pod_multidimarray_t:
                     {
@@ -1341,7 +1334,6 @@ namespace RobotRaconteurWeb
                 ServerContext c = new ServerContext(GetServiceType(servicetype), this);
                 c.SetBaseObject(name, obj, securitypolicy);
 
-                //RegisterEndpoint(c);
                 services.Add(name, c);
 
                 UpdateServiceStateNonce();
@@ -1392,7 +1384,6 @@ namespace RobotRaconteurWeb
 
 
                 s.Close();
-                //DeleteEndpoint(s);
 
                 services.Remove(sname);
             }
@@ -1545,7 +1536,6 @@ namespace RobotRaconteurWeb
                         break;
                     case MessageEntryType.GetServiceDesc:
                         {
-                            //string name = (string)e.FindElement("servicename").Data;
                             string name = e.ServicePath;
                             try
                             {
@@ -1612,8 +1602,6 @@ namespace RobotRaconteurWeb
                                                                        component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
                                                                                                           service_path: e.ServicePath, member: e.MemberName);
 
-                                //services[name].AddClient(m.header.SenderEndpoint);
-                                //eret.AddElement("servicedef", servicedef);
                             }
                             catch (Exception exp)
                             {
@@ -1646,7 +1634,6 @@ namespace RobotRaconteurWeb
                                     se.service.RemoveClient(se);
                                 }
                                 DeleteEndpoint(se);
-                                //eret.AddElement("servicedef", servicedef);
                                 // Info log client disconnected
                                 LogInfo(string.Format("Client disconnected from service {0} from {1} ep {2}", name, m.header.SenderNodeID.ToString(), m.header.SenderEndpoint), this,
                                                                              component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
@@ -2395,7 +2382,6 @@ namespace RobotRaconteurWeb
 
 
 
-            //RobotRaconteurNode.sp = null;
         }
 
 

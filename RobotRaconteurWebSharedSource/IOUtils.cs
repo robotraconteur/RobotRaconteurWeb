@@ -89,7 +89,6 @@ namespace RobotRaconteurWeb
                     {
 
                         m_Position += (uint)bl;
-                        //byte[] b = s_memstream.GetBuffer();
                         Buffer.BlockCopy(a, 0, membuf, (int)s_memstream.Position, bl);
                         s_memstream.Position = s_memstream.Position + bl;
                     }
@@ -268,7 +267,6 @@ namespace RobotRaconteurWeb
         {
             if (count + Position > CurrentLimit) throw new IOException("Message write error");
             base.Write(buffer, index, count);
-            //m_Position += (uint)count;
         }
 
         public override void Write(double value)
@@ -527,7 +525,6 @@ namespace RobotRaconteurWeb
                     {
                         if (Position + bl > CurrentLimit) throw new IOException("Message read error");
 
-                        //byte[] b = s_memstream.GetBuffer();
                         Buffer.BlockCopy(membuf, (int)s_memstream.Position, a, 0, bl);
                         s_memstream.Position = s_memstream.Position + bl;
 
@@ -707,7 +704,6 @@ namespace RobotRaconteurWeb
         {
             if (Position + 1 > CurrentLimit) throw new IOException("Message read error");
             var i = base.Read();
-            //m_Position += 1;
             return i;
         }
 
@@ -715,7 +711,6 @@ namespace RobotRaconteurWeb
         {
             if (Position + count > CurrentLimit) throw new IOException("Message read error");
             var i = base.Read(buffer, index, count);
-            //m_Position += (uint)i;
             return i;
         }
 

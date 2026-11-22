@@ -133,7 +133,6 @@ namespace RobotRaconteurWeb
 
 
 
-        // public delegate void EventDispatchMessageEntry(MessageEntry e);
 
         protected ServiceFactory m_ServiceDef;
 
@@ -146,7 +145,6 @@ namespace RobotRaconteurWeb
         {
 
 
-            //rec_event = new AutoResetEvent(false);
             stubs = new Dictionary<string, ServiceStub>();
             DynamicServiceFactory_ = node.DynamicServiceFactory;
             UsePulledServiceTypes = DynamicServiceFactory_ != null;
@@ -156,7 +154,6 @@ namespace RobotRaconteurWeb
         {
             m_ServiceDef = service_def;
 
-            //rec_event = new AutoResetEvent(false);
             stubs = new Dictionary<string, ServiceStub>();
             DynamicServiceFactory_ = node.DynamicServiceFactory;
             UsePulledServiceTypes = DynamicServiceFactory_ != null;
@@ -174,7 +171,6 @@ namespace RobotRaconteurWeb
             }
 
             MessageEntry e = new MessageEntry(MessageEntryType.ObjectTypeName, "");
-            //MessageElement m = e.AddElement("ObjectPath", path);
             e.ServicePath = path;
             e.AddElement("clientversion", RobotRaconteurNode.Version);
             MessageEntry ret = await ProcessRequest(e, cancel).ConfigureAwait(false);
@@ -365,7 +361,6 @@ namespace RobotRaconteurWeb
 
         public async Task SendMessage(MessageEntry m, CancellationToken cancel)
         {
-            //m.ServiceName = ServiceName;
 
             if (!Connected) throw new ConnectionException("Client has been disconnected");
 
@@ -384,7 +379,6 @@ namespace RobotRaconteurWeb
         private object rec_loc = new object();
 
         private uint request_number = 0;
-        //private AutoResetEvent rec_event;
 
         public override void MessageReceived(Message m)
         {
@@ -418,7 +412,6 @@ namespace RobotRaconteurWeb
 
         protected void MessageEntryReceived(MessageEntry m)
         {
-            //lock (rec_loc)
             {
                 if (m.EntryType == MessageEntryType.EventReq)
                 {
@@ -431,7 +424,6 @@ namespace RobotRaconteurWeb
                             stub = stubs[m.ServicePath];
                             a = (delegate () { stub.DispatchEvent(m); });
 
-                            //stub.DispatchEvent(m);
                         }
                     if (a != null)
                     {
@@ -440,7 +432,6 @@ namespace RobotRaconteurWeb
                 }
                 else if (m.EntryType == MessageEntryType.PropertyGetRes || m.EntryType == MessageEntryType.PropertySetRes || m.EntryType == MessageEntryType.FunctionCallRes || m.EntryType == MessageEntryType.ObjectTypeNameRet || m.EntryType == MessageEntryType.ConnectClientRet || m.EntryType == MessageEntryType.ConnectClientCombinedRet || m.EntryType == MessageEntryType.DisconnectClientRet || m.EntryType == MessageEntryType.GetServiceDescRet || (m.EntryType >= MessageEntryType.PipeConnectReq && m.EntryType <= MessageEntryType.PipeDisconnectRet) || m.EntryType == MessageEntryType.ClientSessionOpRet || m.EntryType == MessageEntryType.ServiceCheckCapabilityRet || m.EntryType == MessageEntryType.WireConnectRet || m.EntryType == MessageEntryType.WireDisconnectRet || m.EntryType == MessageEntryType.MemoryReadRet || m.EntryType == MessageEntryType.MemoryWriteRet || m.EntryType == MessageEntryType.MemoryGetParamRet || m.EntryType == MessageEntryType.WirePeekInValueRet || m.EntryType == MessageEntryType.WirePeekOutValueRet || m.EntryType == MessageEntryType.WirePokeOutValueRet || m.EntryType == MessageEntryType.GeneratorNextRes)
                 {
-                    // Console.WriteLine("Got " + m.TransactionID + " " + m.EntryType + " " + m.MemberName);
                     TaskCompletionSource<MessageEntry> r = null;
                     lock (rec_wait)
                     {
@@ -468,7 +459,6 @@ namespace RobotRaconteurWeb
                             stub = stubs[m.ServicePath];
                             a = (delegate () { stub.DispatchPipeMessage(m); });
 
-                            //stub.DispatchEvent(m);
                         }
                     if (a != null)
                     {
@@ -485,7 +475,6 @@ namespace RobotRaconteurWeb
                             stub = stubs[m.ServicePath];
                             a = delegate () { stub.DispatchWireMessage(m); };
 
-                            //stub.DispatchEvent(m);
                         }
 
                     if (a != null)
@@ -622,10 +611,6 @@ namespace RobotRaconteurWeb
             m_RemoteNodeName = u.nodename;
             m_ServiceName = u.service;
 
-            //ProgramName = ProgramName1;
-            /* try
-             {*/
-            //if (RobotRaconteurService.s.transports[c] == null) return null;
             if (!c.CanConnectService(url)) throw new ServiceException("Invalid transport");
 
             TransportConnection = await c.CreateTransportConnection(url, this, cancel).ConfigureAwait(false);
@@ -671,7 +656,6 @@ namespace RobotRaconteurWeb
                 if (use_combined_connection)
                 {
                     MessageEntry e = new MessageEntry(MessageEntryType.ConnectClientCombined, "");
-                    //e.AddElement("servicepath", ServiceName);
                     e.ServicePath = ServiceName;
                     e.AddElement("clientversion", RobotRaconteurNode.Version);
                     e.AddElement("returnservicedefs", "true");
@@ -753,7 +737,6 @@ namespace RobotRaconteurWeb
 
                                 for (int i = 0; i < pulleddefs_str.Length; i++)
                                 {
-                                    //di2[i].Node = node;
                                     lock (pulled_service_types)
                                     {
                                         pulled_service_types.Add(di2[i].GetServiceName(), di2[i]);
@@ -819,7 +802,6 @@ namespace RobotRaconteurWeb
                     }
 
                     MessageEntry e = new MessageEntry(MessageEntryType.ObjectTypeName, "");
-                    //e.AddElement("servicepath", ServiceName);
                     e.ServicePath = ServiceName;
                     e.AddElement("clientversion", RobotRaconteurNode.Version);
 
@@ -870,10 +852,6 @@ namespace RobotRaconteurWeb
             }
 
 
-            /*}
-            catch {
-                return null;
-            }*/
         }
 
         protected CancellationTokenSource cancel_source = new CancellationTokenSource();
@@ -964,14 +942,12 @@ namespace RobotRaconteurWeb
 
         public async Task SendPipeMessage(MessageEntry m, CancellationToken cancel)
         {
-            //m.EntryType= MessageEntryType.PipePacket;
             await SendMessage(m, cancel).ConfigureAwait(false);
         }
 
 
         public async Task SendWireMessage(MessageEntry m, CancellationToken cancel)
         {
-            //m.EntryType= MessageEntryType.PipePacket;
             await SendMessage(m, cancel).ConfigureAwait(false);
         }
 
@@ -1129,7 +1105,6 @@ namespace RobotRaconteurWeb
                         }
                         catch { }
                     }
-                    //Monitor.Exit(obj);
                 }
             }
 
