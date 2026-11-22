@@ -549,6 +549,8 @@ namespace RobotRaconteurWeb
                 var waiter = inval_waiter.CreateWaiterTask(timeout, token);
                 using (waiter)
                 {
+                    if (inval_valid && !IsValueExpired(lasttime_recv_local, InValueLifespan))
+                        return true;
                     await waiter.Task.ConfigureAwait(false);
                 }
 
@@ -574,6 +576,8 @@ namespace RobotRaconteurWeb
                 var waiter = outval_waiter.CreateWaiterTask(timeout, token);
                 using (waiter)
                 {
+                    if (outval_valid && !IsValueExpired(lasttime_send_local, OutValueLifespan))
+                        return true;
                     await waiter.Task.ConfigureAwait(false);
                 }
 
@@ -1780,6 +1784,8 @@ namespace RobotRaconteurWeb
             var waiter = inval_waiter.CreateWaiterTask(timeout, token);
             using (waiter)
             {
+                if (in_value_valid && !Wire<T>.WireConnection.IsValueExpired(lasttime_recv_local, InValueLifespan))
+                    return true;
                 await waiter.Task.ConfigureAwait(false);
             }
 
