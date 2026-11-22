@@ -202,6 +202,8 @@ namespace RobotRaconteurTest
 
                         MultiDimArrayTest.TestZeroCountCopiesNothing();
 
+                        await AsyncStreamStreamOpCancelTest.TestCancelledQueuedStreamOpDoesNotStall();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

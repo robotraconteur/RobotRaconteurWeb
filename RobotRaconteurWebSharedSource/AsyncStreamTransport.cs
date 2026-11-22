@@ -1343,15 +1343,17 @@ namespace RobotRaconteurWeb
             {
                 lock (this)
                 {
-                    if (streamop_queue.Count == 0)
-                    {
-                        streamop_ret = null;
-                    }
-                    else
+                    streamop_ret = null;
+                    // Skip queued operations that were already cancelled, otherwise nobody completes the slot
+                    while (streamop_queue.Count > 0)
                     {
                         streamop_ret = new TaskCompletionSource<Message>();
                         TaskCompletionSource<int> t2 = streamop_queue.Dequeue();
-                        t2.TrySetResult(0);
+                        if (t2.TrySetResult(0))
+                        {
+                            break;
+                        }
+                        streamop_ret = null;
                     }
                 }
             }
@@ -1451,15 +1453,17 @@ namespace RobotRaconteurWeb
             {
                 lock (this)
                 {
-                    if (CheckStreamCapability_queue.Count == 0)
-                    {
-                        CheckStreamCapability_ret = null;
-                    }
-                    else
+                    CheckStreamCapability_ret = null;
+                    // Skip queued operations that were already cancelled, otherwise nobody completes the slot
+                    while (CheckStreamCapability_queue.Count > 0)
                     {
                         CheckStreamCapability_ret = new TaskCompletionSource<Message>();
                         TaskCompletionSource<int> t2 = CheckStreamCapability_queue.Dequeue();
-                        t2.TrySetResult(0);
+                        if (t2.TrySetResult(0))
+                        {
+                            break;
+                        }
+                        CheckStreamCapability_ret = null;
                     }
                 }
             }
