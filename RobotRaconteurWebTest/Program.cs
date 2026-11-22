@@ -236,6 +236,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestEnumFirstValueRequired();
 
+                        RobDefTest.TestFloatConstantLeadingDecimalPoint();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

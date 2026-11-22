@@ -623,5 +623,32 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(e.Values[3].Value, 17);
             RRWebTest.WriteLine("RobDefTest.TestEnumFirstValueRequired passed");
         }
+
+        static bool ConstantAccepted2(string s)
+        {
+            try
+            {
+                new ConstantDefinition((ServiceDefinition)null).FromString(s);
+                return true;
+            }
+            catch (ServiceDefinitionParseException)
+            {
+                return false;
+            }
+        }
+
+        public static void TestFloatConstantLeadingDecimalPoint()
+        {
+            // RR_FLOAT_REGEX had "|:\.\d+" for Core's "|(?:\.\d+)": ".5" was not a float, ":.5" was
+            RRAssert.IsTrue(ConstantAccepted2("constant double d .5"));
+            RRAssert.IsTrue(ConstantAccepted2("constant double d -.5e3"));
+            RRAssert.IsTrue(ConstantAccepted2("constant single[] d {0.5, .25}"));
+            RRAssert.IsFalse(ConstantAccepted2("constant double d :.5"));
+            RRAssert.IsFalse(ConstantAccepted2("constant double[] d {:.5}"));
+            // The integer array regex had "(:?" for "(?:" (an optional ':' before the first element)
+            RRAssert.IsFalse(ConstantAccepted2("constant int32[] a {:5, 6}"));
+            RRAssert.IsTrue(ConstantAccepted2("constant int32[] a {5, 6}"));
+            RRWebTest.WriteLine("RobDefTest.TestFloatConstantLeadingDecimalPoint passed");
+        }
     }
 }

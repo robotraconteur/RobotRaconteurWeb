@@ -165,7 +165,7 @@ namespace RobotRaconteurWeb
             internal const string RR_TYPE2_REGEX = "(?:[a-zA-Z](?:\\w*[a-zA-Z0-9])?)(?:\\.[a-zA-Z](?:\\w*[a-zA-Z0-9])?)*(?:\\[[0-9\\,\\*\\-]*\\])?(?:\\{\\w{1,16}\\})?";
             internal const string RR_INT_REGEX = "[+\\-]?\\d+";
             internal const string RR_HEX_REGEX = "[+\\-]?0x[\\da-fA-F]+";
-            internal const string RR_FLOAT_REGEX = "[+\\-]?(?:(?:0|[1-9]\\d*)(?:\\.\\d*)?|:\\.\\d+)(?:[eE][+\\-]?\\d+)?";
+            internal const string RR_FLOAT_REGEX = "[+\\-]?(?:(?:0|[1-9]\\d*)(?:\\.\\d*)?|(?:\\.\\d+))(?:[eE][+\\-]?\\d+)?";
             internal const string RR_NUMBER_REGEX = "(?:" + RR_INT_REGEX + "|" + RR_HEX_REGEX + "|" + RR_FLOAT_REGEX + ")";
 
             internal static void ServiceDefinition_FromStringFormat_common(Regex r, string l, string keyword, ref List<string> vec, ref ServiceDefinitionParseInfo parse_info)
@@ -2830,7 +2830,7 @@ namespace RobotRaconteurWeb
                     }
                     else
                     {
-                        var r_array = new Regex("^[ \\t]*\\{[ \\t]*((?:(:?" + detail.ServiceDefinitionUtil.RR_INT_REGEX + ")|(?:" + detail.ServiceDefinitionUtil.RR_HEX_REGEX + "))(?:[ \\t]*,[ \\t]*(?:" + detail.ServiceDefinitionUtil.RR_INT_REGEX + "|" + detail.ServiceDefinitionUtil.RR_HEX_REGEX + "))*)?[ \\t]*}[ \\t]*$");
+                        var r_array = new Regex("^[ \\t]*\\{[ \\t]*((?:(?:" + detail.ServiceDefinitionUtil.RR_INT_REGEX + ")|(?:" + detail.ServiceDefinitionUtil.RR_HEX_REGEX + "))(?:[ \\t]*,[ \\t]*(?:" + detail.ServiceDefinitionUtil.RR_INT_REGEX + "|" + detail.ServiceDefinitionUtil.RR_HEX_REGEX + "))*)?[ \\t]*}[ \\t]*$");
                         r_array_match = r_array.Match(value);
                         if (!r_array_match.Success)
                             return false;
