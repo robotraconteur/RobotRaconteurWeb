@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await ServicePathReleasedTest.TestServicePathReleasedSeparator();
+
                         await ReleaseServicePathTest.TestReleaseServicePathSeparator();
 
                         await RobotRaconteurSubTest.Wires.WireWaitValidTest.TestWaitValueValidAlreadyValid();
@@ -279,6 +281,11 @@ namespace RobotRaconteurTest
                 case "releaseservicepath":
                     {
                         await ReleaseServicePathTest.TestReleaseServicePathSeparator();
+                        break;
+                    }
+                case "servicepathreleased":
+                    {
+                        await ServicePathReleasedTest.TestServicePathReleasedSeparator();
                         break;
                     }
                 case "message":

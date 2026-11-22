@@ -496,19 +496,22 @@ namespace RobotRaconteurWeb
                 else if (m.EntryType == MessageEntryType.ServicePathReleasedReq)
                 {
                     string path = m.ServicePath;
-                    string[] objkeys = stubs.Keys.Where(x => (x.Length >= path.Length) && (x.Substring(0, path.Length) == path)).ToArray();
-                    //if (objkeys.Count() == 0) throw new ServiceException("Unknown service path");
-
-                    foreach (string path1 in objkeys)
+                    lock (stubs)
                     {
-                        try
+                        string[] objkeys = stubs.Keys.Where(x => x == path || x.StartsWith(path + ".")).ToArray();
+                        //if (objkeys.Count() == 0) throw new ServiceException("Unknown service path");
+
+                        foreach (string path1 in objkeys)
                         {
-                            stubs[path1].RRReleaseContext();
+                            try
+                            {
+                                stubs[path1].RRReleaseContext();
 
-                            stubs.Remove(path1);
+                                stubs.Remove(path1);
+                            }
+                            catch { }
+
                         }
-                        catch { }
-
                     }
 
                 }

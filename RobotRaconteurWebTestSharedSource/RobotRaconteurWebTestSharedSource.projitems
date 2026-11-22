@@ -32,6 +32,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)WireWaitValidTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)ReleaseServicePathTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)ServicePathReleasedTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 
