@@ -60,6 +60,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)IntraDetectedNodesTests.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)LocalDiscoveryWatchTests.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)LocalListenCloseTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RobDefTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceLockAsyncTests.cs" />

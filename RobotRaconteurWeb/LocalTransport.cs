@@ -605,12 +605,15 @@ namespace RobotRaconteurWeb
 
             try
             {
-
-                while (!close_token.IsCancellationRequested)
+                // AcceptAsync does not observe close_token: close the socket to end the wait
+                using (close_token.Token.Register(() => { try { socket.Close(); } catch { } }))
                 {
-                    var s2 = await socket.AcceptAsync().ConfigureAwait(false);
+                    while (!close_token.IsCancellationRequested)
+                    {
+                        var s2 = await socket.AcceptAsync().ConfigureAwait(false);
 
-                    ClientConnected(new NetworkStream(s2, true));
+                        ClientConnected(new NetworkStream(s2, true));
+                    }
                 }
             }
             finally
