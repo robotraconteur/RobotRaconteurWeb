@@ -112,6 +112,8 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await ReplyEntryTypeTest.TestUnhandledReplyEntryType();
+
                         ServiceStateNonceTests.RunTestAnnounceNonce(); await ServiceStateNonceTests.RunTestLocalInfoFileNonce();
                         await CheckServiceCapabilityTest.TestCheckServiceCapability();
 
@@ -304,6 +306,11 @@ namespace RobotRaconteurTest
                 case "checkcapability":
                     {
                         await CheckServiceCapabilityTest.TestCheckServiceCapability();
+                        break;
+                    }
+                case "replyentrytype":
+                    {
+                        await ReplyEntryTypeTest.TestUnhandledReplyEntryType();
                         break;
                     }
                 case "message":

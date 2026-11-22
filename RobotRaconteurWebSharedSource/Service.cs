@@ -832,8 +832,16 @@ namespace RobotRaconteurWeb
                 LogDebug(string.Format("Error processing service entry: {0}", e.ToString()), node,
                     RobotRaconteur_LogComponent.Service, service_path: m.ServicePath, member: m.MemberName, endpoint: c.LocalEndpoint);
 #endif
-                ret = new MessageEntry(m.EntryType + 1, m.MemberName);
-                RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
+                // Only requests (odd entry types) are answered
+                if ((int)m.EntryType % 2 == 1)
+                {
+                    ret = new MessageEntry(m.EntryType + 1, m.MemberName);
+                    RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
+                }
+                else
+                {
+                    ret = null;
+                }
 
             }
 
@@ -849,7 +857,7 @@ namespace RobotRaconteurWeb
 
             }
 
-            if (!noreturn)
+            if (!noreturn && ret != null)
             {
                 ret.ServicePath = m.ServicePath;
                 ret.RequestID = m.RequestID;
