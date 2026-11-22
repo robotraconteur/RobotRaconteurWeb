@@ -185,7 +185,6 @@ namespace RobotRaconteurWeb
     public sealed class TcpTransport : Transport
     {
 
-        //protected int Port {get {return m_Port;}}
         private int m_Port;
 
         private bool transportopen = false;
@@ -356,7 +355,6 @@ namespace RobotRaconteurWeb
         [PublicApi]
         public void StartServer(int porte, bool localhost_only = false)
         {
-            //sProgramName = progname;
             lock (this)
             {
                 if (listen_started) throw new InvalidOperationException("TcpTransport server already started");
@@ -364,8 +362,6 @@ namespace RobotRaconteurWeb
                 m_Port = porte;
                 transportopen = true;
             }
-            //conthread = new Thread(WaitForConnections);
-            //conthread.Start();
 
             StartWaitForConnections(localhost_only);
         }
@@ -423,7 +419,6 @@ namespace RobotRaconteurWeb
 
             foreach (IPEndPoint e in listener_endpoints)
             {
-                //Console.WriteLine(e);
                 try
                 {
                     TcpListener listen = new TcpListener(e);
@@ -445,7 +440,6 @@ namespace RobotRaconteurWeb
                     listeners.Add(listen);
 
                     listen.BeginAcceptTcpClient(ClientConnected, listen);
-                    //Console.WriteLine("Success");
                     count++;
                 }
                 catch (Exception ee)
@@ -854,7 +848,6 @@ namespace RobotRaconteurWeb
             Uri u = new Uri(url);
             if (UrlSchemeString.Contains(u.Scheme))
                 return true;
-            //if (u.Host != "localhost") return false;
 
             return false;
         }
@@ -1619,7 +1612,6 @@ namespace RobotRaconteurWeb
 
         private TcpClient socket;
         private WebSocket websocket;
-        //public NetworkStream netstream;
 
         private TcpTransport parenttransport;
 
@@ -1650,40 +1642,6 @@ namespace RobotRaconteurWeb
 
 
 
-            /*Uri u = new Uri(url);
-            //string[] s = u.Segments;
-
-            if (u.Scheme == "ws")
-            {
-                await ConnectWebsocketTransport(url, e, cancel);
-                return;
-            }
-
-            string ap = Uri.UnescapeDataString(u.AbsolutePath);
-            if (ap[0] == '/')
-                ap = ap.Remove(0, 1);
-
-            string[] s = ap.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-
-            string noden = s[s.Length-2];
-
-            NodeID target_nodeid = null;
-            string target_nodename = null;
-
-            if (noden.Contains('[') || noden.Contains('{'))
-            {
-                NodeID remid = new NodeID(s[0]);
-                target_nodeid = remid;
-            }
-            else
-            {
-                if (!Regex.Match(s[0], "^[a-zA-Z][a-zA-Z0-9_\\.\\-]*$").Success)
-                {
-                    throw new NodeNotFoundException("Invalid node name");
-                }
-                target_nodename = s[0];
-            }*/
-
             var target_nodeid = u.nodeid;
             var target_nodename = u.nodename;
 
@@ -1694,15 +1652,11 @@ namespace RobotRaconteurWeb
             IPAddress addr;
             if (IPAddress.TryParse(u.host, out addr))
             {
-                //addr.ScopeId = 10;
 
                 IPEndPoint en = new IPEndPoint(addr, u.port);
 
                 if (!(addr.IsIPv6LinkLocal && addr.ScopeId == 0))
                 {
-                    //socket = new TcpClient(addr.AddressFamily);
-                    //socket.Connect(en);
-                    //socket = new TcpClient(u.Host, u.Port);
 
                     socket = null;
                     AutoResetEvent ev = new AutoResetEvent(false);
@@ -1827,7 +1781,6 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                //socket = new TcpClient(u.Host, u.Port);
                 socket = null;
                 AutoResetEvent ev = new AutoResetEvent(false);
                 TcpClient socket1 = new TcpClient();
@@ -1837,17 +1790,6 @@ namespace RobotRaconteurWeb
                 socket = socket1;
 
             }
-            //socket = new TcpClient(u.Host, u.Port);
-            //socket.ReceiveBufferSize = 100000;
-            //socket.SendBufferSize = 100000;
-            //socket.Client.NoDelay = true;
-            //socket.Connect();
-            /*if (socket.Available > 0)
-            {
-                byte[] rbuf = new byte[socket.Available + 10];
-                socket.GetStream().Read(rbuf, 0, socket.Available);
-
-            }*/
 
             m_Connected = true;
 
@@ -1866,13 +1808,6 @@ namespace RobotRaconteurWeb
         private async Task ConnectWebsocketTransport(string url, Endpoint e, CancellationToken cancel = default(CancellationToken))
         {
             var u = TransportUtil.ParseConnectionUrl(url);
-            /*Uri u = new Uri(url);
-
-            string ap = Uri.UnescapeDataString(u.AbsolutePath);
-            if (ap[0] == '/')
-                ap = ap.Remove(0, 1);
-
-            string[] s = ap.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);*/
 
             string http_scheme = "ws";
             if (u.scheme.EndsWith("wss"))
@@ -1886,34 +1821,16 @@ namespace RobotRaconteurWeb
             NodeID target_nodeid = u.nodeid;
             string target_nodename = u.nodename;
 
-            /*if (noden.Contains('[') || noden.Contains('{'))
-            {
-                NodeID remid = new NodeID(s[s.Length-2]);
-                target_nodeid = remid;
-            }
-            else
-            {
-                if (!Regex.Match(s[s.Length-2], "^[a-zA-Z][a-zA-Z0-9_\\.\\-]*$").Success)
-                {
-                    throw new NodeNotFoundException("Invalid node name");
-                }
-                target_nodename = s[s.Length-2];
-            }*/
-
             m_LocalEndpoint = e.LocalEndpoint;
 
             IPAddress addr;
             if (IPAddress.TryParse(u.host, out addr))
             {
-                //addr.ScopeId = 10;
 
                 IPEndPoint en = new IPEndPoint(addr, u.port);
 
                 if (!(addr.IsIPv6LinkLocal && addr.ScopeId == 0))
                 {
-                    //socket = new TcpClient(addr.AddressFamily);
-                    //socket.Connect(en);
-                    //socket = new TcpClient(u.Host, u.Port);
 
                     websocket = null;
                     AutoResetEvent ev = new AutoResetEvent(false);
@@ -2042,7 +1959,6 @@ namespace RobotRaconteurWeb
             }
             else
             {
-                //socket = new TcpClient(u.Host, u.Port);
                 websocket = null;
 
                 ClientWebSocket socket1 = new ClientWebSocket();
@@ -2098,12 +2014,8 @@ namespace RobotRaconteurWeb
         public async Task Connect(TcpClient s, CancellationToken cancel = default(CancellationToken))
         {
             this.m_RequireTls = parenttransport.RequireTls;
-            //LocalEndpoint = e.LocalEndpoint;
 
             socket = s;
-            //socket.ReceiveBufferSize = 10000;
-            //socket.SendBufferSize = 10000;
-            //socket.Client.NoDelay = true;
 
             m_Connected = true;
             socketstream = s.GetStream();
@@ -2131,16 +2043,6 @@ namespace RobotRaconteurWeb
             this.connecturl = connecturl;
 
             if (!this.parenttransport.AcceptWebSockets) throw new InvalidOperationException("Transport not accepting websockets");
-
-            /*IPEndPoint ep = (IPEndPoint)socket.Client.LocalEndPoint;
-            if (ep.Address.AddressFamily == AddressFamily.InterNetworkV6)
-            {
-                connecturl = "ws://[" + ep.Address.ToString() + "]:" + ep.Port + "/";
-            }
-            else
-            {
-                connecturl = "ws://" + ep.ToString() + "/";
-            }*/
 
             m_Connected = true;
             this.websocket_stream = new WebSocketStreamWrapper(s);
@@ -2366,7 +2268,6 @@ namespace RobotRaconteurWeb
                 //Initialize the ipv4 socket for UDP broadcast receive
                 recvsock = new Socket(AddressFamily.InterNetwork,
                 SocketType.Dgram, ProtocolType.Udp);
-                //recvsock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
                 recvsock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
                 recvsock.Bind(iep);
             }
@@ -2382,16 +2283,11 @@ namespace RobotRaconteurWeb
                 {
                     recvsockV6 = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
                     IPAddress a = IPAddress.IPv6Any;
-                    //a.ScopeId=14;
                     iepV6 = new IPEndPoint(a, ANNOUNCE_PORT);
                     recvsockV6.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
 
-                    //byte[] sid = BitConverter.GetBytes(14);
-                    //recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastInterface, sid);
-                    //recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.Broadcast, 1);
 
 
-                    // long sid2 = ((IPEndPoint)recvsock.LocalEndPoint).Address.ScopeId;
                     foreach (IPAddress ip in IPv6MulticastListenAddresses)
                     {
                         try
@@ -2420,7 +2316,6 @@ namespace RobotRaconteurWeb
                 }
                 catch (Exception e)
                 {
-                    //Console.WriteLine(e.ToString());
                 }
             }
 
@@ -2458,7 +2353,6 @@ namespace RobotRaconteurWeb
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e.ToString());
             }
 
             // Stop this receive loop when the socket was replaced; the new socket has its own
@@ -2471,7 +2365,6 @@ namespace RobotRaconteurWeb
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e.ToString());
             }
 
         }
@@ -2487,12 +2380,10 @@ namespace RobotRaconteurWeb
                 string stringData = Encoding.ASCII.GetString(recvbufV6, 0, count);
 
                 NodeAnnounceReceived(stringData, ep);
-                //Console.WriteLine(stringData);
 
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e.ToString());
             }
 
             // Stop this receive loop when the socket was replaced; the new socket has its own
@@ -2505,7 +2396,6 @@ namespace RobotRaconteurWeb
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e.ToString());
             }
 
         }
@@ -2733,14 +2623,11 @@ namespace RobotRaconteurWeb
             {
                 BroadcastAddressInfo binfo = new BroadcastAddressInfo();
                 binfo.AdapterEndPoint = ep;
-                //Console.WriteLine(uniCast.Address.ToString());
-                //binfo.AdapterPhysicalAddress = adapter.GetPhysicalAddress();
 
                 if (ep.Address.AddressFamily == AddressFamily.InterNetworkV6)
                 {
 
                     binfo.IsIpv6 = true;
-                    //Console.WriteLine("preferred " + uniCast.AddressPreferredLifetime + " " + uniCast.Address.ToString());
                 }
                 else
                 {
@@ -2749,7 +2636,6 @@ namespace RobotRaconteurWeb
                 }
                 BroadcastAddresses.Add(binfo);
 
-                //Console.WriteLine(uniCast.Address.ToString());
 
             }
             foreach (BroadcastAddressInfo binfo in BroadcastAddresses)
@@ -2805,7 +2691,6 @@ namespace RobotRaconteurWeb
 
                             string packetdata = packet_gen(scheme, binfo);
                             sock = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
-                            //sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                             IPEndPoint local_endpoint = new IPEndPoint(binfo.AdapterEndPoint.Address, ANNOUNCE_PORT);
 
 
@@ -2839,7 +2724,6 @@ namespace RobotRaconteurWeb
                             foreach (IPAddress ip in IPv6MulticastBroadcastAddresses)
                             {
                                 IPEndPoint broadcast_endpoint = new IPEndPoint(ip, ANNOUNCE_PORT);
-                                //broadcast_endpoint.Address.ScopeId = binfo.AdapterEndPoint.Address.ScopeId;
 
                                 try
                                 {
@@ -3684,7 +3568,6 @@ namespace RobotRaconteurWeb
                             }
                             {
                                 await Task.Run(() => socket.Connect(new UnixDomainSocketEndPoint(fname)));
-                                //localSocket = new NetworkStream(socket, true);
                             }
                         }
 
