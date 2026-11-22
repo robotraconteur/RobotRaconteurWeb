@@ -1966,7 +1966,7 @@ namespace RobotRaconteurWeb
                             ClientWebSocket socket1 = new ClientWebSocket();
                             socket1.Options.AddSubProtocol("robotraconteur.robotraconteur.com");
                             Uri uu = new Uri(url);
-                            Uri u3 = new Uri(http_scheme + "://" + en.ToString() + "/" + uu.PathAndQuery);
+                            Uri u3 = new Uri(http_scheme + "://" + en.ToString() + uu.PathAndQuery);
                             Task task1 = socket1.ConnectAsync(u3, cancel);
                             wait_tasks.Add(Tuple.Create(task1, socket1));
 
