@@ -456,9 +456,24 @@ namespace RobotRaconteurWeb
                         {
                             if (ret.header.SenderNodeID == node.NodeID)
                             {
+                                bool already_connected;
+                                lock (this)
+                                {
+                                    already_connected = m_LocalEndpoint != 0;
+                                    if (!already_connected)
+                                    {
+                                        m_RemoteEndpoint = ret.header.ReceiverEndpoint;
+                                        m_LocalEndpoint = ret.header.SenderEndpoint;
+                                    }
+                                }
 
-                                m_RemoteEndpoint = ret.header.ReceiverEndpoint;
-                                m_LocalEndpoint = ret.header.SenderEndpoint;
+                                if (already_connected)
+                                {
+                                    // Only one endpoint per connection (Core also closes the connection)
+                                    Close();
+                                    return;
+                                }
+
                                 parent.AddTransportConnection(ret.header.SenderEndpoint, this);
                             }
                             else

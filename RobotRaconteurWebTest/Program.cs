@@ -219,6 +219,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestEntryConstantsToString();
 
+                        await AsyncStreamSingleEndpointTest.TestSecondConnectClientClosesConnection();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
