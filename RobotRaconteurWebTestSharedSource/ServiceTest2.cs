@@ -496,18 +496,24 @@ namespace RobotRaconteurTest
             return Task.FromResult((obj5)obj5_);
         }
 
-        // Core's test service also sets the error sub-name ("my_error") and error parameters
-        // {param1: 10, param2: "20"}. RobotRaconteurWeb exceptions cannot carry them.
         public override Task test_exception_params1(CancellationToken rr_cancel = default(CancellationToken))
         {
-            throw new InvalidOperationException("test error");
+            // As Core's test service: InvalidOperation with an error sub-name and error parameter
+            var param = new Dictionary<string, object>();
+            param.Add("param1", new int[] { 10 });
+            param.Add("param2", "20");
+            var e = new InvalidOperationException("test error");
+            e.Data["ErrorSubName"] = "my_error";
+            e.Data["ErrorParam"] = param;
+            throw e;
         }
 
-        // Core's test service also sets the error sub-name ("my_error2") and error parameters
-        // {param1: 30, param2: "40"}. RobotRaconteurWeb exceptions cannot carry them.
         public override Task test_exception_params2(CancellationToken rr_cancel = default(CancellationToken))
         {
-            throw new test_exception4("test error2");
+            var param = new Dictionary<string, object>();
+            param.Add("param1", new int[] { 30 });
+            param.Add("param2", "40");
+            throw new test_exception4("test error2", "my_error2", param);
         }
 
     }
