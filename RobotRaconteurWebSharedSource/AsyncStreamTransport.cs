@@ -1136,7 +1136,7 @@ namespace RobotRaconteurWeb
 
                             if (response.Error != MessageErrorType.None && response.Error != MessageErrorType.ProtocolError)
                             {
-                                throw RobotRaconteurExceptionUtil.MessageEntryToException(response);
+                                throw RobotRaconteurExceptionUtil.MessageEntryToException(response, node, null);
                             }
 
                             if (!m_RemoteNodeID.IsAnyNode)

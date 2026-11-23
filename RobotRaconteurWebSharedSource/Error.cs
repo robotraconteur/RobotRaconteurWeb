@@ -54,6 +54,25 @@ namespace RobotRaconteurWeb
         }
         /**
         <summary>
+        Initializes a new exception with an error sub-name and error parameter
+        </summary>
+        <param name="ErrorCode">The error code</param>
+        <param name="error">The Robot Raconteur error name</param>
+        <param name="message">The Robot Raconteur error message</param>
+        <param name="subname">The error sub-name, or null</param>
+        <param name="param_">The error parameter, or null</param>
+        */
+        [PublicApi]
+        public RobotRaconteurException(MessageErrorType ErrorCode, string error, string message, string subname, object param_)
+            : base(message)
+        {
+            Error = error;
+            this.ErrorCode = ErrorCode;
+            ErrorSubName = subname;
+            ErrorParam = param_;
+        }
+        /**
+        <summary>
         Initializes a Robot Raconteur exception that contains a C# exception
         </summary>
         <param name="message">The message</param>
@@ -79,6 +98,28 @@ namespace RobotRaconteurWeb
         */
         [PublicApi]
         public string Error = "";
+        /**
+        <summary>
+        The error sub-name
+        </summary>
+        <remarks>
+        An optional sub-name to further identify the error. Sent as
+        "errorsubname" when not empty.
+        </remarks>
+        */
+        [PublicApi]
+        public string ErrorSubName = null;
+        /**
+        <summary>
+        The error parameter
+        </summary>
+        <remarks>
+        An optional parameter containing additional error information, packed as a varvalue.
+        Sent as "errorparam" when not null.
+        </remarks>
+        */
+        [PublicApi]
+        public object ErrorParam = null;
         /**
         <summary>
         Returns a string representation of this exception
@@ -519,6 +560,18 @@ namespace RobotRaconteurWeb
             : base(MessageErrorType.RemoteError, error, message)
         {
         }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotRaconteurRemoteException"/> class with an error sub-name and error parameter.
+        /// </summary>
+        /// <param name="error">The error code that identifies the type of error.</param>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        /// <param name="errorsubname">The error sub-name, or null.</param>
+        /// <param name="param_">The error parameter, or null.</param>
+        [PublicApi]
+        public RobotRaconteurRemoteException(string error, string message, string errorsubname, object param_)
+            : base(MessageErrorType.RemoteError, error, message, errorsubname, param_)
+        {
+        }
     }
 
     /// <summary>
@@ -779,6 +832,12 @@ namespace RobotRaconteurWeb
     {
         public static void ExceptionToMessageEntry(Exception exception, MessageEntry entry)
         {
+            ExceptionToMessageEntry(exception, entry, null, null);
+        }
+
+        public static void ExceptionToMessageEntry(Exception exception, MessageEntry entry, RobotRaconteurNode node,
+                                                   ClientContext context)
+        {
 
 
             if (exception is InvalidOperationException)
@@ -786,6 +845,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.InvalidOperation;
                 entry.AddElement("errorname", "RobotRaconteur.InvalidOperation");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -794,6 +854,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.OutOfRange;
                 entry.AddElement("errorname", "RobotRaconteur.OutOfRange");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -802,6 +863,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.InvalidArgument;
                 entry.AddElement("errorname", "RobotRaconteur.InvalidArgument");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -810,6 +872,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.NullValue;
                 entry.AddElement("errorname", "RobotRaconteur.NullValue");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -818,6 +881,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.NotImplementedError;
                 entry.AddElement("errorname", "RobotRaconteur.NotImplementedError");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -826,6 +890,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.KeyNotFound;
                 entry.AddElement("errorname", "RobotRaconteur.KeyNotFound");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -834,6 +899,7 @@ namespace RobotRaconteurWeb
                 entry.Error = MessageErrorType.IOError;
                 entry.AddElement("errorname", "RobotRaconteur.IOError");
                 entry.AddElement("errorstring", exception.Message);
+                AddErrorSubNameParam(entry, exception.Data["ErrorSubName"] as string, exception.Data["ErrorParam"], node, context);
                 return;
             }
 
@@ -843,7 +909,7 @@ namespace RobotRaconteurWeb
                 entry.Error = r.ErrorCode;
                 entry.AddElement("errorname", r.Error);
                 entry.AddElement("errorstring", r.Message);
-
+                AddErrorSubNameParam(entry, r.ErrorSubName, r.ErrorParam, node, context);
             }
             else
             {
@@ -856,7 +922,77 @@ namespace RobotRaconteurWeb
 
         }
 
+        // Optional error sub-name and error parameter, as Core. Plain .NET exceptions (InvalidOperationException,
+        // ArgumentException, ...) carry them in Exception.Data["ErrorSubName"] and Exception.Data["ErrorParam"], as in
+        // the RobotRaconteurNET wrapper. The parameter needs the node to be packed; without one it is not sent.
+        static void AddErrorSubNameParam(MessageEntry entry, string errorsubname, object param, RobotRaconteurNode node,
+                                         ClientContext context)
+        {
+            if (!string.IsNullOrEmpty(errorsubname))
+            {
+                entry.AddElement("errorsubname", errorsubname);
+            }
+            if (param != null && node != null)
+            {
+                try
+                {
+                    entry.AddElement("errorparam", node.PackVarType(param, context));
+                }
+                catch (Exception)
+                {
+                    // Like Core, an error parameter that cannot be packed is dropped
+                }
+            }
+        }
+
         public static Exception MessageEntryToException(MessageEntry entry)
+        {
+            return MessageEntryToException(entry, null, null);
+        }
+
+        public static Exception MessageEntryToException(MessageEntry entry, RobotRaconteurNode node,
+                                                        ClientContext context)
+        {
+            var e = MessageEntryToException1(entry);
+
+            string errorsubname = null;
+            MessageElement error_sub_name_m;
+            if (entry.TryFindElement("errorsubname", out error_sub_name_m))
+            {
+                errorsubname = error_sub_name_m.CastData<string>();
+            }
+
+            object errorparam = null;
+            MessageElement error_param_m;
+            if (node != null && entry.TryFindElement("errorparam", out error_param_m))
+            {
+                try
+                {
+                    errorparam = node.UnpackVarType(error_param_m, context);
+                }
+                catch (Exception)
+                {
+                    // Like Core, an error parameter that cannot be unpacked is ignored
+                }
+            }
+
+            var rr_e = e as RobotRaconteurException;
+            if (rr_e != null)
+            {
+                rr_e.ErrorSubName = errorsubname;
+                rr_e.ErrorParam = errorparam;
+            }
+            else
+            {
+                // Plain .NET exceptions carry them in Exception.Data, as in the RobotRaconteurNET wrapper
+                if (errorsubname != null) e.Data["ErrorSubName"] = errorsubname;
+                if (errorparam != null) e.Data["ErrorParam"] = errorparam;
+            }
+
+            return e;
+        }
+
+        private static Exception MessageEntryToException1(MessageEntry entry)
         {
             var error_code = entry.Error;
             var errorname = entry.FindElement("errorname").CastData<string>();

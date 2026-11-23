@@ -299,7 +299,7 @@ namespace RobotRaconteurWeb
 
             if (rec_message.Error != MessageErrorType.None)
             {
-                Exception e = RobotRaconteurExceptionUtil.MessageEntryToException(rec_message);
+                Exception e = RobotRaconteurExceptionUtil.MessageEntryToException(rec_message, node, this);
                 RobotRaconteurRemoteException e2 = e as RobotRaconteurRemoteException;
                 if (e2 != null)
                 {
@@ -1206,7 +1206,7 @@ namespace RobotRaconteurWeb
                 ret = new MessageEntry(m.EntryType + 1, m.MemberName);
                 ret.ServicePath = m.ServicePath;
                 ret.RequestID = m.RequestID;
-                RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
+                RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret, node, this);
 
 #if RR_LOG_DEBUG
                 LogDebug(string.Format("Error processing callback call: {0}", e.ToString()), node,

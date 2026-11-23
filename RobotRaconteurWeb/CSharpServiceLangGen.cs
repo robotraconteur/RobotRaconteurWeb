@@ -1012,7 +1012,7 @@ namespace RobotRaconteurWeb
                 w2.WriteLine("public class " + FixName(e) + " : RobotRaconteurRemoteException");
                 w2.WriteLine("{");
 
-                w2.WriteLine("    public " + FixName(e) + "(string message) : base(\"" + d.Name + "." + e + "\",message) {}");
+                w2.WriteLine("    public " + FixName(e) + "(string message,string errorsubname=null,object param=null) : base(\"" + d.Name + "." + e + "\",message,errorsubname,param) {}");
                 w2.WriteLine("};");
             }
 
@@ -1212,7 +1212,7 @@ namespace RobotRaconteurWeb
             w2.WriteLine("    if (CompareNamespace(rr_type, out rr_stype)) {");
             foreach (var e in d.Exceptions)
             {
-                w2.WriteLine("    if (rr_stype==\"" + e + "\") return new " + FixName(e) + "(rr_exp.Message);");
+                w2.WriteLine("    if (rr_stype==\"" + e + "\") return new " + FixName(e) + "(rr_exp.Message,rr_exp.ErrorSubName,rr_exp.ErrorParam);");
             }
             w2.WriteLine("    } else {");
             w2.WriteLine("    return base.DownCastException(rr_exp); ");

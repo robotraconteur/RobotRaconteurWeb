@@ -949,7 +949,7 @@ namespace RobotRaconteurWeb
                 if ((int)m.EntryType % 2 == 1)
                 {
                     ret = new MessageEntry(m.EntryType + 1, m.MemberName);
-                    RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret);
+                    RobotRaconteurExceptionUtil.ExceptionToMessageEntry(e, ret, node, null);
                 }
                 else
                 {
@@ -1858,7 +1858,7 @@ namespace RobotRaconteurWeb
 
             if (rec_message.Error != MessageErrorType.None)
             {
-                Exception e1 = RobotRaconteurExceptionUtil.MessageEntryToException(rec_message);
+                Exception e1 = RobotRaconteurExceptionUtil.MessageEntryToException(rec_message, node, null);
                 RobotRaconteurRemoteException e2 = e1 as RobotRaconteurRemoteException;
                 if (e2 != null)
                 {
