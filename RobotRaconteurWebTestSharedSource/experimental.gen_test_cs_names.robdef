@@ -1,0 +1,9 @@
+service experimental.gen_test_cs_names
+
+stdver 0.10
+
+# Generated C# must compile for parameters named like the stub's own parameters (CancellationToken)
+object testobj
+    function double f(double cancel)
+    function double{generator} g(double cancel)
+end

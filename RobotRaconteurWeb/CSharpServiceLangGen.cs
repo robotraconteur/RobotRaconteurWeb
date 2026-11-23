@@ -1495,11 +1495,11 @@ namespace RobotRaconteurWeb
                     string params_ = str_pack_parameters(m.Parameters, true);
                     if (params_.Length == 0)
                     {
-                        params_ = "CancellationToken cancel = default(CancellationToken)";
+                        params_ = "CancellationToken rr_cancel = default(CancellationToken)";
                     }
                     else
                     {
-                        params_ += ", CancellationToken cancel = default(CancellationToken)";
+                        params_ += ", CancellationToken rr_cancel = default(CancellationToken)";
                     }
 
                     string ret_type = (m.ReturnType.Type == DataTypes.void_t) ? "Task" : "Task<" + t.cs_type + t.cs_arr_type + ">";
@@ -1510,7 +1510,7 @@ namespace RobotRaconteurWeb
                     {
                         w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_m," + str_pack_message_element(p.Name, FixName(p.Name), p) + ");");
                     }
-                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);", t));
+                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, rr_cancel).ConfigureAwait(false);", t));
                     if (m.ReturnType.Type != DataTypes.void_t)
                     {
                         w2.WriteLine("    return " + str_unpack_message_element("rr_me.FindElement(\"return\")", m.ReturnType) + ";");
@@ -1523,11 +1523,11 @@ namespace RobotRaconteurWeb
                     string params_ = str_pack_parameters(t.params_, true);
                     if (params_.Length == 0)
                     {
-                        params_ = "CancellationToken cancel = default(CancellationToken)";
+                        params_ = "CancellationToken rr_cancel = default(CancellationToken)";
                     }
                     else
                     {
-                        params_ += ", CancellationToken cancel = default(CancellationToken)";
+                        params_ += ", CancellationToken rr_cancel = default(CancellationToken)";
                     }
                     w2.WriteLine("    public async Task<" + t.generator_csharp_type + "> " + FixName(m.Name) + "(" + params_ + ") {");
                     w2.WriteLine(String.Format("        MessageEntry rr_m=new MessageEntry(MessageEntryType.FunctionCallReq,\"{0}\");", m.Name));
@@ -1535,7 +1535,7 @@ namespace RobotRaconteurWeb
                     {
                         w2.WriteLine("    MessageElementUtil.AddMessageElement(rr_m," + str_pack_message_element(p.Name, FixName(p.Name), p) + ");");
                     }
-                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, cancel).ConfigureAwait(false);", t));
+                    w2.WriteLine(String.Format("        MessageEntry rr_me=await ProcessRequest(rr_m, rr_cancel).ConfigureAwait(false);", t));
                     w2.WriteLine("    return new " + t.generator_csharp_base_type + "Client<" + t.generator_csharp_template_params + ">(\"" + m.Name + "\",this,rr_me.FindElement(\"index\").CastData<int[]>()[0]);");
                     w2.WriteLine("    }");
                 }

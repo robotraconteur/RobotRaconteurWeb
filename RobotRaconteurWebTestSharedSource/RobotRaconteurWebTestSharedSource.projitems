@@ -182,5 +182,6 @@
     <None Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter.robdef" />
     <None Include="$(MSBuildThisFileDirectory)experimental.testing.sub_test.robdef" />
     <None Include="$(MSBuildThisFileDirectory)experimental.wire_sub_test.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)experimental.gen_test_cs_names.robdef" />
   </ItemGroup>
 </Project>
