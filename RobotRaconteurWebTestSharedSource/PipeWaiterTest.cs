@@ -19,7 +19,8 @@ namespace RobotRaconteurWebTest
             {
                 var urls = nodes.GetServiceUrl("RobotRaconteurTestService");
                 var c = (testroot)await nodes.client_node.ConnectService(urls[0]);
-                var ep = await c.broadcastpipe.Connect(-1);
+                // p1 only answers packets the client sends; broadcastpipe now broadcasts as in Core
+                var ep = await c.p1.Connect(-1);
 
                 for (int i = 0; i < 20; i++)
                 {
