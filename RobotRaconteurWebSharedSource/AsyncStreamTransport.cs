@@ -561,6 +561,8 @@ namespace RobotRaconteurWeb
 
                 if (IsTls)
                 {
+                    // Before the connection has a client endpoint, only a single special request is accepted (as
+                    // Core). Member requests and replies (entry types above 500) are normal after that.
                     if (local_ep == 0 || remote_ep == 0)
                     {
                         if (mes.entries.Count != 1)
@@ -568,13 +570,13 @@ namespace RobotRaconteurWeb
                             Close();
                             return;
                         }
-                    }
 
-                    var command = mes.entries[0].EntryType;
-                    if ((ushort)command > 500)
-                    {
-                        Close();
-                        return;
+                        var command = mes.entries[0].EntryType;
+                        if ((ushort)command > 500)
+                        {
+                            Close();
+                            return;
+                        }
                     }
                 }
 
