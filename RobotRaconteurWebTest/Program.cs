@@ -307,6 +307,8 @@ namespace RobotRaconteurTest
 
                         RobDefTest.TestServiceDefinitionExceptionErrorName();
 
+                        await ObjectLockUnauthenticatedTest.TestUnauthenticatedClientGetsObjectLocked();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
