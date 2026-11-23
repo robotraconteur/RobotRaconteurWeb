@@ -346,10 +346,6 @@ namespace RobotRaconteurTest
                 case "multidimarray":
                     {
                         MultiDimArrayTest.TestInvalidPosLength();
-                        break;
-                    }
-                case "multidimarray":
-                    {
                         MultiDimArrayTest.TestCopyRangeOverflow();
                         break;
                     }
