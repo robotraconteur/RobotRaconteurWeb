@@ -308,13 +308,10 @@ namespace RobotRaconteurWeb
             DisableMessage4 = false;
             MaxMessageSize = 12 * 1024 * 1024;
 
-            allowed_websocket_origins.Add("null"); //Why firefox??
+            // "null" is the origin browsers send for pages loaded from local files; sandboxed iframes and data: pages
+            // send it too. Deployments that do not need local files can remove it with RemoveWebSocketAllowedOrigin().
+            allowed_websocket_origins.Add("null");
             allowed_websocket_origins.Add("file://");
-            allowed_websocket_origins.Add("chrome-extension://");
-            allowed_websocket_origins.Add("http://robotraconteur.com");
-            allowed_websocket_origins.Add("http://robotraconteur.com:80");
-            allowed_websocket_origins.Add("http://*.robotraconteur.com");
-            allowed_websocket_origins.Add("http://*.robotraconteur.com:80");
             allowed_websocket_origins.Add("https://robotraconteur.com");
             allowed_websocket_origins.Add("https://robotraconteur.com:443");
             allowed_websocket_origins.Add("https://*.robotraconteur.com");
@@ -1389,10 +1386,6 @@ namespace RobotRaconteurWeb
          * * (empty string)
          * * "null"
          * * "file://"
-         * * "http://robotraconteur.com"
-         * * "http://robotraconteur.com:80"
-         * * "http://(*).robotraconteur.com"
-         * * "http://(*).robotraconteur.com:80"
          * * "https://robotraconteur.com"
          * * "https://robotraconteur.com:443"
          * * "https://(*).robotraconteur.com"
@@ -1418,6 +1411,13 @@ namespace RobotRaconteurWeb
         {
             lock (this)
             {
+                if (origin == "null")
+                {
+                    // Opaque origin (local files, sandboxed iframes, data: URLs); not a URL, so not matched below
+                    if (!allowed_websocket_origins.Contains("null")) allowed_websocket_origins.Add("null");
+                    return;
+                }
+
                 var res = Regex.Match(origin, "^([^:\\s]+)://(?:((?:\\[[A-Fa-f0-9\\:]+(?:\\%\\w*)?\\])|(?:[^\\[\\]\\:/\\?\\s]+))(?::([^\\:/\\?\\s]+))?)?$");
                 if (!res.Success) throw new InvalidOperationException("Invalid WebSocket origin");
 
