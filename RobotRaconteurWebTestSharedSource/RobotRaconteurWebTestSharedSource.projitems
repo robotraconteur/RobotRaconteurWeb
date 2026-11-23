@@ -158,6 +158,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RRWebTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTest2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceTest3.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceTestClient2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SubscriberTests.cs" />
@@ -195,6 +196,7 @@
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService1.robdef" />
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService2.robdef" />
     <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService3.robdef" />
+    <None Include="$(MSBuildThisFileDirectory)com.robotraconteur.testing.TestService5.robdef" />
     <None Include="$(MSBuildThisFileDirectory)experimental.pipe_sub_test.robdef" />
     <None Include="$(MSBuildThisFileDirectory)experimental.subobject_sub_test.robdef" />
     <None Include="$(MSBuildThisFileDirectory)experimental.testing.subtestfilter.robdef" />

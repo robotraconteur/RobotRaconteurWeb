@@ -44,7 +44,13 @@ namespace RobotRaconteurTest
         public void RegisterServices()
         {
             testservice2 = new testroot3_impl();
-            node.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
+            var c = node.RegisterService("RobotRaconteurTestService2", "com.robotraconteur.testing.TestService3", testservice2);
+
+            // Lock nolock_test as user "server" like Core's test service, so clients can test the
+            // [nolock] and [nolockread] member modifiers
+            var nolock_skel = c.GetObjectSkel("RobotRaconteurTestService2.nolock_test").GetAwaiter().GetResult();
+            var nolock_lock = new ServerContext.ObjectLock("server", nolock_skel);
+            nolock_lock.AddSkel(nolock_skel);
         }
 
         public void UnregisterServices()
@@ -123,7 +129,7 @@ namespace RobotRaconteurTest
 
         public override Task<Generator2<double>> gen_func1(CancellationToken cancel = default(CancellationToken))
         {
-            return Task.FromResult((Generator2<double>)new EnumeratorGenerator<double>(new double[] { 5, 6, 7, 8 }));
+            return Task.FromResult((Generator2<double>)new EnumeratorGenerator<double>(Enumerable.Range(0, 16).Select(x => (double)x)));
         }
 
         public override Task<Generator2<byte[]>> gen_func2(string name, CancellationToken cancel = default(CancellationToken))
@@ -139,7 +145,7 @@ namespace RobotRaconteurTest
 
         public override Task<Generator3<byte[]>> gen_func3(string name, CancellationToken cancel = default(CancellationToken))
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult((Generator3<byte[]>)null);
         }
 
         public override Task<Generator1<byte[], byte[]>> gen_func4(CancellationToken cancel = default(CancellationToken))
@@ -149,7 +155,7 @@ namespace RobotRaconteurTest
 
         public override Task<Generator1<teststruct2, teststruct2>> gen_func5(CancellationToken cancel = default(CancellationToken))
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult((Generator1<teststruct2, teststruct2>)null);
         }
 
         public override Task<obj4> get_o4(CancellationToken cancel = default(CancellationToken))
@@ -405,6 +411,105 @@ namespace RobotRaconteurTest
         MultiDimArrayMemory<CDouble> c_m2_v = new MultiDimArrayMemory<CDouble>(new MultiDimArray(new uint[] { 10, 10 }, new CDouble[100]));
         public override MultiDimArrayMemory<CDouble> c_m2 => c_m2_v;
 
+        public override Task<bool> get_b1(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(true);
+        }
+
+        public override Task set_b1(bool value, CancellationToken cancel = default(CancellationToken))
+        {
+            if (!value) throw new Exception();
+            return Task.FromResult(0);
+        }
+
+        public override Task<bool[]> get_b2(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(new bool[] { true, false, true, true, false, true, false });
+        }
+
+        public override Task set_b2(bool[] value, CancellationToken cancel = default(CancellationToken))
+        {
+            ca(value, new bool[] { true, false, false, true, true, true, false, true });
+            return Task.FromResult(0);
+        }
+
+        public override Task<MultiDimArray> get_b3(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(new MultiDimArray(new uint[] { 2, 2 }, new bool[] { false, true, true, false }));
+        }
+
+        public override Task set_b3(MultiDimArray value, CancellationToken cancel = default(CancellationToken))
+        {
+            if (value == null) throw new Exception();
+            ca(value.Dims, new uint[] { 2, 1 });
+            ca((bool[])value.Array_, new bool[] { true, false });
+            return Task.FromResult(0);
+        }
+
+        public override Task<List<bool>> get_b4(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(new List<bool> { true });
+        }
+
+        public override Task set_b4(List<bool> value, CancellationToken cancel = default(CancellationToken))
+        {
+            if (value == null) throw new Exception();
+            ca(value.ToArray(), new bool[] { true });
+            return Task.FromResult(0);
+        }
+
+        public override Task<List<bool[]>> get_b5(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(new List<bool[]> { new bool[] { false, true, false, false } });
+        }
+
+        public override Task set_b5(List<bool[]> value, CancellationToken cancel = default(CancellationToken))
+        {
+            if (value == null || value.Count != 1 || value[0] == null) throw new Exception();
+            ca(value[0], new bool[] { true, false });
+            return Task.FromResult(0);
+        }
+
+        public override Task<List<MultiDimArray>> get_b6(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(new List<MultiDimArray> {
+                new MultiDimArray(new uint[] { 2, 2 }, new bool[] { false, true, true, false }) });
+        }
+
+        public override Task set_b6(List<MultiDimArray> value, CancellationToken cancel = default(CancellationToken))
+        {
+            if (value == null || value.Count != 1 || value[0] == null) throw new Exception();
+            ca(value[0].Dims, new uint[] { 2, 1 });
+            ca((bool[])value[0].Array_, new bool[] { true, false });
+            return Task.FromResult(0);
+        }
+
+        ArrayMemory<bool> c_m5_v = new ArrayMemory<bool>(new bool[512]);
+        public override ArrayMemory<bool> c_m5 => c_m5_v;
+
+        MultiDimArrayMemory<bool> c_m6_v = new MultiDimArrayMemory<bool>(new MultiDimArray(new uint[] { 10, 10 }, new bool[100]));
+        public override MultiDimArrayMemory<bool> c_m6 => c_m6_v;
+
+        obj5_impl obj5_ = new obj5_impl();
+        public override Task<obj5> get_nolock_test(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult((obj5)obj5_);
+        }
+
+        // Core's test service also sets the error sub-name ("my_error") and error parameters
+        // {param1: 10, param2: "20"}. RobotRaconteurWeb exceptions cannot carry them.
+        public override Task test_exception_params1(CancellationToken rr_cancel = default(CancellationToken))
+        {
+            throw new InvalidOperationException("test error");
+        }
+
+        // Core's test service also sets the error sub-name ("my_error2") and error parameters
+        // {param1: 30, param2: "40"}. RobotRaconteurWeb exceptions cannot carry them.
+        public override Task test_exception_params2(CancellationToken rr_cancel = default(CancellationToken))
+        {
+            throw new test_exception4("test error2");
+        }
+
     }
 
     class func4_gen : Generator1<byte[], byte[]>
@@ -489,6 +594,64 @@ namespace RobotRaconteurTest
             s_ind = value;
             return Task.FromResult(0);
         }
+    }
+
+    class obj5_impl : obj5_default_impl
+    {
+        double p1_v;
+        double p2_v;
+        double p3_v;
+
+        ArrayMemory<int> m1_v = new ArrayMemory<int>(new int[100]);
+        ArrayMemory<int> m2_v = new ArrayMemory<int>(new int[100]);
+        ArrayMemory<int> m3_v = new ArrayMemory<int>(new int[100]);
+
+        public override Task<double> get_p1(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(p1_v);
+        }
+
+        public override Task set_p1(double value, CancellationToken cancel = default(CancellationToken))
+        {
+            p1_v = value;
+            return Task.FromResult(0);
+        }
+
+        public override Task<double> get_p2(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(p2_v);
+        }
+
+        public override Task set_p2(double value, CancellationToken cancel = default(CancellationToken))
+        {
+            p2_v = value;
+            return Task.FromResult(0);
+        }
+
+        public override Task<double> get_p3(CancellationToken cancel = default(CancellationToken))
+        {
+            return Task.FromResult(p3_v);
+        }
+
+        public override Task set_p3(double value, CancellationToken cancel = default(CancellationToken))
+        {
+            p3_v = value;
+            return Task.FromResult(0);
+        }
+
+        public override Task<int> f1(CancellationToken rr_cancel = default(CancellationToken))
+        {
+            return Task.FromResult(10);
+        }
+
+        public override Task<int> f2(CancellationToken rr_cancel = default(CancellationToken))
+        {
+            return Task.FromResult(11);
+        }
+
+        public override ArrayMemory<int> m1 => m1_v;
+        public override ArrayMemory<int> m2 => m2_v;
+        public override ArrayMemory<int> m3 => m3_v;
     }
 #endif
     class ServiceTest2_test_sequence_gen

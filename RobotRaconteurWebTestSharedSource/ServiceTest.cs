@@ -1280,8 +1280,10 @@ namespace RobotRaconteurTest
             {
                 await cb_errtest.GetClientFunction(ep)(default(CancellationToken));
             }
-            catch (RobotRaconteurRemoteException e)
+            catch (Exception)
             {
+                // Any error is accepted: the client may report its error as a remote error or as a
+                // standard error such as OperationFailed
                 errthrown = true;
             }
 

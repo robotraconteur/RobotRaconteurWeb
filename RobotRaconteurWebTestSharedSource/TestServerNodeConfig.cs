@@ -43,6 +43,7 @@ namespace RobotRaconteurTest
                     node.RegisterServiceType(new com.robotraconteur.testing.TestService1.com__robotraconteur__testing__TestService1Factory(node));
                     node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory(node));
                     node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory(node));
+                    node.RegisterServiceType(new com.robotraconteur.testing.TestService5.com__robotraconteur__testing__TestService5Factory(node));
 
 
                 // Create TcpTransport using reflection and create dynamic reference
@@ -99,6 +100,9 @@ namespace RobotRaconteurTest
 
                     var s2 = new RobotRaconteurTestServiceSupport2(node);
                     s2.RegisterServices();
+
+                    var s3 = new RobotRaconteurTestServiceSupport3(node);
+                    s3.RegisterServices();
 
                     if (enable_intra_transport)
                     {
