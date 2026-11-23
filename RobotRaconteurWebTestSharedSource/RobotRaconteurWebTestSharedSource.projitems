@@ -92,6 +92,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ErrorCodesTest.cs" />
 
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionParamsTest.cs" />
+
+    <Compile Include="$(MSBuildThisFileDirectory)TestServiceBroadcastMonitorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PipeClientTests.cs" />
 

@@ -1248,8 +1248,8 @@ namespace RobotRaconteurTest
             return Task.FromResult(0);
         }
 
-        //TODO: implement broadcast
         PipeServer<double> m_broadcastpipe;
+        PipeBroadcaster<double> m_broadcastpipe_broadcaster;
         public Pipe<double> broadcastpipe
         {
             get
@@ -1259,7 +1259,30 @@ namespace RobotRaconteurTest
             set
             {
                 m_broadcastpipe = (PipeServer<double>)value;
-                //m_p1.PipeConnectCallback = p1_connect_callback;
+                // As Core's test service: send 0..99 to all connected endpoints every 100 ms, backlog 3
+                m_broadcastpipe_broadcaster = new PipeBroadcaster<double>(value, 3);
+                var _ = BroadcastPipeLoop(new WeakReference<PipeBroadcaster<double>>(m_broadcastpipe_broadcaster));
+            }
+        }
+
+        // Holds only a weak reference so the loop ends once the service object is gone
+        static async Task BroadcastPipeLoop(WeakReference<PipeBroadcaster<double>> broadcaster_ref)
+        {
+            while (true)
+            {
+                await Task.Delay(100).ConfigureAwait(false);
+                PipeBroadcaster<double> broadcaster;
+                if (!broadcaster_ref.TryGetTarget(out broadcaster))
+                    return;
+                for (int i = 0; i < 100; i++)
+                {
+                    try
+                    {
+                        await broadcaster.SendPacket((double)i).ConfigureAwait(false);
+                    }
+                    catch (Exception)
+                    { }
+                }
             }
         }
 
@@ -1546,10 +1569,17 @@ namespace RobotRaconteurTest
             return mymutex.Lock();
         }
 
-        public Task<IDisposable> RobotRaconteurMonitorEnter(int timeout)
+        public async Task<IDisposable> RobotRaconteurMonitorEnter(int timeout)
         {
-            return mymutex.LockWithTimeout(timeout);
-            //if(!Monitor.TryEnter(this,timeout)) throw new TimeoutException();
+            try
+            {
+                return await mymutex.LockWithTimeout(timeout).ConfigureAwait(false);
+            }
+            catch (TimeoutException)
+            {
+                // As Core's test service, so the client receives RobotRaconteur.RequestTimeout
+                throw new RequestTimeoutException("Monitor lock timed out");
+            }
         }
     }
 
