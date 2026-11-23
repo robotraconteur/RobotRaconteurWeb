@@ -445,6 +445,10 @@ namespace RobotRaconteurWeb
                     if (local_ep != mes.header.ReceiverEndpoint || remote_ep != mes.header.SenderEndpoint)
                     {
                         var ret1 = node.GenerateErrorReturnMessage(mes, MessageErrorType.InvalidEndpoint, "RobotRaconteurNode.InvalidEndpoint", "Invalid sender endpoint");
+                        // Address the error with this connection's own endpoint pair: the peer checks replies
+                        // against it too, and would drop one sent from the endpoint the request named
+                        ret1.header.SenderEndpoint = local_ep;
+                        ret1.header.ReceiverEndpoint = remote_ep;
                         if (ret1.entries.Count > 0)
                         {
                             Task noop = SendMessage(ret1, default(CancellationToken)).IgnoreResult();

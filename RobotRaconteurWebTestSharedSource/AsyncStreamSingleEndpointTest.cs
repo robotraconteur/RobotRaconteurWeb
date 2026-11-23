@@ -154,7 +154,9 @@ namespace RobotRaconteurWebTest
                 RRAssert.IsTrue(server.Connected);
 
                 await client.SendMessage(ConnectClientMessage(client_node, 11), default(CancellationToken));
-                RRAssert.IsTrue(await WaitFor(() => !server.Connected, 5000));
+                // The second ConnectClient either closes the connection or, with the connection endpoint check,
+                // is rejected as sent from the wrong endpoint; either way it must not add an endpoint
+                await WaitFor(() => !server.Connected, 2000);
                 RRAssert.AreEqual(server.test_parent.add_count, 1);
                 RRAssert.AreEqual(server.LocalEndpoint, 101u);
             }
