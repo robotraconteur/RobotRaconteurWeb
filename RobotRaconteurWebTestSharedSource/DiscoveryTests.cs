@@ -19,12 +19,13 @@ namespace RobotRaconteurTest
 
                 foreach (var e in r)
                 {
-                    RRWebTest.WriteLine("Name: " + e.Name);
-                    RRWebTest.WriteLine("RootObjectType: " + e.RootObjectType);
-                    RRWebTest.WriteLine("RootObjectImplements: " + e.ConnectionURL);
-                    RRWebTest.WriteLine("ConnectionURL: " + String.Join(", ", e.ConnectionURL));
-                    RRWebTest.WriteLine("NodeID: " + e.NodeID.ToString());
-                    RRWebTest.WriteLine("NodeName: " + e.NodeName);
+                    // WriteLine takes a format string: pass the values as arguments (a NodeID contains braces)
+                    RRWebTest.WriteLine("Name: {0}", e.Name);
+                    RRWebTest.WriteLine("RootObjectType: {0}", e.RootObjectType);
+                    RRWebTest.WriteLine("RootObjectImplements: {0}", String.Join(", ", e.RootObjectImplements ?? new string[0]));
+                    RRWebTest.WriteLine("ConnectionURL: {0}", String.Join(", ", e.ConnectionURL));
+                    RRWebTest.WriteLine("NodeID: {0}", e.NodeID.ToString());
+                    RRWebTest.WriteLine("NodeName: {0}", e.NodeName);
                     RRWebTest.WriteLine("");
                 }
             }
@@ -40,9 +41,9 @@ namespace RobotRaconteurTest
 
                 foreach (var e in r)
                 {
-                    RRWebTest.WriteLine("NodeID: " + e.NodeID);
-                    RRWebTest.WriteLine("NodeName: " + e.NodeName);
-                    RRWebTest.WriteLine("ConnectionURL: " + String.Join(", ", e.ConnectionURL));
+                    RRWebTest.WriteLine("NodeID: {0}", e.NodeID);
+                    RRWebTest.WriteLine("NodeName: {0}", e.NodeName);
+                    RRWebTest.WriteLine("ConnectionURL: {0}", String.Join(", ", e.ConnectionURL));
                     RRWebTest.WriteLine("");
                 }
 
@@ -59,9 +60,9 @@ namespace RobotRaconteurTest
 
                 foreach (var e in r)
                 {
-                    RRWebTest.WriteLine("NodeID: " + e.NodeID);
-                    RRWebTest.WriteLine("NodeName: " + e.NodeName);
-                    RRWebTest.WriteLine("ConnectionURL: " + String.Join(", ", e.ConnectionURL));
+                    RRWebTest.WriteLine("NodeID: {0}", e.NodeID);
+                    RRWebTest.WriteLine("NodeName: {0}", e.NodeName);
+                    RRWebTest.WriteLine("ConnectionURL: {0}", String.Join(", ", e.ConnectionURL));
                     RRWebTest.WriteLine("");
                 }
 
