@@ -280,6 +280,8 @@ namespace RobotRaconteurTest
 
                         await TcpWebSocketHeaderCaseTest.TestWebSocketHandshakeHeaderCase();
 
+                        await AsyncStreamStalledWriteTest.TestStalledWriteReceiveTimeout();
+
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();

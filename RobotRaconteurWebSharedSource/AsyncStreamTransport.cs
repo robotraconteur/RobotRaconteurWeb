@@ -914,12 +914,16 @@ namespace RobotRaconteurWeb
 
             try
             {
+                Task heartbeat_send = null;
                 while (m_Connected)
                 {
                     await Task.Delay(500, cancellationToken.Token).ConfigureAwait(false);
 
 
-                    if ((DateTime.UtcNow - tlastsend).TotalMilliseconds > m_HeartbeatPeriod)
+                    // Do not await the heartbeat: if a write never completes (the peer stopped reading), the send
+                    // queues behind it and awaiting it would stop the timeout checks below
+                    if ((DateTime.UtcNow - tlastsend).TotalMilliseconds > m_HeartbeatPeriod &&
+                        (heartbeat_send == null || heartbeat_send.IsCompleted))
                     {
                         Message m = new Message();
                         m.header = new MessageHeader();
@@ -927,12 +931,13 @@ namespace RobotRaconteurWeb
                         MessageEntry mm = new MessageEntry(MessageEntryType.ConnectionTest, "");
                         m.entries.Add(mm);
 
-                        await SendMessage(m, default(CancellationToken)).ConfigureAwait(false);
+                        heartbeat_send = SendMessage(m, default(CancellationToken));
+                        heartbeat_send.IgnoreResult();
                     }
 
-                    if ((tlastsend - tlastrec).TotalMilliseconds > ReceiveTimeout)
+                    // tlastsend is frozen while a write is stalled, so measure from now
+                    if ((DateTime.UtcNow - tlastrec).TotalMilliseconds > ReceiveTimeout)
                     {
-                        var diff = (tlastsend - tlastrec).TotalMilliseconds;
                         Close();
                     }
                     else if ((DateTime.UtcNow - tlastrec_mes).TotalMilliseconds > node.TransportInactivityTimeout)
