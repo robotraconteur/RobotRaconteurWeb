@@ -107,6 +107,7 @@ namespace RobotRaconteurTest
                         MessageSerializationTest.RunMessageTests();
                         ErrorMappingTests.TestArgumentOutOfRangeMapping();
 
+                        RobDefTest.RunRobDefNoServiceNameTest();
                         await ServiceTests.RunIntraLoopback();
                         await ServiceTests.RunTcpLoopback();
                         await ServiceTests.RunLocalLoopback();

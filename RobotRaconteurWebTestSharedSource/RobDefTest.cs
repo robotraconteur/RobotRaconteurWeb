@@ -9,6 +9,20 @@ namespace RobotRaconteurTest
 {
     public class RobDefTest
     {
+        public static void RunRobDefNoServiceNameTest()
+        {
+            // A definition without a service line must be rejected by the parser, not leave Name null
+            foreach (var text in new string[] { "", "\n\n", "# comment only\n", "  \t\n# c\n\n" })
+            {
+                RRAssert.ThrowsException<ServiceDefinitionParseException>(() =>
+                {
+                    var def = new ServiceDefinition();
+                    def.FromString(text);
+                });
+            }
+            RRWebTest.WriteLine("RunRobDefNoServiceNameTest passed");
+        }
+
         public static void RunRobDefTest(string[] filenames)
         {
             var robdef_filenames = filenames;

@@ -710,6 +710,9 @@ namespace RobotRaconteurWeb
 
                 }
 
+                if (!service_name_found)
+                    throw new ServiceDefinitionParseException("service name not specified", working_info);
+
                 bool version_found = false;
                 if (stdver_found)
                 {
