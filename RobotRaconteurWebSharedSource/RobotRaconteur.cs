@@ -1445,7 +1445,15 @@ namespace RobotRaconteurWeb
 #pragma warning disable 1591
         public async Task<Message> SpecialRequest(Message m, uint transportid)
         {
-
+            // A special request must be the only entry in its message (object protocol, "Special Requests").
+            // Anything else is a protocol violation: throw so the transport closes the connection
+            if (m.entries.Count != 1)
+            {
+#if RR_LOG_DEBUG
+                LogDebug(string.Format("Received SpecialRequest with {0} entries, closing connection", m.entries.Count), this, component: RobotRaconteur_LogComponent.Node);
+#endif
+                throw new ProtocolException("Special request must be the only entry in a message");
+            }
 
             if (!(m.header.ReceiverNodeID == NodeID.Any && (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == NodeName))
                 && !(m.header.ReceiverNodeID == NodeID))

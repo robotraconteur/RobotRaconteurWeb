@@ -112,6 +112,7 @@ namespace RobotRaconteurTest
                         await ServiceTests.RunLocalLoopback();
 
                         await AttributesTest.RunAttributesTest();
+                        await SpecialRequestSingleEntryTest.RunTestSpecialRequestSingleEntry();
                         await TestServiceBroadcastMonitorTest.RunTestServiceBroadcastMonitorTest();
                         WebSocketDefaultOriginsTests.RunTestDefaultOrigins();
                         ErrorCodesTest.TestCoreErrorCodes();
