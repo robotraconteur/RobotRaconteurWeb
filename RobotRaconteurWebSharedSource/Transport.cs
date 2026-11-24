@@ -205,7 +205,12 @@ namespace RobotRaconteurWeb
             o.host = u1.Groups[2].Value;
             if (u1.Groups[3].Success && u1.Groups[3].Value != "")
             {
-                o.port = int.Parse(u1.Groups[3].Value);
+                int port;
+                if (!int.TryParse(u1.Groups[3].Value, System.Globalization.NumberStyles.Integer,
+                                  System.Globalization.CultureInfo.InvariantCulture, out port) ||
+                    port < 1 || port > 65535)
+                    throw new ConnectionException("Invalid connection URL");
+                o.port = port;
             }
             else
             {
@@ -271,6 +276,7 @@ namespace RobotRaconteurWeb
                 var q3 = e.Split(new char[] { '=' });
                 if (q3.Length != 2) throw new ConnectionException("Invalid Connection URL");
                 if (q3[0].Length == 0 || q3[1].Length == 0) throw new ConnectionException("Invalid Connection URL");
+                if (query_params.ContainsKey(q3[0])) throw new ConnectionException("Invalid Connection URL");
                 query_params.Add(q3[0], RRUriExtensions.UnescapeDataString(q3[1]));
             }
 

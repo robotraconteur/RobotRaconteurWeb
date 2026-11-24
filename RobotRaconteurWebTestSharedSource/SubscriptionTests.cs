@@ -209,6 +209,34 @@ namespace RobotRaconteurSubTest
             }
         }
 
+        public static void RunTestParseConnectionUrlBadUrl()
+        {
+            // Malformed ports and repeated query parameters are reported as ConnectionException
+            var bad_urls = new string[] {
+                "rr+tcp://localhost:x/?service=s",
+                "rr+tcp://localhost:99999999999/?service=s",
+                "rr+tcp://localhost:0/?service=s",
+                "rr+tcp://localhost:65536/?service=s",
+                "rr+tcp://localhost:-1/?service=s",
+                "rr+tcp://localhost:1234/?service=s&service=t",
+                "rr+tcp://localhost:1234/?nodename=a&service=s&nodename=b",
+                "tcp://localhost:x/a/s"
+            };
+            foreach (var u in bad_urls)
+            {
+                RRAssert.ThrowsException<ConnectionException>(() => TransportUtil.ParseConnectionUrl(u));
+            }
+
+            var u1 = TransportUtil.ParseConnectionUrl("rr+tcp://localhost:1/?service=s");
+            RRAssert.AreEqual(u1.port, 1);
+            var u2 = TransportUtil.ParseConnectionUrl("rr+tcp://localhost:65535/?nodename=a&service=s");
+            RRAssert.AreEqual(u2.port, 65535);
+            RRAssert.AreEqual(u2.service, "s");
+            RRAssert.AreEqual(u2.nodename, "a");
+            var u3 = TransportUtil.ParseConnectionUrl("rr+tcp://localhost/?service=s");
+            RRAssert.AreEqual(u3.port, 48653);
+        }
+
         public static async Task RunTestSubscribeServiceInfo2()
         {
             var test_servers = new Dictionary<string, NodeID>()

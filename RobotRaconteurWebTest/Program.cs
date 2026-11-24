@@ -317,6 +317,7 @@ namespace RobotRaconteurTest
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByType();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeByUrlBadUrl();
+                        RobotRaconteurSubTest.SubscriptionTests.RunTestParseConnectionUrlBadUrl();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeServiceInfo2();
                         await RobotRaconteurSubTest.SubscriptionTests.RunTestSubscribeMultiServiceSameNode();
 
