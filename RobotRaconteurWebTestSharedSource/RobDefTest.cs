@@ -674,5 +674,33 @@ namespace RobotRaconteurTest
             RRAssert.AreEqual(e.Error, "RobotRaconteur.ServiceDefinitionError");
             RRWebTest.WriteLine("RobDefTest.TestServiceDefinitionExceptionErrorName passed");
         }
+
+        public static void RunRobDefOptionBeforeStdverTest()
+        {
+            // stdver must come right after the service line, also when an option precedes it
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() =>
+            {
+                var def = new ServiceDefinition();
+                def.FromString("service a.b\noption foo\nstdver 0.9.2\n");
+            });
+            RRAssert.ThrowsException<ServiceDefinitionParseException>(() =>
+            {
+                var def = new ServiceDefinition();
+                def.FromString("service a.b\noption foo\nstdver 0.9\n");
+            });
+
+            // Options without stdver, or after a stdver < 0.9.2, are still accepted (deprecated)
+            var def1 = new ServiceDefinition();
+            def1.FromString("service a.b\noption foo\n");
+            RRAssert.AreEqual(def1.Options.Count, 1);
+            var def2 = new ServiceDefinition();
+            def2.FromString("service a.b\nstdver 0.9\noption foo\n");
+            RRAssert.AreEqual(def2.Options.Count, 1);
+            var def3 = new ServiceDefinition();
+            def3.FromString(def2.ToString());
+            RRAssert.AreEqual(def3.Options.Count, 1);
+
+            RRWebTest.WriteLine("RunRobDefOptionBeforeStdverTest passed");
+        }
     }
 }

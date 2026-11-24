@@ -337,6 +337,8 @@ namespace RobotRaconteurTest
                         RobotRaconteurSubTest.SubscriberFilterTests.TestSubscriptionAttributeIdentifier();
                         RobotRaconteurSubTest.SubscriberFilterTests.TestAttributeGroupSplitStringDelimiter();
 
+                        RobDefTest.RunRobDefOptionBeforeStdverTest();
+
                         await RobotRaconteurSubTest.Pipes.SubscriptionPipeTests.TestPipeSubscription();
                         await RobotRaconteurSubTest.Pipes.PipeClientTests.TestPipeReconnectAfterClose();
                         await RobotRaconteurSubTest.Wires.SubscriptionWireTests.TestWireSubscription();

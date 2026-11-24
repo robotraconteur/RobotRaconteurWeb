@@ -573,7 +573,7 @@ namespace RobotRaconteurWeb
                         //stdver
                         case 2:
                             {
-                                if (entry_key_max >= 2)
+                                if (entry_key_max >= 2 || Options.Count != 0)
                                     throw new ServiceDefinitionParseException("stdver must be first after service name", working_info);
                                 if (stdver_found)
                                     throw new ServiceDefinitionParseException("stdver already specified", working_info);
