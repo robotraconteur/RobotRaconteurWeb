@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
 using RobotRaconteurWeb;
-using com.robotraconteur.testing.TestService1;
 
 namespace RobotRaconteurWebTest
 {

@@ -264,3 +264,11 @@ tlastrec
 tlastsend
 transportid
 RRTVECTS
+pässword
+pössword
+skelobjecttype
+rrprefix
+cyclea
+cycleb
+nostdver
+xabcx
