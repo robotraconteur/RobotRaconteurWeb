@@ -90,7 +90,7 @@ namespace RobotRaconteurWeb
         uint ParseVersionPart(string s, string v)
         {
             uint r;
-            if (!UInt32.TryParse(s, NumberStyles.None, CultureInfo.InvariantCulture, out r))
+            if (!detail.ServiceDefinitionUtil.IsDigits(s) || !UInt32.TryParse(s, out r))
             {
                 throw new ServiceDefinitionParseException("Format error for version definition \"" + v + "\"", ParseInfo);
             }
@@ -159,6 +159,20 @@ namespace RobotRaconteurWeb
     {
         static class ServiceDefinitionUtil
         {
+            // True if s is a non-empty string of ASCII digits (NumberStyles.None without the overloads that the
+            // H5 build does not have)
+            internal static bool IsDigits(string s)
+            {
+                if (string.IsNullOrEmpty(s))
+                    return false;
+                foreach (char c in s)
+                {
+                    if (c < '0' || c > '9')
+                        return false;
+                }
+                return true;
+            }
+
             internal const string RR_NAME_REGEX = "[a-zA-Z](?:\\w*[a-zA-Z0-9])?";
             internal const string RR_TYPE_REGEX = "(?:[a-zA-Z](?:\\w*[a-zA-Z0-9])?)(?:\\.[a-zA-Z](?:\\w*[a-zA-Z0-9])?)*";
             internal const string RR_QUALIFIED_TYPE_REGEX = "(?:[a-zA-Z](?:\\w*[a-zA-Z0-9])?)(?:\\.[a-zA-Z](?:\\w*[a-zA-Z0-9])?)+";
@@ -2099,7 +2113,7 @@ namespace RobotRaconteurWeb
         int ParseArrayLength(string v, string s)
         {
             int r;
-            if (!Int32.TryParse(v, NumberStyles.None, CultureInfo.InvariantCulture, out r))
+            if (!detail.ServiceDefinitionUtil.IsDigits(v) || !Int32.TryParse(v, out r))
             {
                 throw new ServiceDefinitionParseException("Could not parse type \"" + s.Trim() + "\": invalid array length", ParseInfo);
             }

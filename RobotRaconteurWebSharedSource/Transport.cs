@@ -206,8 +206,7 @@ namespace RobotRaconteurWeb
             if (u1.Groups[3].Success && u1.Groups[3].Value != "")
             {
                 int port;
-                if (!int.TryParse(u1.Groups[3].Value, System.Globalization.NumberStyles.Integer,
-                                  System.Globalization.CultureInfo.InvariantCulture, out port) ||
+                if (!int.TryParse(u1.Groups[3].Value, out port) ||
                     port < 1 || port > 65535)
                     throw new ConnectionException("Invalid connection URL");
                 o.port = port;
