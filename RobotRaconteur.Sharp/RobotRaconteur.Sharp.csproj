@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>RobotRaconteurWeb</AssemblyName>
+    <RootNamespace>RobotRaconteurWeb</RootNamespace>
+    <PackageId>RobotRaconteurWeb</PackageId>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Company>Wason Technology, LLC</Company>
     <Copyright>Wason Technology, LLC 2023</Copyright>
@@ -44,10 +47,8 @@
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
   </ItemGroup>
 
-  <Import Project="..\RobotRaconteurWebSharedSource\RobotRaconteurWebSharedSource.projitems" Label="Shared" />
-
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\"/>
-    <None Include="targets\RobotRaconteurWeb.targets" Pack="true" PackagePath="build\"/>
+    <None Include="targets\RobotRaconteur.Sharp.targets" Pack="true" PackagePath="build\"/>
   </ItemGroup>
 </Project>

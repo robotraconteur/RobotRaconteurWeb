@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <StartupObject>RobotRaconteurWebGen.Program</StartupObject>
     <AssemblyName>RobotRaconteurWebGen</AssemblyName>
+    <PackageId>RobotRaconteurWebGen</PackageId>
     <PackAsTool>True</PackAsTool>
     <ApplicationIcon />
     <Company>Wason Technology, LLC</Company>
@@ -25,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RobotRaconteurWeb\RobotRaconteurWeb.csproj" />
+    <ProjectReference Include="..\RobotRaconteur.Sharp\RobotRaconteur.Sharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

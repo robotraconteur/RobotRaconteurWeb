@@ -21,12 +21,12 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Run
-      run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
+      run: dotnet run --project RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj --configuration Release
       shell: cmd
     - name: Build nuget packages
       run: |
-        dotnet pack  "RobotRaconteurWeb/RobotRaconteurWeb.csproj" -p:Platform="AnyCPU" --configuration Release
-        dotnet pack  "RobotRaconteurWebGen/RobotRaconteurWebGen.csproj" -p:Platform="AnyCPU" --configuration Release
+        dotnet pack  "RobotRaconteur.Sharp/RobotRaconteur.Sharp.csproj" -p:Platform="AnyCPU" --configuration Release
+        dotnet pack  "RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj" -p:Platform="AnyCPU" --configuration Release
     - name: Upload nuget packages
       uses: actions/upload-artifact@v4
       with:
@@ -45,13 +45,13 @@ jobs:
         path: rr-core
         sparse-checkout: test/data
     - name: Check test vectors against Core
-      run: python3 .github/scripts/check_test_vectors.py RobotRaconteurWebTestSharedSource/test_vectors.bin rr-core/test/data
+      run: python3 .github/scripts/check_test_vectors.py RobotRaconteur.Sharp.Test/test_vectors.bin rr-core/test/data
     - name: Setup dotnet 8.x
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.x
     - name: Build and Run
-      run: dotnet run --project RobotRaconteurWebTest/RobotRaconteurWebTest.csproj --configuration Release
+      run: dotnet run --project RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj --configuration Release
   pre-commit:
     runs-on: ubuntu-latest
     env:

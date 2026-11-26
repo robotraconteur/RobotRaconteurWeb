@@ -7,7 +7,7 @@ ignorePaths:
 - ".cmake-format.yml"
 - ".clang-tidy"
 - ".clang-format"
-- RobotRaconteurWebTest/Properties/launchSettings.json
+- RobotRaconteur.Sharp.Test/Properties/launchSettings.json
 - ".editorconfig"
 dictionaryDefinitions:
 - name: custom-dictionary
