@@ -8,18 +8,20 @@
     <RootNamespace>RobotRaconteurSharp.Gen</RootNamespace>
     <PackageId>RobotRaconteur.Sharp.Gen</PackageId>
     <ToolCommandName>RobotRaconteur.Sharp.Gen</ToolCommandName>
+    <!-- Run on newer .NET runtimes when .NET 8 is not installed -->
+    <RollForward>Major</RollForward>
     <PackAsTool>True</PackAsTool>
     <ApplicationIcon />
     <Company>Wason Technology, LLC</Company>
     <Copyright>Wason Technology, LLC 2023</Copyright>
     <PackageProjectUrl>http://robotraconteur.com</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>0.22.0.0</AssemblyVersion>
-    <FileVersion>0.22.0.0</FileVersion>
+    <AssemblyVersion>0.22.1.0</AssemblyVersion>
+    <FileVersion>0.22.1.0</FileVersion>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Authors>John Wason</Authors>
     <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteur.Sharp.git</RepositoryUrl>
-    <Version>0.22.0</Version>
+    <Version>0.22.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
