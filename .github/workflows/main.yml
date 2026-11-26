@@ -55,7 +55,7 @@ jobs:
   blazor:
     runs-on: ubuntu-latest
     # Must match the @playwright/test version in test/RobotRaconteur.Sharp.BlazorTest/e2e/package.json
-    container: mcr.microsoft.com/playwright:v1.49.1-noble
+    container: mcr.microsoft.com/playwright:v1.65.1-noble
     steps:
     - uses: actions/checkout@v7
     - name: Setup dotnet 8.x

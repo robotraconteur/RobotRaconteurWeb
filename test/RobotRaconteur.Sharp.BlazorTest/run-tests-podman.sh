@@ -12,7 +12,7 @@ set -eu
 cd "$(dirname "$0")/../.."
 NETWORK="--network=slirp4netns:allow_host_loopback=false"
 DOTNET_IMAGE="mcr.microsoft.com/dotnet/sdk:8.0"
-PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.49.1-noble"
+PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.65.1-noble"
 
 podman run --rm $NETWORK -v "$PWD":/src:Z -w /src \
     -e NUGET_PACKAGES=/src/.work/nuget -e DOTNET_CLI_HOME=/src/.work/dotnet-home \

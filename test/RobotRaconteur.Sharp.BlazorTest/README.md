@@ -22,7 +22,7 @@ test/RobotRaconteur.Sharp.BlazorTest/run-tests-podman.sh
 
 Extra arguments are passed to `playwright test`, for example `--project=chromium`. The script publishes the app
 and a self-contained test server in the .NET SDK container, then runs Playwright in the
-`mcr.microsoft.com/playwright:v1.49.1-noble` container. The Playwright image version must match the
+`mcr.microsoft.com/playwright:v1.65.1-noble` container. The Playwright image version must match the
 `@playwright/test` version in `e2e/package.json`. Neither container can reach the host or the local network.
 
 ## Running directly
