@@ -13,7 +13,6 @@ using RobotRaconteurWeb;
 namespace RobotRaconteurSubTest.SubObject
 {
 
-#if !ROBOTRACONTEUR_H5
     public class testobj3_impl : testobj3_default_impl, IRRServiceObject
     {
         string index;
@@ -185,5 +184,4 @@ namespace RobotRaconteurSubTest.SubObject
             }
         }
     }
-#endif
 }

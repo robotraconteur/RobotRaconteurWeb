@@ -51,7 +51,6 @@ namespace RobotRaconteurTest
                 { "test2", 42 }
 
             };
-#if !ROBOTRACONTEUR_H5
             string authdata = "testuser1 0b91dec4fe98266a03b136b59219d0d6 objectlock\ntestuser2 841c4221c2e7e0cefbc0392a35222512 objectlock\ntestsuperuser 503ed776c50169f681ad7bbc14198b68 objectlock,objectlockoverride";
             PasswordFileUserAuthenticator p = new PasswordFileUserAuthenticator(authdata);
             Dictionary<string, string> policies = new Dictionary<string, string>();
@@ -61,7 +60,6 @@ namespace RobotRaconteurTest
 
             node.RegisterService("RobotRaconteurTestService_auth", "com.robotraconteur.testing.TestService1", testservice_auth, s);
 
-#endif
         }
 
         public void UnregisterServices()
@@ -1012,7 +1010,6 @@ namespace RobotRaconteurTest
 
         public Task<double> func3(double d1, double d2, CancellationToken cancel = default(CancellationToken))
         {
-#if !ROBOTRACONTEUR_H5
             if (this.transport != null)
             {
             TcpTransport transport = (TcpTransport)this.transport;
@@ -1023,7 +1020,6 @@ namespace RobotRaconteurTest
                 RRWebTest.WriteLine(transport.GetSecurePeerIdentity(ServerEndpoint.CurrentEndpoint));
             }
             }
-#endif
 
 
             return Task.FromResult(d1 + d2);

@@ -8,7 +8,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // Object locks are refused unless the security policy sets allowobjectlock
     public static class AllowObjectLockPolicyTests
     {
@@ -34,5 +33,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

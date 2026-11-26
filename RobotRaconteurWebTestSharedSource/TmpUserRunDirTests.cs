@@ -7,7 +7,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // The /tmp/robotraconteur-run-<uid> fallback user run dir must be private to the current user
     public static class TmpUserRunDirTests
     {
@@ -107,5 +106,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

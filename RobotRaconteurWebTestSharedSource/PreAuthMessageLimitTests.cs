@@ -8,7 +8,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // Messages over 512 KiB are refused before an auth-required service has authenticated the client
     public static class PreAuthMessageLimitTests
     {
@@ -42,5 +41,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

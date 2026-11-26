@@ -64,7 +64,6 @@ namespace RobotRaconteurSubTest
             return node;
         }
 
-#if !ROBOTRACONTEUR_H5
         static private void RegisterServiceAuth(RobotRaconteurNode node, string serviceName, uint service_type)
         {
             string authData = "testuser1 0b91dec4fe98266a03b136b59219d0d6 objectlock\ntestuser2 841c4221c2e7e0cefbc0392a35222512 objectlock\ntestsuperuser 503ed776c50169f681ad7bbc14198b68 objectlock,objectlockoverride";
@@ -90,7 +89,6 @@ namespace RobotRaconteurSubTest
 
             node.RegisterService(serviceName, "experimental.testing.subtestfilter", serviceInstance, securityPolicy);
         }
-#endif
 
         static private RobotRaconteurNode InitClientNode()
         {
@@ -270,9 +268,7 @@ namespace RobotRaconteurSubTest
             var node2 = InitNode("test_node4", "service1", new Dictionary<string, object>(), 2);
             var node3 = InitNode("test_node5", "service3", new Dictionary<string, object>(), 2);
             var node4 = InitNode("test_node6", "service2", new Dictionary<string, object>(), 2);
-#if !ROBOTRACONTEUR_H5
             RegisterServiceAuth(node3, "service1", 2);
-#endif
 
             await Task.Delay(500);
 
@@ -305,7 +301,6 @@ namespace RobotRaconteurSubTest
             };
             filter1.Nodes = new ServiceSubscriptionFilterNode[] { filter1Node };
             await RunFilterTest(clientNode, filter1, 1, "2");
-#if !ROBOTRACONTEUR_H5
             var filter2 = new ServiceSubscriptionFilter();
             var filter2Node = new ServiceSubscriptionFilterNode
             {
@@ -316,7 +311,6 @@ namespace RobotRaconteurSubTest
             filter2.ServiceNames = new string[] { "service1" };
             filter2.Nodes = new ServiceSubscriptionFilterNode[] { filter2Node };
             await RunFilterTest(clientNode, filter2, 1, "2");
-#endif
             node1.Shutdown();
             node2.Shutdown();
             node3.Shutdown();

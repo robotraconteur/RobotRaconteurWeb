@@ -12,7 +12,6 @@ namespace RobotRaconteurSubTest
 {
     public static class ServiceInfo2RefreshTest
     {
-#if !ROBOTRACONTEUR_H5
         public static async Task TestServiceInfo2RefreshSameUrls()
         {
             // A refresh of a node's service list with the same contents (new arrays) must not report the
@@ -79,6 +78,5 @@ namespace RobotRaconteurSubTest
             }
             Console.WriteLine("ServiceInfo2RefreshTest.TestServiceInfo2RefreshSameUrls passed");
         }
-#endif
     }
 }

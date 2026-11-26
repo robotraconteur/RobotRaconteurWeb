@@ -9,7 +9,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // An accepted TCP connection that never sends data is closed after the receive timeout
     public static class TcpSilentConnectionTests
     {
@@ -49,5 +48,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

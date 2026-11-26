@@ -228,4 +228,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
-/RobotRaconteurH5Test/H5/output
+
+# Local scratch (builds, nuget cache)
+.work/

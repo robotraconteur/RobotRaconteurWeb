@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !ROBOTRACONTEUR_H5
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Mono.Unix;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -149,7 +147,6 @@ namespace RobotRaconteurWeb
 
 #pragma warning disable 1591
 
-#if !ROBOTRACONTEUR_H5
     static class NodeDirectoriesUtil
     {
         internal static string replace_default_val_with_env(string default_val, string rr_env_var)
@@ -1082,15 +1079,6 @@ namespace RobotRaconteurWeb
             fd?.Dispose();
         }
     }
-#else
-    public static class NodeDirectoriesUtil
-    {
-        public static NodeDirectories GetDefaultNodeDirectories(RobotRaconteurNode node)
-        {
-            return new NodeDirectories();
-        }
-    }
-#endif
     public class NodeDirectoriesResourceAlreadyInUse : IOException
     {
         public NodeDirectoriesResourceAlreadyInUse() : base("Identifier UUID or Name already in use") { }

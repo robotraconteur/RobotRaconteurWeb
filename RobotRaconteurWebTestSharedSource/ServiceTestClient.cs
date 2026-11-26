@@ -939,7 +939,6 @@ namespace RobotRaconteurTest
             ca<double>(m1_3, m1_4);
 
         }
-#if !ROBOTRACONTEUR_H5
         private async Task test_m2()
         {
             // cSpell: ignore testmdarray
@@ -1014,7 +1013,6 @@ namespace RobotRaconteurTest
             ca<uint>(m5.Dims, m7.Dims);
             ca<byte>((byte[])m5.Array_, (byte[])m7.Array_);
         }
-#endif
 
 
         public async Task DisconnectService()

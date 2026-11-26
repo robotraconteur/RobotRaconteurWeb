@@ -26,7 +26,6 @@ namespace RobotRaconteurTest
 
         public TestNodeConfig(string nodename, bool enable_tcp_transport = true, bool enable_local_transport = false, bool enable_intra_transport = true, bool start_server = true, object tcp_port = null)
         {
-#if !ROBOTRACONTEUR_H5
             if (start_server)
             {
                 string nodenv = Environment.GetEnvironmentVariable("ROBOTRACONTEUR_NODEID");
@@ -114,7 +113,6 @@ namespace RobotRaconteurTest
                     }
                 }
             }
-#endif
 
             client_node = new RobotRaconteurNode();
             client_node.SetLogLevelFromEnvVariable();
@@ -123,7 +121,6 @@ namespace RobotRaconteurTest
             client_node.RegisterServiceType(new com.robotraconteur.testing.TestService2.com__robotraconteur__testing__TestService2Factory(client_node));
             client_node.RegisterServiceType(new com.robotraconteur.testing.TestService3.com__robotraconteur__testing__TestService3Factory(client_node));
 
-#if !ROBOTRACONTEUR_H5
             if (enable_local_transport)
             {
                 client_local_transport = new LocalTransport(client_node);
@@ -138,7 +135,6 @@ namespace RobotRaconteurTest
                 client_node.RegisterTransport(t2);
                 client_tcp_transport = t2;
             }
-#endif
 
             if (enable_intra_transport)
             {

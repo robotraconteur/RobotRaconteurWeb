@@ -276,7 +276,6 @@ namespace RobotRaconteurWeb
             }
         }
 
-#if !ROBOTRACONTEUR_H5
         ~WallTimer()
         {
             try
@@ -287,7 +286,6 @@ namespace RobotRaconteurWeb
             }
             catch { }
         }
-#endif
     }
 
     public class WallRate : IRate

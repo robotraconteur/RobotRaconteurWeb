@@ -7,7 +7,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // The first request on a sub-object that is created for it must run with
     // ServerContext.CurrentServicePath / CurrentServerContext set
     public static class SubObjectCurrentPathTest
@@ -51,5 +50,4 @@ namespace RobotRaconteurWebTest
             Console.WriteLine("SubObjectCurrentPathTest.TestFirstSubObjectRequestCurrentPath passed");
         }
     }
-#endif
 }

@@ -174,7 +174,6 @@ namespace RobotRaconteurWeb
             if (!started)
             {
 
-#if !ROBOTRACONTEUR_H5
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.WinCE)
                 {
                     iswindows = true;
@@ -183,7 +182,6 @@ namespace RobotRaconteurWeb
 
 
                 }
-#endif
 
                 start_time = DateTime.UtcNow.ToUniversalTime();
                 TimeSpan t = start_time - (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc));

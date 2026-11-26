@@ -9,7 +9,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // svc.o3[1] and svc.o3[%31] name the same object, so a lock on one covers the other
     public static class ServicePathAliasTests
     {
@@ -36,5 +35,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

@@ -8,7 +8,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // Locks held by a session are released when its user logs out (and when it disconnects afterwards)
     public static class LockReleaseOnLogoutTests
     {
@@ -36,5 +35,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

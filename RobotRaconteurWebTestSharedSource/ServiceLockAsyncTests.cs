@@ -10,7 +10,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // Lock checks must use the requesting endpoint and user even when the
     // first access of a sub-object yields in an async objref getter (the
     // thread-static current endpoint/user are not valid after an await)
@@ -63,5 +62,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

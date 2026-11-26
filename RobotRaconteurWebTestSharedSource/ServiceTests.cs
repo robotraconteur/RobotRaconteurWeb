@@ -79,9 +79,6 @@ namespace RobotRaconteurWebTest
                 var auth_urls = nodes.GetServiceUrl("RobotRaconteurTestService_auth");
                 var urls2 = nodes.GetServiceUrl("RobotRaconteurTestService2");
 
-#if ROBOTRACONTEUR_H5
-                auth_urls = null;
-#endif
 
                 var test = new ServiceTests(nodes.client_node, urls, auth_urls, urls2);
                 await test.LoopbackTest();
@@ -96,9 +93,6 @@ namespace RobotRaconteurWebTest
             var auth_urls = new string[] { endpoint_url + join_char + "service=RobotRaconteurTestService_auth" };
             var urls2 = new string[] { endpoint_url + join_char + "service=RobotRaconteurTestService2" };
 
-#if ROBOTRACONTEUR_H5
-            auth_urls = null;
-#endif
             using (var nodes = new TestNodeConfig("testprog", true, true, true, false))
             {
                 var test = new ServiceTests(nodes.client_node, urls, auth_urls, urls2);

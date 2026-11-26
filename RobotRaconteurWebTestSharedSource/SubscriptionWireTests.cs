@@ -10,7 +10,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurSubTest.Wires
 {
-#if !ROBOTRACONTEUR_H5
     public class testobj_impl : testobj_default_impl
     {
         public testobj2_impl subobj = new testobj2_impl();
@@ -161,6 +160,5 @@ namespace RobotRaconteurSubTest.Wires
         }
 
     }
-#endif
 
 }

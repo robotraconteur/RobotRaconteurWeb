@@ -5,7 +5,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // Default WebSocket origins: pages loaded from local files ("null", "file://") and https robotraconteur.com,
     // but not every browser extension or plain http origins an on-path attacker can produce
     public static class WebSocketDefaultOriginsTests
@@ -35,5 +34,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

@@ -25,7 +25,6 @@ using RobotRaconteurWeb;
 namespace RobotRaconteurTest
 {
 
-#if !ROBOTRACONTEUR_H5
     public class RobotRaconteurTestServiceSupport2
     {
 
@@ -659,7 +658,6 @@ namespace RobotRaconteurTest
         public override ArrayMemory<int> m2 => m2_v;
         public override ArrayMemory<int> m3 => m3_v;
     }
-#endif
     class ServiceTest2_test_sequence_gen
     {
         private uint counter;

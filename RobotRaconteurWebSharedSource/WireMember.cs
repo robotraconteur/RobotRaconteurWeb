@@ -1482,9 +1482,7 @@ namespace RobotRaconteurWeb
                                     }
                                 }
                             }
-#if !ROBOTRACONTEUR_H5
                             , TaskContinuationOptions.OnlyOnFaulted
-#endif
                             );
 
                         }

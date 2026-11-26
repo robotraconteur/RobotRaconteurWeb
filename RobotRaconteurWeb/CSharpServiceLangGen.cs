@@ -2252,7 +2252,6 @@ namespace RobotRaconteurWeb
 
         public static void GenerateDefaultImpl(ServiceEntryDefinition e, TextWriter w2)
         {
-            w2.WriteLine("#if !ROBOTRACONTEUR_H5");
             w2.WriteLine("public class " + FixName(e.Name) + "_default_impl : " + FixName(e.Name) + "{");
 
             foreach (var m in MemberIter<CallbackDefinition>(e))
@@ -2492,7 +2491,6 @@ namespace RobotRaconteurWeb
 
             w2.WriteLine("}");
 
-            w2.WriteLine("#endif");
 
         }
 

@@ -1,4 +1,3 @@
-#if !ROBOTRACONTEUR_H5
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,4 +42,3 @@ namespace RobotRaconteurSubTest.Manager
         }
     }
 }
-#endif

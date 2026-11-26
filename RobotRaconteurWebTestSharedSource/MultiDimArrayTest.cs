@@ -22,7 +22,6 @@ using RobotRaconteurWeb;
 namespace RobotRaconteurTest
 {
 
-#if !ROBOTRACONTEUR_H5
     class MultiDimArrayTest
     {
 
@@ -216,5 +215,4 @@ namespace RobotRaconteurTest
             RRWebTest.WriteLine("MultiDimArrayTest.TestZeroCountCopiesNothing passed");
         }
     }
-#endif
 }

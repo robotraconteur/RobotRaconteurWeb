@@ -7,7 +7,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // ServerEndpoint.CurrentEndpoint and ServerContext.CurrentServicePath must stay valid
     // in service code after an await
     public static class CurrentEndpointAsyncTest
@@ -54,5 +53,4 @@ namespace RobotRaconteurWebTest
             Console.WriteLine("CurrentEndpointAsyncTest.TestCurrentEndpointAfterAwait passed");
         }
     }
-#endif
 }

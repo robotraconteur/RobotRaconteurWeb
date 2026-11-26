@@ -12,7 +12,6 @@ namespace RobotRaconteurSubTest.Wires
 {
     public static class WireRepeatConnectTest
     {
-#if !ROBOTRACONTEUR_H5
         public static async Task TestWireRepeatConnect()
         {
             // A repeated WireConnectReq from a connected client must not register the connection again
@@ -53,6 +52,5 @@ namespace RobotRaconteurSubTest.Wires
             }
             Console.WriteLine("WireRepeatConnectTest.TestWireRepeatConnect passed");
         }
-#endif
     }
 }

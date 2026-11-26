@@ -19,7 +19,6 @@ jobs:
       run: |
         cp RobotRaconteurWeb/README.md docs/netcore/articles/robotraconteurweb_readme.md
         cp RobotRaconteurWebGen/README.md docs/netcore/articles/robotraconteurwebgen_readme.md
-        cp RobotRaconteurH5/README.md docs/netcore/articles/robotraconteurh5_readme.md
     - name: Build docs
       working-directory: ./docs/netcore
       run: docfx

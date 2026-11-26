@@ -28,7 +28,6 @@ namespace RobotRaconteurWebTest
             }
         }
 
-#if !ROBOTRACONTEUR_H5
         public static void TestPasswordHashUtf8()
         {
             // Passwords are hashed from their UTF-8 bytes, as in Core
@@ -47,7 +46,6 @@ namespace RobotRaconteurWebTest
             auth2.AuthenticateUser("user1", new Dictionary<string, object> { { "password", "pässword" } });
             Console.WriteLine("AttributesTest.TestPasswordHashUtf8 passed");
         }
-#endif
 
         public static void TestCloseServiceUpdatesNonce()
         {

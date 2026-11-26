@@ -21,11 +21,9 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using RobotRaconteurWeb.Extensions;
-#if !ROBOTRACONTEUR_H5
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
-#endif
 using System.Reflection;
 
 #pragma warning disable 1591
@@ -134,11 +132,7 @@ namespace RobotRaconteurWeb
                 {
                     if (starttls)
                     {
-#if !ROBOTRACONTEUR_H5
                     await DoClientTlsHandshake(cancel).ConfigureAwait(false);
-#else
-                        throw new NotImplementedException("TLS support not implemented");
-#endif
                     }
 
                     NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
@@ -333,7 +327,6 @@ namespace RobotRaconteurWeb
 
                             if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                             {
-#if !ROBOTRACONTEUR_H5
                             if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                             {
                                 //TODO: enforce direction of handshake
@@ -364,7 +357,6 @@ namespace RobotRaconteurWeb
                                 }
                                     continue;
                             }
-#endif
                                 await StreamOpMessageReceived(mes).ConfigureAwait(false);
 
                                 continue;
@@ -526,12 +518,10 @@ namespace RobotRaconteurWeb
 
                 if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                 {
-#if !ROBOTRACONTEUR_H5
                 if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
                 {
                     await DoServerTlsHandshake(mes).ConfigureAwait(false);
                 }
-#endif
                     await StreamOpMessageReceived(mes).ConfigureAwait(false);
                     return;
 
@@ -1068,10 +1058,8 @@ namespace RobotRaconteurWeb
                 //CheckStreamCapability_ret.TrySetException(new ConnectionException("Transport connection closed"));
                 r2 = CheckStreamCapability_ret;
                 CheckStreamCapability_ret = null;
-#if !ROBOTRACONTEUR_H5
             h1 = clienthandshake_recv_task;
             h2 = clienthandshake_recv_done_task;
-#endif
             }
 
             if (r1 != null) r1.TrySetException(new ConnectionException("Transport connection closed"));
@@ -1622,7 +1610,6 @@ namespace RobotRaconteurWeb
 
             return false;
         }
-#if !ROBOTRACONTEUR_H5
     protected async Task DoServerTlsHandshake(Message m)
     {
         Message mret = new Message();
@@ -2044,7 +2031,6 @@ namespace RobotRaconteurWeb
         }
     }
 
-#endif
     }
 
     public interface AsyncStreamTransportParent
@@ -2057,9 +2043,7 @@ namespace RobotRaconteurWeb
 
         void RemoveTransportConnection(AsyncStreamTransport transport);
 
-#if !ROBOTRACONTEUR_H5
     Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate();
-#endif
     }
 
 }

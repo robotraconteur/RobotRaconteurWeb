@@ -10,7 +10,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // A client (session) lock can only be released by the session that holds it
     public static class ServiceLockSessionTests
     {
@@ -39,5 +38,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

@@ -7,7 +7,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // A special request must be the only entry in its message (object protocol, "Special Requests"). A message
     // with more entries is a protocol violation: SpecialRequest throws and the transport closes the connection.
     // Each entry used to be answered, so one message could make the node build a reply of entries x service
@@ -57,5 +56,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

@@ -6,7 +6,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // The Web test server must behave like Core's test server for the shared test clients:
     // broadcastpipe sends packets, and a monitor lock timeout is returned as RequestTimeoutException
     static class TestServiceBroadcastMonitorTest
@@ -49,5 +48,4 @@ namespace RobotRaconteurWebTest
             Console.WriteLine("TestServiceBroadcastMonitorTest.RunTestServiceBroadcastMonitorTest passed");
         }
     }
-#endif
 }

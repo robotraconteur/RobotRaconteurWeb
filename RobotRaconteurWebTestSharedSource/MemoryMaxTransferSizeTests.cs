@@ -10,7 +10,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // A service MaxTransferSize smaller than the element size must give an error, not a division by zero
     public static class MemoryMaxTransferSizeTests
     {
@@ -32,5 +31,4 @@ namespace RobotRaconteurWebTest
             }
         }
     }
-#endif
 }

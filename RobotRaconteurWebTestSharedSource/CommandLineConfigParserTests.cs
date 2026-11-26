@@ -1,4 +1,3 @@
-#if !ROBOTRACONTEUR_H5
 using System;
 using RobotRaconteurTest;
 using RobotRaconteurWeb;
@@ -39,4 +38,3 @@ namespace RobotRaconteurWebTest
         }
     }
 }
-#endif

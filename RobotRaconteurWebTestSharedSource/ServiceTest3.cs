@@ -6,7 +6,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurTest
 {
-#if !ROBOTRACONTEUR_H5
     // Port of Core's test/cpp/service/ServiceTest3.cpp ("RobotRaconteurTestService3")
     public class RobotRaconteurTestServiceSupport3
     {
@@ -84,5 +83,4 @@ namespace RobotRaconteurTest
             throw new asynctestexp("");
         }
     }
-#endif
 }

@@ -208,7 +208,6 @@ namespace RobotRaconteurWeb
         AuthenticatedUser AuthenticateUser(string username, Dictionary<string, object> credentials);
     }
 
-#if !ROBOTRACONTEUR_H5
     /**
     <summary>
 
@@ -381,6 +380,5 @@ namespace RobotRaconteurWeb
 #pragma warning restore 1591
 
     }
-#endif
 
 }

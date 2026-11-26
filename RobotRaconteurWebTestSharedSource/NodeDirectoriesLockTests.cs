@@ -1,4 +1,3 @@
-#if !ROBOTRACONTEUR_H5
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -98,4 +97,3 @@ namespace RobotRaconteurWebTest
         }
     }
 }
-#endif

@@ -13,7 +13,6 @@ namespace RobotRaconteurSubTest
 {
     public static class DefaultClientTest
     {
-#if !ROBOTRACONTEUR_H5
         public static async Task TestDefaultClientSkipsConnecting()
         {
             // TryGetDefaultClient must return a connected client even when the first entry is still connecting
@@ -53,6 +52,5 @@ namespace RobotRaconteurSubTest
             }
             Console.WriteLine("DefaultClientTest.TestDefaultClientSkipsConnecting passed");
         }
-#endif
     }
 }

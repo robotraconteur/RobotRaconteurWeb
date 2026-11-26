@@ -9,7 +9,6 @@ namespace RobotRaconteurSubTest.Wires
 {
     public static class SubscriptionUpdateFilterTest
     {
-#if !ROBOTRACONTEUR_H5
         public static async Task TestUpdateServiceByTypeDisconnectsFiltered()
         {
             // UpdateServiceByType with a filter that excludes a connected service must disconnect it
@@ -40,6 +39,5 @@ namespace RobotRaconteurSubTest.Wires
             }
             Console.WriteLine("SubscriptionUpdateFilterTest.TestUpdateServiceByTypeDisconnectsFiltered passed");
         }
-#endif
     }
 }

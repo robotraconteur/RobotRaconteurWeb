@@ -7,10 +7,7 @@ Welcome to the RobotRaconteurWeb documentation!
 Robot Raconteur is a communication framework for robotics, automation, and the Internet of Things. RobotRaconteurWeb
 is an implementation of Robot Raconteur developed in pure C#. This is in contrast to RobotRaconteurNET, which
 is a wrapper for the native RobotRaconteurCore implementation that is developed in C++. RobotRaconteurWeb
-is more portable since it is pure C#. RobotRaconteurWeb is also available for use with the H5 C#-to-JavaScript
-compiler. RobotRaconteurH5 is RobotRaconteurWeb compiled to JavaScript for use with any modern web browser.
-It uses WebSockets to communicate with Robot Raconteur services. RobotRaconteurWeb can also be used with ASP.NET
-web servers using WebSockets. See the examples for a demonstration of how this work. This capability allows
+is more portable since it is pure C#. RobotRaconteurWeb can also be used with ASP.NET web servers using WebSockets. See the examples for a demonstration of how this work. This capability allows
 for Robot Raconteur to be easily integrated into cloud and information systems without requiring any modifications
 to the infrastructure!
 
@@ -22,8 +19,6 @@ are instead asynchronous, and should be used with async/await.
 
 See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library:
 https://github.com/robotraconteur/robotraconteur/wiki/Documentation
-
-Also see the H5 compiler: https://github.com/theolivenbaum/h5
 
 ## Robot Raconteur
 
@@ -43,6 +38,5 @@ See the individual package Readme files for more information:
 
 * [RobotRaconteurWeb](articles/robotraconteurweb_readme.md)
 * [RobotRaconteurWebGen](articles/robotraconteurwebgen_readme.md)
-* [RobotRaconteurH5](articles/robotraconteurh5_readme.md)
 
 Copyright (C) 2024 Wason Technology, LLC

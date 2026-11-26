@@ -2216,9 +2216,7 @@ namespace RobotRaconteurWeb
         // nesting level, so unbounded nesting allows a small message to overflow the stack.
         internal const int MaxNestingDepth = 512;
 
-#if !ROBOTRACONTEUR_H5
         [ThreadStatic]
-#endif
         private static int read_nesting_depth;
 
         public uint ElementSize;

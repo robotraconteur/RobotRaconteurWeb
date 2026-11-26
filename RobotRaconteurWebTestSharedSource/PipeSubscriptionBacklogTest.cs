@@ -9,7 +9,6 @@ namespace RobotRaconteurSubTest.Pipes
 {
     public static class PipeSubscriptionBacklogTest
     {
-#if !ROBOTRACONTEUR_H5
         public static async Task TestPipeSubscriptionMaxBacklog()
         {
             // SubscribePipe(max_backlog: 2) must keep only the newest two received packets
@@ -60,6 +59,5 @@ namespace RobotRaconteurSubTest.Pipes
             }
             Console.WriteLine("PipeSubscriptionBacklogTest.TestPipeSubscriptionMaxBacklog passed");
         }
-#endif
     }
 }

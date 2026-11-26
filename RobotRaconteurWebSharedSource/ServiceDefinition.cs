@@ -159,8 +159,7 @@ namespace RobotRaconteurWeb
     {
         static class ServiceDefinitionUtil
         {
-            // True if s is a non-empty string of ASCII digits (NumberStyles.None without the overloads that the
-            // H5 build does not have)
+            // True if s is a non-empty string of ASCII digits
             internal static bool IsDigits(string s)
             {
                 if (string.IsNullOrEmpty(s))

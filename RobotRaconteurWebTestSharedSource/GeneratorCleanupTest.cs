@@ -11,7 +11,6 @@ using RobotRaconteurWeb;
 
 namespace RobotRaconteurWebTest
 {
-#if !ROBOTRACONTEUR_H5
     // Service-side generators must be destroyed when they finish, fail, are closed/aborted, or stay idle
     public static class GeneratorCleanupTest
     {
@@ -95,5 +94,4 @@ namespace RobotRaconteurWebTest
             Console.WriteLine("GeneratorCleanupTest.TestGeneratorCleanup passed");
         }
     }
-#endif
 }
