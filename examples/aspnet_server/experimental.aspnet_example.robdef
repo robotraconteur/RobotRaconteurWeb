@@ -1,0 +1,8 @@
+service experimental.aspnet_example
+
+stdver 0.10
+
+object Greeter
+    property string greeting
+    function string say_hello(string name)
+end

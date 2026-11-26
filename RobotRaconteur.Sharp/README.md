@@ -16,7 +16,8 @@ Robot Raconteur is a communication framework for robotics, automation, and the I
 is an implementation of Robot Raconteur developed in pure C#. This is in contrast to
 [RobotRaconteurNET](https://www.nuget.org/packages/RobotRaconteurNET),
 which is a wrapper for the native RobotRaconteurCore implementation that is developed in C++.
-RobotRaconteur.Sharp can be used with ASP.NET web servers using WebSockets, allowing for
+RobotRaconteur.Sharp can be used with ASP.NET web servers using WebSockets (see the
+[ASP.NET Core server example](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples/aspnet_server)), allowing for
 Robot Raconteur to be easily integrated into cloud and information systems without requiring any modifications
 to clients.
 

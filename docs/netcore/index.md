@@ -9,7 +9,7 @@ is an implementation of Robot Raconteur developed in pure C#. This is in contras
 is a wrapper for the native RobotRaconteurCore implementation that is developed in C++. RobotRaconteur.Sharp
 is more portable since it is pure C#. For web browsers, use the Robot Raconteur TypeScript implementation, or
 RobotRaconteur.Sharp with Blazor WebAssembly. RobotRaconteur.Sharp can also be used with ASP.NET web servers using
-WebSockets. See the examples for a demonstration of how this works. This capability allows for Robot Raconteur to
+WebSockets. See the [ASP.NET Core server example](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples/aspnet_server) for a demonstration. This capability allows for Robot Raconteur to
 be easily integrated into cloud and information systems without requiring any modifications to the infrastructure!
 
 RobotRaconteur.Sharp was formerly named RobotRaconteurWeb.
