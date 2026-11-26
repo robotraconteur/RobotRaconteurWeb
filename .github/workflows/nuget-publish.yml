@@ -2,7 +2,14 @@ name: Publish NuGet packages
 
 # Publishes RobotRaconteur.Sharp and RobotRaconteur.Sharp.Gen to nuget.org when a GitHub release is
 # published. Uses nuget.org Trusted Publishing, so no long-lived API key is stored in the repository.
-# See "Releasing" in README.md for the one-time setup.
+#
+# To release, set the version in both .csproj files and RobotRaconteurNode.Version, then publish a GitHub
+# release tagged v<version>. The workflow fails before pushing if the tag does not match all three.
+#
+# One-time setup:
+# - On nuget.org, add a Trusted Publishing policy: owner robotraconteur, repository RobotRaconteur.Sharp,
+#   workflow file nuget-publish.yml, environment nuget
+# - Add a NUGET_USER Actions secret with the nuget.org profile name (not the email address) of the policy owner
 
 on:
   release:
