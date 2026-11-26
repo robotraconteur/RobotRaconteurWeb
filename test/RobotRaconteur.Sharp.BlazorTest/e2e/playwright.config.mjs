@@ -20,7 +20,9 @@ export default defineConfig({
   workers: 1,
   reporter: [['list']],
   use: {
-    baseURL: `http://localhost:${httpPort}`,
+    // Use 127.0.0.1, not localhost: where localhost also resolves to ::1 (as in GitHub Actions job
+    // containers), Firefox connects over IPv6 and does not reach the test server
+    baseURL: `http://127.0.0.1:${httpPort}`,
     // Saved to test-results/ when a test fails; open with "npx playwright show-trace"
     trace: 'retain-on-failure',
   },
@@ -31,7 +33,7 @@ export default defineConfig({
   ],
   webServer: {
     command: `${server} browsertestserver ${tcpPort} ${httpPort} ../bin/publish-app/wwwroot`,
-    url: `http://localhost:${httpPort}/index.html`,
+    url: `http://127.0.0.1:${httpPort}/index.html`,
     timeout: 120_000,
     reuseExistingServer: false,
     stdout: 'pipe',

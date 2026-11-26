@@ -42,7 +42,7 @@ npx playwright test
 changes the command that runs the test server.
 
 To debug in a normal browser, start the server yourself, open
-`http://localhost:22356/?server=localhost:22355` and watch the browser console:
+`http://127.0.0.1:22356/?server=127.0.0.1:22355` and watch the browser console:
 
 ```bash
 test/RobotRaconteur.Sharp.BlazorTest/bin/publish-server/RobotRaconteur.Sharp.Test browsertestserver 22355 22356 test/RobotRaconteur.Sharp.BlazorTest/bin/publish-app/wwwroot

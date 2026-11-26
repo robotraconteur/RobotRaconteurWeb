@@ -14,7 +14,8 @@ test('client service tests pass in Blazor WebAssembly', async ({ page }) => {
     }
   });
 
-  await page.goto(`/?server=localhost:${tcpPort}`);
+  const response = await page.goto(`/?server=127.0.0.1:${tcpPort}`);
+  expect(response?.status(), 'status of the app page load').toBe(200);
 
   // The app sets #status to PASS or FAIL when the tests finish
   const status = page.locator('#status');
