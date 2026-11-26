@@ -13,7 +13,7 @@
     <ItemGroup>
       <PackageReference Include="DrekarLaunchProcessNET" Version="*" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="restsharp" Version="110.2.0" />
+      <PackageReference Include="restsharp" Version="112.0.0" />
       <PackageReference Include="RobotRaconteur.Sharp" Version="*" />
     </ItemGroup>
 </Project>
