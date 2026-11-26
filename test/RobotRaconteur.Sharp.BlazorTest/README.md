@@ -17,7 +17,7 @@ no other transports.
 ## Running with podman
 
 ```bash
-RobotRaconteur.Sharp.BlazorTest/run-tests-podman.sh
+test/RobotRaconteur.Sharp.BlazorTest/run-tests-podman.sh
 ```
 
 Extra arguments are passed to `playwright test`, for example `--project=chromium`. The script publishes the app
@@ -30,9 +30,9 @@ and a self-contained test server in the .NET SDK container, then runs Playwright
 You need the .NET 8 SDK and Node.js.
 
 ```bash
-dotnet publish RobotRaconteur.Sharp.BlazorTest/RobotRaconteur.Sharp.BlazorTest.csproj -c Release -o RobotRaconteur.Sharp.BlazorTest/bin/publish-app
-dotnet publish RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj -c Release -r linux-x64 --self-contained -o RobotRaconteur.Sharp.BlazorTest/bin/publish-server
-cd RobotRaconteur.Sharp.BlazorTest/e2e
+dotnet publish test/RobotRaconteur.Sharp.BlazorTest/RobotRaconteur.Sharp.BlazorTest.csproj -c Release -o test/RobotRaconteur.Sharp.BlazorTest/bin/publish-app
+dotnet publish test/RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj -c Release -r linux-x64 --self-contained -o test/RobotRaconteur.Sharp.BlazorTest/bin/publish-server
+cd test/RobotRaconteur.Sharp.BlazorTest/e2e
 npm ci
 npx playwright install --with-deps
 npx playwright test
@@ -45,5 +45,5 @@ To debug in a normal browser, start the server yourself, open
 `http://localhost:22356/?server=localhost:22355` and watch the browser console:
 
 ```bash
-RobotRaconteur.Sharp.BlazorTest/bin/publish-server/RobotRaconteur.Sharp.Test browsertestserver 22355 22356 RobotRaconteur.Sharp.BlazorTest/bin/publish-app/wwwroot
+test/RobotRaconteur.Sharp.BlazorTest/bin/publish-server/RobotRaconteur.Sharp.Test browsertestserver 22355 22356 test/RobotRaconteur.Sharp.BlazorTest/bin/publish-app/wwwroot
 ```

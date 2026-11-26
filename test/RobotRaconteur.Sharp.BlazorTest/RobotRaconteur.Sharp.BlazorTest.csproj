@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RobotRaconteur.Sharp\RobotRaconteur.Sharp.csproj" />
-    <ProjectReference Include="..\RobotRaconteur.Sharp.Gen\RobotRaconteur.Sharp.Gen.csproj">
+    <ProjectReference Include="..\..\RobotRaconteur.Sharp\RobotRaconteur.Sharp.csproj" />
+    <ProjectReference Include="..\..\RobotRaconteur.Sharp.Gen\RobotRaconteur.Sharp.Gen.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
     </ProjectReference>
@@ -41,7 +41,7 @@
   </Target>
 
   <Target Name="_UpdateRobotRaconteurGenFiles" Outputs="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs">
-    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)../RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj -- --include-path=$(MSBuildThisFileDirectory)../RobotRaconteur.Sharp.Test --thunksource --lang=csharp --outfile=$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs com.robotraconteur.testing.TestService1.robdef com.robotraconteur.testing.TestService2.robdef com.robotraconteur.testing.TestService3.robdef" />
+    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)../../RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj -- --include-path=$(MSBuildThisFileDirectory)../RobotRaconteur.Sharp.Test --thunksource --lang=csharp --outfile=$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs com.robotraconteur.testing.TestService1.robdef com.robotraconteur.testing.TestService2.robdef com.robotraconteur.testing.TestService3.robdef" />
   </Target>
 
   <PropertyGroup>

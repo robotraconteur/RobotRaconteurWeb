@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteur.Sharp", "Rob
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteur.Sharp.Gen", "RobotRaconteur.Sharp.Gen\RobotRaconteur.Sharp.Gen.csproj", "{C064DBC8-3D53-4D41-AD33-8B5267ECAF15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteur.Sharp.Test", "RobotRaconteur.Sharp.Test\RobotRaconteur.Sharp.Test.csproj", "{A3878527-86AE-4553-8E2A-AF6F446119F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteur.Sharp.Test", "test\RobotRaconteur.Sharp.Test\RobotRaconteur.Sharp.Test.csproj", "{A3878527-86AE-4553-8E2A-AF6F446119F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteur.Sharp.BlazorTest", "RobotRaconteur.Sharp.BlazorTest\RobotRaconteur.Sharp.BlazorTest.csproj", "{667FB6EE-C717-43F5-A835-87C6176C4897}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotRaconteur.Sharp.BlazorTest", "test\RobotRaconteur.Sharp.BlazorTest\RobotRaconteur.Sharp.BlazorTest.csproj", "{667FB6EE-C717-43F5-A835-87C6176C4897}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
