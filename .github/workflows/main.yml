@@ -73,6 +73,12 @@ jobs:
       run: |
         npm ci
         npx playwright test
+    - name: Upload Playwright traces
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-traces
+        path: test/RobotRaconteur.Sharp.BlazorTest/e2e/test-results/
   pre-commit:
     runs-on: ubuntu-latest
     env:
@@ -90,4 +96,6 @@ jobs:
         dotnet-version: 8.x
     - name: Update dotnet format
       run: dotnet tool update -g dotnet-format
+    - name: Restore solution for dotnet format
+      run: dotnet restore RobotRaconteur.Sharp.sln
     - uses: pre-commit/action@v3.0.1

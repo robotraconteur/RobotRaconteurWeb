@@ -14,7 +14,7 @@ namespace RobotRaconteurSharp.Test
         // TcpTransport server over rr+ws, calls a member and disconnects
         public static async Task TestBrowserWebSocketConnect()
         {
-            using (var nodes = new TestNodeConfig("browserwstest", true, false, false))
+            using (var nodes = new TestNodeConfig("browser_ws_test", true, false, false))
             {
                 var client_node = new RobotRaconteurNode();
                 try

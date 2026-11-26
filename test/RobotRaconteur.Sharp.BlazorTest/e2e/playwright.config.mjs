@@ -21,6 +21,8 @@ export default defineConfig({
   reporter: [['list']],
   use: {
     baseURL: `http://localhost:${httpPort}`,
+    // Saved to test-results/ when a test fails; open with "npx playwright show-trace"
+    trace: 'retain-on-failure',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
