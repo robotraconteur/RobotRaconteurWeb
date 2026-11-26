@@ -15,7 +15,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Title>RobotRaconteur.Sharp</Title>
     <Authors>John Wason</Authors>
-    <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteurWeb.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/robotraconteur/RobotRaconteur.Sharp.git</RepositoryUrl>
     <Version>0.22.0</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/robotraconteur/RobotRaconteurWeb/master/docs/figures/logo-header.svg)
+![](https://raw.githubusercontent.com/robotraconteur/RobotRaconteur.Sharp/master/docs/figures/logo-header.svg)
 
 # RobotRaconteur.Sharp.Gen
 
@@ -8,7 +8,7 @@
 
 [J. Wason and J. T. Wen, "Robot Raconteur Updates on an Open Source Interoperable Middleware for Robotics", in Proc. IEEE Conference on Automation Science and Engineering, 2023, pp. 1-8.](https://files2.wasontech.com/RobotRaconteur_CASE2023.pdf)
 
-Github Repository: https://github.com/robotraconteur/RobotRaconteurWeb
+Github Repository: https://github.com/robotraconteur/RobotRaconteur.Sharp
 
 ## Introduction
 
@@ -51,9 +51,9 @@ RobotRaconteur.Sharp.Gen --thunksource --lang=csharp --outfile thunksource.cs ex
 
 ## Documentation
 
-See the [RobotRaconteur.Sharp Documentation](https://github.com/robotraconteur/RobotRaconteurWeb/wiki/Documentation)
+See the [RobotRaconteur.Sharp Documentation](https://github.com/robotraconteur/RobotRaconteur.Sharp/wiki/Documentation)
 
-See the [RobotRaconteur.Sharp Examples](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples)
+See the [RobotRaconteur.Sharp Examples](https://github.com/robotraconteur/RobotRaconteur.Sharp/tree/master/examples)
 
 ## License
 
@@ -61,7 +61,7 @@ Apache 2.0
 
 ## Support
 
-Please report bugs and issues on the [GitHub issue tracker](https://github.com/robotraconteur/RobotRaconteurWeb/issues).
+Please report bugs and issues on the [GitHub issue tracker](https://github.com/robotraconteur/RobotRaconteur.Sharp/issues).
 
 Ask questions on the [Github discussions](https://github.com/robotraconteur/robotraconteur/discussions).
 
