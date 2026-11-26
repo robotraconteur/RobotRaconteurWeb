@@ -1,0 +1,3961 @@
+// Copyright 2011-2024 Wason Technology, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using RobotRaconteurSharp.Extensions;
+using static RobotRaconteurSharp.RRLogFuncs;
+
+namespace RobotRaconteurSharp
+{
+    /**
+    <summary>
+    Transport for Transport Control Protocol Internet Protocol (TCP/IP) networks
+    </summary>
+    <remarks>
+    <para>
+    It is recommended that ClientNodeSetup, ServerNodeSetup, or SecureServerNodeSetup
+    be used to construct this class.
+    </para>
+    <para>
+    See robotraconteur_url for more information on URLs.
+    </para>
+    <para>
+    The TcpTransport implements transport connections over TCP/IP networks. TCP/IP is the
+    most common protocol used for Internet and Local Area Network (LAN) communication,
+    including
+    Ethernet and WiFi connections. The Transport Control Protocol (TCP) is a reliable stream
+    protocol that establishes connections between devices using IP address and port pairs.
+    Each adapter has an assigned address, and applications create connections on different
+    ports.
+    TcpTransport listens to the port specified in StartServer(), and the client uses
+    a URL containing the IP address and port of the listening transport. The TcpTransport
+    uses the established connection to pass messages between nodes.
+    </para>
+    <para>
+    The IP protocol is available in two major versions, IPv4 and IPv6. The most common
+    is IPv4, and its 32 bit address is typically written as four numbers,
+    ie 172.17.12.174. IPv4 has a number of critical limitations, the greatest being
+    its 2^32 address limit (approximately 4 billion). This is a problem when there are
+    tens of billions of internet connected devices already present. IPv6 introduces a 128
+    bit address space, which allows for approximately 3.4x10^38 possible addresses. The major
+    advantage for Robot Raconteur is the introduction of "link-local" addresses. These
+    addresses
+    begin with "FE80::" and finish with an "EUI-64" address, which is tied to the MAC
+    address
+    of the adaptor. IPv4 addresses need to be assigned to devices locally, and have a tendency
+    to change. IPv6 addresses are permanently assigned to the adapter itself, meaning that
+    network configuration for LAN communication is essentially automatic. Robot Raconteur
+    will prefer IPv6 connections when possible for this reason.
+    </para>
+    <para>
+    The TcpTransport is capable of using "raw" streams that implement the Robot Raconteur
+    message protocols, or to use HTTP WebSockets. HTTP WebSockets allow Robot Raconteur
+    to communicate seamlessly with browsers and HTTP servers without requiring
+    additional plugins. WebSockets provide additional security using "origins". See
+    AddWebSocketAllowedOrigin() for more information.
+    </para>
+    <para>
+    The TcpTransport supports TLS encryption using certificates. See tls_security for
+    more information on TLS. The TcpTransport supports four modes of TLS encryption:
+    </para>
+    <list type="table">
+    <listheader>
+    <term>Scheme</term>
+    <term>Description</term>
+    <term>Direction</term>
+    </listheader>
+    <item>
+    <term>rrs+tcp</term>
+    <term>"Raw" protocol with TLS</term>
+    <term>Both</term>
+    </item>
+    <item>
+    <term>rr+wss</term>
+    <term>Websocket over HTTPS</term>
+    <term>Client Only</term>
+    </item>
+    <item>
+    <term>rrs+ws</term>
+    <term>Websocket with RobotRaconteur TLS over HTTP</term>
+    <term>Both</term>
+    </item>
+    <item>
+    <term>rrs+wss</term>
+    <term>Websocket with RobotRaconteur TLS over HTTPS</term>
+    <term>Client Only</term>
+    </item>
+    </list>
+
+    <para>
+    The different combinations of TLS and HTTPS for websockets are used for different
+    scenarios.
+    Robot Raconteur Core can initiate HTTPS connections, but cannot accept them. Accepting
+    HTTPS connections requires a certificate issued by an authority like GoDaddy or Digicert,
+    and is typically used with an HTTP server running RobotRaconteur.Sharp.
+    </para>
+    <para>
+    TLS certificates for Robot Raconteur nodes are issued by Wason Technology, LLC using
+    a root certificate that is "burned in" to Robot Raconteur Core. All devices running
+    Robot Raconteur will support this certificate chain.
+    </para>
+    <para>
+    Discovery for the TcpTransport is accomplished using User Defined Protocol (UDP) multicast
+    and/or broadcast packets. Broadcast packets are sent to all connected devices, while
+    multicast is sent to devices that have registered to receive them. Unlike TCP, the packets
+    sent to broadcast or multicast are sent to the entire network. This allows for devices
+    to find each other on the network.
+    </para>
+    <para>
+    For IPv4, the broadcast address 255.255.255.255 on port 48653
+    is used for discovery. By default, IPv4 is disabled in favor of IPv6. IPv6 uses the
+    multicast
+    following multicast addresses:
+    </para>
+    <list type="table">
+    <listheader>
+    <term>Address</term>
+    <term>Scope</term>
+    <term>Port</term>
+    <term>Default?</term>
+    </listheader>
+    <item>
+    <term>FF01::BA86</term>
+    <term>Node-Local</term>
+    <term>48653</term>
+    <term>Disabled</term>
+    </item>
+    <item>
+    <term>FF02::BA86</term>
+    <term>Link-Local</term>
+    <term>48653</term>
+    <term>Enabled</term>
+    </item>
+    <item>
+    <term>FF05::BA86</term>
+    <term>Site-Local</term>
+    <term>48653</term>
+    <term>Disabled</term>
+    </item>
+    </list>
+
+    <para>
+    By default, discovery will only occur on the link-local IPv6 scope. This will
+    find nodes on the local subnet, but will not attempt to pass through any routers.
+    </para>
+    <para>
+    The use of RobotRaconteurNodeSetup and subclasses is recommended to construct
+    transports.
+    </para>
+    <para> The transport must be registered with the node using
+    RobotRaconteurNode.RegisterTransport() after construction if node
+    setup is not used.
+    </para>
+    </remarks>
+    */
+    [PublicApi]
+    public sealed class TcpTransport : Transport
+    {
+
+        private int m_Port;
+
+        private bool transportopen = false;
+        private CancellationTokenSource transportcancel = new CancellationTokenSource();
+
+        /// <summary>
+        /// Checks if the transport is configured to accept incoming connections
+        /// </summary>
+        [PublicApi]
+        public override bool IsServer { get { return true; } }
+        /// <summary>
+        /// Checks if the transport is configured to initiate client connections
+        /// </summary>
+        [PublicApi]
+        public override bool IsClient { get { return true; } }
+
+        internal Dictionary<uint, AsyncStreamTransport> TransportConnections = new Dictionary<uint, AsyncStreamTransport>();
+
+        /// <summary>
+        /// Default message receive timeout in milliseconds
+        /// </summary>
+        /// <remarks>
+        /// If a message is not received in the specified timeout
+        /// period the connection is closed
+        /// </remarks>
+        [PublicApi]
+        public int DefaultReceiveTimeout { get; set; }
+        /// <summary>
+        /// Default connect timeout in milliseconds
+        /// </summary>
+        [PublicApi]
+        public int DefaultConnectTimeout { get; set; }
+
+        /// <summary>
+        /// Allow incoming Web Socket connections from HTTP clients
+        /// </summary>
+        [PublicApi]
+        public bool AcceptWebSockets { get; set; }
+
+        /// <summary>
+        /// Disable message version 4
+        /// </summary>
+        [PublicApi]
+        public bool DisableMessage4 { get; set; }
+
+        /// <summary>
+        /// The maximum message size in bytes
+        /// </summary>
+        [PublicApi]
+        public uint MaxMessageSize { get; set; }
+
+        /// <summary>
+        /// The supported URL transport schemes
+        /// </summary>
+        [PublicApi]
+        public override string[] UrlSchemeString { get { return new string[] { "tcp", "rr+tcp", "rrs+tcp", "rr+ws", "rrs+ws", "rr+wss", "rrs+wss" }; } }
+
+        private int m_HeartbeatPeriod = 5000;
+
+        /// <summary>
+        /// The transport connection heartbeat period in milliseconds
+        /// </summary>
+        /// <remarks>
+        /// The transport will send a connection test heartbeat message
+        /// if a message has not been sent within the specified interval
+        /// </remarks>
+        [PublicApi]
+        public int HeartbeatPeriod
+        {
+            get
+            {
+                return m_HeartbeatPeriod;
+            }
+            set
+            {
+                if (value < 500) throw new InvalidOperationException();
+                m_HeartbeatPeriod = value;
+            }
+        }
+
+        /// <summary>
+        /// The IPEndPoints that the transport is listening on for incoming connections
+        /// </summary>
+        [PublicApi]
+        public List<IPEndPoint> ListeningEndpoints
+        {
+            get
+            {
+                if (port_sharer_client != null)
+                {
+                    int port = port_sharer_client.ListenPort;
+                    if (port != 0)
+                    {
+                        return new List<IPEndPoint>() { new IPEndPoint(IPAddress.Any, port), new IPEndPoint(IPAddress.IPv6Any, port) };
+                    }
+                }
+                List<IPEndPoint> eps = new List<IPEndPoint>();
+                foreach (TcpListener l in listeners)
+                {
+                    eps.Add((IPEndPoint)l.LocalEndpoint);
+                }
+                return eps;
+            }
+        }
+
+        /**
+        <summary>
+        Construct a new LocalTransport for a non-default node. Must be registered with node using
+        node.RegisterTransport()
+        </summary>
+        <remarks>None</remarks>
+        <param name="node">The node to use with the transport. Defaults to RobotRaconteurNode.s</param>
+        */
+        [PublicApi]
+        public TcpTransport(RobotRaconteurNode node = null) : base(node)
+        {
+            DefaultReceiveTimeout = 15000;
+            DefaultConnectTimeout = 2500;
+            parent_adapter = new AsyncStreamTransportParentImpl(this);
+            AcceptWebSockets = true;
+            DisableMessage4 = false;
+            MaxMessageSize = 12 * 1024 * 1024;
+
+            // "null" is the origin browsers send for pages loaded from local files; sandboxed iframes and data: pages
+            // send it too. Deployments that do not need local files can remove it with RemoveWebSocketAllowedOrigin().
+            allowed_websocket_origins.Add("null");
+            allowed_websocket_origins.Add("file://");
+            allowed_websocket_origins.Add("https://robotraconteur.com");
+            allowed_websocket_origins.Add("https://robotraconteur.com:443");
+            allowed_websocket_origins.Add("https://*.robotraconteur.com");
+            allowed_websocket_origins.Add("https://*.robotraconteur.com:443");
+        }
+
+#pragma warning disable 1591
+        public override async Task<ITransportConnection> CreateTransportConnection(string url, Endpoint e, CancellationToken cancel)
+        {
+            TcpClientTransport p = new TcpClientTransport(this);
+            p.ReceiveTimeout = DefaultReceiveTimeout;
+            await p.ConnectTransport(url, e, cancel).ConfigureAwait(false);
+
+            return p;
+        }
+
+        public override Task CloseTransportConnection(Endpoint e, CancellationToken cancel)
+        {
+            AsyncStreamTransport c = null;
+            lock (this)
+            {
+                if (TransportConnections.ContainsKey(e.LocalEndpoint))
+                    c = TransportConnections[e.LocalEndpoint];
+            }
+            // Close outside the transport lock: the connection takes its own lock and then the transport lock
+            c?.Close();
+            return Task.FromResult(0);
+        }
+
+        bool listen_started = false;
+#pragma warning restore 1591
+
+        /// <summary>
+        /// Start the TcpTransport service listening on the specified TCP port
+        /// </summary>
+        /// <param name="porte">The TCP port to listen on</param>
+        /// <param name="localhost_only">Only accept connections from localhost</param>
+        [PublicApi]
+        public void StartServer(int porte, bool localhost_only = false)
+        {
+            lock (this)
+            {
+                if (listen_started) throw new InvalidOperationException("TcpTransport server already started");
+                listen_started = true;
+                m_Port = porte;
+                transportopen = true;
+            }
+
+            StartWaitForConnections(localhost_only);
+        }
+
+        TcpTransportPortSharerClient port_sharer_client = null;
+
+        /// <summary>
+        /// Listen for incoming connections using the port sharer
+        /// </summary>
+        [PublicApi]
+        public void StartServerUsingPortSharer()
+        {
+            lock (this)
+            {
+                if (listen_started) throw new InvalidOperationException("TcpTransport server already started");
+
+                port_sharer_client = new TcpTransportPortSharerClient(this);
+                port_sharer_client.Start();
+                listen_started = true;
+                transportopen = true;
+            }
+
+        }
+
+        /// <summary>
+        /// Check if the port sharer is being used
+        /// </summary>
+        public bool IsPortSharerRunning
+        {
+            get
+            {
+                return port_sharer_client != null;
+            }
+        }
+
+        private List<TcpListener> listeners = new List<TcpListener>();
+
+
+        private void StartWaitForConnections(bool localhost_only)
+        {
+            List<IPEndPoint> listener_endpoints = new List<IPEndPoint>();
+
+            if (!localhost_only)
+            {
+                listener_endpoints.Add(new IPEndPoint(IPAddress.Any, m_Port));
+                listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Any, m_Port));
+            }
+            else
+            {
+                listener_endpoints.Add(new IPEndPoint(IPAddress.Loopback, m_Port));
+                listener_endpoints.Add(new IPEndPoint(IPAddress.IPv6Loopback, m_Port));
+            }
+
+            int count = 0;
+
+            foreach (IPEndPoint e in listener_endpoints)
+            {
+                try
+                {
+                    TcpListener listen = new TcpListener(e);
+
+                    try
+                    {
+                        listen.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+                    }
+                    catch (Exception) { }
+                    if (e.AddressFamily == AddressFamily.InterNetworkV6)
+                    {
+                        try
+                        {
+                            listen.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, true);
+                        }
+                        catch (Exception) { }
+                    }
+                    listen.Start();
+                    listeners.Add(listen);
+
+                    listen.BeginAcceptTcpClient(ClientConnected, listen);
+                    count++;
+                }
+                catch (Exception ee)
+                {
+                    RRLogFuncs.LogWarning(ee.ToString());
+                }
+
+            }
+
+            if (count == 0) throw new IOException("Could not bind to any adapters to listen for connections");
+        }
+
+        private void ClientConnected(IAsyncResult a)
+        {
+            TcpListener listen = (TcpListener)a.AsyncState;
+            try
+            {
+                if (!transportopen) return;
+                // cSpell: ignore tcpc
+                TcpClient tcpc = listen.EndAcceptTcpClient(a);
+
+                ClientConnected2(tcpc).IgnoreResult();
+
+            }
+            catch (Exception)
+            {
+            }
+
+
+            if (!transportopen) return;
+            try
+            {
+                listen.BeginAcceptTcpClient(ClientConnected, listen);
+
+            }
+            catch (Exception)
+            {
+            }
+
+        }
+
+        internal void AcceptSocket(TcpClient tcpc)
+        {
+            if (!transportopen)
+            {
+                tcpc.Close();
+                return;
+            }
+            ClientConnected2(tcpc).IgnoreResult();
+        }
+
+        private async Task ClientConnected2(TcpClient tcpc)
+        {
+            try
+            {
+
+                var s = tcpc.Client;
+                var b = new byte[1024];
+
+                int i = 0;
+                int trycount = 0;
+                // A connection that sends nothing must not be held open forever
+                DateTime first_data_deadline = DateTime.UtcNow.AddMilliseconds(DefaultReceiveTimeout);
+                while (true)
+                {
+                    var recv_task = Task<int>.Factory.FromAsync(delegate (AsyncCallback cb, object state)
+                    {
+                        return s.BeginReceive(b, 0, b.Length, SocketFlags.Peek, cb, state);
+                    }, s.EndReceive, s);
+
+                    int remaining_ms = (int)Math.Max(0, (first_data_deadline - DateTime.UtcNow).TotalMilliseconds);
+                    if (await Task.WhenAny(recv_task, Task.Delay(remaining_ms)).ConfigureAwait(false) != recv_task)
+                    {
+                        recv_task.IgnoreResult();
+                        tcpc.Close();
+                        return;
+                    }
+                    i = await recv_task.ConfigureAwait(false);
+
+                    if (i > 4) break;
+
+                    trycount++;
+                    if (trycount > 100)
+                    {
+                        tcpc.Close();
+                        return;
+                    }
+                    await Task.Delay(10).ConfigureAwait(false);
+                }
+
+
+                string seed = ASCIIEncoding.ASCII.GetString(b, 0, 4);
+                if (seed == "RRAC")
+                {
+                    //Hurray, we have a normal Robot Raconteur connection
+                    TcpServerTransport c = new TcpServerTransport(this);
+                    c.ReceiveTimeout = DefaultReceiveTimeout;
+                    await c.Connect(tcpc).ConfigureAwait(false);
+                    return;
+                }
+
+                if (seed == "GET " || seed == "GET\t")
+                {
+                    if (!AcceptWebSockets)
+                    {
+                        tcpc.Close();
+                        return;
+                    }
+
+                    bool firstline = true;
+
+                    int trycount2 = 0;
+
+                    // HTTP header names are case-insensitive
+                    var request = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    string path = null;
+
+                    while (true)
+                    {
+                        i = 0;
+                        //Hurray, we have a potential HTTP websocket request
+                        trycount = 0;
+                        while (b.Take(i).Count(x => x == 0x0A) == 0)
+                        {
+                            i = await Task<int>.Factory.FromAsync(delegate (AsyncCallback cb, object state)
+                            {
+                                return s.BeginReceive(b, 0, b.Length, SocketFlags.Peek, cb, state);
+                            }, s.EndReceive, s).ConfigureAwait(false);
+                            trycount++;
+                            if (trycount > 100)
+                            {
+                                tcpc.Close();
+                                return;
+                            }
+                            await Task.Delay(10).ConfigureAwait(false);
+                        }
+
+                        int endpos = 0;
+                        for (int j = 0; j < i; j++)
+                        {
+                            if (b[j] == 0x0A)
+                            {
+                                endpos = j + 1;
+                                break;
+                            }
+                        }
+
+                        byte[] b2 = new byte[endpos];
+                        int lineread = s.Receive(b2);
+                        if (lineread != endpos)
+                        {
+                            tcpc.Close();
+                            return;
+                        }
+
+                        string line = UTF8Encoding.UTF8.GetString(b2).Trim();
+
+                        if (line == "")
+                        {
+                            break;
+                        }
+
+
+                        if (firstline)
+                        {
+                            var f = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            if (f[0] != "GET" || !f[2].StartsWith("HTTP"))
+                            {
+                                tcpc.Close();
+                                return;
+                            }
+
+                            path = f[1];
+
+                            firstline = false;
+                        }
+                        else
+                        {
+                            var f = line.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+                            // A repeated header is combined into one comma-separated value
+                            if (request.ContainsKey(f[0].Trim()))
+                            {
+                                request[f[0].Trim()] = request[f[0].Trim()] + ", " + f[1].Trim();
+                            }
+                            else
+                            {
+                                request.Add(f[0].Trim(), f[1].Trim());
+                            }
+
+                        }
+
+
+
+                        trycount2++;
+                        if (trycount2 > 100)
+                        {
+                            tcpc.Close();
+                            return;
+                        }
+                    }
+
+                    string error = null;
+
+                    if (!request.ContainsKey("Upgrade") || !request.ContainsKey("Sec-WebSocket-Key") || !request.ContainsKey("Sec-WebSocket-Version"))
+                    {
+                        error = "426 Upgrade Required";
+                    }
+
+                    if (error == null)
+                    {
+                        // RFC 6455 4.2.1: Upgrade must be "websocket" and Connection must include "Upgrade"
+                        bool upgrade_ok = string.Equals(request["Upgrade"].Trim(), "websocket", StringComparison.OrdinalIgnoreCase);
+                        bool connection_ok = request.ContainsKey("Connection") && request["Connection"].Split(new char[] { ',' })
+                            .Any(x => string.Equals(x.Trim(), "upgrade", StringComparison.OrdinalIgnoreCase));
+                        if (!upgrade_ok || !connection_ok)
+                        {
+                            error = "426 Upgrade Required";
+                        }
+                    }
+
+                    if (error == null && request.ContainsKey("Sec-WebSocket-Protocol"))
+                    {
+                        var p = request["Sec-WebSocket-Protocol"].Split(new char[] { ',' }).Select(x => x.Trim());
+                        if (!p.Contains("robotraconteur.robotraconteur.com"))
+                        {
+                            error = "405 Invalid Protocol";
+                        }
+                    }
+
+                    if (error == null && !request["Sec-WebSocket-Version"].Split(new char[] { ',' }).Select(x => x.Trim()).Contains("13"))
+                    {
+                        error = "426 Upgrade Required";
+                    }
+
+                    if (error == null && request.ContainsKey("Origin"))
+                    {
+                        string origin1 = request["Origin"];
+                        bool good_origin = false;
+
+                        var res = Regex.Match(origin1, "(?:^([^:\\s]+://[^/]*).*$)|(?:null)");
+                        if (res.Success)
+                        {
+                            string origin;
+                            if (res.Groups[1].Success)
+                            {
+                                origin = res.Groups[1].Value;
+                            }
+                            else
+                            {
+                                origin = "null";
+                            }
+
+                            lock (this)
+                            {
+                                foreach (var e in allowed_websocket_origins)
+                                {
+                                    if (!e.Contains("*"))
+                                    {
+                                        if (e == origin)
+                                        {
+                                            good_origin = true;
+                                            break;
+                                        }
+
+                                        if (e.EndsWith("://"))
+                                        {
+                                            if (origin.StartsWith(e))
+                                            {
+                                                good_origin = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var scheme_pos = e.IndexOf("://");
+                                        if (scheme_pos == -1) continue;
+                                        var test_scheme = e.Substring(0, scheme_pos) + "://";
+                                        if (!origin.StartsWith(test_scheme)) continue;
+
+                                        var origin2 = origin.ReplaceFirst(test_scheme, "");
+                                        var e2 = e.ReplaceFirst(test_scheme, "").ReplaceFirst("*", "");
+                                        if (origin2.EndsWith(e2))
+                                        {
+                                            good_origin = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!good_origin)
+                        {
+                            error = "403 Forbidden Origin";
+                        }
+                    }
+
+                    string accept = "";
+
+                    if (error == null)
+                    {
+                        string key1 = request["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+                        using (var sha1 = new SHA1Managed())
+                        {
+                            accept = Convert.ToBase64String(sha1.ComputeHash(ASCIIEncoding.ASCII.GetBytes(key1)));
+                        }
+                    }
+
+                    string path2 = path.Split(new char[] { '?' })[0];
+
+                    if (path2 != "/" && path2 != "*")
+                    {
+                        error = "404 File not found";
+                    }
+
+                    var stream = tcpc.GetStream();
+
+                    if (error != null)
+                    {
+                        string response1 = "HTTP/1.1 " + error + "\r\n"
+                            + "Upgrade: websocket\r\n"
+                            + "Sec-WebSocket-Protocol: robotraconteur.robotraconteur.com\r\n"
+                            + "Sec-WebSocket-Version: 13\r\n"
+                            + "Connection: close\r\n"
+                            + "\r\n";
+
+                        var bresponse1 = UTF8Encoding.UTF8.GetBytes(response1);
+                        await stream.WriteAsync(bresponse1, 0, bresponse1.Length).ConfigureAwait(false);
+                        tcpc.Close();
+                        return;
+                    }
+
+                    string response = "HTTP/1.1 101 Switching Protocols\r\n"
+                        + "Upgrade: websocket\r\n"
+                        + "Connection: Upgrade\r\n"
+                        + "Sec-WebSocket-Accept: " + accept + "\r\n"
+                        + "Sec-WebSocket-Protocol: robotraconteur.robotraconteur.com\r\n"
+                        + "Sec-WebSocket-Version: 13\r\n"
+                        + "\r\n";
+
+                    var bresponse = UTF8Encoding.UTF8.GetBytes(response);
+                    await stream.WriteAsync(bresponse, 0, bresponse.Length).ConfigureAwait(false);
+
+                    var ws = new WebSocketStream(stream);
+
+                    string connecturl;
+
+                    IPEndPoint ep = (IPEndPoint)tcpc.Client.LocalEndPoint;
+                    if (ep.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                    {
+                        connecturl = "rr+ws://[" + ep.Address.ToString() + "]:" + ep.Port + "/";
+                    }
+                    else
+                    {
+                        connecturl = "rr+ws://" + ep.ToString() + "/";
+                    }
+
+                    TcpServerTransport c = new TcpServerTransport(this);
+                    c.ReceiveTimeout = DefaultReceiveTimeout;
+
+                    await c.Connect(ws, connecturl).ConfigureAwait(false);
+                    return;
+
+                }
+
+                //Ug, we have an invalid request. Assume it is HTTP and send a generic 404 error response.
+
+                var stream2 = tcpc.GetStream();
+                string response2 = "HTTP/1.1 404 File Not Found\r\n";
+
+                var bresponse2 = UTF8Encoding.UTF8.GetBytes(response2);
+                await stream2.WriteAsync(bresponse2, 0, bresponse2.Length).ConfigureAwait(false);
+
+                tcpc.Close();
+                return;
+
+
+
+            }
+            catch (Exception exp)
+            {
+                // LogDebug transport connection lost
+#if RR_LOG_DEBUG
+                LogDebug("Transport connection lost: " + exp.Message, node, component: RobotRaconteur_LogComponent.Transport);
+#endif
+
+                tcpc.Close();
+            }
+
+
+        }
+
+        /// <summary>
+        /// Accept an incoming WebSocket previously accepted by a web server
+        /// </summary>
+        /// <remarks>
+        /// Use this function to embed RobotRaconteur.Sharp in an ASP.NET server.
+        /// Receive WebSockets as normal and pass to this function. To not
+        /// use StartServer()
+        /// </remarks>
+        /// <param name="s">The WebSocket to accept</param>
+        /// <param name="url">The URL used to connect the WebSocket</param>
+        /// <returns></returns>
+        [PublicApi]
+        public async Task AcceptAndProcessServerWebSocket(WebSocket s, string url)
+        {
+            TcpServerTransport c = new TcpServerTransport(this);
+            c.ReceiveTimeout = DefaultReceiveTimeout;
+            await c.ProccessWebSocket(s, url).ConfigureAwait(false);
+        }
+#pragma warning disable 1591
+        public override bool CanConnectService(string url)
+        {
+            Uri u = new Uri(url);
+            if (UrlSchemeString.Contains(u.Scheme))
+                return true;
+
+            return false;
+        }
+
+        public override async Task SendMessage(Message m, CancellationToken cancel)
+        {
+            if (m.header.SenderNodeID != node.NodeID)
+            {
+                throw new NodeNotFoundException("Invalid sender node");
+            }
+            try
+            {
+                ITransportConnection tc;
+                lock (this)
+                {
+                    tc = TransportConnections[m.header.SenderEndpoint];
+                }
+                await tc.SendMessage(m, cancel).ConfigureAwait(false);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ConnectionException("Connection to remote node has been closed");
+            }
+        }
+
+
+        protected internal override void MessageReceived(Message m)
+        {
+
+
+            node.MessageReceived(m);
+
+        }
+#pragma warning restore 1591
+
+        /// <summary>
+        /// Close the TcpTransport and all active connections
+        /// </summary>
+        /// <returns></returns>
+        [PublicApi]
+        public override Task Close()
+        {
+            transportopen = false;
+            transportcancel.Cancel();
+
+            AsyncStreamTransport[] cc;
+            lock (this)
+            {
+                cc = TransportConnections.Values.ToArray();
+            }
+
+            foreach (AsyncStreamTransport c in cc)
+            {
+                try
+                {
+                    c.Close();
+                }
+                catch { }
+            }
+
+
+            try
+            {
+                lock (this)
+                {
+                    TransportConnections.Clear();
+                }
+            }
+            catch { }
+
+            foreach (TcpListener listen in listeners)
+            {
+                try
+                {
+                    listen.Stop();
+                }
+                catch { }
+            }
+
+
+            try
+            {
+
+                DisableNodeDiscoveryListening();
+            }
+            catch { }
+
+            try
+            {
+                DisableNodeAnnounce();
+            }
+            catch { }
+
+            try
+            {
+                port_sharer_client?.Close();
+            }
+            catch { }
+
+            base.Close();
+
+            // LogTrace connection closed
+#if RR_LOG_TRACE
+            LogTrace("Connection closed", node, component: RobotRaconteur_LogComponent.Transport);
+#endif
+
+            return Task.FromResult(0);
+        }
+#pragma warning disable 1591
+        public override void CheckConnection(uint endpoint)
+        {
+            try
+            {
+                lock (this)
+                {
+                    TransportConnections[endpoint].CheckConnection(endpoint);
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ConnectionException("Transport not connected");
+            }
+        }
+#pragma warning restore 1591
+
+        private IPNodeDiscovery node_discovery;
+        /**
+        <summary>
+        Enable node discovery listening
+        </summary>
+        <remarks>
+        <para>
+        By default enables listening on IPv6 link-local scope
+        </para>
+        <para> See IPNodeDiscoveryFlags constants
+        </para>
+        </remarks>
+        <param name="flags">The flags specifying the scope</param>
+        */
+        [PublicApi]
+        public void EnableNodeDiscoveryListening(IPNodeDiscoveryFlags flags = IPNodeDiscoveryFlags.LinkLocal)
+        {
+            if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
+            node_discovery.StartListeningForNodes(flags);
+
+        }
+        /**
+        <summary>
+        Disable node discovery listening
+        </summary>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
+        public void DisableNodeDiscoveryListening()
+        {
+            if (node_discovery == null) return;
+            node_discovery.StopListeningForNodes();
+        }
+        /**
+        <summary>
+        Enable node discovery announce
+        </summary>
+        <remarks>
+        <para>
+        By default enables announce on IPv6 link-local scope
+        </para>
+        <para> See IPNodeDiscoveryFlags constants
+        </para>
+        </remarks>
+        <param name="flags">The flags specifying the scope</param>
+        */
+        [PublicApi]
+        public void EnableNodeAnnounce(IPNodeDiscoveryFlags flags = IPNodeDiscoveryFlags.LinkLocal)
+        {
+            if (node_discovery == null) node_discovery = new IPNodeDiscovery(this);
+            node_discovery.StartAnnouncingNode(flags);
+        }
+        /**
+        <summary>
+        Disable node discovery announce
+        </summary>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
+        public void DisableNodeAnnounce()
+        {
+            if (node_discovery == null) return;
+            node_discovery.StopAnnouncingNode();
+        }
+
+
+        internal void RemoveTransportConnection(uint e)
+        {
+            lock (this)
+            {
+                TransportConnections.Remove(e);
+            }
+
+            FireTransportEventListener(TransportListenerEventType.TransportConnectionClosed, e);
+        }
+
+#pragma warning disable 1591
+        public override uint TransportCapability(string name)
+        {
+            return base.TransportCapability(name);
+        }
+#pragma warning restore 1591
+
+        internal Tuple<X509Certificate, X509CertificateCollection> nodecertificate = null;
+
+        internal Tuple<X509Certificate, X509CertificateCollection> TlsNodeCertificate
+        {
+            get
+            {
+                lock (this)
+                {
+                    return nodecertificate;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if a TLS node certificate has been loaded
+        /// </summary>
+        [PublicApi]
+        public bool IsTlsNodeCertificateLoaded
+        {
+            get
+            {
+                lock (this)
+                {
+                    return nodecertificate != null;
+                }
+            }
+        }
+        /// <summary>
+        /// Load a TLS node certificate. This is done automatically
+        /// by SecureServerNodeSetup
+        /// </summary>
+        [PublicApi]
+        public void LoadTlsNodeCertificate()
+        {
+            lock (this)
+            {
+                if (nodecertificate != null)
+                    throw new InvalidOperationException("Certificate already loaded");
+
+                X509Certificate cert;
+                X509CertificateCollection collection = new X509CertificateCollection();
+
+                var store = new X509Store("My");
+                store.Open(OpenFlags.ReadOnly);
+                foreach (X509Certificate2 mCert in store.Certificates)
+                {
+                    if (mCert.SubjectName.Name == "CN=Robot Raconteur Node " + node.NodeID.ToString())
+                    {
+                        cert = mCert;
+                        nodecertificate = Tuple.Create(cert, collection);
+
+                    }
+                }
+
+                if (nodecertificate == null)
+                    throw new Exception("Certificate not found");
+            }
+        }
+
+        /// <summary>
+        /// Set to require all connections to use TLS. Automatically configured by
+        /// SecureServerNodeSetup
+        /// </summary>
+        [PublicApi]
+        public bool RequireTls { get; set; }
+
+        private class AsyncStreamTransportParentImpl : AsyncStreamTransportParent
+        {
+            TcpTransport parent;
+
+            public AsyncStreamTransportParentImpl(TcpTransport parent)
+            {
+                this.parent = parent;
+            }
+
+            public Task<Message> SpecialRequest(Message m)
+            {
+                return parent.SpecialRequest(m);
+            }
+
+            public Task MessageReceived(Message m)
+            {
+                parent.MessageReceived(m);
+                return Task.FromResult(0);
+            }
+
+            public void AddTransportConnection(uint endpoint, AsyncStreamTransport transport)
+            {
+                lock (parent)
+                {
+                    parent.TransportConnections.Add(endpoint, transport);
+                }
+            }
+
+            public void RemoveTransportConnection(AsyncStreamTransport transport)
+            {
+                lock (parent)
+                {
+                    parent.RemoveTransportConnection(transport.LocalEndpoint);
+                }
+            }
+
+            public Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate()
+            {
+                return parent.TlsNodeCertificate;
+            }
+        }
+
+        internal readonly AsyncStreamTransportParent parent_adapter;
+
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="endpoint">The LocalEndpoint ID of the connection</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
+        public bool IsTransportConnectionSecure(uint endpoint)
+        {
+            try
+            {
+                AsyncStreamTransport t = null;
+                lock (this)
+                {
+                    if (!TransportConnections.ContainsKey(endpoint)) throw new ConnectionException("Transport connection not found");
+                    t = TransportConnections[endpoint];
+                }
+
+                return t.IsSecure;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="endpoint">The Endpoint of the connection</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
+        public bool IsTransportConnectionSecure(Endpoint endpoint)
+        {
+            return IsTransportConnectionSecure(endpoint.LocalEndpoint);
+        }
+
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="obj">An object reference of a connected client</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
+        public bool IsTransportConnectionSecure(object obj)
+        {
+            ServiceStub s = obj as ServiceStub;
+            if (s == null) throw new InvalidOperationException("Object must be a service stub");
+            return IsTransportConnectionSecure(s.RRContext.LocalEndpoint);
+        }
+
+        /// <summary>
+        /// Check if an active TcpTransportConnection is secure
+        /// </summary>
+        /// <param name="transport">The transport connection</param>
+        /// <returns>True if secured with TLS</returns>
+        [PublicApi]
+        public bool IsTransportConnectionSecure(ITransportConnection transport)
+        {
+            AsyncStreamTransport s = transport as AsyncStreamTransport;
+            if (s == null) throw new ConnectionException("Transport connection not found");
+            return s.IsSecure;
+        }
+
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The LocalEndpoint ID of the connection</param>
+        /// <returns></returns>
+        [PublicApi]
+        public bool IsSecurePeerIdentityVerified(uint endpoint)
+        {
+            try
+            {
+                AsyncStreamTransport t = null;
+                lock (this)
+                {
+                    if (!TransportConnections.ContainsKey(endpoint)) throw new ConnectionException("Transport connection not found");
+                    t = TransportConnections[endpoint];
+                }
+
+                return t.IsSecurePeerIdentityVerified;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The Endpoint of the connection</param>
+        /// <returns></returns>
+        [PublicApi]
+        public bool IsSecurePeerIdentityVerified(Endpoint endpoint)
+        {
+            return IsSecurePeerIdentityVerified(endpoint.LocalEndpoint);
+        }
+
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="obj">An object reference of a connected client</param>
+        /// <returns></returns>
+        [PublicApi]
+        public bool IsSecurePeerIdentityVerified(object obj)
+        {
+            ServiceStub s = obj as ServiceStub;
+            if (s == null) throw new InvalidOperationException("Object must be a service stub");
+            return IsSecurePeerIdentityVerified(s.RRContext.LocalEndpoint);
+        }
+
+        /// <summary>
+        /// Check if the identity of the peer has been verified using TLS certificates
+        /// </summary>
+        /// <param name="transport">The transport connection</param>
+        /// <returns></returns>
+        [PublicApi]
+        public bool IsSecurePeerIdentityVerified(ITransportConnection transport)
+        {
+            AsyncStreamTransport s = transport as AsyncStreamTransport;
+            if (s == null) throw new ConnectionException("Transport connection not found");
+            return s.IsSecurePeerIdentityVerified;
+        }
+
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The LocalEndpoint ID of the connection</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
+        public string GetSecurePeerIdentity(uint endpoint)
+        {
+            AsyncStreamTransport t = null;
+            lock (this)
+            {
+                if (!TransportConnections.ContainsKey(endpoint)) throw new ConnectionException("Transport connection not found");
+                t = TransportConnections[endpoint];
+            }
+
+            return t.GetSecurePeerIdentity();
+        }
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="endpoint">The Endpoint of the connection</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
+        public string GetSecurePeerIdentity(Endpoint endpoint)
+        {
+            return GetSecurePeerIdentity(endpoint.LocalEndpoint);
+        }
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="obj">An object reference of a connected client</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
+        public string GetSecurePeerIdentity(object obj)
+        {
+            ServiceStub s = obj as ServiceStub;
+            if (s == null) throw new InvalidOperationException("Object must be a service stub");
+            return GetSecurePeerIdentity(s.RRContext.LocalEndpoint);
+        }
+        /// <summary>
+        /// Get the NodeID of the peer if verified using TLS certificates
+        /// </summary>
+        /// <param name="transport">The transport connection</param>
+        /// <returns>The NodeID UUID as a string</returns>
+        [PublicApi]
+        public string GetSecurePeerIdentity(ITransportConnection transport)
+        {
+            AsyncStreamTransport s = transport as AsyncStreamTransport;
+            if (s == null) throw new ConnectionException("Transport connection not found");
+            return s.GetSecurePeerIdentity();
+        }
+
+        List<string> allowed_websocket_origins = new List<string>();
+
+        /**
+         * <summary>Get the currently configured WebSocket origins</summary>
+         * <remarks>
+         * See AddWebSocketAllowedOrigin()
+         * </remarks>
+         * <returns>The currently configured WebSocket origins</returns>
+         */
+        [PublicApi]
+        public string[] GetWebSocketAllowedOrigins()
+        {
+            lock (this)
+            {
+                return allowed_websocket_origins.ToArray();
+            }
+        }
+        /**
+         * <summary>brief Add a WebSocket allowed origin</summary>
+         *
+         * <remarks>
+         * WebSockets are vulnerable to an attack method called "cross-site scripting" (XSS). In
+         * XSS, a malicious website will attempt to create a connection to an arbitrary website or local
+         * device and attempt to hack or otherwise interact with it. WebSockets protect against this attack
+         * using an "Origin" HTTP header field specified in the header upon connection. This header
+         * field contains the domain name, the IP address, and/or the port of the web page that is
+         * attempting to initiate the connection. This header field is filled by the browser, and cannot
+         * be modified by the web page. If the web page is loaded from the local filesystem, the origin
+         * will be the empty string ("") or null ("null"). The Robot Raconteur Core library uses the
+         * empty string origin when initiating WebSocket connections. By default, it accepts
+         * the following origins:
+         *
+         * * (empty string)
+         * * "null"
+         * * "file://"
+         * * "https://robotraconteur.com"
+         * * "https://robotraconteur.com:443"
+         * * "https://(*).robotraconteur.com"
+         * * "https://(*).robotraconteur.com:443"
+         *
+         * <para>
+         *    Note: forward-slash-star is not a valid comment, assume (*) is *
+         * </para>
+         * <para>
+         * The star symbol can be used for a subdomain wildcard when matching origins.
+         * </para>
+         * <para>
+         * Additional allowed origins can be added using this function, or the
+         * `--robotraconteur-tcp-ws-add-origin=` command line option if
+         * the RobotRaconteurNodeSetup classes are being used.
+         * </para>
+         * </remarks>
+         *
+         * <param name="origin">he origin to add</param>
+         */
+        [PublicApi]
+        public void AddWebSocketAllowedOrigin(string origin)
+        {
+            lock (this)
+            {
+                if (origin == "null")
+                {
+                    // Opaque origin (local files, sandboxed iframes, data: URLs); not a URL, so not matched below
+                    if (!allowed_websocket_origins.Contains("null")) allowed_websocket_origins.Add("null");
+                    return;
+                }
+
+                var res = Regex.Match(origin, "^([^:\\s]+)://(?:((?:\\[[A-Fa-f0-9\\:]+(?:\\%\\w*)?\\])|(?:[^\\[\\]\\:/\\?\\s]+))(?::([^\\:/\\?\\s]+))?)?$");
+                if (!res.Success) throw new InvalidOperationException("Invalid WebSocket origin");
+
+                if (res.Groups.Count < 3) throw new InvalidOperationException("Invalid WebSocket origin");
+
+                string host = "";
+                string port = "";
+                string scheme = res.Groups[1].Value;
+
+                if (!String.IsNullOrEmpty(res.Groups[2].Value))
+                {
+                    host = res.Groups[2].Value;
+                    if (host.StartsWith("*"))
+                    {
+                        string host2 = host.Substring(1);
+                        if (host2.Contains("*")) throw new InvalidOperationException("Invalid WebSocket origin");
+                        if (host2.Length != 0)
+                        {
+                            if (!host2.StartsWith(".")) throw new InvalidOperationException("Invalid WebSocket origin");
+                        }
+                    }
+                    else
+                    {
+                        if (host.Contains("*")) throw new InvalidOperationException("Invalid WebSocket origin");
+                    }
+
+                    port = res.Groups[3].Value;
+                    if (!String.IsNullOrEmpty(port))
+                    {
+                        int v;
+                        if (!int.TryParse(port, out v)) throw new InvalidOperationException("Invalid WebSocket origin");
+                    }
+                }
+                else if (!String.IsNullOrEmpty(res.Groups[3].Value)) throw new InvalidOperationException("Invalid WebSocket origin");
+
+                allowed_websocket_origins.Add(origin);
+
+                if (scheme == "http" && String.IsNullOrEmpty(port))
+                {
+                    allowed_websocket_origins.Add(origin + ":80");
+                }
+
+                if (scheme == "https" && String.IsNullOrEmpty(port))
+                {
+                    allowed_websocket_origins.Add(origin + ":443");
+                }
+
+                if (scheme == "http" && port == "80")
+                {
+                    allowed_websocket_origins.Add(origin.Replace(":80", ""));
+                }
+
+                if (scheme == "https" && port == "443")
+                {
+                    allowed_websocket_origins.Add(origin.Replace(":443", ""));
+                }
+
+            }
+        }
+        /**
+         * <summary>Remove a previously added WebSocket origin</summary>
+         * <remarks>
+         * See AddWebSocketAllowedOrigin()
+         * </remarks>
+         * <param name="origin">The origin to remove</param>
+         */
+        [PublicApi]
+        public void RemoveWebSocketAllowedOrigin(string origin)
+        {
+            lock (this)
+            {
+                allowed_websocket_origins.Remove(origin);
+            }
+        }
+#pragma warning disable 1591
+        public override void LocalNodeServicesChanged()
+        {
+            if (node_discovery == null) return;
+            node_discovery.SendAnnounceNow();
+        }
+
+        public override void SendDiscoveryRequest()
+        {
+            if (node_discovery == null) return;
+            node_discovery.SendDiscoveryRequestNow();
+        }
+
+        public override async Task<List<NodeDiscoveryInfo>> GetDetectedNodes(CancellationToken token)
+        {
+            if (node_discovery != null)
+            {
+                node_discovery.SendDiscoveryRequestNow();
+                await Task.Delay(1000).ConfigureAwait(false);
+            }
+            return new List<NodeDiscoveryInfo>();
+        }
+#pragma warning restore 1591
+        /**
+         * <summary>Get the TCP endpoints the server is listening with "all" addresses resolved to specific addresses</summary>
+         *
+         *
+         */
+        [PublicApi]
+        public IPEndPoint[] ResolvedListenerEndpoints
+        {
+            get
+            {
+                var socket_listen_endpoints = ListeningEndpoints;
+
+                if (socket_listen_endpoints.Count == 0)
+                {
+                    return new IPEndPoint[] { };
+                }
+
+                HashSet<IPEndPoint> listener_endpoints = new HashSet<IPEndPoint>();
+                foreach (var s in socket_listen_endpoints)
+                {
+                    listener_endpoints.Add(s);
+                }
+
+                bool ipv4_any = false;
+                bool ipv6_any = false;
+                int ipv4_any_port = 0;
+                int ipv6_any_port = 0;
+
+                var erase = new HashSet<IPEndPoint>();
+
+                foreach (var it in listener_endpoints)
+                {
+                    if (IPAddress.Any.Equals(it.Address))
+                    {
+                        ipv4_any_port = it.Port;
+                        ipv4_any = true;
+                        erase.Add(it);
+                    }
+                    if (IPAddress.IPv6Any.Equals(it.Address))
+                    {
+                        ipv6_any_port = it.Port;
+                        ipv6_any = true;
+                        erase.Add(it);
+                    }
+                }
+
+                foreach (var it in erase)
+                {
+                    listener_endpoints.Remove(it);
+                }
+
+                if (ipv4_any || ipv6_any)
+                {
+                    NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (NetworkInterface adapter in adapters)
+                    {
+                        if (adapter.OperationalStatus == OperationalStatus.Up || adapter.OperationalStatus == OperationalStatus.Unknown)
+                        {
+                            IPInterfaceProperties properties = adapter.GetIPProperties();
+                            foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
+                            {
+                                if (ipv4_any && uniCast.Address.AddressFamily == AddressFamily.InterNetwork)
+                                {
+                                    listener_endpoints.Add(new IPEndPoint(uniCast.Address, (int)ipv4_any_port));
+                                }
+
+                                if (ipv6_any && uniCast.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                                {
+                                    listener_endpoints.Add(new IPEndPoint(uniCast.Address, (int)ipv6_any_port));
+                                }
+                            }
+                        }
+                    }
+                }
+                return listener_endpoints.ToArray();
+            }
+        }
+
+        /**
+         * <summary>Get the TCP endpoints the server is listening on as Robot Raconteur candidate URLs</summary>
+         *
+         * <returns>Candidate connections urls for the node, without service specified</returns>
+         */
+        [PublicApi]
+        public override string[] ServerListenUrls
+        {
+            get
+            {
+                var o = new List<string>();
+                var endpoints = this.ResolvedListenerEndpoints;
+                foreach (var ep in endpoints)
+                {
+                    o.Add(string.Format("rr+tcp://{0}/?nodeid={1}", ep.ToString(), node.NodeID.ToString("D")));
+                }
+                return o.ToArray();
+            }
+        }
+
+    }
+
+
+
+    sealed class TcpClientTransport : AsyncStreamTransport
+    {
+
+
+
+        private TcpClient socket;
+        private WebSocket websocket;
+
+        private TcpTransport parenttransport;
+
+        private DateTime LastMessageReceivedTime = DateTime.UtcNow;
+
+        public TcpClientTransport(TcpTransport c) : base(c.node, c.parent_adapter)
+        {
+            parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
+            max_message_size = parenttransport.MaxMessageSize;
+        }
+
+        private string connecturl = null;
+
+        public async Task ConnectTransport(string url, Endpoint e, CancellationToken cancel = default(CancellationToken))
+        {
+            this.connecturl = url;
+
+            var u = TransportUtil.ParseConnectionUrl(url);
+
+            if (u.host == "") throw new ConnectionException("Invalid connection URL for TCP");
+
+            if (u.scheme == "rr+ws" || u.scheme == "rrs+ws" || u.scheme == "rr+wss" || u.scheme == "rrs+wss")
+            {
+                await ConnectWebsocketTransport(url, e, cancel).ConfigureAwait(false);
+                return;
+            }
+
+
+
+            var target_nodeid = u.nodeid;
+            var target_nodename = u.nodename;
+
+            if (!(u.path == "" || u.path == "/")) throw new ConnectionException("Invalid Connection URL");
+
+            m_LocalEndpoint = e.LocalEndpoint;
+
+            IPAddress addr;
+            if (IPAddress.TryParse(u.host, out addr))
+            {
+
+                IPEndPoint en = new IPEndPoint(addr, u.port);
+
+                if (!(addr.IsIPv6LinkLocal && addr.ScopeId == 0))
+                {
+
+                    socket = null;
+                    AutoResetEvent ev = new AutoResetEvent(false);
+                    TcpClient socket1 = new TcpClient(addr.AddressFamily);
+
+                    await socket1.ConnectAsync(addr, u.port).AwaitWithTimeout(parenttransport.DefaultConnectTimeout).ConfigureAwait(false);
+
+                    socket = socket1;
+
+                }
+                else
+                {
+                    //We need to figure out the scope id for this connection.  This is a really
+                    //annoying property of ipv6 link-local addresses.
+
+
+                    //Start finding all the valid scope ids on this computer
+                    List<long> scopeids = new List<long>();
+                    NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (NetworkInterface adapter in adapters)
+                    {
+
+                        if (adapter.OperationalStatus == OperationalStatus.Up)
+                        {
+                            IPInterfaceProperties properties = adapter.GetIPProperties();
+                            foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
+                            {
+                                if (uniCast.Address.AddressFamily == AddressFamily.InterNetworkV6 && uniCast.Address.IsIPv6LinkLocal)
+                                {
+                                    if (uniCast.Address.ScopeId != 0)
+                                    {
+                                        scopeids.Add(uniCast.Address.ScopeId);
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    }
+                    //Finish finding all the scope ids
+
+                    //Now just try all of them to see if we can get a connection
+
+
+
+                    socket = null;
+                    var wait_tasks = new List<Tuple<Task, TcpClient>>();
+                    AutoResetEvent ev = new AutoResetEvent(false);
+                    foreach (long sid in scopeids)
+                    {
+                        try
+                        {
+                            addr.ScopeId = sid;
+                            en = new IPEndPoint(addr, u.port);
+                            TcpClient socket1 = new TcpClient(addr.AddressFamily);
+                            Task task1 = socket1.ConnectAsync(addr, u.port);
+                            wait_tasks.Add(Tuple.Create(task1, socket1));
+
+                        }
+                        catch (Exception) { }
+
+                    }
+
+                    var active_wait_tasks = new List<Tuple<Task, TcpClient>>(wait_tasks);
+                    var connect_deadline = DateTime.UtcNow.AddMilliseconds(parenttransport.DefaultConnectTimeout);
+
+                    Tuple<Task, TcpClient> found = null;
+                    while (active_wait_tasks.Count > 0 && found == null)
+                    {
+                        // DefaultConnectTimeout limits the whole connect, not each round
+                        int remaining = (int)Math.Max(0, (connect_deadline - DateTime.UtcNow).TotalMilliseconds);
+                        try
+                        {
+                            await Task.WhenAny(active_wait_tasks.Select(x => x.Item1)).AwaitWithTimeout(remaining).ConfigureAwait(false);
+                        }
+                        catch { }
+
+                        active_wait_tasks.Clear();
+
+                        foreach (var t in wait_tasks)
+                        {
+                            if (t.Item1.IsCompleted && !t.Item1.IsFaulted && !t.Item1.IsCanceled && found == null)
+                            {
+                                found = t;
+                                socket = t.Item2;
+                                break;
+                            }
+
+                            if (!t.Item1.IsCompleted)
+                            {
+                                active_wait_tasks.Add(t);
+                            }
+                        }
+
+                        if (DateTime.UtcNow >= connect_deadline)
+                        {
+                            break;
+                        }
+                    }
+
+                    foreach (var t in wait_tasks)
+                    {
+                        if (!Object.ReferenceEquals(t, found))
+                        {
+                            try
+                            {
+                                t.Item2.Close();
+                            }
+                            catch { }
+                            var noop = t.Item1.IgnoreResult();
+                        }
+
+                    }
+
+                    if (found == null)
+                    {
+                        throw new System.Exception("Could not connect to remote service " + url);
+                    }
+                }
+
+            }
+            else
+            {
+                socket = null;
+                AutoResetEvent ev = new AutoResetEvent(false);
+                TcpClient socket1 = new TcpClient();
+
+                await socket1.ConnectAsync(u.host, u.port).AwaitWithTimeout(parenttransport.DefaultConnectTimeout).ConfigureAwait(false);
+
+                socket = socket1;
+
+            }
+
+            m_Connected = true;
+
+            bool tls = u.scheme == "rrs+tcp";
+
+            await ConnectStream(socket.GetStream(), false, target_nodeid, target_nodename, tls, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+
+            lock (parenttransport)
+            {
+                parenttransport.TransportConnections.Add(LocalEndpoint, this);
+            }
+
+
+        }
+
+        private async Task ConnectWebsocketTransport(string url, Endpoint e, CancellationToken cancel = default(CancellationToken))
+        {
+            var u = TransportUtil.ParseConnectionUrl(url);
+
+            string http_scheme = "ws";
+            if (u.scheme.EndsWith("wss"))
+            {
+                http_scheme = "wss";
+            }
+
+            Uri u2 = new Uri(url.ReplaceFirst(u.scheme + "://", http_scheme + "://"));
+
+
+            NodeID target_nodeid = u.nodeid;
+            string target_nodename = u.nodename;
+
+            m_LocalEndpoint = e.LocalEndpoint;
+
+            IPAddress addr;
+            if (IPAddress.TryParse(u.host, out addr))
+            {
+
+                IPEndPoint en = new IPEndPoint(addr, u.port);
+
+                if (!(addr.IsIPv6LinkLocal && addr.ScopeId == 0))
+                {
+
+                    websocket = null;
+                    AutoResetEvent ev = new AutoResetEvent(false);
+                    ClientWebSocket socket1 = new ClientWebSocket();
+                    socket1.Options.AddSubProtocol("robotraconteur.robotraconteur.com");
+
+                    await socket1.ConnectAsync(u2, cancel).AwaitWithTimeout(parenttransport.DefaultConnectTimeout).ConfigureAwait(false);
+
+                    websocket = socket1;
+
+                }
+                else
+                {
+                    //We need to figure out the scope id for this connection.  This is a really
+                    //annoying property of ipv6 link-local addresses.
+
+
+                    //Start finding all the valid scope ids on this computer
+                    List<long> scopeids = new List<long>();
+                    NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (NetworkInterface adapter in adapters)
+                    {
+
+                        if (adapter.OperationalStatus == OperationalStatus.Up)
+                        {
+                            IPInterfaceProperties properties = adapter.GetIPProperties();
+                            foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
+                            {
+                                if (uniCast.Address.AddressFamily == AddressFamily.InterNetworkV6 && uniCast.Address.IsIPv6LinkLocal)
+                                {
+                                    if (uniCast.Address.ScopeId != 0)
+                                    {
+                                        scopeids.Add(uniCast.Address.ScopeId);
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    }
+                    //Finish finding all the scope ids
+
+                    //Now just try all of them to see if we can get a connection
+
+
+
+                    socket = null;
+                    var wait_tasks = new List<Tuple<Task, ClientWebSocket>>();
+
+                    foreach (long sid in scopeids)
+                    {
+                        try
+                        {
+                            addr.ScopeId = sid;
+                            en = new IPEndPoint(addr, u.port);
+                            ClientWebSocket socket1 = new ClientWebSocket();
+                            socket1.Options.AddSubProtocol("robotraconteur.robotraconteur.com");
+                            Uri uu = new Uri(url);
+                            Uri u3 = new Uri(http_scheme + "://" + en.ToString() + uu.PathAndQuery);
+                            Task task1 = socket1.ConnectAsync(u3, cancel);
+                            wait_tasks.Add(Tuple.Create(task1, socket1));
+
+                        }
+                        catch (Exception) { }
+
+                    }
+
+                    // Wait until one connect succeeded; a connect that failed on one interface is skipped
+                    var active_wait_tasks = new List<Tuple<Task, ClientWebSocket>>(wait_tasks);
+                    var connect_deadline = DateTime.UtcNow.AddMilliseconds(parenttransport.DefaultConnectTimeout);
+
+                    Tuple<Task, ClientWebSocket> found = null;
+                    while (active_wait_tasks.Count > 0 && found == null)
+                    {
+                        int remaining = (int)Math.Max(0, (connect_deadline - DateTime.UtcNow).TotalMilliseconds);
+                        try
+                        {
+                            await Task.WhenAny(active_wait_tasks.Select(x => x.Item1)).AwaitWithTimeout(remaining).ConfigureAwait(false);
+                        }
+                        catch { }
+
+                        active_wait_tasks.Clear();
+
+                        foreach (var t in wait_tasks)
+                        {
+                            if (t.Item1.IsCompleted && !t.Item1.IsFaulted && !t.Item1.IsCanceled && found == null)
+                            {
+                                found = t;
+                                websocket = t.Item2;
+                                break;
+                            }
+
+                            if (!t.Item1.IsCompleted)
+                            {
+                                active_wait_tasks.Add(t);
+                            }
+                        }
+
+                        if (DateTime.UtcNow >= connect_deadline)
+                        {
+                            break;
+                        }
+                    }
+
+                    foreach (var t in wait_tasks)
+                    {
+                        if (!Object.ReferenceEquals(t, found))
+                        {
+                            try
+                            {
+                                t.Item2.Abort();
+                            }
+                            catch { }
+                            var noop = t.Item1.IgnoreResult();
+                        }
+
+                    }
+
+                    if (found == null)
+                    {
+                        throw new System.Exception("Could not connect to remote service " + url);
+                    }
+                }
+
+            }
+            else
+            {
+                websocket = null;
+
+                ClientWebSocket socket1 = new ClientWebSocket();
+                socket1.Options.AddSubProtocol("robotraconteur.robotraconteur.com");
+                await socket1.ConnectAsync(u2, cancel).AwaitWithTimeout(parenttransport.DefaultConnectTimeout).ConfigureAwait(false);
+
+                websocket = socket1;
+
+            }
+
+            m_Connected = true;
+
+            bool tls = u.scheme == "rrs+ws" || u.scheme == "rrs+wss";
+
+            var webstream = new WebSocketStreamWrapper(websocket);
+            await ConnectStream(webstream, false, target_nodeid, target_nodename, tls, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+            lock (parenttransport)
+            {
+                parenttransport.TransportConnections.Add(LocalEndpoint, this);
+            }
+
+
+        }
+
+        public override string GetConnectionURL()
+        {
+            return connecturl;
+        }
+    }
+
+
+    sealed class TcpServerTransport : AsyncStreamTransport
+    {
+
+        private string connecturl;
+
+        private TcpClient socket = null;
+        private WebSocket websocket = null;
+        private Stream websocket_stream = null;
+        private TcpTransport parenttransport;
+        private Stream socketstream;
+
+        private DateTime LastMessageReceivedTime = DateTime.UtcNow;
+
+
+        public TcpServerTransport(TcpTransport c) : base(c.node, c.parent_adapter)
+        {
+            parenttransport = c;
+            disable_message4 = parenttransport.DisableMessage4;
+            max_message_size = parenttransport.MaxMessageSize;
+        }
+
+        public async Task Connect(TcpClient s, CancellationToken cancel = default(CancellationToken))
+        {
+            this.m_RequireTls = parenttransport.RequireTls;
+
+            socket = s;
+
+            m_Connected = true;
+            socketstream = s.GetStream();
+
+            await ConnectStream(socketstream, true, null, null, false, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+        }
+
+        internal async Task Connect(WebSocketStream s, string connecturl, CancellationToken cancel = default(CancellationToken))
+        {
+            this.m_RequireTls = parenttransport.RequireTls;
+            this.websocket_stream = s;
+            this.connecturl = connecturl;
+
+            m_Connected = true;
+
+            await ConnectStream(s, true, null, null, false, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+        }
+
+        TaskCompletionSource<int> on_close_task = new TaskCompletionSource<int>();
+
+        public async Task ProccessWebSocket(WebSocket s, string connecturl, CancellationToken cancel = default(CancellationToken))
+        {
+
+
+            this.connecturl = connecturl;
+
+            if (!this.parenttransport.AcceptWebSockets) throw new InvalidOperationException("Transport not accepting websockets");
+
+            m_Connected = true;
+            this.websocket_stream = new WebSocketStreamWrapper(s);
+
+            await ConnectStream(this.websocket_stream, true, null, null, false, parenttransport.RequireTls, parenttransport.HeartbeatPeriod, cancel).ConfigureAwait(false);
+            await on_close_task.Task.ConfigureAwait(false);
+        }
+
+        /**
+        <summary>
+        Close the transport. Done automatically by node shutdown.
+        </summary>
+        <remarks>None</remarks>
+        */
+        [PublicApi]
+        public override void Close()
+        {
+            base.Close();
+
+            on_close_task.TrySetResult(0);
+        }
+
+
+        public override string GetConnectionURL()
+        {
+            if (socket != null && websocket == null)
+            {
+                string scheme = "rr+tcp";
+                if (IsTls)
+                {
+                    scheme = "rrs+tcp";
+                }
+
+                string connecturl;
+                IPEndPoint ep = (IPEndPoint)socket.Client.LocalEndPoint;
+                if (ep.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+                    var addr2 = IPAddress.Parse(ep.Address.ToString());
+                    addr2.ScopeId = 0;
+
+                    connecturl = scheme + "://[" + addr2.ToString() + "]:" + ep.Port + "/";
+                }
+                else
+                {
+                    connecturl = scheme + "://" + ep.ToString() + "/";
+                }
+
+                return connecturl;
+            }
+
+            if (websocket_stream != null)
+            {
+                if (IsTls)
+                {
+                    if (this.connecturl.StartsWith("rr+ws://"))
+                        return this.connecturl.Replace("rr+ws://", "rrs+ws://");
+
+                    if (this.connecturl.StartsWith("rr+wss://"))
+                        return this.connecturl.Replace("rr+wss://", "rrs+wss://");
+                    else
+                        throw new ApplicationException("Internal error");
+                }
+
+                return this.connecturl;
+            }
+
+
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Configuration flags for IP network node discovery
+    /// </summary>
+    [Flags, PublicApi]
+    public enum IPNodeDiscoveryFlags
+    {
+        /// <summary>
+        /// Use IPv6 FF01:: node local  multicast addresses
+        /// </summary>
+        [PublicApi]
+        NodeLocal = 0x1,
+        /// <summary>
+        /// Use IPv6 FF02:: link local  multicast addresses
+        /// </summary>
+        [PublicApi]
+        LinkLocal = 0x2,
+        /// <summary>
+        /// Use IPv6 FF05:: site local  multicast addresses
+        /// </summary>
+        [PublicApi]
+        SiteLocal = 0x4,
+        /// <summary>
+        /// Use IPv4 255.255.255.255 broadcast addresses
+        /// </summary>
+        [PublicApi]
+        IPv4Broadcast = 0x8
+
+    }
+
+    sealed class IPNodeDiscovery
+    {
+
+
+        private const int ANNOUNCE_PORT = 48653;
+
+        private Socket recvsock;
+        private Socket recvsockV6;
+
+        byte[] recvbuf = new byte[4096];
+        byte[] recvbufV6 = new byte[4096];
+
+        private bool listening = false;
+        private bool broadcasting = false;
+
+        TcpTransport parent;
+
+        IPNodeDiscoveryFlags broadcast_flags;
+        IPNodeDiscoveryFlags listen_flags;
+        IPNodeDiscoveryFlags listen_socket_flags;
+
+        public IPNodeDiscovery(TcpTransport parent)
+        {
+            this.parent = parent;
+            random = new Random();
+        }
+
+        Random random;
+
+        public void StartListeningForNodes(IPNodeDiscoveryFlags flags)
+        {
+            if (listening) throw new InvalidOperationException("Already listening for nodes");
+
+            this_request_id = NodeID.NewUniqueID();
+            listen_flags = flags;
+
+            InitUDPRecvSockets();
+
+            listening = true;
+
+            SendDiscoveryRequestNow();
+        }
+
+        private List<IPAddress> GetIPv6MulticastAddresses(IPNodeDiscoveryFlags flags)
+        {
+            var IPv6MulticastListenAddresses = new List<IPAddress>();
+
+            if (flags.HasFlag(IPNodeDiscoveryFlags.NodeLocal))
+            {
+                IPv6MulticastListenAddresses.Add(IPAddress.Parse("FF01::BA86"));
+            }
+
+            if (flags.HasFlag(IPNodeDiscoveryFlags.LinkLocal))
+            {
+                IPv6MulticastListenAddresses.Add(IPAddress.Parse("FF02::BA86"));
+            }
+
+            if (flags.HasFlag(IPNodeDiscoveryFlags.SiteLocal))
+            {
+                IPv6MulticastListenAddresses.Add(IPAddress.Parse("FF05::BA86"));
+            }
+
+            return IPv6MulticastListenAddresses;
+        }
+
+
+
+        private bool GetUseIPv4(IPNodeDiscoveryFlags flags) => (flags.HasFlag(IPNodeDiscoveryFlags.IPv4Broadcast));
+
+        private void InitUDPRecvSockets()
+        {
+            //Find the scope ids to add to the multicast groups.  Without including every possible
+            //ip multicast range and scopeid combination this won't work.
+
+            IPNodeDiscoveryFlags flags = broadcast_flags | listen_flags;
+
+            if (flags == listen_socket_flags)
+                return;
+
+            listen_socket_flags = flags;
+
+            try
+            {
+                recvsock?.Dispose();
+            }
+            catch { }
+
+            try
+            {
+                recvsockV6?.Dispose();
+            }
+            catch { }
+
+            List<long> scopeids = new List<long>();
+
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface adapter in adapters)
+            {
+                if (adapter.OperationalStatus == OperationalStatus.Up || adapter.OperationalStatus == OperationalStatus.Unknown)
+                {
+                    IPInterfaceProperties properties = adapter.GetIPProperties();
+                    foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
+                    {
+                        if (uniCast.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                            if (!scopeids.Contains(uniCast.Address.ScopeId))
+                            {
+                                scopeids.Add(uniCast.Address.ScopeId);
+                            }
+
+                    }
+                }
+
+            }
+
+
+
+
+            recvsock = null;
+
+            IPEndPoint iep = new IPEndPoint(IPAddress.Any, ANNOUNCE_PORT);
+            if (GetUseIPv4(flags))
+            {
+                //Initialize the ipv4 socket for UDP broadcast receive
+                recvsock = new Socket(AddressFamily.InterNetwork,
+                SocketType.Dgram, ProtocolType.Udp);
+                recvsock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+                recvsock.Bind(iep);
+            }
+
+            IPEndPoint iepV6 = null;
+            recvsockV6 = null;
+
+            var IPv6MulticastListenAddresses = GetIPv6MulticastAddresses(flags);
+
+            if (IPv6MulticastListenAddresses.Count > 0)
+            {
+                try
+                {
+                    recvsockV6 = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
+                    IPAddress a = IPAddress.IPv6Any;
+                    iepV6 = new IPEndPoint(a, ANNOUNCE_PORT);
+                    recvsockV6.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+
+
+
+                    foreach (IPAddress ip in IPv6MulticastListenAddresses)
+                    {
+                        try
+                        {
+                            IPv6MulticastOption ipv6m = new IPv6MulticastOption(ip);
+                            recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, ipv6m);
+
+                            // cSpell: ignore sidi
+                            foreach (long sidi in scopeids)
+                            {
+                                IPv6MulticastOption ipv6m2 = new IPv6MulticastOption(ip, sidi);
+                                try
+                                {
+                                    recvsockV6.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, ipv6m2);
+                                }
+                                catch (Exception)
+                                {
+                                }
+
+                            }
+                        }
+                        catch { }
+
+                    }
+                    recvsockV6.Bind(iepV6);
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            try
+            {
+                // cSpell: ignore recvep
+                recvep = (EndPoint)iep;
+                recvsock?.BeginReceiveFrom(recvbuf, 0, 4096, SocketFlags.None, ref recvep, new AsyncCallback(recvsock_receivecallback), recvsock);
+            }
+            catch { }
+
+            try
+            {
+                recvepV6 = (EndPoint)iepV6;
+                recvsockV6?.BeginReceiveFrom(recvbufV6, 0, 4096, SocketFlags.None, ref recvepV6, new AsyncCallback(recvsockV6_receivecallback), recvsockV6);
+            }
+            catch { }
+
+
+        }
+        EndPoint recvep;
+        EndPoint recvepV6;
+
+        private void recvsock_receivecallback(IAsyncResult a)
+        {
+            // Use the socket this receive was started on; InitUDPRecvSockets may have replaced recvsock
+            var sock = (Socket)a.AsyncState;
+            try
+            {
+                EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
+                int count = sock.EndReceiveFrom(a, ref ep);
+                string stringData = Encoding.ASCII.GetString(recvbuf, 0, count);
+
+                NodeAnnounceReceived(stringData, ep);
+            }
+            catch (Exception e)
+            {
+            }
+
+            // Stop this receive loop when the socket was replaced; the new socket has its own
+            if (!Object.ReferenceEquals(sock, recvsock)) return;
+
+            try
+            {
+                sock.BeginReceiveFrom(recvbuf, 0, 4096, SocketFlags.None, ref recvep, new AsyncCallback(recvsock_receivecallback), sock);
+
+            }
+            catch (Exception e)
+            {
+            }
+
+        }
+
+        private void recvsockV6_receivecallback(IAsyncResult a)
+        {
+            // Use the socket this receive was started on; InitUDPRecvSockets may have replaced recvsockV6
+            var sock = (Socket)a.AsyncState;
+            try
+            {
+                EndPoint ep = new IPEndPoint(IPAddress.IPv6Any, 0);
+                int count = sock.EndReceiveFrom(a, ref ep);
+                string stringData = Encoding.ASCII.GetString(recvbufV6, 0, count);
+
+                NodeAnnounceReceived(stringData, ep);
+
+            }
+            catch (Exception e)
+            {
+            }
+
+            // Stop this receive loop when the socket was replaced; the new socket has its own
+            if (!Object.ReferenceEquals(sock, recvsockV6)) return;
+
+            try
+            {
+                sock.BeginReceiveFrom(recvbufV6, 0, 4096, SocketFlags.None, ref recvepV6, new AsyncCallback(recvsockV6_receivecallback), sock);
+
+            }
+            catch (Exception e)
+            {
+            }
+
+        }
+
+        // Same checks as Core IPNodeDiscovery::NodeAnnounceReceived: the announced URL must be an IP
+        // address that is loopback, or link/site local IPv6, or IPv4 in the sender's /16
+        private bool NodeAnnounceSenderValid(string packet, EndPoint sender)
+        {
+            try
+            {
+                string[] lines = packet.Split(new char[] { '\n' });
+                if (lines.Length < 3) return false;
+                string[] idline = lines[1].Split(new char[] { ',' });
+                NodeID id = new NodeID(idline[0]);
+                if (id == parent.node.NodeID) return false;
+
+                string url = lines[2];
+                if (url.Length > 256) return false;
+
+                var u = TransportUtil.ParseConnectionUrl(url);
+                string u_host = u.host;
+                if (u_host.StartsWith("[") && u_host.EndsWith("]"))
+                {
+                    u_host = u_host.Substring(1, u_host.Length - 2);
+                }
+                IPAddress addr;
+                if (!IPAddress.TryParse(u_host, out addr)) return false;
+
+                var sender_ip = sender as IPEndPoint;
+                if (sender_ip == null) return false;
+                return NodeAnnounceAddressValid(addr, sender_ip.Address);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        // A loopback URL is only accepted from a loopback sender, otherwise a LAN host could make
+        // subscribers connect to their own loopback ports
+        static bool NodeAnnounceAddressValid(IPAddress addr, IPAddress sender_addr)
+        {
+            try
+            {
+                if (sender_addr.IsIPv4MappedToIPv6) sender_addr = sender_addr.MapToIPv4();
+                if (addr.IsIPv4MappedToIPv6) addr = addr.MapToIPv4();
+
+                if (IPAddress.IsLoopback(addr)) return IPAddress.IsLoopback(sender_addr);
+
+                if (addr.AddressFamily != sender_addr.AddressFamily) return false;
+
+                if (addr.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+                    return addr.IsIPv6LinkLocal || addr.IsIPv6SiteLocal;
+                }
+
+                if (addr.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    byte[] a1 = addr.GetAddressBytes();
+                    byte[] a2 = sender_addr.GetAddressBytes();
+                    return a1[0] == a2[0] && a1[1] == a2[1];
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void NodeAnnounceReceived(string packet, EndPoint sender)
+        {
+            if (listening)
+            {
+                string seed = "Robot Raconteur Node Discovery Packet";
+                if (packet.Substring(0, seed.Length) == seed)
+                {
+                    if (NodeAnnounceSenderValid(packet, sender))
+                    {
+                        parent.node.NodeAnnouncePacketReceived(packet);
+                    }
+                }
+            }
+
+            if (broadcasting)
+            {
+                string seed = "Robot Raconteur Discovery Request Packet";
+                if (packet.Substring(0, seed.Length) == seed)
+                {
+                    string[] lines = packet.Split(new char[] { '\n' });
+                    if (lines.Length < 3) return;
+                    string[] idline = lines[1].Split(new char[] { ',' });
+                    NodeID id = new NodeID(idline[0]);
+                    if (id != this_request_id)
+                    {
+                        SendAnnounceNow();
+                    }
+                }
+            }
+        }
+
+        public void StopListeningForNodes()
+        {
+            listen_flags = 0;
+            if (broadcasting)
+            {
+                // The receive sockets also receive the discovery requests for the announcer: keep them,
+                // only drop the flags that were needed for listening
+                InitUDPRecvSockets();
+            }
+            else
+            {
+                try
+                {
+                    recvsock?.Close();
+                }
+                catch (Exception) { }
+
+                try
+                {
+                    recvsockV6?.Close();
+                }
+                catch (Exception) { }
+
+                // Make the next StartListeningForNodes create new sockets
+                listen_socket_flags = 0;
+            }
+
+            listening = false;
+            var t = discovery_request_timer;
+            discovery_request_timer = null;
+            t?.Dispose();
+
+        }
+
+        public void StartAnnouncingNode(IPNodeDiscoveryFlags flags)
+        {
+            if (broadcasting) throw new InvalidOperationException("Already broadcasting node");
+
+            broadcast_flags = flags;
+
+            broadcasting = true;
+            int backoff = random.Next(100, 250);
+            broadcast_timer = new Timer(x => BroadcastAnnouncePacket().ContinueWith(y => { }), null, backoff, 55000);
+            next_broadcast = DateTime.UtcNow + TimeSpan.FromMilliseconds(100);
+
+            InitUDPRecvSockets();
+        }
+
+        DateTime next_broadcast;
+        Timer broadcast_timer;
+
+        public void StopAnnouncingNode()
+        {
+            if (!broadcasting) return;
+
+            broadcasting = false;
+            var t = broadcast_timer;
+            broadcast_timer = null;
+            t?.Dispose();
+        }
+
+
+
+        class BroadcastAddressInfo
+        {
+            public bool IsIpv6;
+            public IPEndPoint AdapterEndPoint;
+            public IPAddress AdapterBroadcastAddress;
+            public PhysicalAddress AdapterPhysicalAddress;
+        }
+
+        private async Task BroadcastAnnouncePacket()
+        {
+            try
+            {
+                List<IPEndPoint> eps = parent.ResolvedListenerEndpoints.ToList();
+
+                //Return if there is nothing to send
+                if (eps.Count >= 0)
+                {
+                    await BroadcastPacket(delegate (string scheme, BroadcastAddressInfo binfo)
+                    {
+                        string nodeidstring = parent.node.NodeID.ToString();
+                        string packetdata = "Robot Raconteur Node Discovery Packet\n";
+                        packetdata += (parent.node.NodeName == "") ? "" + nodeidstring + "\n" : "" + nodeidstring + "," + parent.node.NodeName + "\n";
+                        if (!binfo.IsIpv6)
+                        {
+                            IPEndPoint e = new IPEndPoint(new IPAddress(binfo.AdapterEndPoint.Address.GetAddressBytes()), binfo.AdapterEndPoint.Port);
+                            packetdata += scheme + "://" + e.ToString() + "/?nodeid=" + nodeidstring + "&service=RobotRaconteurServiceIndex\n";
+                        }
+                        else
+                        {
+                            IPEndPoint e = new IPEndPoint(new IPAddress(binfo.AdapterEndPoint.Address.GetAddressBytes()), binfo.AdapterEndPoint.Port);
+                            packetdata += scheme + "://[" + e.Address.ToString() + "]:" + e.Port.ToString() + "/?nodeid=" + nodeidstring + "&service=RobotRaconteurServiceIndex\n";
+                        }
+                        string service_data = "ServiceStateNonce: " + this.parent.node.ServiceStateNonce;
+
+                        string packetdata2 = packetdata + service_data + "\n";
+                        if (packetdata2.Length <= 2048)
+                        {
+                            packetdata = packetdata2;
+                        }
+
+                        return packetdata;
+                    }, broadcast_flags, eps).ConfigureAwait(false);
+                }
+            }
+            catch { }
+
+            next_broadcast = DateTime.UtcNow + TimeSpan.FromMilliseconds(55000);
+            if (broadcasting)
+            {
+                var t = broadcast_timer;
+                t?.Change(55000, 55000);
+            }
+        }
+
+        private async Task BroadcastPacket(Func<string, BroadcastAddressInfo, string> packet_gen, IPNodeDiscoveryFlags flags, List<IPEndPoint> eps)
+        {
+            List<BroadcastAddressInfo> BroadcastAddresses = new List<BroadcastAddressInfo>();
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (IPEndPoint ep in eps)
+            {
+                BroadcastAddressInfo binfo = new BroadcastAddressInfo();
+                binfo.AdapterEndPoint = ep;
+
+                if (ep.Address.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+
+                    binfo.IsIpv6 = true;
+                }
+                else
+                {
+                    binfo.IsIpv6 = false;
+                    binfo.AdapterBroadcastAddress = IPAddress.Broadcast;
+                }
+                BroadcastAddresses.Add(binfo);
+
+
+            }
+            foreach (BroadcastAddressInfo binfo in BroadcastAddresses)
+            {
+                var schemes = new List<string>();
+                schemes.Add("rr+tcp");
+                if (parent.IsTlsNodeCertificateLoaded)
+                {
+                    schemes.Add("rrs+tcp");
+                }
+
+                foreach (var scheme in schemes)
+                {
+                    if (!binfo.IsIpv6)
+                    {
+                        if (GetUseIPv4(flags))
+                        {
+                            Socket sock = null;
+                            try
+                            {
+                                string packetdata = packet_gen(scheme, binfo);
+                                sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                                sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                                IPEndPoint local_endpoint = new IPEndPoint(binfo.AdapterEndPoint.Address, ANNOUNCE_PORT);
+                                IPEndPoint broadcast_endpoint = new IPEndPoint(binfo.AdapterBroadcastAddress, ANNOUNCE_PORT);
+                                byte[] data = Encoding.ASCII.GetBytes(packetdata);
+                                sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                                sock.ExclusiveAddressUse = false;
+                                sock.Bind(local_endpoint);
+                                await Task.Factory.FromAsync<int>(delegate (AsyncCallback cb, object state)
+                                {
+                                    return sock.BeginSendTo(data, 0, data.Length, SocketFlags.None, broadcast_endpoint, cb, state);
+                                },
+                                        sock.EndSendTo, sock).ConfigureAwait(false);
+                            }
+                            catch { }
+                            finally
+                            {
+                                sock?.Close();
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        if (!binfo.AdapterEndPoint.Address.IsIPv6LinkLocal)
+                            continue;
+
+                        Socket sock = null;
+                        try
+                        {
+                            var IPv6MulticastBroadcastAddresses = GetIPv6MulticastAddresses(flags);
+
+                            string packetdata = packet_gen(scheme, binfo);
+                            sock = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
+                            IPEndPoint local_endpoint = new IPEndPoint(binfo.AdapterEndPoint.Address, ANNOUNCE_PORT);
+
+
+                            sock.ExclusiveAddressUse = false;
+                            sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+                            sock.Bind(local_endpoint);
+
+
+                            byte[] sid = BitConverter.GetBytes(binfo.AdapterEndPoint.Address.ScopeId);
+
+                            sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastInterface, sid);
+                            sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastTimeToLive, 32);
+                            try
+                            {
+                                sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, 32);
+                            }
+                            catch { }
+                            sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IpTimeToLive, 32);
+
+                            IPAddress ips = new IPAddress(binfo.AdapterEndPoint.Address.GetAddressBytes());
+
+                            byte[] data = Encoding.ASCII.GetBytes(packetdata);
+                            foreach (IPAddress ip in IPv6MulticastBroadcastAddresses)
+                            {
+                                IPv6MulticastOption ipv6m = new IPv6MulticastOption(ip, binfo.AdapterEndPoint.Address.ScopeId);
+                                sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, ipv6m);
+                            }
+                            byte[] interfaceArray = BitConverter.GetBytes((int)binfo.AdapterEndPoint.Address.ScopeId);
+
+
+                            foreach (IPAddress ip in IPv6MulticastBroadcastAddresses)
+                            {
+                                IPEndPoint broadcast_endpoint = new IPEndPoint(ip, ANNOUNCE_PORT);
+
+                                try
+                                {
+                                    var t = Task.Factory.FromAsync<int>(delegate (AsyncCallback cb, object state)
+                                    {
+                                        return sock.BeginSendTo(data, 0, data.Length, SocketFlags.None, broadcast_endpoint, cb, state);
+                                    },
+                                    sock.EndSendTo, sock);
+
+                                    await t.ConfigureAwait(false);
+                                }
+                                catch { }
+                            }
+                        }
+                        catch
+                        {
+
+                        }
+                        finally
+                        {
+                            sock?.Close();
+                        }
+
+                    }
+                }
+            }
+        }
+
+        NodeID this_request_id;
+
+        internal void SendAnnounceNow()
+        {
+            lock (this)
+            {
+                if (!broadcasting)
+                    return;
+
+                if (broadcast_timer != null)
+                {
+                    var fromnow = next_broadcast - DateTime.UtcNow;
+                    int backoff = random.Next(500, 1000);
+                    if (fromnow.TotalMilliseconds > backoff || fromnow.TotalMilliseconds < 0)
+                    {
+                        var t = broadcast_timer;
+
+                        t?.Change(backoff, 55000);
+                        next_broadcast = DateTime.UtcNow + TimeSpan.FromMilliseconds(500);
+                    }
+                }
+            }
+        }
+
+        Timer discovery_request_timer;
+        DateTime last_request_send_time;
+        internal void SendDiscoveryRequestNow()
+        {
+            if (!listening) return;
+            lock (this)
+            {
+                if (discovery_request_timer != null)
+                    return;
+                int delay = random.Next(250, 1000);
+                discovery_request_timer = new Timer(HandleRequestTimer, 3, delay, Timeout.Infinite);
+            }
+        }
+
+        List<IPEndPoint> GetLocalIPEndpoints()
+        {
+            List<IPEndPoint> listener_endpoints = new List<IPEndPoint>();
+
+            NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface adapter in adapters)
+            {
+                if (adapter.OperationalStatus == OperationalStatus.Up || adapter.OperationalStatus == OperationalStatus.Unknown)
+                {
+                    IPInterfaceProperties properties = adapter.GetIPProperties();
+                    foreach (IPAddressInformation uniCast in properties.UnicastAddresses)
+                    {
+                        listener_endpoints.Add(new IPEndPoint(uniCast.Address, 0));
+
+                    }
+                }
+            }
+
+            return listener_endpoints;
+        }
+
+
+        async void HandleRequestTimer(object v)
+        {
+            try
+            {
+                var eps = GetLocalIPEndpoints();
+
+                string packetdata = "Robot Raconteur Discovery Request Packet\n";
+                packetdata += this_request_id.ToString() + "\n";
+
+                await BroadcastPacket((x, y) => packetdata, listen_flags, eps).ConfigureAwait(false);
+
+                lock (this)
+                {
+                    int c = (int)v;
+                    c--;
+                    if (c > 0)
+                    {
+                        int delay = random.Next(250, 1000);
+                        var d = discovery_request_timer;
+                        discovery_request_timer = new Timer(HandleRequestTimer, c, delay, Timeout.Infinite);
+                        d?.Dispose();
+                    }
+                    else
+                    {
+                        if ((last_request_send_time + TimeSpan.FromMilliseconds(1000)) > DateTime.UtcNow)
+                        {
+                            var d = discovery_request_timer;
+                            discovery_request_timer = new Timer(HandleRequestTimer, c, 5, Timeout.Infinite);
+                            d?.Dispose();
+                        }
+                        else
+                        {
+                            var d = discovery_request_timer;
+                            discovery_request_timer = null;
+                            d?.Dispose();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                var d = discovery_request_timer;
+                discovery_request_timer = null;
+                d?.Dispose();
+            }
+        }
+    }
+
+    class WebSocketStreamWrapper : Stream
+    {
+
+        WebSocket websock;
+
+        public WebSocketStreamWrapper(WebSocket websocket)
+        {
+            websock = websocket;
+        }
+
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        public override bool CanSeek
+        {
+            get { return false; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return true; }
+        }
+
+        public override void Flush()
+        {
+
+        }
+
+        public override long Length
+        {
+            get { throw new NotSupportedException(); }
+        }
+
+        public override long Position
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return ReadAsync(buffer, offset, count).AsApm(callback, state);
+        }
+
+        public override int EndRead(IAsyncResult asyncResult)
+        {
+            return ((Task<int>)asyncResult).Result;
+        }
+
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return WriteAsync(buffer, offset, count).AsApm(callback, state);
+        }
+
+        public override void EndWrite(IAsyncResult asyncResult)
+        {
+            int noop = ((Task<int>)asyncResult).Result;
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), default(CancellationToken)).Result.Count;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, false, default(CancellationToken)).GetAwaiter().GetResult();
+        }
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            var r = await websock.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken).ConfigureAwait(false);
+            if (r.MessageType != WebSocketMessageType.Binary) throw new IOException("Invalid websocket message type");
+            return r.Count;
+        }
+
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            if (count <= 4096)
+            {
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            int pos = 0;
+            while (pos < count)
+            {
+                int c = 4096;
+                if (pos + 4096 > count)
+                {
+                    c = count - pos;
+                }
+
+                await websock.SendAsync(new ArraySegment<byte>(buffer, offset + pos, c), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+
+                pos += c;
+            }
+
+        }
+
+        public override void Close()
+        {
+            websock.CloseAsync(WebSocketCloseStatus.NormalClosure, "", default(CancellationToken)).IgnoreResult();
+        }
+
+
+    }
+
+    class WebSocketStream : Stream
+    {
+
+        Stream stream;
+
+        Random random;
+
+        public WebSocketStream(Stream stream)
+        {
+            this.stream = stream;
+            random = new Random();
+        }
+
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        public override bool CanSeek
+        {
+            get { return false; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return true; }
+        }
+
+        public override void Flush()
+        {
+
+        }
+
+        public override long Length
+        {
+            get { throw new NotSupportedException(); }
+        }
+
+        public override long Position
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return ReadAsync(buffer, offset, count).AsApm(callback, state);
+        }
+
+        public override int EndRead(IAsyncResult asyncResult)
+        {
+            return ((Task<int>)asyncResult).Result;
+        }
+
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return WriteAsync(buffer, offset, count).AsApm(callback, state);
+        }
+
+        public override void EndWrite(IAsyncResult asyncResult)
+        {
+            int noop = ((Task<int>)asyncResult).Result;
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return ReadAsync(buffer, offset, count, default(CancellationToken)).GetAwaiter().GetResult();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            WriteAsync(buffer, offset, count, default(CancellationToken)).GetAwaiter().GetResult();
+        }
+
+        bool recv_inframe = false;
+        ulong recv_framepos = 0;
+        ulong recv_framelen = 0;
+        byte[] recv_mask;
+        bool recv_en_mask = false;
+
+        object ping_request_lock = new object();
+        bool ping_requested = false;
+        byte[] ping_data = null;
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            if (!recv_inframe)
+            {
+                while (true)
+                {
+                    var h1 = new byte[2];
+                    int h1_r = 0;
+                    do
+                    {
+                        var h1_r1 = await stream.ReadAsync(h1, h1_r, h1.Length - h1_r, cancellationToken).ConfigureAwait(false);
+                        if (h1_r1 == 0) throw new IOException("Connection closed");
+                        h1_r += h1_r1;
+                    }
+                    while (h1_r < h1.Length);
+
+                    bool recv_fin1 = (h1[0] & 0x80) != 0;
+                    byte opcode_recv1 = (byte)((h1[0] & 0xF));
+
+                    bool recv_en_mask1 = (h1[1] & 0x80) != 0;
+
+                    // This stream is only used on the server side. RFC 6455 5.1 and 5.2: client frames must be
+                    // masked, and the RSV bits must be zero since no extension is negotiated
+                    if ((h1[0] & 0x70) != 0 || !recv_en_mask1)
+                    {
+                        stream.Close();
+                        throw new IOException("Invalid WebSocket frame");
+                    }
+                    byte[] recv_mask1 = new byte[4];
+                    byte payload_len1 = (byte)((h1[1] & 0x7F));
+
+                    ulong data_len1 = 0;
+
+                    if (payload_len1 < 126)
+                    {
+                        data_len1 = payload_len1;
+                    }
+                    else if (payload_len1 == 126)
+                    {
+                        var h2 = new byte[2];
+                        int h2_r = 0;
+                        do
+                        {
+                            var h2_r1 = await stream.ReadAsync(h2, h2_r, h2.Length - h2_r, cancellationToken).ConfigureAwait(false);
+                            if (h2_r1 == 0) throw new IOException("Connection closed");
+                            h2_r += h2_r1;
+                        }
+                        while (h2_r < h2.Length);
+                        data_len1 = BitConverter.ToUInt16(h2.Reverse().ToArray(), 0);
+                    }
+                    else
+                    {
+                        var h2 = new byte[8];
+                        int h2_r = 0;
+                        do
+                        {
+                            var h2_r1 = await stream.ReadAsync(h2, h2_r, h2.Length - h2_r, cancellationToken).ConfigureAwait(false);
+                            if (h2_r1 == 0) throw new IOException("Connection closed");
+                            h2_r += h2_r1;
+                        }
+                        while (h2_r < h2.Length);
+                        data_len1 = BitConverter.ToUInt64(h2.Reverse().ToArray(), 0);
+                    }
+
+                    if (recv_en_mask1)
+                    {
+
+                        var h3 = new byte[4];
+                        int h3_r = 0;
+                        do
+                        {
+                            var h3_r1 = await stream.ReadAsync(h3, h3_r, h3.Length - h3_r, cancellationToken).ConfigureAwait(false);
+                            if (h3_r1 == 0) throw new IOException("Connection closed");
+                            h3_r += h3_r1;
+                        }
+                        while (h3_r < h3.Length);
+                        Buffer.BlockCopy(h3, 0, recv_mask1, 0, 4);
+                    }
+                    switch (opcode_recv1)
+                    {
+                        case (byte)WebSocketOpcode.continuation:
+                        case (byte)WebSocketOpcode.binary:
+                            {
+                                if (data_len1 == 0)
+                                {
+                                    // Empty data frame, nothing to return. Read the next frame.
+                                    continue;
+                                }
+                                if ((ulong)count > data_len1) count = (int)data_len1;
+                                var r = await stream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+                                if (r == 0)
+                                {
+                                    throw new IOException("Connection closed");
+                                }
+                                if (recv_en_mask1)
+                                {
+                                    for (int i = 0; i < r; i++)
+                                    {
+                                        buffer[i + offset] = (byte)(buffer[i + offset] ^ recv_mask1[i % 4]);
+                                    }
+                                }
+
+                                if ((ulong)r < data_len1)
+                                {
+                                    recv_inframe = true;
+                                    recv_framepos = (ulong)r;
+                                    recv_framelen = data_len1;
+                                    recv_mask = recv_mask1;
+                                    recv_en_mask = recv_en_mask1;
+                                }
+                                else
+                                {
+                                    recv_inframe = false;
+                                    recv_framepos = 0;
+                                    recv_framelen = 0;
+                                    recv_en_mask = false;
+                                }
+
+                                return r;
+                            }
+                        case (byte)WebSocketOpcode.text:
+                            {
+                                stream.Close();
+                                throw new IOException("Invalid data type");
+                            }
+                        case (byte)WebSocketOpcode.close:
+                        case (byte)WebSocketOpcode.ping:
+                        case (byte)WebSocketOpcode.pong:
+                            {
+                                // RFC 6455: control frame payloads are limited to 125 bytes
+                                if (data_len1 > 125)
+                                {
+                                    stream.Close();
+                                    throw new IOException("Invalid control frame");
+                                }
+                                var h4 = new byte[data_len1];
+                                int h4_r = 0;
+                                while (h4_r < h4.Length)
+                                {
+                                    var h4_r1 = await stream.ReadAsync(h4, h4_r, h4.Length - h4_r, cancellationToken).ConfigureAwait(false);
+                                    if (h4_r1 == 0) throw new IOException("Connection closed");
+                                    h4_r += h4_r1;
+                                }
+
+                                if (recv_en_mask1)
+                                {
+                                    for (int i = 0; i < h4.Length; i++)
+                                    {
+                                        h4[i] = (byte)(h4[i] ^ recv_mask1[i % 4]);
+                                    }
+                                }
+
+                                switch (opcode_recv1)
+                                {
+                                    case (byte)WebSocketOpcode.close:
+                                        throw new EndOfStreamException("Connection closed");
+                                    case (byte)WebSocketOpcode.ping:
+                                        {
+                                            lock (ping_request_lock)
+                                            {
+                                                ping_requested = true;
+                                                ping_data = h4;
+                                            }
+                                            var noop = SendPong().IgnoreResult();
+                                        }
+                                        break;
+                                    case (byte)WebSocketOpcode.pong:
+                                        break;
+
+                                }
+                                break;
+                            }
+                        default:
+                            throw new IOException("Invalid message format");
+                    }
+                }
+            }
+            else
+            {
+                if ((ulong)count > recv_framelen - recv_framepos) count = (int)(recv_framelen - recv_framepos);
+                var r = await stream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+                if (r == 0)
+                {
+                    throw new IOException("Connection closed");
+                }
+                if (recv_en_mask)
+                {
+                    for (int i = 0; i < r; i++)
+                    {
+                        buffer[i + offset] = (byte)(buffer[i + offset] ^ recv_mask[(recv_framepos + (ulong)i) % 4]);
+                    }
+                }
+
+                ulong recv_framenewpos = recv_framepos + (ulong)r;
+
+                if (recv_framenewpos < recv_framelen)
+                {
+                    recv_inframe = true;
+                    recv_framepos = (ulong)recv_framenewpos;
+                }
+                else
+                {
+                    recv_inframe = false;
+                    recv_framepos = 0;
+                    recv_framelen = 0;
+                    recv_en_mask = false;
+                }
+
+                return r;
+            }
+        }
+
+        bool send_en_mask = false;
+
+        public bool EnableSendMask
+        {
+            get
+            {
+                return send_en_mask;
+            }
+            set
+            {
+                send_en_mask = value;
+            }
+        }
+
+
+
+        private async Task WriteAsync2(byte[] buffer, int offset, int count, byte command, CancellationToken cancellationToken)
+        {
+            var mask = new byte[4];
+            random.NextBytes(mask);
+
+            var headerlen = (count <= 125) ? 2 : 4;
+            if (send_en_mask) headerlen += 4;
+            var header = new byte[headerlen];
+            header[0] = (byte)(0x80 | (command & 0xF));
+            if (count <= 125)
+            {
+                header[1] = (byte)count;
+                if (send_en_mask)
+                {
+                    Buffer.BlockCopy(mask, 0, header, 2, 4);
+                }
+            }
+            else
+            {
+                header[1] = 126;
+                Buffer.BlockCopy(BitConverter.GetBytes((ushort)count).Reverse().ToArray(), 0, header, 2, 2);
+                if (send_en_mask)
+                {
+                    Buffer.BlockCopy(mask, 0, header, 4, 4);
+                }
+            }
+
+            if (send_en_mask)
+            {
+                header[1] |= 0x80;
+            }
+
+            await stream.WriteAsync(header, 0, headerlen).ConfigureAwait(false);
+
+            if (send_en_mask)
+            {
+                byte[] write_async_2_buf = new byte[count];
+                for (int i = 0; i < count; i++)
+                {
+                    write_async_2_buf[i] = (byte)(buffer[i + offset] ^ mask[i % 4]);
+                }
+                await stream.WriteAsync(write_async_2_buf, 0, count).ConfigureAwait(false);
+            }
+            else
+            {
+                await stream.WriteAsync(buffer, offset, count).ConfigureAwait(false);
+            }
+        }
+
+
+        AsyncMutex write_mutex = new AsyncMutex();
+
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            if (count <= 4096)
+            {
+                using (var t = await write_mutex.Lock().ConfigureAwait(false))
+                {
+                    await WriteAsync2(buffer, offset, count, (byte)WebSocketOpcode.binary, cancellationToken).ConfigureAwait(false);
+                    return;
+                }
+            }
+
+            int pos = 0;
+            while (pos < count)
+            {
+                int c = 4096;
+                if (pos + 4096 > count)
+                {
+                    c = count - pos;
+                }
+                using (var t = await write_mutex.Lock().ConfigureAwait(false))
+                {
+                    await WriteAsync2(buffer, offset + pos, c, (byte)WebSocketOpcode.binary, cancellationToken).ConfigureAwait(false);
+                    pos += c;
+                }
+            }
+
+        }
+
+        private async Task SendPong()
+        {
+            using (var t = await write_mutex.Lock().ConfigureAwait(false))
+            {
+                lock (ping_request_lock)
+                {
+                    if (!ping_requested) return;
+                    ping_requested = false;
+                }
+                await WriteAsync2(ping_data, 0, ping_data.Length, (byte)WebSocketOpcode.pong, default(CancellationToken)).ConfigureAwait(false);
+            }
+
+
+        }
+
+        public override void Close()
+        {
+            try
+            {
+                stream.Close();
+            }
+            catch (Exception) { }
+        }
+
+    }
+
+    enum WebSocketOpcode : byte
+    {
+        continuation = 0x0,
+        text = 0x1,
+        binary = 0x2,
+        close = 0x8,
+        ping = 0x9,
+        pong = 0xA
+    }
+
+    internal class TcpTransportPortSharerClient
+    {
+        private readonly object thisLock = new object();
+        private bool open = false;
+        private Stream localSocket;
+        private Socket unixSocket;
+        private int port;
+        private bool sharerConnected;
+        private readonly ManualResetEvent delayEvent = new ManualResetEvent(false);
+
+        private TcpTransport parent;
+
+        private CancellationTokenSource cancelSource;
+
+        internal TcpTransportPortSharerClient(TcpTransport parent)
+        {
+            this.parent = parent;
+        }
+
+        internal void Start()
+        {
+            lock (this)
+            {
+                if (open)
+                {
+                    throw new InvalidOperationException("Port sharer client already started");
+                }
+                open = true;
+                cancelSource = new CancellationTokenSource();
+                Task.Factory.StartNew(() => ClientThread(cancelSource.Token), cancelSource.Token);
+            }
+        }
+
+        internal void Close()
+        {
+            lock (thisLock)
+            {
+                if (!open)
+                    return;
+                open = false;
+                cancelSource.Cancel();
+                // The token does not interrupt the blocking Receive / recvmsg on Unix; shut the socket
+                // down so the client thread returns (it disposes the socket itself)
+                try
+                {
+                    unixSocket?.Shutdown(SocketShutdown.Both);
+                }
+                catch { }
+            }
+        }
+
+        internal int ListenPort
+        {
+            get
+            {
+                lock (thisLock)
+                {
+                    return port;
+                }
+            }
+        }
+
+        internal async Task ClientThread(CancellationToken cancel)
+        {
+            try
+            {
+                RRLogFuncs.LogDebug("TcpTransport port sharer client started");
+
+                NodeDirectories nodeDirs = null;
+                bool nodeDirsInit = false;
+
+                while (!cancel.IsCancellationRequested)
+                {
+                    Socket socket = null;
+                    lock (thisLock)
+                    {
+                        if (!open)
+                            break;
+                        localSocket = null;
+                    }
+
+                    try
+                    {
+                        NodeID nodeId;
+                        string nodeName;
+                        {
+                            var node = parent.node;
+                            nodeId = node.NodeID;
+                            nodeName = node.NodeName;
+                        }
+
+                        if (nodeId.IsAnyNode)
+                            throw new InvalidOperationException("Internal error");
+
+                        string outData = $"{nodeId} {nodeName}".Trim();
+
+                        if (!nodeDirsInit)
+                        {
+                            nodeDirs = parent.node.NodeDirectories;
+                            nodeDirsInit = true;
+                        }
+
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            string fname = FindPortSharerInfoFile(nodeDirs);
+
+                            if (string.IsNullOrEmpty(fname))
+                            {
+                                await Task.Delay(1000, cancel);
+                                continue;
+                            }
+
+                            RRLogFuncs.LogDebug($"TcpTransport port sharer connecting named pipe to: \"{fname}\"");
+                            string fname2 = fname.Split("\\").Last();
+
+                            var pipeClient = new NamedPipeClientStream(".", fname2, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.Identification);
+
+                            try
+                            {
+                                pipeClient.Connect(2000);
+                                pipeClient.ReadMode = PipeTransmissionMode.Message;
+                                localSocket = pipeClient;
+                            }
+                            catch
+                            {
+                                pipeClient.Dispose();
+                                throw;
+                            }
+                        }
+                        else
+                        {
+                            string fname = "/var/run/robotraconteur/transport/tcp/portsharer/portsharer.sock";
+                            RRLogFuncs.LogDebug($"TcpTransport port sharer connecting named pipe to: \"{fname}\"");
+
+                            socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                            lock (thisLock)
+                            {
+                                if (!open)
+                                {
+                                    socket.Dispose();
+                                    break;
+                                }
+                                unixSocket = socket;
+                            }
+                            {
+                                await Task.Run(() => socket.Connect(new UnixDomainSocketEndPoint(fname)));
+                            }
+                        }
+
+                        if (localSocket == null && socket == null)
+                        {
+                            await Task.Delay(1000, cancel);
+                            continue;
+                        }
+                        using (localSocket)
+                        using (socket)
+                        {
+
+                            RRLogFuncs.LogInfo("TcpTransport port sharer successfully connected");
+
+                            var outDataBytes = Encoding.UTF8.GetBytes(outData);
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                await localSocket.WriteAsync(outDataBytes, 0, outDataBytes.Length, cancel);
+                            }
+                            else
+                            {
+                                await Task.Run(() => socket.Send(outDataBytes), cancel);
+                            }
+
+                            int port1 = 0;
+
+                            {
+                                var inData = new byte[4096];
+                                int nread;
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    nread = await localSocket.ReadAsync(inData, 0, inData.Length, cancel);
+                                }
+                                else
+                                {
+                                    nread = await Task.Run(() => socket.Receive(inData), cancel);
+                                }
+
+                                if (nread == 0)
+                                    throw new InvalidOperationException("Connection closed");
+
+                                string inDataStr = Encoding.ASCII.GetString(inData, 0, nread);
+                                Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+                                inDataStr = rgx.Replace(inDataStr, " ").Trim();
+
+                                if (!inDataStr.StartsWith("OK"))
+                                    throw new InvalidOperationException("Return error");
+
+                                var inDataParts = inDataStr.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                if (inDataParts.Length != 2)
+                                    throw new InvalidOperationException("Return error");
+
+                                port1 = int.Parse(inDataParts[1]);
+
+                                lock (thisLock)
+                                {
+                                    port = port1;
+                                }
+                            }
+
+                            while (true)
+                            {
+                                lock (thisLock)
+                                {
+                                    if (!open)
+                                        break;
+                                    sharerConnected = true;
+                                }
+
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    var buf = new byte[4096];
+                                    int bytesRead = await localSocket.ReadAsync(buf, 0, buf.Length, cancel);
+
+                                    var buf2 = new byte[bytesRead];
+                                    Array.Copy(buf, buf2, bytesRead);
+
+                                    SocketInformation socketInfo = new SocketInformation
+                                    {
+                                        ProtocolInformation = buf2
+                                    };
+
+                                    socketInfo.Options = SocketInformationOptions.Connected | SocketInformationOptions.UseOnlyOverlappedIO;
+
+                                    var sock = new Socket(socketInfo);
+
+                                    IncomingSocket(sock);
+
+                                }
+                                else
+                                {
+                                    var buf = new byte[1024];
+                                    int sock = 0;
+
+                                    // TODO: receive fd from unix socket
+                                    if (!TcpTransportUtil.ReadFd(socket.Handle.ToInt32(), buf, out sock))
+                                        break;
+
+                                    if (sock == 0)
+                                        break;
+                                    if (sock < 0)
+                                        continue;
+
+                                    // Use reflection to get SafeSocketHandle type
+                                    var safe_socket_handle_type = typeof(Socket).Assembly.GetType("System.Net.Sockets.SafeSocketHandle");
+                                    var safe_socket_handle = Activator.CreateInstance(safe_socket_handle_type, new object[] { new IntPtr(sock), true });
+                                    var sock1 = (Socket)Activator.CreateInstance(typeof(Socket), new object[] { safe_socket_handle, }, null);
+
+                                    IncomingSocket(sock1);
+                                }
+                            }
+                        }
+                        localSocket = null;
+                        socket = null;
+                        try
+                        {
+                            socket?.Close();
+                        }
+                        catch { }
+                    }
+                    catch (Exception exp)
+                    {
+                        RRLogFuncs.LogWarning($"TcpTransport port sharer connect failed: {exp.Message}");
+                        // The socket is not disposed by the using block when the connect itself failed
+                        try
+                        {
+                            socket?.Dispose();
+                        }
+                        catch { }
+                    }
+
+                    lock (thisLock)
+                    {
+                        RRLogFuncs.LogInfo("TcpTransport port sharer disconnected");
+                        unixSocket = null;
+                        sharerConnected = false;
+                        localSocket?.Dispose();
+                        localSocket = null;
+                        port = 0;
+                    }
+
+                    await Task.Delay(1000, cancel);
+                }
+
+                lock (thisLock)
+                {
+                    localSocket?.Dispose();
+                    localSocket = null;
+                    port = 0;
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        public void IncomingSocket(Socket socket)
+        {
+            RRLogFuncs.LogInfo($"TcpTransport port sharer accepted socket");
+
+            var parent1 = parent;
+            try
+            {
+                socket.LingerState = new LingerOption(true, 5);
+
+                // Use reflection to access internal constructor
+                var sock = (TcpClient)Activator.CreateInstance(typeof(TcpClient), System.Reflection.BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { socket }, null);
+
+                parent.AcceptSocket(sock);
+            }
+            catch (Exception exp)
+            {
+                RRLogFuncs.LogWarning(string.Format("Failed to accept incoming socket {0}", exp.Message));
+            }
+        }
+
+        public bool IsPortSharerConnected()
+        {
+            lock (thisLock)
+            {
+                return sharerConnected;
+            }
+        }
+
+        public string FindPortSharerInfoFile(NodeDirectories nodeDirs)
+        {
+            string fname = null;
+            if (nodeDirs.system_run_dir != null)
+            {
+                string p1 = Path.Combine(nodeDirs.system_run_dir, "transport", "tcp", "portsharer", "portsharer.info");
+                p1 = Path.GetFullPath(p1);
+
+                RRLogFuncs.LogDebug($"Looking for portsharer.info in {p1}");
+
+                bool infoFileFound = NodeDirectoriesUtil.ReadInfoFile(p1, out var info);
+                if (infoFileFound)
+                {
+                    if (info.TryGetValue("socket", out string socket))
+                    {
+                        fname = socket;
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(fname))
+            {
+                string p1 = Path.Combine(LocalTransportUtil.GetTransportPrivateSocketPath(nodeDirs), "..", "tcp", "portsharer", "portsharer.info");
+                p1 = Path.GetFullPath(p1);
+
+                RRLogFuncs.LogTrace($"Looking for portsharer.info in {p1}");
+
+                if (NodeDirectoriesUtil.ReadInfoFile(p1, out var info))
+                {
+                    if (info.TryGetValue("socket", out string socket))
+                    {
+                        fname = socket;
+                    }
+                }
+            }
+
+            return fname?.Trim();
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct IOVector
+    {
+        public IntPtr Base;
+        public UIntPtr Length;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct msghdr
+    {
+        public IntPtr msg_name; //optional address
+        public UIntPtr msg_namelen; //size of address
+        public IntPtr msg_iov; //scatter/gather array
+        public UIntPtr msg_iovlen; //# elements in msg_iov
+        public IntPtr msg_control; //ancillary data, see below
+        public UIntPtr msg_controllen; //ancillary data buffer len
+        public int msg_flags; //flags on received message
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct cmsghdr2
+    {
+        public UIntPtr cmsg_len; //data byte count, including header
+        public int cmsg_level; //originating protocol
+        public int cmsg_type; //protocol-specific type
+        public int fd;
+
+        public uint pad;
+        public uint pad2;
+        public uint pad3;
+        public uint pad4;
+    }
+    static class TcpTransportUtil
+    {
+        // cSpell: ignore iovdat
+
+        [DllImport("libc", SetLastError = true)]
+        public static extern int recvmsg(int s, IntPtr msg, int flags);
+
+        public static bool ReadFd(int localSocket, byte[] buf, out int sock)
+        {
+            sock = -1;
+
+            IntPtr iovdat_buf = Marshal.AllocHGlobal(4096);
+
+            IOVector iov = new IOVector();
+            iov.Base = iovdat_buf;
+            iov.Length = (UIntPtr)4096;
+
+
+            IntPtr iov_buf = Marshal.AllocHGlobal(Marshal.SizeOf<IOVector>());
+            Marshal.StructureToPtr(iov, iov_buf, false);
+
+            cmsghdr2 cm2 = new cmsghdr2();
+            cm2.cmsg_len = (UIntPtr)Marshal.SizeOf<cmsghdr2>();
+
+            IntPtr cm2_buf = Marshal.AllocHGlobal(Marshal.SizeOf<cmsghdr2>());
+            Marshal.StructureToPtr(cm2, cm2_buf, false);
+
+            msghdr mh = new msghdr();
+            mh.msg_control = cm2_buf;
+            mh.msg_controllen = cm2.cmsg_len;
+            mh.msg_name = IntPtr.Zero;
+            mh.msg_namelen = (UIntPtr)0;
+
+            mh.msg_iov = iov_buf;
+            mh.msg_iovlen = (UIntPtr)1;
+
+            IntPtr mh_buf = Marshal.AllocHGlobal(Marshal.SizeOf<msghdr>());
+            Marshal.StructureToPtr(mh, mh_buf, false);
+
+
+            int read = recvmsg(localSocket, mh_buf, 0);
+
+            if (read <= 0)
+            {
+                Marshal.FreeHGlobal(iov_buf);
+                Marshal.FreeHGlobal(iovdat_buf);
+                Marshal.FreeHGlobal(cm2_buf);
+                Marshal.FreeHGlobal(mh_buf);
+
+                return false;
+            }
+
+            cm2 = Marshal.PtrToStructure<cmsghdr2>(cm2_buf);
+
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+
+                if (cm2.cmsg_level != 1)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+            else
+            {
+                if (cm2.cmsg_level != 0xffff)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+
+
+            sock = cm2.fd;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+
+                if (cm2.cmsg_level != 1)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+            else
+            {
+                if (cm2.cmsg_level != 0xffff)
+                {
+                    Marshal.FreeHGlobal(iov_buf);
+                    Marshal.FreeHGlobal(iovdat_buf);
+                    Marshal.FreeHGlobal(cm2_buf);
+                    Marshal.FreeHGlobal(mh_buf);
+                    return false;
+                }
+            }
+
+            sock = cm2.fd;
+
+            Marshal.FreeHGlobal(iov_buf);
+            Marshal.FreeHGlobal(iovdat_buf);
+            Marshal.FreeHGlobal(cm2_buf);
+            Marshal.FreeHGlobal(mh_buf);
+
+            return true;
+        }
+    }
+}

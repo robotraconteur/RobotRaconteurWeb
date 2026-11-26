@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\RobotRaconteur.Sharp\RobotRaconteur.Sharp.csproj" />
+    <ProjectReference Include="..\..\RobotRaconteur.Sharp.Gen\RobotRaconteur.Sharp.Gen.csproj" >
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="test_vectors.bin" LogicalName="test_vectors.bin" />
+    <!-- Stale checked-in generator output; the build generates this service from its robdef -->
+    <Compile Remove="experimental.testing.subtestfilter_stubskel.cs" />
+  </ItemGroup>
+
+  <Target Name="UpdateRobotRaconteurGenFiles" DependsOnTargets="_UpdateRobotRaconteurGenFiles">
+    <ItemGroup>
+      <Compile Include="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_UpdateRobotRaconteurGenFiles" Outputs="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs">
+    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)../../RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj -- --include-path=$(MSBuildThisFileDirectory) --thunksource --lang=csharp --outfile=$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs com.robotraconteur.testing.TestService1.robdef com.robotraconteur.testing.TestService2.robdef com.robotraconteur.testing.TestService3.robdef experimental.testing.sub_test.robdef experimental.testing.subtestfilter.robdef experimental.pipe_sub_test.robdef experimental.wire_sub_test.robdef experimental.subobject_sub_test.robdef experimental.gen_test_cs_names.robdef com.robotraconteur.testing.TestService5.robdef" />
+  </Target>
+
+  <PropertyGroup>
+    <CoreCompileDependsOn>UpdateRobotRaconteurGenFiles;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+
+</Project>

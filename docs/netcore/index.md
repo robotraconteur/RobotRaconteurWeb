@@ -1,29 +1,27 @@
 <p align="center"><img src="images/logo-header.svg"></p>
 
-# RobotRaconteurWeb Documentation
+# RobotRaconteur.Sharp Documentation
 
-Welcome to the RobotRaconteurWeb documentation!
+Welcome to the RobotRaconteur.Sharp documentation!
 
-Robot Raconteur is a communication framework for robotics, automation, and the Internet of Things. RobotRaconteurWeb
+Robot Raconteur is a communication framework for robotics, automation, and the Internet of Things. RobotRaconteur.Sharp
 is an implementation of Robot Raconteur developed in pure C#. This is in contrast to RobotRaconteurNET, which
-is a wrapper for the native RobotRaconteurCore implementation that is developed in C++. RobotRaconteurWeb
-is more portable since it is pure C#. RobotRaconteurWeb is also available for use with the H5 C#-to-JavaScript
-compiler. RobotRaconteurH5 is RobotRaconteurWeb compiled to JavaScript for use with any modern web browser.
-It uses WebSockets to communicate with Robot Raconteur services. RobotRaconteurWeb can also be used with ASP.NET
-web servers using WebSockets. See the examples for a demonstration of how this work. This capability allows
-for Robot Raconteur to be easily integrated into cloud and information systems without requiring any modifications
-to the infrastructure!
+is a wrapper for the native RobotRaconteurCore implementation that is developed in C++. RobotRaconteur.Sharp
+is more portable since it is pure C#. For web browsers, use the Robot Raconteur TypeScript implementation, or
+RobotRaconteur.Sharp with Blazor WebAssembly. RobotRaconteur.Sharp can also be used with ASP.NET web servers using
+WebSockets. See the [ASP.NET Core server example](https://github.com/robotraconteur/RobotRaconteur.Sharp/tree/master/examples/aspnet_server) for a demonstration. This capability allows for Robot Raconteur to
+be easily integrated into cloud and information systems without requiring any modifications to the infrastructure!
 
-**See the API Documentation here!!** [api/index.html](api/index.html)
+RobotRaconteur.Sharp was formerly named RobotRaconteurWeb.
 
-RobotRaconteurWeb is very similar to RobotRaconteurNET. The main difference is that RobotRaconteurWeb
+**See the API Documentation here!!** [API Documentation](api/index.md)
+
+RobotRaconteur.Sharp is very similar to RobotRaconteurNET. The main difference is that RobotRaconteur.Sharp
 uses the asynchronous Task framework instead of blocking. All function that could potentially block
 are instead asynchronous, and should be used with async/await.
 
 See the RobotRaconteurCore documentation for more information on Robot Raconteur and how to use the library:
 https://github.com/robotraconteur/robotraconteur/wiki/Documentation
-
-Also see the H5 compiler: https://github.com/theolivenbaum/h5
 
 ## Robot Raconteur
 
@@ -41,8 +39,7 @@ before using C\#.
 
 See the individual package Readme files for more information:
 
-* [RobotRaconteurWeb](articles/robotraconteurweb_readme.md)
-* [RobotRaconteurWebGen](articles/robotraconteurwebgen_readme.md)
-* [RobotRaconteurH5](articles/robotraconteurh5_readme.md)
+* [RobotRaconteur.Sharp](articles/robotraconteursharp_readme.md)
+* [RobotRaconteur.Sharp.Gen](articles/robotraconteursharpgen_readme.md)
 
 Copyright (C) 2024 Wason Technology, LLC

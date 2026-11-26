@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Start App": {
+      "commandName": "Project",
+      "commandLineArgs": "citests",
+      "workingDirectory": "C:\\Users\\wasonj\\Documents\\RobotRaconteur2\\RobotRaconteurWeb\\test\\RobotRaconteur.Sharp.Test",
+      "environmentVariables": {
+        "ROBOTRACONTEUR_LOG_LEVEL": "WARNING"
+      }
+    }
+  }
+}

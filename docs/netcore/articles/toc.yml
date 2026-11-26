@@ -1,6 +1,4 @@
-- name: RobotRaconteurWeb Readme
-  href: robotraconteurweb_readme.md
-- name: RobotRaconteurWebGen Readme
-  href: robotraconteurwebgen_readme.md
-- name: RobotRaconteurH5 Readme
-  href: robotraconteurh5_readme.md
+- name: RobotRaconteur.Sharp Readme
+  href: robotraconteursharp_readme.md
+- name: RobotRaconteur.Sharp.Gen Readme
+  href: robotraconteursharpgen_readme.md

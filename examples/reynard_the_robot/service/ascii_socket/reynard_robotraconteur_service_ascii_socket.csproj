@@ -12,7 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="DrekarLaunchProcessNET" Version="0.1.0" />
-      <PackageReference Include="RobotRaconteurWeb" Version="*" />
+      <PackageReference Include="RobotRaconteur.Sharp" Version="*" />
     </ItemGroup>
 
 </Project>
