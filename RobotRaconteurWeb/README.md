@@ -118,6 +118,24 @@ using (var node_setup = new ClientNodeSetup(args: args))
 }
 ```
 
+## Blazor WebAssembly
+
+Raw sockets and most file system access are not available in the browser, so `ClientNodeSetup`, `TcpTransport`
+and `LocalTransport` cannot be used in Blazor WebAssembly. Use `BrowserWebSocketTransport` instead. It connects to
+services over WebSockets using `rr+ws` and `rr+wss` URLs. Register the generated service factories explicitly,
+because Blazor trimming may remove types found by assembly scanning.
+
+```csharp
+var node = RobotRaconteurNode.s;
+node.RegisterServiceType(new experimental.reynard_the_robot.experimental__reynard_the_robotFactory(node));
+node.RegisterTransport(new BrowserWebSocketTransport(node));
+
+var c = (experimental.reynard_the_robot.Reynard)await node.ConnectService(
+    "rr+ws://localhost:29200?service=reynard");
+```
+
+The service must accept WebSocket connections. `TcpTransport` servers accept them by default.
+
 ## License
 
 Apache 2.0

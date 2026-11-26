@@ -294,6 +294,8 @@ namespace RobotRaconteurTest
 
                         await TcpWebSocketTargetNodeTest.TestWebSocketConnectChecksNodeID();
 
+                        await BrowserWebSocketTransportTest.TestBrowserWebSocketConnect();
+
                         await TcpWebSocketHeaderCaseTest.TestWebSocketHandshakeHeaderCase();
 
                         await AsyncStreamStalledWriteTest.TestStalledWriteReceiveTimeout();
