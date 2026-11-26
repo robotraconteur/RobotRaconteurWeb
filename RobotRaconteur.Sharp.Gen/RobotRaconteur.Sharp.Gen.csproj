@@ -8,6 +8,8 @@
     <RootNamespace>RobotRaconteurSharp.Gen</RootNamespace>
     <PackageId>RobotRaconteur.Sharp.Gen</PackageId>
     <ToolCommandName>RobotRaconteur.Sharp.Gen</ToolCommandName>
+    <!-- Run on newer .NET runtimes when .NET 8 is not installed -->
+    <RollForward>Major</RollForward>
     <PackAsTool>True</PackAsTool>
     <ApplicationIcon />
     <Company>Wason Technology, LLC</Company>
