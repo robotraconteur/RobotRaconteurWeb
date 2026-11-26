@@ -136,7 +136,12 @@ var c = (experimental.reynard_the_robot.Reynard)await node.ConnectService(
     "rr+ws://localhost:29200?service=reynard");
 ```
 
-The service must accept WebSocket connections. `TcpTransport` servers accept them by default.
+The service must accept WebSocket connections. `TcpTransport` servers accept them by default, but they only
+accept browser connections from a few known origins. Allow the origin your Blazor app is served from on the
+server, for example `tcp_transport.AddWebSocketAllowedOrigin("https://myapp.example.com")`.
+
+`RobotRaconteur.Sharp.BlazorTest` in the repository runs the client service tests in Chromium, Firefox and
+WebKit using Playwright.
 
 ## License
 

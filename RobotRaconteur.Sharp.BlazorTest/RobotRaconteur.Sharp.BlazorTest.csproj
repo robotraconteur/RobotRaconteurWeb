@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <!-- Blazor WebAssembly app that runs the standard client service tests in a web browser over
+       BrowserWebSocketTransport. Driven by the Playwright tests in e2e/. See README.md. -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>RobotRaconteurSharp.BlazorTest</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS1998;CS0067;CS0168;CS0219;CS0414;CS0649</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobotRaconteur.Sharp\RobotRaconteur.Sharp.csproj" />
+    <ProjectReference Include="..\RobotRaconteur.Sharp.Gen\RobotRaconteur.Sharp.Gen.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Test clients shared with RobotRaconteur.Sharp.Test, compiled unchanged -->
+  <ItemGroup>
+    <Compile Include="..\RobotRaconteur.Sharp.Test\ServiceTestClient.cs" Link="Shared\ServiceTestClient.cs" />
+    <Compile Include="..\RobotRaconteur.Sharp.Test\ServiceTestClient2.cs" Link="Shared\ServiceTestClient2.cs" />
+    <Compile Include="..\RobotRaconteur.Sharp.Test\ServiceTest2.cs" Link="Shared\ServiceTest2.cs" />
+    <Compile Include="..\RobotRaconteur.Sharp.Test\MultiDimArrayTest.cs" Link="Shared\MultiDimArrayTest.cs" />
+    <Compile Include="..\RobotRaconteur.Sharp.Test\RRAssert.cs" Link="Shared\RRAssert.cs" />
+    <Compile Include="..\RobotRaconteur.Sharp.Test\RRWebTest.cs" Link="Shared\RRWebTest.cs" />
+    <Compile Include="..\RobotRaconteur.Sharp.Test\TestVectors.cs" Link="Shared\TestVectors.cs" />
+    <EmbeddedResource Include="..\RobotRaconteur.Sharp.Test\test_vectors.bin" LogicalName="test_vectors.bin" />
+  </ItemGroup>
+
+  <Target Name="UpdateRobotRaconteurGenFiles" DependsOnTargets="_UpdateRobotRaconteurGenFiles">
+    <ItemGroup>
+      <Compile Include="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_UpdateRobotRaconteurGenFiles" Outputs="$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs">
+    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)../RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj -- --include-path=$(MSBuildThisFileDirectory)../RobotRaconteur.Sharp.Test --thunksource --lang=csharp --outfile=$(BaseIntermediateOutputPath)RobotRaconteurGenCSGeneratedFile.g.cs com.robotraconteur.testing.TestService1.robdef com.robotraconteur.testing.TestService2.robdef com.robotraconteur.testing.TestService3.robdef" />
+  </Target>
+
+  <PropertyGroup>
+    <CoreCompileDependsOn>UpdateRobotRaconteurGenFiles;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+
+</Project>

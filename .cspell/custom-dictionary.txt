@@ -271,3 +271,7 @@ cyclea
 cycleb
 nostdver
 xabcx
+blazor
+netns
+nologo
+slirp

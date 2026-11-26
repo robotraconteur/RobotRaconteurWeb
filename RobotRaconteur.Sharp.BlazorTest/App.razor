@@ -1,0 +1,55 @@
+@using System.Text
+@inject NavigationManager Navigation
+
+<h1>RobotRaconteur.Sharp Blazor WebAssembly tests</h1>
+<p>Status: <span id="status">@status</span></p>
+<pre id="log">@log</pre>
+
+@code {
+    // The test server address is passed in the query string: /?server=localhost:22355
+    private string status = "RUNNING";
+    private readonly StringBuilder log = new StringBuilder();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            string server = GetQueryParameter("server") ?? "localhost:22355";
+            Log("Connecting to test server " + server);
+            await BrowserServiceTests.Run(server, Log);
+            status = "PASS";
+        }
+        catch (Exception e)
+        {
+            Log("Test failed: " + e);
+            status = "FAIL";
+        }
+        StateHasChanged();
+    }
+
+    private void Log(string line)
+    {
+        log.AppendLine(line);
+        Console.WriteLine(line);
+        StateHasChanged();
+    }
+
+    private string GetQueryParameter(string name)
+    {
+        var query = new Uri(Navigation.Uri).Query.TrimStart('?');
+        foreach (var part in query.Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = part.Split('=', 2);
+            if (Uri.UnescapeDataString(kv[0]) == name && kv.Length == 2)
+            {
+                return Uri.UnescapeDataString(kv[1]);
+            }
+        }
+        return null;
+    }
+}

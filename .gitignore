@@ -231,3 +231,7 @@ _Pvt_Extensions
 
 # Local scratch (builds, nuget cache)
 .work/
+
+# Playwright output
+test-results/
+playwright-report/

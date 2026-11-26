@@ -45,6 +45,9 @@ namespace RobotRaconteurTest
                 case "server":
                     await TestServer.RunServer(args[2], args[1]);
                     break;
+                case "browsertestserver":
+                    await BrowserTestServer.RunBrowserTestServer(args);
+                    break;
                 case "findservicebytype":
                 case "findnodebyid":
                 case "findnodebyname":

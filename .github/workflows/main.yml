@@ -52,6 +52,27 @@ jobs:
         dotnet-version: 8.x
     - name: Build and Run
       run: dotnet run --project RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj --configuration Release
+  blazor:
+    runs-on: ubuntu-latest
+    # Must match the @playwright/test version in RobotRaconteur.Sharp.BlazorTest/e2e/package.json
+    container: mcr.microsoft.com/playwright:v1.49.1-noble
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup dotnet 8.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+    - name: Publish Blazor test app and test server
+      run: |
+        dotnet publish RobotRaconteur.Sharp.BlazorTest/RobotRaconteur.Sharp.BlazorTest.csproj -c Release -o RobotRaconteur.Sharp.BlazorTest/bin/publish-app
+        dotnet publish RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj -c Release -r linux-x64 --self-contained -o RobotRaconteur.Sharp.BlazorTest/bin/publish-server
+    - name: Run Playwright tests
+      working-directory: RobotRaconteur.Sharp.BlazorTest/e2e
+      env:
+        HOME: /root
+      run: |
+        npm ci
+        npx playwright test
   pre-commit:
     runs-on: ubuntu-latest
     env:
