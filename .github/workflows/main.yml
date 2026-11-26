@@ -13,9 +13,9 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - name: Setup dotnet 8.x
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 8.x
     - name: Install dependencies
@@ -28,7 +28,7 @@ jobs:
         dotnet pack  "RobotRaconteur.Sharp/RobotRaconteur.Sharp.csproj" -p:Platform="AnyCPU" --configuration Release
         dotnet pack  "RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj" -p:Platform="AnyCPU" --configuration Release
     - name: Upload nuget packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: nuget-packages
         path: |
@@ -36,9 +36,9 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - name: Checkout Robot Raconteur Core test vectors
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         repository: robotraconteur/robotraconteur
         ref: master
@@ -47,7 +47,7 @@ jobs:
     - name: Check test vectors against Core
       run: python3 .github/scripts/check_test_vectors.py test/RobotRaconteur.Sharp.Test/test_vectors.bin rr-core/test/data
     - name: Setup dotnet 8.x
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 8.x
     - name: Build and Run
@@ -57,9 +57,9 @@ jobs:
     # Must match the @playwright/test version in test/RobotRaconteur.Sharp.BlazorTest/e2e/package.json
     container: mcr.microsoft.com/playwright:v1.49.1-noble
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Setup dotnet 8.x
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 8.x
     - name: Publish Blazor test app and test server
@@ -75,7 +75,7 @@ jobs:
         npx playwright test
     - name: Upload Playwright traces
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: playwright-traces
         path: test/RobotRaconteur.Sharp.BlazorTest/e2e/test-results/
@@ -84,14 +84,16 @@ jobs:
     env:
       SKIP: no-commit-to-branch
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v7
+    - uses: actions/setup-python@v7
+      with:
+        python-version: 3.x
     - name: apt
       run: |
         sudo apt update
         sudo apt install -y dos2unix
     - name: Setup dotnet 8.x
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 8.x
     - name: Update dotnet format

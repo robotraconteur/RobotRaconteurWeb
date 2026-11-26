@@ -17,9 +17,9 @@ jobs:
       contents: read
       id-token: write  # Trusted Publishing exchanges the GitHub OIDC token for a temporary NuGet API key
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Setup dotnet 8.x
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 8.x
     - name: Check that the release tag matches the package versions
@@ -46,7 +46,7 @@ jobs:
         dotnet pack RobotRaconteur.Sharp/RobotRaconteur.Sharp.csproj --configuration Release --output packages
         dotnet pack RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj --configuration Release --output packages
     - name: Upload packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: nuget-packages
         path: packages/*.nupkg
