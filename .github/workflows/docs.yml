@@ -1,57 +1,48 @@
 name: docs
 
 on:
-
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup dotnet 6.x
-      uses: actions/setup-dotnet@v3
+    - uses: actions/checkout@v7
+    - name: Setup dotnet 8.x
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 6.x
+        dotnet-version: 8.x
     - name: Install docfx
-      run: dotnet tool update -g docfx
+      run: dotnet tool install --global docfx --version 2.81.0
     - name: Copy readme files to docs
       run: |
         cp RobotRaconteur.Sharp/README.md docs/netcore/articles/robotraconteursharp_readme.md
         cp RobotRaconteur.Sharp.Gen/README.md docs/netcore/articles/robotraconteursharpgen_readme.md
     - name: Build docs
-      working-directory: ./docs/netcore
-      run: docfx
-    - name: Move docs
+      working-directory: docs/netcore
+      run: docfx docfx.json
+    - name: Assemble site
       run: |
-        mkdir doc\doc\latest
-        move docs\netcore\_site doc\doc\latest\netcore
-        copy docs\github_pages\index.html doc\index.html
-
-    - name: tree
-      run: tree  /a /f
-    - name: archive docs
-      uses: actions/upload-pages-artifact@v1
+        mkdir -p site/doc/latest
+        mv docs/netcore/_site site/doc/latest/netcore
+        cp docs/github_pages/index.html site/index.html
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v5
       with:
-        path: doc
-     # Deploy job
+        path: site
+
   deploy:
-    # Add a dependency to the build job
     needs: build
-
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    # Permissions required to make a Pages deployment
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
-
-    # Deploy to the github-pages environment
+      pages: write
+      id-token: write
+      actions: read
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    # Specify runner + deployment step
     runs-on: ubuntu-latest
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v1
+      uses: actions/deploy-pages@v5

@@ -14,7 +14,7 @@ be easily integrated into cloud and information systems without requiring any mo
 
 RobotRaconteur.Sharp was formerly named RobotRaconteurWeb.
 
-**See the API Documentation here!!** [api/index.html](api/index.html)
+**See the API Documentation here!!** [API Documentation](api/index.md)
 
 RobotRaconteur.Sharp is very similar to RobotRaconteurNET. The main difference is that RobotRaconteur.Sharp
 uses the asynchronous Task framework instead of blocking. All function that could potentially block
