@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
 using Mono.Options;
 using static RobotRaconteurSharp.RRLogFuncs;
 
@@ -921,9 +921,9 @@ namespace RobotRaconteurSharp
                     }
                     else if (!string.IsNullOrEmpty(nodeId))
                     {
-                                //local_transport.StartServerAsNodeID(new NodeID(nodeId), publicServer);
-                                local_transport.StartServerAsNodeID(new NodeID(nodeId));
-                                nodeNameSet = true;
+                        //local_transport.StartServerAsNodeID(new NodeID(nodeId), publicServer);
+                        local_transport.StartServerAsNodeID(new NodeID(nodeId));
+                        nodeNameSet = true;
                         nodeIdSet = true;
                     }
                     else
@@ -1025,7 +1025,7 @@ namespace RobotRaconteurSharp
 
                 if (config.GetOptionOrDefaultAsBool("discovery-listening-enable"))
                 {
-                            IPNodeDiscoveryFlags listenFlags = 0;
+                    IPNodeDiscoveryFlags listenFlags = 0;
 
                     if (config.GetOptionOrDefaultAsBool("tcp-ipv4-discovery"))
                     {
@@ -1044,7 +1044,7 @@ namespace RobotRaconteurSharp
 
                 if (config.GetOptionOrDefaultAsBool("discovery-announce-enable"))
                 {
-                            IPNodeDiscoveryFlags announceFlags = 0;
+                    IPNodeDiscoveryFlags announceFlags = 0;
 
                     if (config.GetOptionOrDefaultAsBool("tcp-ipv4-discovery"))
                     {

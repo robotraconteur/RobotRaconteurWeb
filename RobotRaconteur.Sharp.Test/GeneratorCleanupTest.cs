@@ -6,8 +6,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService3;
-using RobotRaconteurTest;
 using RobotRaconteurSharp;
+using RobotRaconteurTest;
 
 namespace RobotRaconteurSharp.Test
 {

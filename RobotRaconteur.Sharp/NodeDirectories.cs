@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.InteropServices;
-using System.Security.Principal;
-using Mono.Unix;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
+using Mono.Unix;
 using static RobotRaconteurSharp.RRLogFuncs;
 
 namespace RobotRaconteurSharp
@@ -601,7 +601,7 @@ namespace RobotRaconteurSharp
                 {
                     SecureTmpUserRunDir(node_dirs.user_run_dir);
                     string p_lock = node_dirs.user_run_dir;
-                    foreach(var s in scope)
+                    foreach (var s in scope)
                     {
                         p_lock = Path.Combine(p_lock, s);
                     }
@@ -611,12 +611,12 @@ namespace RobotRaconteurSharp
                     p_lock = Path.Combine(p_lock, name + ".pid");
 
                     string p_state = node_dirs.user_state_dir;
-                    foreach(var s in scope)
+                    foreach (var s in scope)
                     {
                         p_state = Path.Combine(p_state, s);
                     }
 
-                    Directory.CreateDirectory (p_state);
+                    Directory.CreateDirectory(p_state);
 
                     p_state = Path.Combine(p_state, name);
 
@@ -878,14 +878,14 @@ namespace RobotRaconteurSharp
             }
         }
 
-        public static void RefreshInfoFile(NodeDirectoriesFD h_info, Dictionary<string,string> updated_info)
+        public static void RefreshInfoFile(NodeDirectoriesFD h_info, Dictionary<string, string> updated_info)
         {
             if (h_info == null) return;
 
             lock (h_info)
             {
                 // Add or update contents of h_info.info
-                foreach(var e in updated_info)
+                foreach (var e in updated_info)
                 {
                     h_info.Info[e.Key] = e.Value;
                 }

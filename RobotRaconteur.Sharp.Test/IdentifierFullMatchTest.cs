@@ -1,6 +1,6 @@
 using System;
-using RobotRaconteurTest;
 using RobotRaconteurSharp;
+using RobotRaconteurTest;
 
 namespace RobotRaconteurSubTest
 {

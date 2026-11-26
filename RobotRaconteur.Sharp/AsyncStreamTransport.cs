@@ -15,16 +15,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Security;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
-using System.IO;
 using System.Threading.Tasks;
 using RobotRaconteurSharp.Extensions;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Authentication;
-using System.Reflection;
 
 #pragma warning disable 1591
 
@@ -132,7 +132,7 @@ namespace RobotRaconteurSharp
                 {
                     if (starttls)
                     {
-                    await DoClientTlsHandshake(cancel).ConfigureAwait(false);
+                        await DoClientTlsHandshake(cancel).ConfigureAwait(false);
                     }
 
                     NodeID rid = (NodeID)await StreamOp("CreateConnection", Tuple.Create(this.target_nodeid, this.target_nodename), cancel).ConfigureAwait(false);
@@ -327,36 +327,36 @@ namespace RobotRaconteurSharp
 
                             if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                             {
-                            if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
-                            {
-                                //TODO: enforce direction of handshake
-                                await DoServerTlsHandshake(mes).ConfigureAwait(false);
+                                if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
+                                {
+                                    //TODO: enforce direction of handshake
+                                    await DoServerTlsHandshake(mes).ConfigureAwait(false);
                                     continue;
-                            }
-                            else if (mes.entries[0].EntryType == MessageEntryType.StreamOpRet && mes.entries[0].MemberName == "STARTTLS")
-                            {
-                                //TODO: enforce direction of handshake
+                                }
+                                else if (mes.entries[0].EntryType == MessageEntryType.StreamOpRet && mes.entries[0].MemberName == "STARTTLS")
+                                {
+                                    //TODO: enforce direction of handshake
 
-                                TaskCompletionSource<Message> ret;
-                                TaskCompletionSource<int> wait;
-                                lock (this)
-                                {
-                                    ret = clienthandshake_recv_task;
-                                    wait = clienthandshake_recv_done_task;
-                                }
+                                    TaskCompletionSource<Message> ret;
+                                    TaskCompletionSource<int> wait;
+                                    lock (this)
+                                    {
+                                        ret = clienthandshake_recv_task;
+                                        wait = clienthandshake_recv_done_task;
+                                    }
 
-                                if (ret == null || wait == null)
-                                {
-                                    if (ret != null) ret.TrySetCanceled();
-                                    Close();
-                                }
-                                else
-                                {
-                                    ret.TrySetResult(mes);
-                                    await wait.Task.ConfigureAwait(false);
-                                }
+                                    if (ret == null || wait == null)
+                                    {
+                                        if (ret != null) ret.TrySetCanceled();
+                                        Close();
+                                    }
+                                    else
+                                    {
+                                        ret.TrySetResult(mes);
+                                        await wait.Task.ConfigureAwait(false);
+                                    }
                                     continue;
-                            }
+                                }
                                 await StreamOpMessageReceived(mes).ConfigureAwait(false);
 
                                 continue;
@@ -518,10 +518,10 @@ namespace RobotRaconteurSharp
 
                 if ((mes.entries.Count == 1) && (mes.entries[0].EntryType == MessageEntryType.StreamOp || mes.entries[0].EntryType == MessageEntryType.StreamOpRet))
                 {
-                if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
-                {
-                    await DoServerTlsHandshake(mes).ConfigureAwait(false);
-                }
+                    if (mes.entries[0].EntryType == MessageEntryType.StreamOp && mes.entries[0].MemberName == "STARTTLS")
+                    {
+                        await DoServerTlsHandshake(mes).ConfigureAwait(false);
+                    }
                     await StreamOpMessageReceived(mes).ConfigureAwait(false);
                     return;
 
@@ -1058,8 +1058,8 @@ namespace RobotRaconteurSharp
                 //CheckStreamCapability_ret.TrySetException(new ConnectionException("Transport connection closed"));
                 r2 = CheckStreamCapability_ret;
                 CheckStreamCapability_ret = null;
-            h1 = clienthandshake_recv_task;
-            h2 = clienthandshake_recv_done_task;
+                h1 = clienthandshake_recv_task;
+                h2 = clienthandshake_recv_done_task;
             }
 
             if (r1 != null) r1.TrySetException(new ConnectionException("Transport connection closed"));
@@ -1610,209 +1610,209 @@ namespace RobotRaconteurSharp
 
             return false;
         }
-    protected async Task DoServerTlsHandshake(Message m)
-    {
-        Message mret = new Message();
-        mret.header = new MessageHeader();
-        mret.header.SenderNodeName = node.NodeName;
-        mret.header.ReceiverNodeName = m.header.SenderNodeName;
-        mret.header.SenderNodeID = node.NodeID;
-        mret.header.ReceiverNodeID = m.header.SenderNodeID;
-        MessageEntry mmret = new MessageEntry(MessageEntryType.StreamOpRet, "STARTTLS");
-        mret.entries.Add(mmret);
-
-        if (basestream is SslStream)
+        protected async Task DoServerTlsHandshake(Message m)
         {
-            // A second STARTTLS would wrap a new SslStream around the existing one
-            mmret.AddElement("errorname", "RobotRaconteur.ProtocolError");
-            mmret.AddElement("errorstring", "TLS already active");
-            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
-            Close();
-            return;
-        }
+            Message mret = new Message();
+            mret.header = new MessageHeader();
+            mret.header.SenderNodeName = node.NodeName;
+            mret.header.ReceiverNodeName = m.header.SenderNodeName;
+            mret.header.SenderNodeID = node.NodeID;
+            mret.header.ReceiverNodeID = m.header.SenderNodeID;
+            MessageEntry mmret = new MessageEntry(MessageEntryType.StreamOpRet, "STARTTLS");
+            mret.entries.Add(mmret);
 
-        var cert = GetTlsCertificate();
-
-        if (cert == null)
-        {
-            mmret.Error = MessageErrorType.ConnectionError;
-            mmret.AddElement("errorname", "RobotRaconteur.ConnectionError");
-            mmret.AddElement("errorstring", "Server certificate not loaded");
-            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
-            Close();
-            return;
-        }
-
-        bool good = false;
-        lock (this)
-        {
-            if (m.header.ReceiverNodeID.IsAnyNode && (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == node.NodeName))
+            if (basestream is SslStream)
             {
-                m_RemoteNodeID = m.header.SenderNodeID;
-                good = true;
+                // A second STARTTLS would wrap a new SslStream around the existing one
+                mmret.AddElement("errorname", "RobotRaconteur.ProtocolError");
+                mmret.AddElement("errorstring", "TLS already active");
+                await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
+                Close();
+                return;
             }
 
-            if (m.header.ReceiverNodeID == node.NodeID && !good)
+            var cert = GetTlsCertificate();
+
+            if (cert == null)
             {
-                if (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == node.NodeName)
+                mmret.Error = MessageErrorType.ConnectionError;
+                mmret.AddElement("errorname", "RobotRaconteur.ConnectionError");
+                mmret.AddElement("errorstring", "Server certificate not loaded");
+                await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
+                Close();
+                return;
+            }
+
+            bool good = false;
+            lock (this)
+            {
+                if (m.header.ReceiverNodeID.IsAnyNode && (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == node.NodeName))
                 {
                     m_RemoteNodeID = m.header.SenderNodeID;
                     good = true;
                 }
+
+                if (m.header.ReceiverNodeID == node.NodeID && !good)
+                {
+                    if (m.header.ReceiverNodeName == "" || m.header.ReceiverNodeName == node.NodeName)
+                    {
+                        m_RemoteNodeID = m.header.SenderNodeID;
+                        good = true;
+                    }
+                }
+
             }
 
-        }
-
-        if (!good)
-        {
-            mmret.Error = MessageErrorType.NodeNotFound;
-            mmret.AddElement("errorname", "RobotRaconteur.NodeNotFound");
-            mmret.AddElement("errorstring", "Node not found");
-            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
-            Close();
-            return;
-        }
-
-        bool mutualauth=false;
-        var mutualauth1 = m.entries[0].elements.FirstOrDefault(x => x.ElementName == "mutualauth");
-        if (mutualauth1!=null)
-        {
-            if(mutualauth1.CastData<string>().ToLower()=="true")
+            if (!good)
             {
-                mutualauth=true;
-                // Confirm mutual authentication to the client, which requires it when it has a certificate
-                mmret.AddElement("mutualauth", "true");
+                mmret.Error = MessageErrorType.NodeNotFound;
+                mmret.AddElement("errorname", "RobotRaconteur.NodeNotFound");
+                mmret.AddElement("errorstring", "Node not found");
+                await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
+                Close();
+                return;
             }
+
+            bool mutualauth = false;
+            var mutualauth1 = m.entries[0].elements.FirstOrDefault(x => x.ElementName == "mutualauth");
+            if (mutualauth1 != null)
+            {
+                if (mutualauth1.CastData<string>().ToLower() == "true")
+                {
+                    mutualauth = true;
+                    // Confirm mutual authentication to the client, which requires it when it has a certificate
+                    mmret.AddElement("mutualauth", "true");
+                }
+            }
+
+            // Identity expected in the client certificate
+            handshake_host = "Robot Raconteur Node " + m.header.SenderNodeID.ToString();
+
+            try
+            {
+                await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
+
+                await RequestSendPause().ConfigureAwait(false);
+
+                var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
+                await ssl.AuthenticateAsServerAsync(cert.Item1, mutualauth, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
+                basestream = ssl;
+                m_IsTls = true;
+
+                await ResumeSendPause().ConfigureAwait(false);
+
+                return;
+
+            }
+            catch (Exception)
+            {
+                Close();
+            }
+
         }
 
-        // Identity expected in the client certificate
-        handshake_host = "Robot Raconteur Node " + m.header.SenderNodeID.ToString();
-
-        try
+        System.Security.Cryptography.AsymmetricAlgorithm OnPVKSelection(X509Certificate certificate, string targetHost)
         {
-            await SendMessage(mret, default(CancellationToken)).ConfigureAwait(false);
+            return ((X509Certificate2)GetTlsCertificate().Item1).PrivateKey;
+        }
+
+        TaskCompletionSource<Message> clienthandshake_recv_task = null;
+        TaskCompletionSource<int> clienthandshake_recv_done_task = null;
+
+        string handshake_host = null;
+        protected virtual async Task DoClientTlsHandshake(CancellationToken cancel)
+        {
+            lock (this)
+            {
+                clienthandshake_recv_task = new TaskCompletionSource<Message>();
+                clienthandshake_recv_done_task = new TaskCompletionSource<int>();
+            }
 
             await RequestSendPause().ConfigureAwait(false);
 
-            var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
-            await ssl.AuthenticateAsServerAsync(cert.Item1, mutualauth, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
-            basestream = ssl;
-            m_IsTls = true;
-
-            await ResumeSendPause().ConfigureAwait(false);
-
-            return;
-
-        }
-        catch (Exception)
-        {
-            Close();
-        }
-
-    }
-
-    System.Security.Cryptography.AsymmetricAlgorithm OnPVKSelection (X509Certificate certificate, string targetHost)
-    {
-            return ((X509Certificate2)GetTlsCertificate().Item1).PrivateKey;
-    }
-
-    TaskCompletionSource<Message> clienthandshake_recv_task = null;
-    TaskCompletionSource<int> clienthandshake_recv_done_task = null;
-
-    string handshake_host=null;
-    protected virtual async Task DoClientTlsHandshake(CancellationToken cancel)
-    {
-        lock (this)
-        {
-            clienthandshake_recv_task = new TaskCompletionSource<Message>();
-            clienthandshake_recv_done_task = new TaskCompletionSource<int>();
-        }
-
-        await RequestSendPause().ConfigureAwait(false);
-
-        try
-        {
-
-            var m = new Message();
-            m.header = new MessageHeader();
-            m.header.ReceiverNodeID = target_nodeid;
-            m.header.ReceiverNodeName = target_nodename;
-            var mm = new MessageEntry(MessageEntryType.StreamOp, "STARTTLS");
-            var cert = GetTlsCertificate();
-            bool mutualauth = cert != null;
-            if (mutualauth)
+            try
             {
-                mm.AddElement("mutualauth", "true");
+
+                var m = new Message();
+                m.header = new MessageHeader();
+                m.header.ReceiverNodeID = target_nodeid;
+                m.header.ReceiverNodeName = target_nodename;
+                var mm = new MessageEntry(MessageEntryType.StreamOp, "STARTTLS");
+                var cert = GetTlsCertificate();
+                bool mutualauth = cert != null;
+                if (mutualauth)
+                {
+                    mm.AddElement("mutualauth", "true");
+                }
+                m.entries.Add(mm);
+
+
+                byte[] m_mstream_buf = new byte[m.ComputeSize()];
+                var m_mstream = new MemoryStream();
+                var mstream = new ArrayBinaryWriter(m_mstream, m_mstream_buf, m_mstream_buf.Length);
+                m.Write(mstream);
+
+                var mstream_buf = m_mstream.ToArray();
+                await basestream.WriteAsync(mstream_buf, 0, mstream_buf.Length).ConfigureAwait(false);
+
+                clienthandshake_recv_task.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
+                var mret = await clienthandshake_recv_task.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
+                if (mret.entries.Count == 1 && mret.entries[0].Error != MessageErrorType.None)
+                    throw RobotRaconteurExceptionUtil.MessageEntryToException(mret.entries[0]);
+                NodeID recv_nodeid = mret.header.SenderNodeID;
+                string recv_nodename = mret.header.SenderNodeName;
+                if (!target_nodeid.IsAnyNode && target_nodeid != recv_nodeid)
+                    throw new ConnectionException("Could not validate remote node");
+                if (!String.IsNullOrEmpty(target_nodename) && target_nodename != recv_nodename)
+                    throw new ConnectionException("Could not validate remote node");
+                if (mret.entries.Count != 1)
+                    throw new ConnectionException("TLS handshake error");
+                if (mret.entries[0].EntryType != MessageEntryType.StreamOpRet
+                    || mret.entries[0].MemberName != "STARTTLS")
+                    throw new ConnectionException("TLS handshake error");
+                if (mutualauth && mret.entries[0].elements.Count(x => x.ElementName == "mutualauth" && x.CastData<string>().ToLower() == "true") == 0)
+                    throw new ConnectionException("TLS handshake error");
+
+                var host = "Robot Raconteur Node " + recv_nodeid.ToString();
+                handshake_host = host;
+
+                X509CertificateCollection certs = null;
+                if (mutualauth)
+                {
+                    certs = new X509CertificateCollection(new[] { cert.Item1 });
+                }
+
+                var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
+                await ssl.AuthenticateAsClientAsync(host, certs, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
+                basestream = ssl;
+                m_IsTls = true;
+
+                await ResumeSendPause().ConfigureAwait(false);
             }
-            m.entries.Add(mm);
-
-
-            byte[] m_mstream_buf=new byte[m.ComputeSize()];
-            var m_mstream = new MemoryStream();
-            var mstream = new ArrayBinaryWriter(m_mstream,m_mstream_buf, m_mstream_buf.Length);
-            m.Write(mstream);
-
-            var mstream_buf = m_mstream.ToArray();
-            await basestream.WriteAsync(mstream_buf, 0, mstream_buf.Length).ConfigureAwait(false);
-
-            clienthandshake_recv_task.AttachCancellationToken(cancel, new TimeoutException("Timed out"));
-            var mret = await clienthandshake_recv_task.Task.AwaitWithTimeout(5000).ConfigureAwait(false);
-            if (mret.entries.Count == 1 && mret.entries[0].Error != MessageErrorType.None)
-                throw RobotRaconteurExceptionUtil.MessageEntryToException(mret.entries[0]);
-            NodeID recv_nodeid = mret.header.SenderNodeID;
-            string recv_nodename = mret.header.SenderNodeName;
-            if (!target_nodeid.IsAnyNode && target_nodeid != recv_nodeid)
-                throw new ConnectionException("Could not validate remote node");
-            if (!String.IsNullOrEmpty(target_nodename) && target_nodename!=recv_nodename)
-                throw new ConnectionException("Could not validate remote node");
-            if (mret.entries.Count!=1)
-                throw new ConnectionException("TLS handshake error");
-            if(mret.entries[0].EntryType!=MessageEntryType.StreamOpRet
-                || mret.entries[0].MemberName!="STARTTLS")
-                throw new ConnectionException("TLS handshake error");
-            if (mutualauth && mret.entries[0].elements.Count(x => x.ElementName == "mutualauth" && x.CastData<string>().ToLower() == "true")==0)
-                throw new ConnectionException("TLS handshake error");
-
-			var host="Robot Raconteur Node " + recv_nodeid.ToString();
-            handshake_host=host;
-
-            X509CertificateCollection certs = null;
-            if (mutualauth)
+            catch (Exception)
             {
-                certs = new X509CertificateCollection(new[] { cert.Item1 });
+                Close();
+                throw;
+            }
+            finally
+            {
+                TaskCompletionSource<int> done_task = null;
+                lock (this)
+                {
+                    done_task = clienthandshake_recv_done_task;
+                    clienthandshake_recv_done_task = null;
+                    clienthandshake_recv_task = null;
+                }
+                done_task.TrySetResult(0);
             }
 
-            var ssl = new SslStream(basestream, false, RemoteCertificateValidationCallback);
-            await ssl.AuthenticateAsClientAsync(host, certs, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false).AwaitWithTimeout(5000).ConfigureAwait(false);
-            basestream = ssl;
-            m_IsTls = true;
 
-            await ResumeSendPause().ConfigureAwait(false);
         }
-        catch (Exception)
+
+        protected virtual Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate()
         {
-            Close();
-            throw;
+            return parent.GetTlsCertificate();
         }
-        finally
-        {
-            TaskCompletionSource<int> done_task = null;
-            lock(this)
-            {
-                done_task = clienthandshake_recv_done_task;
-                clienthandshake_recv_done_task = null;
-                clienthandshake_recv_task = null;
-            }
-            done_task.TrySetResult(0);
-        }
-
-
-    }
-
-        protected virtual Tuple<X509Certificate,X509CertificateCollection> GetTlsCertificate()
-    {
-        return parent.GetTlsCertificate();
-    }
 
         bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
@@ -1847,7 +1847,7 @@ namespace RobotRaconteurSharp
 
             if (chain0.ChainStatus.Any(x => x.Status == X509ChainStatusFlags.UntrustedRoot))
             {
-                if (!rootcerts.Any(x=> x.Thumbprint == chain0.ChainElements[chain0.ChainElements.Count - 1].Certificate.Thumbprint))
+                if (!rootcerts.Any(x => x.Thumbprint == chain0.ChainElements[chain0.ChainElements.Count - 1].Certificate.Thumbprint))
                 {
                     return false;
                 }
@@ -1873,126 +1873,146 @@ namespace RobotRaconteurSharp
             return rootcerts;
         }
 
-    bool RemoteCertificateValidationCallback2(X509Chain chain, bool embedded_root)
-    {
-
-        // The chain must end in one of the embedded Robot Raconteur root certificates, also when the
-        // operating system trusts another root
-        var chain_root = chain.ChainElements[chain.ChainElements.Count - 1].Certificate;
-        if (!LoadEmbeddedRootCerts().Any(x => x.Thumbprint == chain_root.Thumbprint))
+        bool RemoteCertificateValidationCallback2(X509Chain chain, bool embedded_root)
         {
-            return false;
-        }
 
-
-        if (chain.ChainElements[0].Certificate.Subject != "CN=" + handshake_host)
-        {
-            return false;
-        }
-
-        int CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT = 0x08000000;
-
-        for (int i=0; i<chain.ChainElements.Count; i++)
-        {
-            var element = chain.ChainElements[i];
-            bool found_ext = false;
-            bool found_crit_ext = false;
-            foreach (var s in element.ChainElementStatus)
+            // The chain must end in one of the embedded Robot Raconteur root certificates, also when the
+            // operating system trusts another root
+            var chain_root = chain.ChainElements[chain.ChainElements.Count - 1].Certificate;
+            if (!LoadEmbeddedRootCerts().Any(x => x.Thumbprint == chain_root.Thumbprint))
             {
-
-                if (s.Status == X509ChainStatusFlags.InvalidExtension)
-                {
-                    found_ext = true;
-                    continue;
-                }
-
-                int v1 = (int)s.Status;
-                int v2 = (int)X509ChainStatusFlags.NoError;
-
-                if ((int)s.Status == CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT)
-                {
-                    found_crit_ext = true;
-                    continue;
-                }
-
-            }
-
-            if (!found_ext || !found_crit_ext)
-            {
-                //TODO: re-enable this oid check
-                //return false;
+                return false;
             }
 
 
-            bool found_rr_oid = false;
-
-            foreach (var e in element.Certificate.Extensions)
+            if (chain.ChainElements[0].Certificate.Subject != "CN=" + handshake_host)
             {
-                if (!e.Critical) continue;
+                return false;
+            }
 
-                string oid = e.Oid.Value;
-                if (oid == "2.5.29.15" || oid == "2.5.29.14" || oid == "2.5.29.19" || oid == "2.5.29.35" || oid == "2.5.29.32")
+            int CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT = 0x08000000;
+
+            for (int i = 0; i < chain.ChainElements.Count; i++)
+            {
+                var element = chain.ChainElements[i];
+                bool found_ext = false;
+                bool found_crit_ext = false;
+                foreach (var s in element.ChainElementStatus)
                 {
-                    continue;
+
+                    if (s.Status == X509ChainStatusFlags.InvalidExtension)
+                    {
+                        found_ext = true;
+                        continue;
+                    }
+
+                    int v1 = (int)s.Status;
+                    int v2 = (int)X509ChainStatusFlags.NoError;
+
+                    if ((int)s.Status == CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT)
+                    {
+                        found_crit_ext = true;
+                        continue;
+                    }
+
                 }
 
-                string rr_oid;
-
-                if (i == 0)
+                if (!found_ext || !found_crit_ext)
                 {
-                    rr_oid="1.3.6.1.4.1.45455.1.1.3.3";
-                }
-                else if (i == chain.ChainElements.Count-1)
-                {
-                    rr_oid = "1.3.6.1.4.1.45455.1.1.3.1";
-                }
-                else
-                {
-                    rr_oid = "1.3.6.1.4.1.45455.1.1.3.2";
+                    //TODO: re-enable this oid check
+                    //return false;
                 }
 
-                if (oid != rr_oid)
+
+                bool found_rr_oid = false;
+
+                foreach (var e in element.Certificate.Extensions)
                 {
-                    // Unknown critical extension or wrong certificate role
+                    if (!e.Critical) continue;
+
+                    string oid = e.Oid.Value;
+                    if (oid == "2.5.29.15" || oid == "2.5.29.14" || oid == "2.5.29.19" || oid == "2.5.29.35" || oid == "2.5.29.32")
+                    {
+                        continue;
+                    }
+
+                    string rr_oid;
+
+                    if (i == 0)
+                    {
+                        rr_oid = "1.3.6.1.4.1.45455.1.1.3.3";
+                    }
+                    else if (i == chain.ChainElements.Count - 1)
+                    {
+                        rr_oid = "1.3.6.1.4.1.45455.1.1.3.1";
+                    }
+                    else
+                    {
+                        rr_oid = "1.3.6.1.4.1.45455.1.1.3.2";
+                    }
+
+                    if (oid != rr_oid)
+                    {
+                        // Unknown critical extension or wrong certificate role
+                        return false;
+                    }
+                    else
+                    {
+                        found_rr_oid = true;
+                    }
+                }
+
+                if (!found_rr_oid) return false;
+
+            }
+
+            foreach (var s in chain.ChainStatus)
+            {
+                if (s.Status != X509ChainStatusFlags.InvalidExtension && (int)s.Status != CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT)
+                {
+                    if (!(s.Status == X509ChainStatusFlags.UntrustedRoot && embedded_root))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool IsSecure
+        {
+            get
+            {
+                if (basestream is SslStream)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public bool IsSecurePeerIdentityVerified
+        {
+            get
+            {
+                try
+                {
+                    var s = basestream as SslStream;
+                    if (s != null)
+                    {
+                        var cert = s.RemoteCertificate;
+                        if (cert != null)
+                            return true;
+                    }
                     return false;
                 }
-                else
+                catch
                 {
-                    found_rr_oid = true;
+                    return false;
                 }
             }
-
-            if (!found_rr_oid) return false;
-
         }
 
-        foreach (var s in chain.ChainStatus)
-        {
-            if (s.Status != X509ChainStatusFlags.InvalidExtension && (int)s.Status != CERT_TRUST_HAS_NOT_SUPPORTED_CRITICAL_EXT)
-            {
-                if (!(s.Status == X509ChainStatusFlags.UntrustedRoot && embedded_root))
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    public bool IsSecure
-    {
-        get
-        {
-            if (basestream is SslStream)
-            {
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public bool IsSecurePeerIdentityVerified
-    {
-        get
+        public string GetSecurePeerIdentity()
         {
             try
             {
@@ -2000,36 +2020,16 @@ namespace RobotRaconteurSharp
                 if (s != null)
                 {
                     var cert = s.RemoteCertificate;
-                    if (cert != null)
-                        return true;
+                    if (cert == null) throw new AuthenticationException("Peer identity is not verified");
+                    return cert.Subject.ReplaceFirst("CN=Robot Raconteur Node ", "");
                 }
-                return false;
+                throw new AuthenticationException("Connection is not secure");
             }
             catch
             {
-                return false;
+                throw new AuthenticationException("Connection is not secure");
             }
         }
-    }
-
-    public string GetSecurePeerIdentity()
-    {
-        try
-        {
-            var s = basestream as SslStream;
-            if (s != null)
-            {
-                var cert = s.RemoteCertificate;
-                if (cert == null) throw new AuthenticationException("Peer identity is not verified");
-                return cert.Subject.ReplaceFirst("CN=Robot Raconteur Node ", "");
-            }
-            throw new AuthenticationException("Connection is not secure");
-        }
-        catch
-        {
-            throw new AuthenticationException("Connection is not secure");
-        }
-    }
 
     }
 
@@ -2043,7 +2043,7 @@ namespace RobotRaconteurSharp
 
         void RemoveTransportConnection(AsyncStreamTransport transport);
 
-    Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate();
+        Tuple<X509Certificate, X509CertificateCollection> GetTlsCertificate();
     }
 
 }

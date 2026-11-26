@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using RobotRaconteurTest;
 using RobotRaconteurSharp;
+using RobotRaconteurTest;
 
 namespace RobotRaconteurSharp.Test
 {

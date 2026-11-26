@@ -1012,13 +1012,13 @@ namespace RobotRaconteurTest
         {
             if (this.transport != null)
             {
-            TcpTransport transport = (TcpTransport)this.transport;
-            RRWebTest.WriteLine("Is Connection Secure: {0}", transport.IsTransportConnectionSecure(ServerEndpoint.CurrentEndpoint));
-            RRWebTest.WriteLine("Is Secure Peer Identity Verified: {0}", transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint));
-            if (transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint))
-            {
-                RRWebTest.WriteLine(transport.GetSecurePeerIdentity(ServerEndpoint.CurrentEndpoint));
-            }
+                TcpTransport transport = (TcpTransport)this.transport;
+                RRWebTest.WriteLine("Is Connection Secure: {0}", transport.IsTransportConnectionSecure(ServerEndpoint.CurrentEndpoint));
+                RRWebTest.WriteLine("Is Secure Peer Identity Verified: {0}", transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint));
+                if (transport.IsSecurePeerIdentityVerified(ServerEndpoint.CurrentEndpoint))
+                {
+                    RRWebTest.WriteLine(transport.GetSecurePeerIdentity(ServerEndpoint.CurrentEndpoint));
+                }
             }
 
 

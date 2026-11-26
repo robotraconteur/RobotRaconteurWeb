@@ -1002,8 +1002,8 @@ namespace RobotRaconteurTest
             ca<uint>(m3.Dims, m2_2.Dims);
             ca<byte>((byte[])m3.Array_, (byte[])m2_2.Array_);
 
-            MultiDimArray m6 = new MultiDimArray(new uint[] { 200,200 }, new byte[200*200]);
-            await r.m3.Read(new ulong[] { 65,800 }, m6, new ulong[] { 0, 0 }, new ulong[] { 200, 200 });
+            MultiDimArray m6 = new MultiDimArray(new uint[] { 200, 200 }, new byte[200 * 200]);
+            await r.m3.Read(new ulong[] { 65, 800 }, m6, new ulong[] { 0, 0 }, new ulong[] { 200, 200 });
             ca<uint>(m4.Dims, m6.Dims);
             ca<byte>((byte[])m4.Array_, (byte[])m6.Array_);
 

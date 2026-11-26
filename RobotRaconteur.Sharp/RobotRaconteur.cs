@@ -1225,7 +1225,7 @@ namespace RobotRaconteurSharp
             if (!TryGetServiceType(servicetype, out f))
             {
 #if RR_LOG_DEBUG
-                LogDebug(string.Format("Cannot get nonexistent service type \"{0}\"",servicetype), this, component: RobotRaconteur_LogComponent.Node);
+                LogDebug(string.Format("Cannot get nonexistent service type \"{0}\"", servicetype), this, component: RobotRaconteur_LogComponent.Node);
 #endif
                 throw new ServiceException("Service factory not found for " + servicetype);
             }
@@ -1608,7 +1608,7 @@ namespace RobotRaconteurSharp
                             catch (Exception exp)
                             {
 #if RR_LOG_DEBUG
-                                LogDebug(string.Format("Error connecting client: {0}",exp), this,
+                                LogDebug(string.Format("Error connecting client: {0}", exp), this,
                                     component: RobotRaconteur_LogComponent.Node, endpoint: m.header.ReceiverEndpoint,
                                     service_path: e.ServicePath, member: e.MemberName);
 #endif

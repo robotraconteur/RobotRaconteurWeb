@@ -45,21 +45,21 @@ namespace RobotRaconteurTest
                     node.RegisterServiceType(new com.robotraconteur.testing.TestService5.com__robotraconteur__testing__TestService5Factory(node));
 
 
-                // Create TcpTransport using reflection and create dynamic reference
+                    // Create TcpTransport using reflection and create dynamic reference
 
 
 
-                if (enable_local_transport)
-                {
-                    var t1 = new LocalTransport(node);
-                    t1.StartServerAsNodeName(nodename);
-                    node.RegisterTransport(t1);
-                    local_transport = t1;
-                }
+                    if (enable_local_transport)
+                    {
+                        var t1 = new LocalTransport(node);
+                        t1.StartServerAsNodeName(nodename);
+                        node.RegisterTransport(t1);
+                        local_transport = t1;
+                    }
 
-                if (enable_tcp_transport)
-                {
-                    var t2 = new TcpTransport(node);
+                    if (enable_tcp_transport)
+                    {
+                        var t2 = new TcpTransport(node);
                         string tcp_port_s = tcp_port as string;
                         if (tcp_port_s != null)
                         {
@@ -85,11 +85,11 @@ namespace RobotRaconteurTest
                         }
 
 
-                    t2.EnableNodeAnnounce();
-                    t2.EnableNodeDiscoveryListening();
-                    node.RegisterTransport(t2);
-                    tcp_transport = t2;
-                }
+                        t2.EnableNodeAnnounce();
+                        t2.EnableNodeDiscoveryListening();
+                        node.RegisterTransport(t2);
+                        tcp_transport = t2;
+                    }
 
 
 

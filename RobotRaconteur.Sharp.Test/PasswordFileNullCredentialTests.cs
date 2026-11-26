@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using RobotRaconteurTest;
 using RobotRaconteurSharp;
+using RobotRaconteurTest;
 
 namespace RobotRaconteurSharp.Test
 {

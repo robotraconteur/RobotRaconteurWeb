@@ -258,7 +258,7 @@ namespace RobotRaconteurSharp
     </remarks>
     */
 
-        [PublicApi]
+    [PublicApi]
     public class PasswordFileUserAuthenticator : UserAuthenticator
     {
 

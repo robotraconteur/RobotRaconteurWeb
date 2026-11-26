@@ -66,7 +66,7 @@ namespace RobotRaconteurTest
             ca<double>((double[])m4.Array_, (double[])m6.Array_);
 
             MultiDimArray m7 = new MultiDimArray(new uint[] { 4, 4, 4, 4, 10 }, new double[2560]);
-            m1.RetrieveSubArray(new uint[] { 4, 2, 2, 8, 0 }, m7, new uint[] { 2, 1,2, 1, 0 }, new uint[] { 2, 2, 1, 1, 10 });
+            m1.RetrieveSubArray(new uint[] { 4, 2, 2, 8, 0 }, m7, new uint[] { 2, 1, 2, 1, 0 }, new uint[] { 2, 2, 1, 1, 10 });
             ca<double>((double[])m5.Array_, (double[])m7.Array_);
 
 
@@ -80,20 +80,20 @@ namespace RobotRaconteurTest
             MultiDimArray m4 = LoadByteArrayFromFile(Path.Combine("testdata", "testmdarray_b4.bin"));
             MultiDimArray m5 = LoadByteArrayFromFile(Path.Combine("testdata", "testmdarray_b5.bin"));
 
-            m1.AssignSubArray(new uint[] { 50,100 }, m2, new uint[] { 20,25}, new uint[] { 200,200 });
+            m1.AssignSubArray(new uint[] { 50, 100 }, m2, new uint[] { 20, 25 }, new uint[] { 200, 200 });
 
 
 
             ca<byte>((byte[])m1.Array_, (byte[])m3.Array_);
 
 
-            MultiDimArray m6 = new MultiDimArray(new uint[] { 200,200 }, new byte[40000]);
-            m1.RetrieveSubArray(new uint[] { 65,800 }, m6, new uint[] { 0, 0 }, new uint[] { 200,200 });
+            MultiDimArray m6 = new MultiDimArray(new uint[] { 200, 200 }, new byte[40000]);
+            m1.RetrieveSubArray(new uint[] { 65, 800 }, m6, new uint[] { 0, 0 }, new uint[] { 200, 200 });
             ca<byte>((byte[])m4.Array_, (byte[])m6.Array_);
 
 
-            MultiDimArray m7 = new MultiDimArray(new uint[] { 512,512 }, new byte[512*512]);
-            m1.RetrieveSubArray(new uint[] { 65,800 }, m7, new uint[] { 100,230}, new uint[] { 200,200 });
+            MultiDimArray m7 = new MultiDimArray(new uint[] { 512, 512 }, new byte[512 * 512]);
+            m1.RetrieveSubArray(new uint[] { 65, 800 }, m7, new uint[] { 100, 230 }, new uint[] { 200, 200 });
             ca<byte>((byte[])m5.Array_, (byte[])m7.Array_);
 
         }

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using RobotRaconteurTest;
 using RobotRaconteurSharp;
+using RobotRaconteurTest;
 
 namespace RobotRaconteurSharp.Test
 {
