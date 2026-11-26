@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: FindNodeByID / FindNodeByName must return URLs with "scheme://"
     public static class FindNodeUrlTests

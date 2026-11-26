@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: a LocalTransport server start that fails after the socket was bound must
     // release the socket and its file, and must not leave the transport marked as started

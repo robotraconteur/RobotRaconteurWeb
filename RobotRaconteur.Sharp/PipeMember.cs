@@ -20,11 +20,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 
 // cSpell: ignore opacket
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     //TODO: Add threading locks
 

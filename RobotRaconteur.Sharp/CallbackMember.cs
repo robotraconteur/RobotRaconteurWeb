@@ -20,7 +20,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>

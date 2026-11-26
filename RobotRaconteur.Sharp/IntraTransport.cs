@@ -19,10 +19,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
-using static RobotRaconteurWeb.RRLogFuncs;
+using RobotRaconteurSharp.Extensions;
+using static RobotRaconteurSharp.RRLogFuncs;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>

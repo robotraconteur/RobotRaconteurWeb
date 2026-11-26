@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: password file columns may be separated by any run of whitespace, and
     // whitespace-only lines are ignored

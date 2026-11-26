@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 //cSpell: ignore mema, strideb,
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
 #pragma warning disable 1591
     public class MultiDimArray_CalculateCopyIndicesIter

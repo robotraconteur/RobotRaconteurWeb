@@ -1,8 +1,8 @@
 ![](https://raw.githubusercontent.com/robotraconteur/RobotRaconteurWeb/master/docs/figures/logo-header.svg)
 
-# RobotRaconteurWebGen
+# RobotRaconteur.Sharp.Gen
 
-**RobotRaconteurWeb is a pure C\# implementation of the Robot Raconteur framework for use with .NET Core**
+**RobotRaconteur.Sharp is a pure C\# implementation of the Robot Raconteur framework for use with .NET Core**
 
 [http://robotraconteur.com](http://robotraconteur.com)
 
@@ -12,31 +12,31 @@ Github Repository: https://github.com/robotraconteur/RobotRaconteurWeb
 
 ## Introduction
 
-RobotRaconteurWebGen is a tool used with [RobotRaconteurWeb](https://www.nuget.org/packages/RobotRaconteurWeb)
+RobotRaconteur.Sharp.Gen is a tool used with [RobotRaconteur.Sharp](https://www.nuget.org/packages/RobotRaconteur.Sharp)
 to generate C# code from service definition files (*.robdef).
 The generated code can be used to interact with RobotRaconteur services in C#. This tool can be called
 from the command line or integrated into a build system. See the
-[RobotRaconteurWeb](https://www.nuget.org/packages/RobotRaconteurWeb) documentation for more information.
+[RobotRaconteur.Sharp](https://www.nuget.org/packages/RobotRaconteur.Sharp) documentation for more information.
 
 ## Installation
 
 For most platforms, the easiest way to install Robot Raconteur is using `dotnet`:
 
 ```bash
-dotnet tool install -g RobotRaconteurWebGen
+dotnet tool install -g RobotRaconteur.Sharp.Gen
 ```
 
 ## Usage
 
 ```bash
-RobotRaconteurWebGen [options] [robdef-files]
+RobotRaconteur.Sharp.Gen [options] [robdef-files]
 ```
 
 Options:
 
-* `--version` - Display the version of RobotRaconteurWebGen and exit
+* `--version` - Display the version of RobotRaconteur.Sharp.Gen and exit
 * `--thunksource` - Generate the thunk source code
-* `--lang=` - Specify the output computer language. Only `csharp` is supported for RobotRaconteurWebGen.
+* `--lang=` - Specify the output computer language. Only `csharp` is supported for RobotRaconteur.Sharp.Gen.
 * `--outfile=` - Specify the output file for the generated code
 * `--include-path=` or `-I` - Specify the include path for the service definition files
 * `--auto-import` - Automatically import robdef files in the include path
@@ -46,14 +46,14 @@ Options:
 Example usage:
 
 ```bash
-RobotRaconteurWebGen --thunksource --lang=csharp --outfile thunksource.cs experimental.reynard_the_robot.robdef
+RobotRaconteur.Sharp.Gen --thunksource --lang=csharp --outfile thunksource.cs experimental.reynard_the_robot.robdef
 ```
 
 ## Documentation
 
-See the [Robot Raconteur Web Documentation](https://github.com/robotraconteur/RobotRaconteurWeb/wiki/Documentation)
+See the [RobotRaconteur.Sharp Documentation](https://github.com/robotraconteur/RobotRaconteurWeb/wiki/Documentation)
 
-See the [Robot Raconteur Web Examples](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples)
+See the [RobotRaconteur.Sharp Examples](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples)
 
 ## License
 

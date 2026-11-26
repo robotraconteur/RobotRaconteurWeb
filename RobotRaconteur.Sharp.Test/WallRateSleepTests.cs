@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: WallRate.Sleep must return when the loop is late (a remaining time between
     // -1 and -2 ms used to become Task.Delay(-1), which waits forever)

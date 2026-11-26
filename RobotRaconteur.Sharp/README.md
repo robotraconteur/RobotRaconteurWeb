@@ -1,8 +1,8 @@
 ![](https://raw.githubusercontent.com/robotraconteur/RobotRaconteurWeb/master/docs/figures/logo-header.svg)
 
-# RobotRaconteurWeb
+# RobotRaconteur.Sharp
 
-**RobotRaconteurWeb is a pure C\# implementation of the Robot Raconteur framework for use with .NET Core**
+**RobotRaconteur.Sharp is a pure C\# implementation of the Robot Raconteur framework for use with .NET Core**
 
 [http://robotraconteur.com](http://robotraconteur.com)
 
@@ -12,15 +12,17 @@ Github Repository: https://github.com/robotraconteur/RobotRaconteurWeb
 
 ## Introduction
 
-Robot Raconteur is a communication framework for robotics, automation, and the Internet of Things. RobotRaconteurWeb
+Robot Raconteur is a communication framework for robotics, automation, and the Internet of Things. RobotRaconteur.Sharp
 is an implementation of Robot Raconteur developed in pure C#. This is in contrast to
 [RobotRaconteurNET](https://www.nuget.org/packages/RobotRaconteurNET),
 which is a wrapper for the native RobotRaconteurCore implementation that is developed in C++.
-RobotRaconteurWeb can be used with ASP.NET web servers using WebSockets, allowing for
+RobotRaconteur.Sharp can be used with ASP.NET web servers using WebSockets, allowing for
 Robot Raconteur to be easily integrated into cloud and information systems without requiring any modifications
 to clients.
 
-RobotRaconteurWeb uses async/await for all blocking operations, making it easy to use with C\# projects.
+RobotRaconteur.Sharp was formerly named RobotRaconteurWeb. The namespace is `RobotRaconteurSharp`.
+
+RobotRaconteur.Sharp uses async/await for all blocking operations, making it easy to use with C\# projects.
 Unlike RobotRaconteurNET, there are no blocking functions available.
 
 ## Installation
@@ -28,23 +30,23 @@ Unlike RobotRaconteurNET, there are no blocking functions available.
 For most platforms, the easiest way to install Robot Raconteur is using `dotnet`:
 
 ```bash
-dotnet add package RobotRaconteurWeb
+dotnet add package RobotRaconteur.Sharp
 ```
 
-RobotRaconteurWeb is a pure C\# `netstandard2.1` library, making it very portable and easy to use with .NET Core.
+RobotRaconteur.Sharp is a pure C\# `netstandard2.1` library, making it very portable and easy to use with .NET Core.
 
 ## Code Generation
 
-RobotRaconteurWeb uses service definition files (*.robdef) to define the available services and data types. These files
-are used to generate C\# code for RobotRaconteurWeb using the
-[RobotRaconteurWebGen](https://www.nuget.org/packages/RobotRaconteurWebGen) tool. It can be installed using the
+RobotRaconteur.Sharp uses service definition files (*.robdef) to define the available services and data types. These files
+are used to generate C\# code for RobotRaconteur.Sharp using the
+[RobotRaconteur.Sharp.Gen](https://www.nuget.org/packages/RobotRaconteur.Sharp.Gen) tool. It can be installed using the
 following command:
 
 ```bash
-dotnet tool install --global RobotRaconteurWebGen
+dotnet tool install --global RobotRaconteur.Sharp.Gen
 ```
 
-The RobotRaconteurWeb nuget package provides build integration to automatically generate the code when the project is built.
+The RobotRaconteur.Sharp nuget package provides build integration to automatically generate the code when the project is built.
 The following 'ItemGroup' can be added to the project file to specify the service definition files:
 
 ```xml
@@ -60,9 +62,9 @@ are included in another robdef file.
 
 ## Documentation
 
-See the [Robot Raconteur Web Documentation](https://github.com/robotraconteur/RobotRaconteurWeb/wiki/Documentation)
+See the [RobotRaconteur.Sharp Documentation](https://github.com/robotraconteur/RobotRaconteurWeb/wiki/Documentation)
 
-See the [Robot Raconteur Web Examples](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples)
+See the [RobotRaconteur.Sharp Examples](https://github.com/robotraconteur/RobotRaconteurWeb/tree/master/examples)
 
 ## Example
 
@@ -80,13 +82,13 @@ On Linux, you may need to use `python3` instead of `python`.
 
 Open a browser to [http://localhost:29201](http://localhost:29201) to view the Reynard user interface.
 
-The following is an example RobotRaconteurWeb C\# client for Reynard the Robot:
+The following is an example RobotRaconteur.Sharp C\# client for Reynard the Robot:
 
 ```csharp
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
 // Initialize the client node
 using (var node_setup = new ClientNodeSetup(args: args))

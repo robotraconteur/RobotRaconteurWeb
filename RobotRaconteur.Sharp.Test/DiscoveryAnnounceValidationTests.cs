@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Node announce packets are validated before a first-seen node is stored
     public static class DiscoveryAnnounceValidationTests
@@ -56,7 +56,7 @@ namespace RobotRaconteurWebTest
         public static void RunTestAnnounceLoopbackSender()
         {
             // A loopback URL must only be accepted from a loopback sender
-            var t = typeof(TcpTransport).Assembly.GetType("RobotRaconteurWeb.IPNodeDiscovery");
+            var t = typeof(TcpTransport).Assembly.GetType("RobotRaconteurSharp.IPNodeDiscovery");
             var m = t.GetMethod("NodeAnnounceAddressValid", BindingFlags.NonPublic | BindingFlags.Static);
             RRAssert.IsTrue(m != null);
             Func<string, string, bool> valid = (a, s) => (bool)m.Invoke(null, new object[] { IPAddress.Parse(a), IPAddress.Parse(s) });

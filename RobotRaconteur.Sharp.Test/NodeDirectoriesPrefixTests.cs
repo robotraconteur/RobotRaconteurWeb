@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: ROBOTRACONTEUR_SYSTEM_PREFIX must be prepended to the default system directories
     public static class NodeDirectoriesPrefixTests

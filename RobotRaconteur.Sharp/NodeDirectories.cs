@@ -22,9 +22,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using static RobotRaconteurWeb.RRLogFuncs;
+using static RobotRaconteurSharp.RRLogFuncs;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
 
     /// <summary>

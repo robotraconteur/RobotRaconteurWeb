@@ -17,9 +17,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Mono.Options;
-using static RobotRaconteurWeb.RRLogFuncs;
+using static RobotRaconteurSharp.RRLogFuncs;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
      * <summary>Setup option flags</summary>

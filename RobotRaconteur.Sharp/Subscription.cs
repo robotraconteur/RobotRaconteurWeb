@@ -20,10 +20,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
-using static RobotRaconteurWeb.RRLogFuncs;
+using RobotRaconteurSharp.Extensions;
+using static RobotRaconteurSharp.RRLogFuncs;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>

@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     static class ReleaseServicePathTest
     {

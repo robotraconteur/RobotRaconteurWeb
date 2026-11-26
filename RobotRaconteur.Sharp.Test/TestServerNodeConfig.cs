@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
 namespace RobotRaconteurTest
 {
@@ -203,10 +203,10 @@ namespace RobotRaconteurTest
         {
             // Get the assembly and type using reflection
             Assembly assembly = Assembly.GetExecutingAssembly();
-            //Type type = assembly.GetType("RobotRaconteurWeb." + typeName);
+            //Type type = assembly.GetType("RobotRaconteurSharp." + typeName);
             Type type = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes())
-            .FirstOrDefault(t => t.FullName.Equals("RobotRaconteurWeb." + typeName));
+            .FirstOrDefault(t => t.FullName.Equals("RobotRaconteurSharp." + typeName));
 
             // Create an instance of the type
             return (Transport)Activator.CreateInstance(type, new object[] { node });

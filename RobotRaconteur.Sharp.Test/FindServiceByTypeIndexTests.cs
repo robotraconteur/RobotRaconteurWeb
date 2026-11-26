@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: FindServiceByType must charge a failed query to the node it was sent to.
     // A node without a URL for the requested scheme is not queried and must stay in the cache.

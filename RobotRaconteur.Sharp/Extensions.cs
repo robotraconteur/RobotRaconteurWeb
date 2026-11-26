@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb.Extensions
+namespace RobotRaconteurSharp.Extensions
 {
     public static class Extensions
     {

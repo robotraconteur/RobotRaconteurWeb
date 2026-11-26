@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
 namespace RobotRaconteurTest
 {

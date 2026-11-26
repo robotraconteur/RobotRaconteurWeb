@@ -20,12 +20,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
-using static RobotRaconteurWeb.RRLogFuncs;
+using RobotRaconteurSharp.Extensions;
+using static RobotRaconteurSharp.RRLogFuncs;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     public abstract class ServiceStub
     {

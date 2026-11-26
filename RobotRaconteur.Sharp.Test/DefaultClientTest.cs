@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using experimental.sub_test;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
 namespace RobotRaconteurSubTest
 {
@@ -28,7 +28,7 @@ namespace RobotRaconteurSubTest
 
                 // Put an entry that has no client yet (connecting) in front of the connected one
                 var clients = (IDictionary)typeof(ServiceSubscription).GetField("clients", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(sub);
-                var client_type = typeof(ServiceSubscription).Assembly.GetType("RobotRaconteurWeb.ServiceSubscription_client");
+                var client_type = typeof(ServiceSubscription).Assembly.GetType("RobotRaconteurSharp.ServiceSubscription_client");
                 var connecting = Activator.CreateInstance(client_type, true);
                 var connecting_key = new ServiceSubscriptionClientID(new NodeID("00000000-0000-0000-0000-0000000000aa"), "connecting");
                 lock (sub)

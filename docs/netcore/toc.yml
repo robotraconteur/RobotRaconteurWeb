@@ -5,7 +5,7 @@
 - name: Api Documentation
   href: api/
   homepage: api/index.md
-- name: RobotRaconteurWeb Readme
-  href: articles/robotraconteurweb_readme.md
-- name: RobotRaconteurWebGen Readme
-  href: articles/robotraconteurwebgen_readme.md
+- name: RobotRaconteur.Sharp Readme
+  href: articles/robotraconteursharp_readme.md
+- name: RobotRaconteur.Sharp.Gen Readme
+  href: articles/robotraconteursharpgen_readme.md

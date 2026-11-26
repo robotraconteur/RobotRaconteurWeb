@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // A service MaxTransferSize smaller than the element size must give an error, not a division by zero
     public static class MemoryMaxTransferSizeTests

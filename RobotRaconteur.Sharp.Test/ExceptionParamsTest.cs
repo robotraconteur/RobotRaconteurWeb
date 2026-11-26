@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService3;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Service object that throws exceptions carrying an error sub-name and error parameter,
     // matching what Core's ServiceTest2.cpp sends for test_exception_params1/2

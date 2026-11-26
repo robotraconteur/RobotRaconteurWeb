@@ -31,10 +31,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
-using static RobotRaconteurWeb.RRLogFuncs;
+using RobotRaconteurSharp.Extensions;
+using static RobotRaconteurSharp.RRLogFuncs;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>
@@ -120,7 +120,7 @@ namespace RobotRaconteurWeb
     scenarios.
     Robot Raconteur Core can initiate HTTPS connections, but cannot accept them. Accepting
     HTTPS connections requires a certificate issued by an authority like GoDaddy or Digicert,
-    and is typically used with an HTTP server running RobotRaconteurWeb.
+    and is typically used with an HTTP server running RobotRaconteur.Sharp.
     </para>
     <para>
     TLS certificates for Robot Raconteur nodes are issued by Wason Technology, LLC using
@@ -837,7 +837,7 @@ namespace RobotRaconteurWeb
         /// Accept an incoming WebSocket previously accepted by a web server
         /// </summary>
         /// <remarks>
-        /// Use this function to embed RobotRaconteurWeb in an ASP.NET server.
+        /// Use this function to embed RobotRaconteur.Sharp in an ASP.NET server.
         /// Receive WebSockets as normal and pass to this function. To not
         /// use StartServer()
         /// </remarks>

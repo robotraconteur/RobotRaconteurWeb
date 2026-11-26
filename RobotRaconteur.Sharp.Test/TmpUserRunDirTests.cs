@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // The /tmp/robotraconteur-run-<uid> fallback user run dir must be private to the current user
     public static class TmpUserRunDirTests

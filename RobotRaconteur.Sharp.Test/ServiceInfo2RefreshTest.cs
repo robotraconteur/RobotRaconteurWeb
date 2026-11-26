@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
 namespace RobotRaconteurSubTest
 {
@@ -69,7 +69,7 @@ namespace RobotRaconteurSubTest
                 var info_field = client.GetType().GetField("service_info2", BindingFlags.NonPublic | BindingFlags.Instance);
                 var info_before = info_field.GetValue(client);
 
-                var node_updated = asm.GetType("RobotRaconteurWeb.IServiceSubscription").GetMethod("NodeUpdated");
+                var node_updated = asm.GetType("RobotRaconteurSharp.IServiceSubscription").GetMethod("NodeUpdated");
                 node_updated.Invoke(sub, new object[] { storage });
 
                 // The stored info is replaced only when the service changed

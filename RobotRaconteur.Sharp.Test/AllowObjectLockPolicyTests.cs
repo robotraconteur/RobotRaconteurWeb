@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Object locks are refused unless the security policy sets allowobjectlock
     public static class AllowObjectLockPolicyTests

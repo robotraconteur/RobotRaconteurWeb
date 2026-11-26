@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: a null user name or null password must fail with AuthenticationException
     public static class PasswordFileNullCredentialTests

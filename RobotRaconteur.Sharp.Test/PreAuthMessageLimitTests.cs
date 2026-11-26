@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Messages over 512 KiB are refused before an auth-required service has authenticated the client
     public static class PreAuthMessageLimitTests

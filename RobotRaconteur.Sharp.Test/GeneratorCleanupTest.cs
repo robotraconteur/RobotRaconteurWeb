@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService3;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Service-side generators must be destroyed when they finish, fail, are closed/aborted, or stay idle
     public static class GeneratorCleanupTest

@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService3;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Lock checks must use the requesting endpoint and user even when the
     // first access of a sub-object yields in an async objref getter (the

@@ -18,11 +18,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     public class AsyncMutex
     {

@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Default WebSocket origins: pages loaded from local files ("null", "file://") and https robotraconteur.com,
     // but not every browser extension or plain http origins an on-path attacker can produce

@@ -20,9 +20,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Options;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebGen
+namespace RobotRaconteurSharp.Gen
 {
     class Program
     {
@@ -71,9 +71,9 @@ namespace RobotRaconteurWebGen
                 }
                 catch (OptionException e)
                 {
-                    Console.Write("RobotRaconteurWebGen: fatal error: ");
+                    Console.Write("RobotRaconteur.Sharp.Gen: fatal error: ");
                     Console.WriteLine(e.Message);
-                    Console.WriteLine("Try 'RobotRaconteurWebGen --help' for more information.");
+                    Console.WriteLine("Try 'RobotRaconteur.Sharp.Gen --help' for more information.");
                     return 1;
                 }
 
@@ -92,20 +92,20 @@ namespace RobotRaconteurWebGen
 
                 if (!thunksource)
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: no command specified");
-                    Console.WriteLine("Try 'RobotRaconteurWebGen --help' for more information.");
+                    Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: no command specified");
+                    Console.WriteLine("Try 'RobotRaconteur.Sharp.Gen --help' for more information.");
                     return 1;
                 }
 
                 if (sources.Count(x => x.is_import == false) == 0)
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: no files specified for thunksource");
+                    Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: no files specified for thunksource");
                     return 1001;
                 }
 
                 if (lang != "csharp")
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: unknown or no language specified");
+                    Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: unknown or no language specified");
                     return 1012;
                 }
 
@@ -137,14 +137,14 @@ namespace RobotRaconteurWebGen
                 {
                     if (!File.Exists(s.filename))
                     {
-                        Console.WriteLine("RobotRaconteurWebGen: fatal error: input file not found {0}", s.filename);
+                        Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: input file not found {0}", s.filename);
                         return 1002;
                     }
                 }
 
                 if (!Directory.Exists(output_dir))
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: output directory not found {0}", output_dir);
+                    Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: output directory not found {0}", output_dir);
                     return 1003;
                 }
 
@@ -162,7 +162,7 @@ namespace RobotRaconteurWebGen
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine("RobotRaconteurWebGen: fatal error: could not open file {0}", s.filename);
+                        Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: could not open file {0}", s.filename);
                         return 1004;
                     }
 
@@ -219,7 +219,7 @@ namespace RobotRaconteurWebGen
 
                             if (!imp_found)
                             {
-                                Console.WriteLine("RobotRaconteurWebGen: fatal error: could not find import {0}", imp_file);
+                                Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: could not find import {0}", imp_file);
                                 return 1002;
                             }
 
@@ -245,7 +245,7 @@ namespace RobotRaconteurWebGen
                 }
                 catch (Exception ee)
                 {
-                    Console.WriteLine("RobotRaconteurWebGen: fatal error: could not verify service definition set {0}", ee.Message);
+                    Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: could not verify service definition set {0}", ee.Message);
                     return 1009;
                 }
 
@@ -279,7 +279,7 @@ namespace RobotRaconteurWebGen
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine("RobotRaconteurWebGen: fatal error: could not open outfile for writing {0}", outfile);
+                        Console.WriteLine("RobotRaconteur.Sharp.Gen: fatal error: could not open outfile for writing {0}", outfile);
                         return 1015;
                     }
 
@@ -309,7 +309,7 @@ namespace RobotRaconteurWebGen
             }
             catch (Exception e)
             {
-                Console.Write("RobotRaconteurWebGen: error: ");
+                Console.Write("RobotRaconteur.Sharp.Gen: error: ");
                 Console.WriteLine(e.Message);
                 return 1;
             }
@@ -321,8 +321,8 @@ namespace RobotRaconteurWebGen
 
         static void ShowHelp(OptionSet p)
         {
-            Console.WriteLine("Usage: RobotRaconteurWebGen [Options+] sources");
-            Console.WriteLine("Generates sources and provides utilities for the RobotRaconteurWeb library.");
+            Console.WriteLine("Usage: RobotRaconteur.Sharp.Gen [Options+] sources");
+            Console.WriteLine("Generates sources and provides utilities for the RobotRaconteur.Sharp library.");
             Console.WriteLine();
             Console.WriteLine("Options:");
             p.WriteOptionDescriptions(Console.Out);
@@ -330,7 +330,7 @@ namespace RobotRaconteurWebGen
 
         static void ShowVersion(OptionSet p)
         {
-            Console.WriteLine("RobotRaconteurWebGen version {0}", RobotRaconteurNode.Version);
+            Console.WriteLine("RobotRaconteur.Sharp.Gen version {0}", RobotRaconteurNode.Version);
             Console.WriteLine();
         }
     }

@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // The Web test server must behave like Core's test server for the shared test clients:
     // broadcastpipe sends packets, and a monitor lock timeout is returned as RequestTimeoutException

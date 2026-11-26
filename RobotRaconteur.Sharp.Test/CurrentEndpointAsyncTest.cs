@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService3;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // ServerEndpoint.CurrentEndpoint and ServerContext.CurrentServicePath must stay valid
     // in service code after an await

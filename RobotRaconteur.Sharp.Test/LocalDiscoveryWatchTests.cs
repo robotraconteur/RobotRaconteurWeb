@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: LocalTransport discovery listening must detect a local server started
     // after listening was enabled (the info files are in subdirectories of the watched paths)

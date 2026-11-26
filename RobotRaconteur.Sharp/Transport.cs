@@ -18,11 +18,11 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
 
     public interface ITransportConnection

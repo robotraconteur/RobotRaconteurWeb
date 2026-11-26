@@ -20,7 +20,7 @@ using System.Text;
 using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
@@ -28,7 +28,7 @@ using System.Reflection;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
 
     public abstract class AsyncStreamTransport : ITransportConnection
@@ -1863,7 +1863,7 @@ namespace RobotRaconteurWeb
 
             foreach (var root_cert_name in root_cert_names)
             {
-                using (var root_cert_stream1 = typeof(AsyncStreamTransport).Assembly.GetManifestResourceStream("RobotRaconteurWeb.Data." + root_cert_name))
+                using (var root_cert_stream1 = typeof(AsyncStreamTransport).Assembly.GetManifestResourceStream("RobotRaconteurSharp.Data." + root_cert_name))
                 using (var root_cert_stream = new MemoryStream())
                 {
                     root_cert_stream1.CopyTo(root_cert_stream);

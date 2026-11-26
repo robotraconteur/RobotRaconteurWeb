@@ -20,7 +20,7 @@ using System.Text;
 
 // cSpell: ignore ecount
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
 
     /// <summary>
@@ -905,29 +905,29 @@ namespace RobotRaconteurWeb
                     return DataTypes.string_t;
                 case "System.Boolean":
                     return DataTypes.bool_t;
-                case "RobotRaconteurWeb.CDouble":
+                case "RobotRaconteurSharp.CDouble":
                     return DataTypes.cdouble_t;
-                case "RobotRaconteurWeb.CSingle":
+                case "RobotRaconteurSharp.CSingle":
                     return DataTypes.csingle_t;
-                case "RobotRaconteurWeb.MessageElementStructure":
+                case "RobotRaconteurSharp.MessageElementStructure":
                     return DataTypes.structure_t;
-                case "RobotRaconteurWeb.MessageElementMap<int>":
+                case "RobotRaconteurSharp.MessageElementMap<int>":
                     return DataTypes.vector_t;
-                case "RobotRaconteurWeb.MessageElementMap<string>":
+                case "RobotRaconteurSharp.MessageElementMap<string>":
                     return DataTypes.dictionary_t;
-                case "RobotRaconteurWeb.MessageElementMultiDimArray":
+                case "RobotRaconteurSharp.MessageElementMultiDimArray":
                     return DataTypes.multidimarray_t;
-                case "RobotRaconteurWeb.MessageElementList":
+                case "RobotRaconteurSharp.MessageElementList":
                     return DataTypes.list_t;
-                case "RobotRaconteurWeb.MessageElementPod":
+                case "RobotRaconteurSharp.MessageElementPod":
                     return DataTypes.pod_t;
-                case "RobotRaconteurWeb.MessageElementPodArray":
+                case "RobotRaconteurSharp.MessageElementPodArray":
                     return DataTypes.pod_array_t;
-                case "RobotRaconteurWeb.MessageElementPodMultiDimArray":
+                case "RobotRaconteurSharp.MessageElementPodMultiDimArray":
                     return DataTypes.pod_multidimarray_t;
-                case "RobotRaconteurWeb.MessageElementNamedArray":
+                case "RobotRaconteurSharp.MessageElementNamedArray":
                     return DataTypes.namedarray_array_t;
-                case "RobotRaconteurWeb.MessageElementNamedMultiDimArray":
+                case "RobotRaconteurSharp.MessageElementNamedMultiDimArray":
                     return DataTypes.namedarray_multidimarray_t;
                 case "System.Object":
                     return DataTypes.varvalue_t;
@@ -969,17 +969,17 @@ namespace RobotRaconteurWeb
 
                 case "System.Boolean":
 
-                case "RobotRaconteurWeb.CDouble":
+                case "RobotRaconteurSharp.CDouble":
 
-                case "RobotRaconteurWeb.CSingle":
+                case "RobotRaconteurSharp.CSingle":
 
-                case "RobotRaconteurWeb.MessageElementStructure":
+                case "RobotRaconteurSharp.MessageElementStructure":
 
-                case "RobotRaconteurWeb.MessageElementIndexedSet<int>":
+                case "RobotRaconteurSharp.MessageElementIndexedSet<int>":
 
-                case "RobotRaconteurWeb.MessageElementIndexedSet<string>":
+                case "RobotRaconteurSharp.MessageElementIndexedSet<string>":
 
-                case "RobotRaconteurWeb.MessageElementMultiDimArray":
+                case "RobotRaconteurSharp.MessageElementMultiDimArray":
 
                 case "System.Object":
                     return true;
@@ -1082,9 +1082,9 @@ namespace RobotRaconteurWeb
                     return new long[] { ((long)inv) };
                 case "System.UInt64":
                     return new ulong[] { ((ulong)inv) };
-                case "RobotRaconteurWeb.CDouble":
+                case "RobotRaconteurSharp.CDouble":
                     return new CDouble[] { ((CDouble)inv) };
-                case "RobotRaconteurWeb.CSingle":
+                case "RobotRaconteurSharp.CSingle":
                     return new CSingle[] { ((CSingle)inv) };
                 case "System.Boolean":
                     return new bool[] { ((bool)inv) };
@@ -1583,7 +1583,7 @@ namespace RobotRaconteurWeb
 
             if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
             {
-                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+                throw new DataTypeException("String table not supported in RobotRaconteur.Sharp");
             }
 
             if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
@@ -1676,7 +1676,7 @@ namespace RobotRaconteurWeb
 
             if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
             {
-                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+                throw new DataTypeException("String table not supported in RobotRaconteur.Sharp");
             }
 
             if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)
@@ -1757,7 +1757,7 @@ namespace RobotRaconteurWeb
 
             if ((MessageFlags_ & (byte)MessageFlags.StringTable) != 0)
             {
-                throw new DataTypeException("String table not supported in RobotRaconteurWeb");
+                throw new DataTypeException("String table not supported in RobotRaconteur.Sharp");
             }
 
             if ((MessageFlags_ & (byte)MessageFlags.MultipleEntries) != 0)

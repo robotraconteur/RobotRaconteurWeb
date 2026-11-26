@@ -16,11 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 
 #pragma warning disable 1591
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     public class ArrayBinaryWriter : BinaryWriter
     {

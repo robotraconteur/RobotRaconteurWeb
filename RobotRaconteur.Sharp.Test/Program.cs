@@ -20,8 +20,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
-using RobotRaconteurWeb;
-using RobotRaconteurWebTest;
+using RobotRaconteurSharp;
+using RobotRaconteurSharp.Test;
 
 // cSpell: ignore subscriptioncitests, citests
 
@@ -176,8 +176,8 @@ namespace RobotRaconteurTest
                         ServiceStateNonceTests.RunTestAnnounceNonce(); await ServiceStateNonceTests.RunTestLocalInfoFileNonce();
                         await CheckServiceCapabilityTest.TestCheckServiceCapability();
 
-                        await RobotRaconteurWebTest.FindServiceByTypeIndexTests.RunTestFindServiceByTypeSkippedNode();
-                        await RobotRaconteurWebTest.FindNodeUrlTests.RunTestFindNodeUrls();
+                        await RobotRaconteurSharp.Test.FindServiceByTypeIndexTests.RunTestFindServiceByTypeSkippedNode();
+                        await RobotRaconteurSharp.Test.FindNodeUrlTests.RunTestFindNodeUrls();
                         await ServicePathReleasedTest.TestServicePathReleasedSeparator();
 
                         await ReleaseServicePathTest.TestReleaseServicePathSeparator();

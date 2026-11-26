@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // A special request must be the only entry in its message (object protocol, "Special Requests"). A message
     // with more entries is a protocol violation: SpecialRequest throws and the transport closes the connection.

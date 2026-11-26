@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // A hand-written skel whose object type name contains "_skel"
     class arm_skeleton_skel : ServiceSkel
@@ -24,7 +24,7 @@ namespace RobotRaconteurWebTest
         {
             // Only the "_skel" suffix of the class name may be removed
             var skel = (ServiceSkel)RuntimeHelpers.GetUninitializedObject(typeof(arm_skeleton_skel));
-            RRAssert.AreEqual(skel.GetObjectType(), "RobotRaconteurWebTest.arm_skeleton");
+            RRAssert.AreEqual(skel.GetObjectType(), "RobotRaconteurSharp.Test.arm_skeleton");
 
             // Generated skels report the object type of the service definition
             using (var nodes = new TestNodeConfig("testprog", false, false, true))

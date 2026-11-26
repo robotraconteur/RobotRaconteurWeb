@@ -17,9 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>

@@ -1,8 +1,8 @@
 using System;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     // Regression test: values of the standard and user-added command line options must be stored
     // and returned by the getters

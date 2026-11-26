@@ -22,10 +22,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
-using static RobotRaconteurWeb.RRLogFuncs;
+using RobotRaconteurSharp.Extensions;
+using static RobotRaconteurSharp.RRLogFuncs;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>
@@ -80,11 +80,11 @@ namespace RobotRaconteurWeb
         }
 
         /**
-         * <summary>The current version of RobotRaconteurWeb in string format</summary>
+         * <summary>The current version of RobotRaconteur.Sharp in string format</summary>
          * <remarks>None</remarks>
          */
         [PublicApi]
-        public const string Version = "0.20.0";
+        public const string Version = "0.22.0";
 
         private NodeID m_NodeID;
         /**

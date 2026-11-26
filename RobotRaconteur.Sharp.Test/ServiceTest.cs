@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using com.robotraconteur.testing.TestService1;
 using com.robotraconteur.testing.TestService2;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
 namespace RobotRaconteurTest
 {

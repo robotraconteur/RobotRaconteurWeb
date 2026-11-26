@@ -24,7 +24,7 @@ using System.Text.RegularExpressions;
 
 // TODO: Document this file
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     public struct RobotRaconteurVersion
     {

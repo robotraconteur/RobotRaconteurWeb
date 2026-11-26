@@ -19,9 +19,9 @@ using System.Net.WebSockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using RobotRaconteurWeb.Extensions;
+using RobotRaconteurSharp.Extensions;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /// <summary>
     /// Client-only transport that connects to Robot Raconteur services over WebSockets

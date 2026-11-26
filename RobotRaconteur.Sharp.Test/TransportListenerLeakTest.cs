@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using RobotRaconteurTest;
-using RobotRaconteurWeb;
+using RobotRaconteurSharp;
 
-namespace RobotRaconteurWebTest
+namespace RobotRaconteurSharp.Test
 {
     static class TransportListenerLeakTest
     {

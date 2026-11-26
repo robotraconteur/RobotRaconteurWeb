@@ -14,7 +14,7 @@
 
 using System;
 
-namespace RobotRaconteurWeb
+namespace RobotRaconteurSharp
 {
     /**
     <summary>
