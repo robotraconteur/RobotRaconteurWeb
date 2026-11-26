@@ -84,7 +84,7 @@ namespace RobotRaconteurSharp
          * <remarks>None</remarks>
          */
         [PublicApi]
-        public const string Version = "0.22.0";
+        public const string Version = "0.22.1";
 
         private NodeID m_NodeID;
         /**
