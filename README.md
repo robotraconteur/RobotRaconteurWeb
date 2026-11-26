@@ -44,6 +44,29 @@ before using C\#.
 
 * NuGet RobotRaconteur.Sharp homepage: https://www.nuget.org/packages/RobotRaconteur.Sharp/
 
+## Releasing
+
+Publishing a GitHub release runs the [nuget-publish](.github/workflows/nuget-publish.yml) workflow. It checks the
+versions, runs the tests, and pushes `RobotRaconteur.Sharp` and `RobotRaconteur.Sharp.Gen` to nuget.org.
+
+To make a release:
+
+1. Set the new version in `RobotRaconteur.Sharp/RobotRaconteur.Sharp.csproj` and
+   `RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj` (`Version`, `AssemblyVersion` and `FileVersion`), and
+   `RobotRaconteurNode.Version` in `RobotRaconteur.Sharp/RobotRaconteur.cs`.
+2. Create a GitHub release with the tag `v<version>`, for example `v0.22.0`. The workflow fails without pushing if
+   the tag does not match all three versions.
+
+The workflow uses [nuget.org Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing),
+so no API key is stored in the repository. One-time setup:
+
+1. On nuget.org, open your username menu, choose **Trusted Publishing**, and add a policy with repository owner
+   `robotraconteur`, repository `RobotRaconteur.Sharp`, workflow file `nuget-publish.yml`, and environment `nuget`.
+   Packages published through the policy belong to the policy owner (a nuget.org user or organization).
+2. In the GitHub repository settings, add a `NUGET_USER` Actions secret with the nuget.org profile name (not the
+   email address) of the policy owner.
+3. Optionally, add required reviewers to the `nuget` environment, so each publish waits for approval.
+
 Copyright (C) 2024 Wason Technology, LLC
 
 ## Acknowledgment

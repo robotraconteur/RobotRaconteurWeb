@@ -1,0 +1,62 @@
+name: Publish NuGet packages
+
+# Publishes RobotRaconteur.Sharp and RobotRaconteur.Sharp.Gen to nuget.org when a GitHub release is
+# published. Uses nuget.org Trusted Publishing, so no long-lived API key is stored in the repository.
+# See "Releasing" in README.md for the one-time setup.
+
+on:
+  release:
+    types:
+    - published
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write  # Trusted Publishing exchanges the GitHub OIDC token for a temporary NuGet API key
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup dotnet 8.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+    - name: Check that the release tag matches the package versions
+      run: |
+        tag_version="${GITHUB_REF_NAME#v}"
+        status=0
+        for project in RobotRaconteur.Sharp/RobotRaconteur.Sharp.csproj RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj; do
+          version=$(dotnet msbuild "$project" -getProperty:Version)
+          if [ "$version" != "$tag_version" ]; then
+            echo "::error file=$project::Version $version does not match release tag $GITHUB_REF_NAME"
+            status=1
+          fi
+        done
+        node_version=$(sed -n 's/.*public const string Version = "\(.*\)";.*/\1/p' RobotRaconteur.Sharp/RobotRaconteur.cs)
+        if [ "$node_version" != "$tag_version" ]; then
+          echo "::error file=RobotRaconteur.Sharp/RobotRaconteur.cs::RobotRaconteurNode.Version $node_version does not match release tag $GITHUB_REF_NAME"
+          status=1
+        fi
+        exit $status
+    - name: Run tests
+      run: dotnet run --project test/RobotRaconteur.Sharp.Test/RobotRaconteur.Sharp.Test.csproj --configuration Release
+    - name: Pack
+      run: |
+        dotnet pack RobotRaconteur.Sharp/RobotRaconteur.Sharp.csproj --configuration Release --output packages
+        dotnet pack RobotRaconteur.Sharp.Gen/RobotRaconteur.Sharp.Gen.csproj --configuration Release --output packages
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: packages/*.nupkg
+    - name: NuGet login
+      id: login
+      uses: NuGet/login@v1
+      with:
+        user: ${{ secrets.NUGET_USER }}
+    - name: Push packages to nuget.org
+      env:
+        NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+      # --skip-duplicate lets a failed run be re-run after some packages were already pushed
+      run: dotnet nuget push "packages/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
