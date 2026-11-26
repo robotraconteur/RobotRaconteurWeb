@@ -6,6 +6,8 @@ name: Publish NuGet packages
 # To release, set the version in both .csproj files and RobotRaconteurNode.Version, then publish a GitHub
 # release tagged v<version>. The workflow fails before pushing if the tag does not match all three.
 #
+# The published packages are also attached to the release.
+#
 # One-time setup:
 # - On nuget.org, add a Trusted Publishing policy: owner robotraconteur, repository RobotRaconteur.Sharp,
 #   workflow file nuget-publish.yml, environment nuget
@@ -67,3 +69,22 @@ jobs:
         NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
       # --skip-duplicate lets a failed run be re-run after some packages were already pushed
       run: dotnet nuget push "packages/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+  release-assets:
+    # Attach the published packages to the GitHub release. A separate job, so only this job gets write access
+    # to the repository contents.
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download packages
+      uses: actions/download-artifact@v8
+      with:
+        name: nuget-packages
+        path: packages
+    - name: Upload packages to the release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      # --clobber replaces files already attached, so a re-run does not fail
+      run: gh release upload "$GITHUB_REF_NAME" packages/*.nupkg --repo "$GITHUB_REPOSITORY" --clobber
